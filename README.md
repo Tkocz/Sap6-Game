@@ -7,8 +7,8 @@
 ### Prerequisites
 
 * [GNU Make](https://www.gnu.org/software/make/) (Linux/macOS) — *A tool which controls the generation of executables and other non-source files of a program from the program's source files.*
-* [Mono](http://www.mono-project.com/) — *Mono is a software platform designed to allow developers to easily create cross platform applications part of the .NET Foundation.*
-* [MonoGame](http://www.monogame.net/) — *MonoGame is an Open Source implementation of the [Microsoft XNA 4 Framework](https://en.wikipedia.org/wiki/Microsoft_XNA).*
+* [Mono](http://www.mono-project.com/) — *A software platform designed to allow developers to easily create cross platform applications part of the .NET Foundation.*
+* [MonoGame](http://www.monogame.net/) — *An Open Source implementation of the [Microsoft XNA 4 Framework](https://en.wikipedia.org/wiki/Microsoft_XNA).*
 
 ### Linux/macOS
 
@@ -25,3 +25,12 @@
 ### Windows
 
 n/a
+
+## Development team
+
+* **Philip Arvidsson** - *n/a* - [philiparvidsson](https://github.com/philiparvidsson)
+* **Martin Bergqvist** - *n/a* - [Tkocz](https://github.com/Tkocz)
+* **Jim Glansk** - *n/a* - [s141587](https://github.com/s141587)
+* **Christoffer Olsson** - *n/a* - [crippa9](https://github.com/crippa9)
+* **Tobias Öhrström** - *n/a* - [tobohr](https://github.com/tobohr)
+* **Tobias Ånhed** - *n/a* - [tobiasanhed](https://github.com/tobiasanhed)
