@@ -1,6 +1,6 @@
 # Sap6-Game
 
-*More info at [Sap6—Agenda](https://paper.dropbox.com/doc/Sap6Agenda-IVHtFon27xPOxeDWtnWZs).*
+*More info at [Sap6—Agenda](https://paper.dropbox.com/doc/Sap6Agenda-IVHtFon27xPOxeDWtnWZs) (only for devs).*
 
 ## Building the game from source
 
