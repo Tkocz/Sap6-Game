@@ -10,19 +10,7 @@
 * [Mono](http://www.mono-project.com/) — *Mono is a software platform designed to allow developers to easily create cross platform applications part of the .NET Foundation.*
 * [MonoGame](http://www.monogame.net/) — *MonoGame is an Open Source implementation of the [Microsoft XNA 4 Framework](https://en.wikipedia.org/wiki/Microsoft_XNA).*
 
-### Linux
-
-1. Clone this repository:  
-   `git clone https://github.com/philiparvidsson/Sap6-Game`
-2. Compile the game:  
-   ```bash
-   cd Sap6-Game
-   make
-   ```
-3. You should now be able to run it:
-   `make run`
-
-### macOS
+### Linux/macOS
 
 1. Clone this repository:  
    `git clone https://github.com/philiparvidsson/Sap6-Game`
