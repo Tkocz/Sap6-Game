@@ -19,7 +19,7 @@
    cd Sap6-Game
    make
    ```
-3. You should now be able to run it:
+3. You should now be able to run it:  
    `make run`
    
 ### Windows
