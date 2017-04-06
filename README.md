@@ -1,5 +1,8 @@
 # Sap6-Game
 
+![](https://img.shields.io/travis/philiparvidsson/Sap6-Game.svg)
+![](https://img.shields.io/github/license/philiparvidsson/Sap6-Game.svg)
+
 *More info at [Sap6—Agenda](https://paper.dropbox.com/doc/Sap6Agenda-IVHtFon27xPOxeDWtnWZs) (only for devs).*
 
 ## Building the game from source
