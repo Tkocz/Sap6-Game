@@ -2,6 +2,7 @@
 
 [![](https://img.shields.io/travis/philiparvidsson/Sap6-Game.svg)](https://travis-ci.org/philiparvidsson/Sap6-Game)
 [![](https://img.shields.io/github/license/philiparvidsson/Sap6-Game.svg)](https://tldrlegal.com/license/mit-license)
+[![](https://img.shields.io/waffle/label/philiparvidsson/Sap6-Game/in%20progress.svg)](https://waffle.io/philiparvidsson/Sap6-Game)]
 
 *More info at [Sap6—Agenda](https://paper.dropbox.com/doc/Sap6Agenda-IVHtFon27xPOxeDWtnWZs) (only for devs).*
 
