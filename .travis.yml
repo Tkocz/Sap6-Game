@@ -3,6 +3,7 @@ before_install:
   - wget http://www.monogame.net/releases/v3.6/monogame-sdk.run
   - chmod +x monogame-sdk.run
 install:
-  - sudo ./monogame-sdk.run
+  - sudo apt-get install -y gtk-sharp3
+  - yes | sudo ./monogame-sdk.run
 script:
   - make all
