@@ -1,5 +1,4 @@
 # Sap6-Game
-
 [![](https://img.shields.io/github/license/philiparvidsson/Sap6-Game.svg)](https://tldrlegal.com/license/mit-license)
 [![](https://img.shields.io/travis/philiparvidsson/Sap6-Game.svg)](https://travis-ci.org/philiparvidsson/Sap6-Game)
 [![](https://img.shields.io/waffle/label/philiparvidsson/Sap6-Game/in%20progress.svg)](https://waffle.io/philiparvidsson/Sap6-Game)
@@ -9,13 +8,12 @@
 ## Building the game from source
 
 ### Prerequisites
-
 * [GNU Make](https://www.gnu.org/software/make/) (Linux/macOS) — *A tool which controls the generation of executables and other non-source files of a program from the program's source files.*
 * [Mono](http://www.mono-project.com/) — *A software platform designed to allow developers to easily create cross platform applications part of the .NET Foundation.*
 * [MonoGame](http://www.monogame.net/) — *An Open Source implementation of the [Microsoft XNA 4 Framework](https://en.wikipedia.org/wiki/Microsoft_XNA).*
+* [Visual Studio](https://www.visualstudio.com/) (Windows) — *An integrated development environment (IDE) from Microsoft.*
 
 ### Linux/macOS
-
 1. Clone this repository:  
    `git clone https://github.com/philiparvidsson/Sap6-Game`
 2. Compile the game:  
@@ -27,11 +25,13 @@
    `make run`
    
 ### Windows
-
-n/a
+1. Clone this repository:  
+   `git clone https://github.com/philiparvidsson/Sap6-Game`
+2. Browse to the directory using File Explorer.
+3. Double click the file `Sap6-Game.sln` to load the solution in Visual Studio.
+4. Hit the F5 key to build and run the game.
 
 ## Development team
-
 * **Philip Arvidsson** - *n/a* - [philiparvidsson](https://github.com/philiparvidsson)
 * **Martin Bergqvist** - *n/a* - [Tkocz](https://github.com/Tkocz)
 * **Jim Glansk** - *n/a* - [s141587](https://github.com/s141587)
