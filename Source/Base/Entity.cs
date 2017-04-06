@@ -6,6 +6,7 @@ namespace Sap6.Base {
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 /*--------------------------------------
  * CLASSES
@@ -20,6 +21,17 @@ public sealed class Entity {
     /// <summary>The attached components.</summary>
     private readonly Dictionary<Type, Component> m_Components =
         new Dictionary<Type, Component>();
+
+    /// <summary>The ID that will be assigned to the next entity
+    ///          instance.</summary>
+    private static int s_NextID = 1;
+
+    /*--------------------------------------
+     * PUBLIC PROPERTIES
+     *------------------------------------*/
+
+    /// <summary>Gets the unique entity ID.</summary>
+    public int ID { get; } = Interlocked.Increment(ref s_NextID);
 
     /*--------------------------------------
      * PUBLIC METHODS
