@@ -43,6 +43,20 @@ public sealed class EcsEntity {
         m_Components.Add(component.GetType(), component);
     }
 
+    /// <summary>Retrieves the entity component of the specified type.</summary>
+    /// <param name="type">The type of the component to retrieve.</param>
+    /// <returns>The attached entity component of the specified type.</returns>
+    public EcsComponent GetComponent(Type type) {
+        return m_Components[type];
+    }
+
+    /// <summary>Retrieves the entity component of the specified type.</summary>
+    /// <typeparam name="T">The type of the component to retrieve.</typeparam>
+    /// <returns>The attached entity component of the specified type.</returns>
+    public T GetComponent<T>() where T: EcsComponent {
+        return (T)GetComponent(typeof (T));
+    }
+
     /// <summary>Checks whether the entity has a component of the specified
     ///          type.</summary>
     /// <param name="type">The type of the component to look for.</param>
