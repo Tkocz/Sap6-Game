@@ -1,2 +1,8 @@
 language: csharp
-script: make
+before_install:
+  - wget http://www.monogame.net/releases/v3.6/monogame-sdk.run
+  - chmod +x monogame-sdk.run
+install:
+  - ./monogame-sdk.run
+script:
+  - make
