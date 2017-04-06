@@ -13,7 +13,7 @@ using System.Threading;
  *------------------------------------*/
 
 /// <summary>Represents an entity.</summary>
-public sealed class Entity {
+public sealed class EcsEntity {
     /*--------------------------------------
      * PRIVATE FIELDS
      *------------------------------------*/
