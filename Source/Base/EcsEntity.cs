@@ -19,8 +19,8 @@ public sealed class EcsEntity {
      *------------------------------------*/
 
     /// <summary>The attached components.</summary>
-    private readonly Dictionary<Type, Component> m_Components =
-        new Dictionary<Type, Component>();
+    private readonly Dictionary<Type, EcsComponent> m_Components =
+        new Dictionary<Type, EcsComponent>();
 
     /// <summary>The ID that will be assigned to the next entity
     ///          instance.</summary>
@@ -39,7 +39,7 @@ public sealed class EcsEntity {
 
     /// <summary>Adds a component to the entity.</summary>
     /// <param name="component">The component to add to the entity.</param>
-    public void AddComponent(Component component) {
+    public void AddComponent(EcsComponent component) {
         m_Components.Add(component.GetType(), component);
     }
 
@@ -57,7 +57,7 @@ public sealed class EcsEntity {
     /// <typeparam name="T">The type of the component to look for.</typeparam>
     /// <returns><see langword="true"/> if the entity has a component of the
     ///          specified type.</returns>
-    public bool HasComponent<T>() where T: Component {
+    public bool HasComponent<T>() where T: EcsComponent {
         return HasComponent(typeof (T));
     }
 
@@ -75,7 +75,7 @@ public sealed class EcsEntity {
     ///                         entity.</typeparam>
     /// <returns><see langword="true"/> if a component of the specified type was
     ///          removed from the entity.</returns>
-    public bool RemoveComponent<T>() where T: Component {
+    public bool RemoveComponent<T>() where T: EcsComponent {
         return RemoveComponent(typeof (T));
     }
 }
