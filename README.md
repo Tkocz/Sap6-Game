@@ -30,7 +30,7 @@
    
 ### Windows
 1. Clone this repository:  
-   ```bash
+   ```bash
    git clone https://github.com/philiparvidsson/Sap6-Game
    ```
 2. Browse to the directory using File Explorer.
