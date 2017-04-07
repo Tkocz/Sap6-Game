@@ -18,6 +18,7 @@ public static class Program {
 
     /// <summary>Program entry point.</summary>
     /// <param name="args">The command line arguments.</param>
+    [STAThread]
     private static void Main(string[] args) {
         Console.WriteLine("Hello. :-)");
     }
