@@ -8,7 +8,6 @@
 ## Building the game from source
 
 ### Prerequisites
-* [GNU Make](https://www.gnu.org/software/make/) (Linux/macOS) — *A tool which controls the generation of executables and other non-source files of a program from the program's source files.*
 * [Mono](http://www.mono-project.com/) (Linux/macOS) — *A software platform designed to allow developers to easily create cross platform applications part of the .NET Foundation.*
 * [MonoGame](http://www.monogame.net/) — *An Open Source implementation of the [Microsoft XNA 4 Framework](https://en.wikipedia.org/wiki/Microsoft_XNA).*
 * [Visual Studio](https://www.visualstudio.com/) (Windows) — *An integrated development environment (IDE) from Microsoft.*
