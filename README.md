@@ -15,18 +15,24 @@
 
 ### Linux/macOS
 1. Clone this repository:  
-   `git clone https://github.com/philiparvidsson/Sap6-Game`
+   ```bash
+   git clone https://github.com/philiparvidsson/Sap6-Game
+   ```
 2. Compile the game:  
    ```bash
    cd Sap6-Game
    make
    ```
 3. You should now be able to run it:  
-   `make run`
+   ```bash
+   make run
+   ```
    
 ### Windows
 1. Clone this repository:  
-   `git clone https://github.com/philiparvidsson/Sap6-Game`
+   ```bash
+   git clone https://github.com/philiparvidsson/Sap6-Game
+   ```
 2. Browse to the directory using File Explorer.
 3. Double-click the file named `Sap6-Game.sln` to load the solution in Visual Studio.
 4. Hit the F5 key to build and run the game.
