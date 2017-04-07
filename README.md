@@ -15,7 +15,7 @@
 
 ### Linux/macOS
 1. Clone this repository:  
-   ```bash
+   ```bash
    git clone https://github.com/philiparvidsson/Sap6-Game
    ```
 2. Compile the game:  
@@ -24,7 +24,7 @@
    make
    ```
 3. You should now be able to run it:  
-   ```bash
+   ```bash
    make run
    ```
    
