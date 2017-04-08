@@ -57,8 +57,8 @@ public abstract class Scene {
     private readonly HashSet<EcsEntity> m_Entities = new HashSet<EcsEntity>();
 
     /// <summary>The pending entities waiting to be added or removed.</summary>
-    private readonly List<PendingEntity> m_EntitiesPending =
-        new List<PendingEntity>();
+    private readonly Queue<PendingEntity> m_EntitiesPending =
+        new Queue<PendingEntity>();
 
     /// <summary>Used as a cache for entity retrieval.</summary>
     private readonly Dictionary<Type, HashSet<EcsEntity>> m_EntityComponents =
@@ -77,10 +77,10 @@ public abstract class Scene {
         Trace.Assert(AtomicUtil.CAS(ref entity.m_Scene, entity.m_Scene, this));
 
         lock (m_EntitiesPending) {
-            m_EntitiesPending.Add(new PendingEntity {
-                                      Entity    = entity,
-                                      Operation = PendingEntity.ADD
-                                  });
+            m_EntitiesPending.Enqueue(new PendingEntity {
+                                          Entity    = entity,
+                                          Operation = PendingEntity.ADD
+                                      });
         }
     }
 
@@ -88,6 +88,14 @@ public abstract class Scene {
     /// <param name="system">The system to add.</param>
     public void AddSystem(EcsSystem system) {
         m_Systems.Add(system);
+    }
+
+    /// <summary>Add the specified systems to the scene.</summary>
+    /// <param name="systems">The systems to add.</param>
+    public void AddSystems(params EcsSystem[] systems) {
+        foreach (var system in systems) {
+            AddSystem(system);
+        }
     }
 
     /// <summary>Performs cleanup logic for the scene.</summary>
@@ -151,19 +159,13 @@ public abstract class Scene {
         }
 
         lock (m_EntitiesPending) {
-            m_EntitiesPending.Add(new PendingEntity {
-                                      Entity    = entity,
-                                      Operation = PendingEntity.REMOVE
-                                  });
+            m_EntitiesPending.Enqueue(new PendingEntity {
+                                          Entity    = entity,
+                                          Operation = PendingEntity.REMOVE
+                                      });
         }
 
         return true;
-    }
-
-    /// <summary>Removes the specified system from the scene.</summary>
-    /// <param name="system">The system to remove.</param>
-    public void RemoveSysten(EcsSystem system) {
-        m_Systems.Remove(system);
     }
 
     /// <summary>Updates the scene by invoking the
@@ -189,10 +191,10 @@ public abstract class Scene {
     ///                      for.</param>
     internal void NotifyComponentsChanged(EcsEntity entity) {
         lock (m_EntitiesPending) {
-            m_EntitiesPending.Add(new PendingEntity {
-                                      Entity    = entity,
-                                      Operation = PendingEntity.UPDATE
-                                  });
+            m_EntitiesPending.Enqueue(new PendingEntity {
+                                          Entity    = entity,
+                                          Operation = PendingEntity.UPDATE
+                                      });
         }
     }
 
@@ -218,6 +220,10 @@ public abstract class Scene {
         // NOTE: We don't have to lock here because we never touch
         //       m_Entitiespending between updates, only during.
         foreach (var pending in m_EntitiesPending) {
+            Debug.Assert((pending.Operation == PendingEntity.ADD)
+                      || (pending.Operation == PendingEntity.REMOVE)
+                      || (pending.Operation == PendingEntity.UPDATE));
+
             if (pending.Operation == PendingEntity.ADD) {
                 RemoveEntityInternal(pending.Entity);
             }
