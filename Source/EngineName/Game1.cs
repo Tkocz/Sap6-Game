@@ -63,6 +63,8 @@ public class Game1: Game {
         Trace.Assert(AtomicUtil.CAS(ref s_Inst, null, this));
         Trace.Assert(scene != null);
 
+        m_Scenes.Push(scene);
+
         Graphics = new GraphicsDeviceManager(this);
     }
 
