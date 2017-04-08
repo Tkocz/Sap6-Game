@@ -23,7 +23,7 @@ public abstract class Scene {
      *------------------------------------*/
 
     /// <summary>Represents a pending entity add- or remove operation.</summary>
-    private class PendingEntity {
+    private struct PendingEntity {
         /*--------------------------------------
          * PUBLIC CONSTANTS
          *------------------------------------*/
@@ -46,7 +46,7 @@ public abstract class Scene {
 
         /// <summary>Indicates whether the entity should be removed instead of
         ///          added.</summary>
-        public int Operation = ADD;
+        public int Operation;
     }
 
     /*--------------------------------------
