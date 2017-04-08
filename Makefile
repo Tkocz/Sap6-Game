@@ -72,7 +72,7 @@ run:
 	mono $(GAME_TARGET)
 
 #-------------------
-# MONO
+# ASSEMBLIES
 #-------------------
 
 # Always recompile. Makes it easier to work on the project.
@@ -100,7 +100,7 @@ engine: $(COMMON_BINDIR)/$(ENGINE_TARGET)
 game: $(COMMON_BINDIR)/$(GAME_TARGET)
 
 #-------------------
-# MONOGAME
+# GAME CONTENT
 #-------------------
 
 # Find all content to build with MonoGame Content Builder.
@@ -118,7 +118,7 @@ $(GAME_CONTENTDIR)/Textures/*.png:
 pre-content:
 	@echo /compress                        > $(CONTENTFILE)
 	@echo /intermediateDir:$(GAME_OBJDIR) >> $(CONTENTFILE)
-	@echo /outputDir:$(COMMON_BINDIR)            >> $(CONTENTFILE)
+	@echo /outputDir:$(COMMON_BINDIR)     >> $(CONTENTFILE)
 	@echo /quiet                          >> $(CONTENTFILE)
 
 content: pre-content $(CONTENT)
