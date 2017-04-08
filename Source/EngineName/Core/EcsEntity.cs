@@ -49,6 +49,11 @@ public sealed class EcsEntity {
     /// <param name="component">The component to add to the entity.</param>
     public void AddComponent(EcsComponent component) {
         m_Components.Add(component.GetType(), component);
+
+        var scene = m_Scene;
+        if (scene != null) {
+            m_Scene.NotifyComponentsChanged(this);
+        }
     }
 
     /// <summary>Retrieves the entity component of the specified type.</summary>
@@ -89,7 +94,16 @@ public sealed class EcsEntity {
     /// <returns><see langword="true"/> if a component of the specified type was
     ///          removed from the entity.</returns>
     public bool RemoveComponent(Type type) {
-        return m_Components.Remove(type);
+        bool removed = m_Components.Remove(type);
+
+        if (removed) {
+            var scene = m_Scene;
+            if (scene != null) {
+                m_Scene.NotifyComponentsChanged(this);
+            }
+        }
+
+        return removed;
     }
 
     /// <summary>Removes the component of the specified type.</summary>
