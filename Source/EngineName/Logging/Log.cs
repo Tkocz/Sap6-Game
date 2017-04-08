@@ -63,8 +63,8 @@ public class Log {
     /// <summary>Writes a debug message to the log.</summary>
     /// <param name="message">The message to write to the log.</param>
     /// <param name="args">The message arguments.</param>
-    [Conditional("DEBUG")]
-    public void Debug(string message, params object[] args) {
+    /// <returns>The log instance.</returns>
+    public Log Debug(string message, params object[] args) {
         var oldColor = Console.ForegroundColor;
         try {
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -73,12 +73,15 @@ public class Log {
         finally {
             Console.ForegroundColor = oldColor;
         }
+
+        return this;
     }
 
     /// <summary>Writes an error message to the log.</summary>
     /// <param name="message">The message to write to the log.</param>
     /// <param name="args">The message arguments.</param>
-    public void Err(string message, params object[] args) {
+    /// <returns>The log instance.</returns>
+    public Log Err(string message, params object[] args) {
         var oldColor = Console.ForegroundColor;
         try {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -87,12 +90,15 @@ public class Log {
         finally {
             Console.ForegroundColor = oldColor;
         }
+
+        return this;
     }
 
     /// <summary>Writes an informational message to the log.</summary>
     /// <param name="message">The message to write to the log.</param>
     /// <param name="args">The message arguments.</param>
-    public void Info(string message, params object[] args) {
+    /// <returns>The log instance.</returns>
+    public Log Info(string message, params object[] args) {
         var oldColor = Console.ForegroundColor;
         try {
             Console.ForegroundColor = ConsoleColor.White;
@@ -101,6 +107,8 @@ public class Log {
         finally {
             Console.ForegroundColor = oldColor;
         }
+
+        return this;
     }
 
     /// <summary>Enables file logging.</summary>
@@ -117,7 +125,8 @@ public class Log {
     /// <summary>Writes a warning message to the log.</summary>
     /// <param name="message">The message to write to the log.</param>
     /// <param name="args">The message arguments.</param>
-    public void Warn(string message, params object[] args) {
+    /// <returns>The log instance.</returns>
+    public Log Warn(string message, params object[] args) {
         var oldColor = Console.ForegroundColor;
         try {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -126,6 +135,8 @@ public class Log {
         finally {
             Console.ForegroundColor = oldColor;
         }
+
+        return this;
     }
 
     /*--------------------------------------

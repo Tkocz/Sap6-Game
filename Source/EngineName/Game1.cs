@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 using Core;
 using Logging;
@@ -66,6 +67,9 @@ public class Game1: Game {
         m_Scenes.Push(scene);
 
         Graphics = new GraphicsDeviceManager(this);
+        Graphics.PreparingDeviceSettings += (sender, e) => {
+            e.GraphicsDeviceInformation.GraphicsProfile = GraphicsProfile.HiDef;
+        };
     }
 
     /*--------------------------------------
@@ -110,6 +114,16 @@ public class Game1: Game {
     protected override void Initialize() {
         // There is always an initial scene, so just init it here.
         Scene.Init();
+
+        var profile = Graphics.GraphicsDevice.GraphicsProfile;
+        var width   = Graphics.PreferredBackBufferWidth;
+        var height  = Graphics.PreferredBackBufferHeight;
+        var vsync   = Graphics.SynchronizeWithVerticalRetrace;
+
+        Log.Get().Info("Graphics device initialized.")
+                 .Info("  Profile: {0}", profile)
+                 .Info("  Resolution: {0}x{1}", width, height)
+                 .Info("  VSync: {0}", vsync);
     }
 
     /// <summary>Updates the current scene.</summary>
