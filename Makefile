@@ -58,7 +58,7 @@ MONOGAME_PATH := $(MONOGAME_PATH)/Assemblies/DesktopGL
 .PHONY: all clean libs run
 
 # Default target.
-all: compile_game content libs
+all: game content libs
 
 clean:
 	rm -rf $(GAME_CONTENTFILE) $(BINDIR) $(GAME_OBJDIR)
@@ -67,7 +67,7 @@ libs:
 	mkdir -p $(BINDIR)
 	-cp -nr $(MONOGAME_PATH)/* $(BINDIR)
 
-run: all
+run:
 	cd $(BINDIR); \
 	mono $(GAME_TARGET)
 
@@ -76,8 +76,8 @@ run: all
 #-------------------
 
 # Always recompile. Makes it easier to work on the project.
-.PHONY: $(BINDIR)/$(ENGINE_TARGET) compile_engine
-.PHONY: $(BINDIR)/$(GAME_TARGET) compile_game
+.PHONY: $(BINDIR)/$(ENGINE_TARGET) engine
+.PHONY: $(BINDIR)/$(GAME_TARGET) game
 
 $(BINDIR)/$(ENGINE_TARGET):
 	mkdir -p $(BINDIR)
@@ -87,7 +87,7 @@ $(BINDIR)/$(ENGINE_TARGET):
 	            -out:$(BINDIR)/$(ENGINE_TARGET)        \
 	            -recurse:$(ENGINE_SRCDIR)/*.cs
 
-$(BINDIR)/$(GAME_TARGET): compile_engine
+$(BINDIR)/$(GAME_TARGET): engine
 	mkdir -p $(BINDIR)
 	$(GAME_COMPILER) $(GAME_FLAGS)                        \
 	            $(addprefix -lib:, $(GAME_LIBPATHS)) \
@@ -95,32 +95,32 @@ $(BINDIR)/$(GAME_TARGET): compile_engine
 	            -out:$(BINDIR)/$(GAME_TARGET)        \
 	            -recurse:$(GAME_SRCDIR)/*.cs
 
-compile_engine: $(BINDIR)/$(ENGINE_TARGET)
+engine: $(BINDIR)/$(ENGINE_TARGET)
 
 
-compile_game: $(BINDIR)/$(GAME_TARGET)
+game: $(BINDIR)/$(GAME_TARGET)
 
 #-------------------
 # MONOGAME
 #-------------------
 
 # Find all content to build with MonoGame Content Builder.
-CONTENT := $(shell find $(CONTENTDIR) -type f)
+CONTENT := $(shell find $(GAME_CONTENTDIR) -type f)
 
 # Kind of a hack to build content easily.
-.PHONY: $(CONTENTDIR)/*/* pre-content content
+.PHONY: $(GAME_CONTENTDIR)/*/* pre-content content
 
-$(CONTENTDIR)/Models/*.fbx:
+$(GAME_CONTENTDIR)/Models/*.fbx:
 	@echo /build:$@ >> $(CONTENTFILE)
 
-$(CONTENTDIR)/Textures/*.png:
+$(GAME_CONTENTDIR)/Textures/*.png:
 	@echo /build:$@ >> $(CONTENTFILE)
 
 pre-content:
-	@echo /compress                   > $(CONTENTFILE)
-	@echo /intermediateDir:$(OBJDIR) >> $(CONTENTFILE)
-	@echo /outputDir:$(BINDIR)       >> $(CONTENTFILE)
-	@echo /quiet                     >> $(CONTENTFILE)
+	@echo /compress                        > $(CONTENTFILE)
+	@echo /intermediateDir:$(GAME_OBJDIR) >> $(CONTENTFILE)
+	@echo /outputDir:$(BINDIR)            >> $(CONTENTFILE)
+	@echo /quiet                          >> $(CONTENTFILE)
 
 content: pre-content $(CONTENT)
 	mkdir -p $(BINDIR)
