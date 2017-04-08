@@ -8,27 +8,32 @@
 ## Building the game from source
 
 ### Prerequisites
-* [GNU Make](https://www.gnu.org/software/make/) (Linux/macOS) — *A tool which controls the generation of executables and other non-source files of a program from the program's source files.*
 * [Mono](http://www.mono-project.com/) (Linux/macOS) — *A software platform designed to allow developers to easily create cross platform applications part of the .NET Foundation.*
 * [MonoGame](http://www.monogame.net/) — *An Open Source implementation of the [Microsoft XNA 4 Framework](https://en.wikipedia.org/wiki/Microsoft_XNA).*
 * [Visual Studio](https://www.visualstudio.com/) (Windows) — *An integrated development environment (IDE) from Microsoft.*
 
 ### Linux/macOS
 1. Clone this repository:  
-   `git clone https://github.com/philiparvidsson/Sap6-Game`
+   ```bash
+   git clone https://github.com/philiparvidsson/Sap6-Game
+   ```
 2. Compile the game:  
    ```bash
    cd Sap6-Game
    make
    ```
 3. You should now be able to run it:  
-   `make run`
+   ```bash
+   make run
+   ```
    
 ### Windows
 1. Clone this repository:  
-   `git clone https://github.com/philiparvidsson/Sap6-Game`
+   ```bash
+   git clone https://github.com/philiparvidsson/Sap6-Game
+   ```
 2. Browse to the directory using File Explorer.
-3. Double-click the file named `Sap6-Game.sln` to load the solution in Visual Studio.
+3. Double-click the file named Sap6-Game.sln to load the solution in Visual Studio.
 4. Hit the F5 key to build and run the game.
 
 ## Development team
