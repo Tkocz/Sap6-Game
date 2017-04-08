@@ -4,6 +4,7 @@ namespace Sap6.Base {
  * USINGS
  *------------------------------------*/
 
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Microsoft.Xna.Framework;
@@ -21,6 +22,8 @@ public class Game1: Game {
 
     private static Game1 s_Inst;
 
+    private readonly Stack<Scene> m_Scenes = new Stack<Scene>();
+
     /*--------------------------------------
      * PUBLIC PROPERTIES
      *------------------------------------*/
@@ -31,7 +34,16 @@ public class Game1: Game {
         get { return s_Inst; }
     }
 
-    public Scene Scene { get; private set; }
+    public Scene Scene {
+        get {
+            // TODO: Possible race condition here, but probably unimportant.
+            if (m_Scenes.Count == 0) {
+                return null;
+            }
+
+            return m_Scenes.Peek();
+        }
+    }
 
     /*--------------------------------------
      * CONSTRUCTORS
@@ -48,18 +60,17 @@ public class Game1: Game {
      *------------------------------------*/
 
     public void EnterScene(Scene scene) {
-        scene.Parent = Scene;
-        Scene = scene;
         scene.Init();
+        m_Scenes.Push(scene);
     }
 
     public void LeaveScene() {
-        var scene = Scene;
-
-        if (scene != null) {
-            scene.Cleanup();
-            Scene = scene.Parent;
+        if (m_Scenes.Count == 0) {
+            return;
         }
+
+        var scene = m_Scenes.Pop();
+        scene.Cleanup();
     }
 
     /*--------------------------------------
@@ -67,7 +78,7 @@ public class Game1: Game {
      *------------------------------------*/
 
     protected override void Draw(GameTime gameTime) {
-        var scene = Scene;
+        var scene = m_Scenes.Peek();
         if (scene != null) {
             var t  = (float)gameTime.TotalGameTime.TotalSeconds;
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -78,7 +89,7 @@ public class Game1: Game {
     }
 
     protected override void Update(GameTime gameTime) {
-        var scene = Scene;
+        var scene = m_Scenes.Peek();
         if (scene != null) {
             var t  = (float)gameTime.TotalGameTime.TotalSeconds;
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
