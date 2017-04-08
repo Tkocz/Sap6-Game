@@ -16,25 +16,32 @@ using Utils;
  * CLASSES
  *------------------------------------*/
 
+// TODO: Rename this to something sane.
+/// <summary>Represents the main class for game implementations.</summary>
 public class Game1: Game {
     /*--------------------------------------
      * NON-PUBLIC FIELDS
      *------------------------------------*/
 
+    /// <summary>The game class singleton instance.</summary>
     private static Game1 s_Inst;
 
+    /// <summary>The game scene stack.</summary>
     private readonly Stack<Scene> m_Scenes = new Stack<Scene>();
 
     /*--------------------------------------
      * PUBLIC PROPERTIES
      *------------------------------------*/
 
+    /// <summary>Gets the graphics device manager.</summary>
     public GraphicsDeviceManager Graphics { get; }
 
+    /// <summary>Gets the game instance.</summary>
     public static Game1 Inst {
         get { return s_Inst; }
     }
 
+    /// <summary>Gets the currently displayed game scene.</summary>
     public Scene Scene {
         get {
             // TODO: Possible race condition here, but probably unimportant.
@@ -50,8 +57,11 @@ public class Game1: Game {
      * CONSTRUCTORS
      *------------------------------------*/
 
+    /// <summary>Initializes the game singleton instance.</summary>
+    /// <param name="scene">The scene to display initially.</param>
     public Game1(Scene scene) {
         Trace.Assert(AtomicUtil.CAS(ref s_Inst, null, this));
+        Trace.Assert(scene != null);
 
         Graphics = new GraphicsDeviceManager(this);
     }
@@ -60,11 +70,14 @@ public class Game1: Game {
      * PUBLIC METHODS
      *------------------------------------*/
 
+    /// <summary>Enters the specified scene.</summary>
+    /// <param name="scene">The scene to display.</param
     public void EnterScene(Scene scene) {
         scene.Init();
         m_Scenes.Push(scene);
     }
 
+    /// <summary>Leaves the currently displayed scene..</summary>
     public void LeaveScene() {
         if (m_Scenes.Count == 0) {
             return;
@@ -78,6 +91,8 @@ public class Game1: Game {
      * NON-PUBLIC METHODS
      *------------------------------------*/
 
+    /// <summary>Draws the current scene.</summary>
+    /// <param name="gameTime">The game time.</param>
     protected override void Draw(GameTime gameTime) {
         var scene = Scene;
         if (scene != null) {
@@ -89,6 +104,14 @@ public class Game1: Game {
         base.Draw(gameTime);
     }
 
+    /// <summary>Initializes the game.</summary>
+    protected override void Initialize() {
+        // There is always an initial scene, so just init it here.
+        Scene.Init();
+    }
+
+    /// <summary>Updates the current scene.</summary>
+    /// <param name="gameTime">The game time.</param>
     protected override void Update(GameTime gameTime) {
         var scene = Scene;
         if (scene != null) {
