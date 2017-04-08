@@ -23,11 +23,11 @@ public class Game1: Game {
      * NON-PUBLIC FIELDS
      *------------------------------------*/
 
-    /// <summary>The game class singleton instance.</summary>
-    private static Game1 s_Inst;
-
     /// <summary>The game scene stack.</summary>
     private readonly Stack<Scene> m_Scenes = new Stack<Scene>();
+
+    /// <summary>The game class singleton instance.</summary>
+    private static Game1 s_Inst;
 
     /*--------------------------------------
      * PUBLIC PROPERTIES
@@ -61,7 +61,6 @@ public class Game1: Game {
     /// <param name="scene">The scene to display initially.</param>
     public Game1(Scene scene) {
         Trace.Assert(AtomicUtil.CAS(ref s_Inst, null, this));
-        Trace.Assert(scene != null);
 
         m_Scenes.Push(scene);
 

@@ -18,12 +18,12 @@ public sealed class EcsEntity {
      * NON-PUBLIC FIELDS
      *------------------------------------*/
 
+    /// <summary>The attached components.</summary>
+    internal readonly Dictionary<Type, EcsComponent> m_Components =
+        new Dictionary<Type, EcsComponent>();
+
     /// <summary>The scene that the entity is currently in.</summary>
     internal Scene m_Scene;
-
-    /// <summary>The attached components.</summary>
-    private readonly Dictionary<Type, EcsComponent> m_Components =
-        new Dictionary<Type, EcsComponent>();
 
     /// <summary>The ID that will be assigned to the next entity
     ///          instance.</summary>

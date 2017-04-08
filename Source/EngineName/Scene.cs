@@ -5,6 +5,7 @@ namespace EngineName {
  *------------------------------------*/
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -18,11 +19,33 @@ using Utils;
 /// <summary>Represents a game scene.</summary>
 public abstract class Scene {
     /*--------------------------------------
+     * NESTED TYPES
+     *------------------------------------*/
+
+    /// <summary>Represents a pending entity add- or remove operation.</summary>
+    private class PendingEntity {
+        /// <summary>The entity to add or remove.</summary>
+        public EcsEntity Entity;
+
+        /// <summary>Indicates whether the entity should be removed instead of
+        ///          added.</summary>
+        public bool IsRemove;
+    }
+
+    /*--------------------------------------
      * NON-PUBLIC FIELDS
      *------------------------------------*/
 
     /// <summary>The entities added to the scene.</summary>
-    private readonly List<EcsEntity> m_Entities = new List<EcsEntity>();
+    private readonly HashSet<EcsEntity> m_Entities = new HashSet<EcsEntity>();
+
+    /// <summary>The pending entities waiting to be added or removed.</summary>
+    private readonly List<PendingEntity> m_EntitiesPending =
+        new List<PendingEntity>();
+
+    /// <summary>Used as a cache for entity retrieval.</summary>
+    private readonly Dictionary<Type, List<EcsEntity>> m_EntityComponents =
+        new Dictionary<Type, List<EcsEntity>>();
 
     /// <summary>The systems in use by the scene.</summary>
     private readonly List<EcsSystem> m_Systems = new List<EcsSystem>();
@@ -31,13 +54,13 @@ public abstract class Scene {
      * PUBLIC METHODS
      *------------------------------------*/
 
+    /// <summary>Adds the specified entity to the scene.</summary>
+    /// <param name="entity">The entity to add to the scene.</param>
     public void AddEntity(EcsEntity entity) {
         Trace.Assert(AtomicUtil.CAS(ref entity.m_Scene, entity.m_Scene, this));
 
-        // TODO: Probably use a message to add the entity on the next call to
-        //       Update()...
-        lock (m_Entities) {
-            m_Entities.Add(entity);
+        lock (m_EntitiesPending) {
+            m_EntitiesPending.Add(new PendingEntity { Entity = entity });
         }
     }
 
@@ -67,20 +90,25 @@ public abstract class Scene {
         }
     }
 
+    /// <summary>Retrieves all entities containing a component of the specified
+    ///          type.</summary>
+    /// <param name="type">The component type to look for.</param>
+    /// <returns>All entities containing a component of the specified
+    ///          type.</returns>
     public IEnumerable<EcsEntity> GetEntities(Type type) {
-        // TODO: This is a super bad idea, but it's ok for now. Come up with
-        //       a better implementation lol.
-        var entities = new List<EcsEntity>();
-
-        foreach (var entity in m_Entities) {
-            if (entity.HasComponent(type)) {
-                entities.Add(entity);
-            }
+        List<EcsEntity> entities;
+        if (m_EntityComponents.TryGetValue(type, out entities)) {
+            return entities;
         }
 
-        return entities;
+        return new EcsEntity[0];
     }
 
+    /// <summary>Retrieves all entities containing a component of the specified
+    ///          type.</summary>
+    /// <typeparam name="T">The component type to look for.</typeparam>
+    /// <returns>All entities containing a component of the specified
+    ///          type.</returns>
     public IEnumerable<EcsEntity> GetEntities<T>() where T: EcsComponent {
         return GetEntities(typeof (T));
     }
@@ -92,17 +120,24 @@ public abstract class Scene {
         }
     }
 
+    /// <summary>Removes the specified entity from the scene.</summary>
+    /// <param name="entity">The entity to remove from the scene.</param>
+    /// <returns><see langword="true"/> if the entity existed in the scene and
+    ///          was removed,</returns>
     public bool RemoveEntity(EcsEntity entity) {
         if (AtomicUtil.CAS(ref entity.m_Scene, this, null)) {
             // The entity is someone else's responsibility.
             return false;
         }
 
-        // TODO: Probably use a message to remove the entity on the next call to
-        //       Update()...
-        lock (m_Entities) {
-            return m_Entities.Remove(entity);
+        lock (m_EntitiesPending) {
+            m_EntitiesPending.Add(new PendingEntity {
+                                      Entity   = entity,
+                                      IsRemove = true
+                                  });
         }
+
+        return true;
     }
 
     /// <summary>Removes the specified system from the scene.</summary>
@@ -118,8 +153,55 @@ public abstract class Scene {
     /// <param name="dt">The game time, in seconds, since the last call to this
     //                   method.</param>
     public virtual void Update(float t, float dt) {
+        HandlePendingEntities();
+
         foreach (var system in m_Systems) {
             system.Update(t, dt);
+        }
+    }
+
+    /*--------------------------------------
+     * NON-PUBLIC METHODS
+     *------------------------------------*/
+
+    private void AddEntityInternal(EcsEntity entity) {
+        Debug.Assert(m_Entities.Add(entity));
+
+        foreach (var component in entity.m_Components) {
+            List<EcsEntity> entities;
+            if (!m_EntityComponents.TryGetValue(component.GetType(), out entities)) {
+                entities = new List<EcsEntity>();
+                m_EntityComponents[component.GetType()] = entities;
+            }
+
+            entities.Add(entity);
+        }
+    }
+
+    /// <summary>Adds the specified entity to the scene.</summary>
+    /// <param name="entity">The entity to add to the scene.</param>
+    private void HandlePendingEntities() {
+        // NOTE: We don't have to lock here because we never touch
+        //       m_Entitiespending between updates, only during.
+        foreach (var pending in m_EntitiesPending) {
+            if (pending.IsRemove) {
+                RemoveEntityInternal(pending.Entity);
+            }
+            else {
+                AddEntityInternal(pending.Entity);
+            }
+        }
+
+        m_EntitiesPending.Clear();
+    }
+
+    /// <summary>Removes the specified entity from the scene.</summary>
+    /// <param name="entity">The entity to remove from the scene.</param>
+    private void RemoveEntityInternal(EcsEntity entity) {
+        Debug.Assert(m_Entities.Remove(entity));
+
+        foreach (var component in entity.m_Components) {
+            m_EntityComponents[component.GetType()].Remove(entity);
         }
     }
 }
