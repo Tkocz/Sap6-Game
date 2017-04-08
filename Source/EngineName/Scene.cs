@@ -22,20 +22,21 @@ public abstract class Scene {
      * NESTED TYPES
      *------------------------------------*/
 
-    /// <summary>Represents a pending entity add- or remove operation.</summary>
-    private struct PendingEntity {
+    /// <summary>Represents a pending entity add-, remove- or update
+    ///          operation.</summary>
+    private struct EntityOp {
         /*--------------------------------------
          * PUBLIC CONSTANTS
          *------------------------------------*/
 
         /// <summary>Add entity.</summary>
-        public const int ADD = 1;
+        public const int OP_ADD = 1;
 
         /// <summary>Remove entity.</summary>
-        public const int REMOVE = 2;
+        public const int OP_REMOVE = 2;
 
         /// <summary>Update entity components.</summary>
-        public const int UPDATE = 3;
+        public const int OP_UPDATE = 3;
 
         /*--------------------------------------
          * PUBLIC FIELDS
@@ -44,9 +45,8 @@ public abstract class Scene {
         /// <summary>The entity to add or remove.</summary>
         public EcsEntity Entity;
 
-        /// <summary>Indicates whether the entity should be removed instead of
-        ///          added.</summary>
-        public int Operation;
+        /// <summary>The operation to perform.</summary>
+        public int Op;
     }
 
     /*--------------------------------------
@@ -57,8 +57,8 @@ public abstract class Scene {
     private readonly HashSet<EcsEntity> m_Entities = new HashSet<EcsEntity>();
 
     /// <summary>The pending entities waiting to be added or removed.</summary>
-    private readonly Queue<PendingEntity> m_EntitiesPending =
-        new Queue<PendingEntity>();
+    private readonly Queue<EntityOp> m_EntitiesPending =
+        new Queue<EntityOp>();
 
     /// <summary>Used as a cache for entity retrieval.</summary>
     private readonly Dictionary<Type, HashSet<EcsEntity>> m_EntityComponents =
@@ -77,9 +77,9 @@ public abstract class Scene {
         Trace.Assert(AtomicUtil.CAS(ref entity.m_Scene, entity.m_Scene, this));
 
         lock (m_EntitiesPending) {
-            m_EntitiesPending.Enqueue(new PendingEntity {
-                                          Entity    = entity,
-                                          Operation = PendingEntity.ADD
+            m_EntitiesPending.Enqueue(new EntityOp {
+                                          Entity = entity,
+                                          Op     = EntityOp.OP_ADD
                                       });
         }
     }
@@ -159,9 +159,9 @@ public abstract class Scene {
         }
 
         lock (m_EntitiesPending) {
-            m_EntitiesPending.Enqueue(new PendingEntity {
-                                          Entity    = entity,
-                                          Operation = PendingEntity.REMOVE
+            m_EntitiesPending.Enqueue(new EntityOp {
+                                          Entity = entity,
+                                          Op     = EntityOp.OP_REMOVE
                                       });
         }
 
@@ -191,9 +191,9 @@ public abstract class Scene {
     ///                      for.</param>
     internal void NotifyComponentsChanged(EcsEntity entity) {
         lock (m_EntitiesPending) {
-            m_EntitiesPending.Enqueue(new PendingEntity {
-                                          Entity    = entity,
-                                          Operation = PendingEntity.UPDATE
+            m_EntitiesPending.Enqueue(new EntityOp {
+                                          Entity = entity,
+                                          Op     = EntityOp.OP_UPDATE
                                       });
         }
     }
@@ -203,11 +203,12 @@ public abstract class Scene {
     private void AddEntityInternal(EcsEntity entity) {
         Debug.Assert(m_Entities.Add(entity));
 
+        var entityComponents = m_EntityComponents;
         foreach (var component in entity.m_Components) {
+            var type = component.GetType();
             HashSet<EcsEntity> entities;
-            if (!m_EntityComponents.TryGetValue(component.GetType(), out entities)) {
-                entities = new HashSet<EcsEntity>();
-                m_EntityComponents[component.GetType()] = entities;
+            if (!entityComponents.TryGetValue(type, out entities)) {
+                entityComponents[type] = entities = new HashSet<EcsEntity>();
             }
 
             entities.Add(entity);
@@ -220,19 +221,16 @@ public abstract class Scene {
         // NOTE: We don't have to lock here because we never touch
         //       m_Entitiespending between updates, only during.
         foreach (var pending in m_EntitiesPending) {
-            Debug.Assert((pending.Operation == PendingEntity.ADD)
-                      || (pending.Operation == PendingEntity.REMOVE)
-                      || (pending.Operation == PendingEntity.UPDATE));
+            Debug.Assert((pending.Op == EntityOp.OP_ADD)
+                      || (pending.Op == EntityOp.OP_REMOVE)
+                      || (pending.Op == EntityOp.OP_UPDATE));
 
-            if (pending.Operation == PendingEntity.ADD) {
-                RemoveEntityInternal(pending.Entity);
-            }
-            else if (pending.Operation == PendingEntity.REMOVE) {
-                AddEntityInternal(pending.Entity);
-            }
-            else if (pending.Operation == PendingEntity.UPDATE) {
-                UpdateEntityInternal(pending.Entity);
-            }
+
+            var e = pending.Entity;
+
+                 if (pending.Op == EntityOp.OP_ADD   )    AddEntityInternal(e);
+            else if (pending.Op == EntityOp.OP_REMOVE) RemoveEntityInternal(e);
+            else if (pending.Op == EntityOp.OP_UPDATE) UpdateEntityInternal(e);
         }
 
         m_EntitiesPending.Clear();
@@ -251,13 +249,17 @@ public abstract class Scene {
     /// <summary>Updates the component cache for the specified entity.</summary>
     /// <param name="entity">The entity to update.</param>
     private void UpdateEntityInternal(EcsEntity entity) {
-        Debug.Assert(entity.Scene == this);
+        if (entity.Scene != this) {
+            // Entity is no longer in this scene.
+            return;
+        }
 
+        var entityComponents = m_EntityComponents;
         foreach (var component in entity.m_Components) {
+            var type = component.GetType();
             HashSet<EcsEntity> entities;
-            if (!m_EntityComponents.TryGetValue(component.GetType(), out entities)) {
-                entities = new HashSet<EcsEntity>();
-                m_EntityComponents[component.GetType()] = entities;
+            if (!entityComponents.TryGetValue(type, out entities)) {
+                entityComponents[type] = entities = new HashSet<EcsEntity>();
             }
 
             entities.Add(entity);

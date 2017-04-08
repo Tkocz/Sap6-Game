@@ -10,6 +10,7 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
 using Core;
+using Logging;
 using Utils;
 
 /*--------------------------------------

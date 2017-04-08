@@ -59,7 +59,7 @@ MONOGAME_PATH := $(MONOGAME_PATH)/Assemblies/DesktopGL
 all: game content libs
 
 clean:
-	rm -rf $(G_CONTENTFILE) $(C_BINDIR) $(G_OBJDIR)
+	rm -rf $(C_BINDIR) $(G_OBJDIR) $(G_CONTENTFILE)
 
 engine: $(C_BINDIR)/$(E_TARGET)
 
