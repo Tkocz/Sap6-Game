@@ -1,4 +1,4 @@
-namespace Sap6 {
+namespace GameName {
 
 /*--------------------------------------
  * USINGS
@@ -6,7 +6,7 @@ namespace Sap6 {
 
 using System;
 
-using Base;
+using EngineName;
 
 /*--------------------------------------
  * CLASSES

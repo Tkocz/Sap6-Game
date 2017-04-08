@@ -1,4 +1,4 @@
-namespace Sap6.Base {
+namespace EngineName.Core {
 
 /*--------------------------------------
  * USINGS

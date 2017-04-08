@@ -1,4 +1,4 @@
-namespace Sap6.Base {
+namespace EngineName {
 
 /*--------------------------------------
  * USINGS
@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 using Microsoft.Xna.Framework;
 
+using Core;
 using Utils;
 
 /*--------------------------------------
@@ -78,7 +79,7 @@ public class Game1: Game {
      *------------------------------------*/
 
     protected override void Draw(GameTime gameTime) {
-        var scene = m_Scenes.Peek();
+        var scene = Scene;
         if (scene != null) {
             var t  = (float)gameTime.TotalGameTime.TotalSeconds;
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -89,7 +90,7 @@ public class Game1: Game {
     }
 
     protected override void Update(GameTime gameTime) {
-        var scene = m_Scenes.Peek();
+        var scene = Scene;
         if (scene != null) {
             var t  = (float)gameTime.TotalGameTime.TotalSeconds;
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;

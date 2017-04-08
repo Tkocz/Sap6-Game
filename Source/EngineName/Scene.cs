@@ -1,4 +1,4 @@
-namespace Sap6.Base {
+namespace EngineName {
 
 /*--------------------------------------
  * USINGS
@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+using Core;
 using Utils;
 
 /*--------------------------------------

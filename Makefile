@@ -7,18 +7,27 @@
 # CONSTANTS
 #---------------------------------------
 
-# Paths
-BINDIR     = bin
-CONTENTDIR = Content
-OBJDIR     = obj
-SRCDIR     = Source
+# Common config
+BINDIR = bin
 
-# Mono C# Compiler
-COMPILER = mcs
-FLAGS    = -debug+ -define:DEBUG -target:winexe
-LIBPATHS = $(MONOGAME_PATH)
-LIBS     = MonoGame.Framework.dll
-TARGET   = Program.exe
+# Engine config
+ENGINE_COMPILER   = mcs
+ENGINE_FLAGS      = -debug+ -define:DEBUG -target:library
+ENGINE_LIBPATHS   = $(MONOGAME_PATH)
+ENGINE_LIBS       = MonoGame.Framework.dll
+ENGINE_OBJDIR     = obj/Engine
+ENGINE_SRCDIR     = Source/EngineName
+ENGINE_TARGET     = EngineName.dll
+
+# Game config
+GAME_COMPILER   = mcs
+GAME_CONTENTDIR = Content
+GAME_FLAGS      = -debug+ -define:DEBUG -target:winexe
+GAME_LIBPATHS   = $(MONOGAME_PATH)
+GAME_LIBS       = $(BINDIR)/EngineName.dll MonoGame.Framework.dll
+GAME_OBJDIR     = obj
+GAME_SRCDIR     = Source/GameName
+GAME_TARGET     = Program.exe
 
 # MonoGame Content Builder
 CONTENTFILE = content.mgcb
@@ -49,10 +58,10 @@ MONOGAME_PATH := $(MONOGAME_PATH)/Assemblies/DesktopGL
 .PHONY: all clean libs run
 
 # Default target.
-all: compile content libs
+all: compile_game content libs
 
 clean:
-	rm -rf $(CONTENTFILE) $(BINDIR) $(OBJDIR)
+	rm -rf $(GAME_CONTENTFILE) $(BINDIR) $(GAME_OBJDIR)
 
 libs:
 	mkdir -p $(BINDIR)
@@ -60,24 +69,36 @@ libs:
 
 run: all
 	cd $(BINDIR); \
-	mono $(TARGET)
+	mono $(GAME_TARGET)
 
 #-------------------
 # MONO
 #-------------------
 
 # Always recompile. Makes it easier to work on the project.
-.PHONY: $(BINDIR)/$(TARGET) compile
+.PHONY: $(BINDIR)/$(ENGINE_TARGET) compile_engine
+.PHONY: $(BINDIR)/$(GAME_TARGET) compile_game
 
-$(BINDIR)/$(TARGET):
+$(BINDIR)/$(ENGINE_TARGET):
 	mkdir -p $(BINDIR)
-	$(COMPILER) $(FLAGS)                        \
-	            $(addprefix -lib:, $(LIBPATHS)) \
-	            $(addprefix -r:, $(LIBS))       \
-	            -out:$(BINDIR)/$(TARGET)        \
-	            -recurse:$(SRCDIR)/*.cs
+	$(ENGINE_COMPILER) $(ENGINE_FLAGS)                        \
+	            $(addprefix -lib:, $(ENGINE_LIBPATHS)) \
+	            $(addprefix -r:, $(ENGINE_LIBS))       \
+	            -out:$(BINDIR)/$(ENGINE_TARGET)        \
+	            -recurse:$(ENGINE_SRCDIR)/*.cs
 
-compile: $(BINDIR)/$(TARGET)
+$(BINDIR)/$(GAME_TARGET): compile_engine
+	mkdir -p $(BINDIR)
+	$(GAME_COMPILER) $(GAME_FLAGS)                        \
+	            $(addprefix -lib:, $(GAME_LIBPATHS)) \
+	            $(addprefix -r:, $(GAME_LIBS))       \
+	            -out:$(BINDIR)/$(GAME_TARGET)        \
+	            -recurse:$(GAME_SRCDIR)/*.cs
+
+compile_engine: $(BINDIR)/$(ENGINE_TARGET)
+
+
+compile_game: $(BINDIR)/$(GAME_TARGET)
 
 #-------------------
 # MONOGAME
