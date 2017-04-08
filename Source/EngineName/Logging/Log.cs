@@ -6,6 +6,7 @@ namespace EngineName.Logging {
 
 using System;
 using System.Diagnostics;
+using System.IO;
 
 /*--------------------------------------
  * CLASSES
@@ -19,6 +20,9 @@ public class Log {
 
     /// <summary>The name of the log.</summary>
     private readonly string m_Name;
+
+    /// <summary>The file log, if file logging is enabled.</summary>
+    private static StreamWriter s_File;
 
     /// <summary>The time that the <see cref="Log"/> class was
     //           initialized.</summary>
@@ -99,6 +103,17 @@ public class Log {
         }
     }
 
+    /// <summary>Enables file logging.</summary>
+    /// <param name="fileName">The name of the file to write to.</param>
+    public static void ToFile(string fileName=null) {
+        if (string.IsNullOrEmpty(fileName)) {
+            fileName = AppDomain.CurrentDomain.FriendlyName;
+            fileName = Path.GetFileNameWithoutExtension(fileName) + ".log";
+        }
+
+        s_File = new StreamWriter(fileName);
+    }
+
     /// <summary>Writes a warning message to the log.</summary>
     /// <param name="message">The message to write to the log.</param>
     /// <param name="args">The message arguments.</param>
@@ -124,7 +139,16 @@ public class Log {
         var t  = (DateTime.UtcNow - s_InitTime).TotalSeconds;
         var s0 = string.Format("({0})", type);
         var s1 = string.Format("[{0:0.000}] {1,-5} {2}()", t, s0, m_Name);
-        Console.WriteLine(string.Format("{0}: {1}", s1, text));
+        var s2 = string.Format("{0}: {1}", s1, text);
+
+        Console.WriteLine(s2);
+
+        if (s_File != null) {
+            lock (s_File) {
+                s_File.WriteLine(s2);
+                s_File.Flush();
+            }
+        }
     }
 }
 

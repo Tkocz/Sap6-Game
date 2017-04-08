@@ -7,12 +7,20 @@ namespace GameName {
 using System;
 
 using EngineName;
+using EngineName.Logging;
 
 /*--------------------------------------
  * CLASSES
  *------------------------------------*/
 
-public class TestScene: Scene {}
+// TODO: Remove this crap.
+public class TestScene: Scene {
+    public override void Init() {
+        base.Init();
+
+        Log.Get().Debug("TestScene initialized.");
+    }
+}
 
 /// <summary>Provides a program entry point.</summary>
 public static class Program {
@@ -24,6 +32,8 @@ public static class Program {
     /// <param name="args">The command line arguments.</param>
     [STAThread]
     private static void Main(string[] args) {
+        Log.ToFile();
+
         // TODO: Create initial scene.
         using (var game = new Game1(new TestScene())) {
             game.Run();
