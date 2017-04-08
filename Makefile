@@ -8,29 +8,27 @@
 #---------------------------------------
 
 # Common config
-COMMON_BINDIR = bin
-COMMON_FLAGS  = -debug+ -define:DEBUG
+C_BINDIR = bin
+C_FLAGS  = -debug+ -define:DEBUG
 
 # Engine config
-ENGINE_COMPILER   = mcs
-ENGINE_FLAGS      = $(COMMON_FLAGS) -target:library
-ENGINE_LIBPATHS   = $(MONOGAME_PATH)
-ENGINE_LIBS       = MonoGame.Framework.dll
-ENGINE_SRCDIR     = Source/EngineName
-ENGINE_TARGET     = EngineName.dll
+E_COMPILER   = mcs
+E_FLAGS      = $(C_FLAGS) -target:library
+E_LIBPATHS   = $(MONOGAME_PATH)
+E_LIBS       = MonoGame.Framework.dll
+E_SRCDIR     = Source/EngineName
+E_TARGET     = EngineName.dll
 
 # Game config
-GAME_COMPILER   = mcs
-GAME_CONTENTDIR = Content
-GAME_FLAGS      = $(COMMON_FLAGS) -target:winexe
-GAME_LIBPATHS   = $(COMMON_BINDIR) $(MONOGAME_PATH)
-GAME_LIBS       = EngineName.dll MonoGame.Framework.dll
-GAME_OBJDIR     = obj
-GAME_SRCDIR     = Source/GameName
-GAME_TARGET     = Program.exe
-
-# MonoGame Content Builder
-CONTENTFILE = content.mgcb
+G_COMPILER    = mcs
+G_CONTENTDIR  = Content
+G_CONTENTFILE = content.mgcb
+G_FLAGS       = $(C_FLAGS) -target:winexe
+G_LIBPATHS    = $(C_BINDIR) $(MONOGAME_PATH)
+G_LIBS        = EngineName.dll MonoGame.Framework.dll
+G_OBJDIR      = obj
+G_SRCDIR      = Source/GameName
+G_TARGET      = Program.exe
 
 #---------------------------------------
 # INITIALIZATION
@@ -61,67 +59,67 @@ MONOGAME_PATH := $(MONOGAME_PATH)/Assemblies/DesktopGL
 all: game content libs
 
 clean:
-	rm -rf $(GAME_CONTENTFILE) $(COMMON_BINDIR) $(GAME_OBJDIR)
+	rm -rf $(G_CONTENTFILE) $(C_BINDIR) $(G_OBJDIR)
+
+engine: $(C_BINDIR)/$(E_TARGET)
+
+game: $(C_BINDIR)/$(G_TARGET)
 
 libs:
-	mkdir -p $(COMMON_BINDIR)
-	-cp -nr $(MONOGAME_PATH)/* $(COMMON_BINDIR)
+	mkdir -p $(C_BINDIR)
+	-cp -nr $(MONOGAME_PATH)/* $(C_BINDIR)
 
 run:
-	cd $(COMMON_BINDIR); \
-	mono $(GAME_TARGET)
+	cd $(C_BINDIR); \
+	mono $(G_TARGET)
 
 #-------------------
 # ASSEMBLIES
 #-------------------
 
 # Always recompile. Makes it easier to work on the project.
-.PHONY: $(COMMON_BINDIR)/$(ENGINE_TARGET) engine
-.PHONY: $(COMMON_BINDIR)/$(GAME_TARGET) game
+.PHONY: $(C_BINDIR)/$(E_TARGET) engine
+.PHONY: $(C_BINDIR)/$(G_TARGET) game
 
-$(COMMON_BINDIR)/$(ENGINE_TARGET):
-	mkdir -p $(COMMON_BINDIR)
-	$(ENGINE_COMPILER) $(ENGINE_FLAGS)                 \
-	            $(addprefix -lib:, $(ENGINE_LIBPATHS)) \
-	            $(addprefix -r:, $(ENGINE_LIBS))       \
-	            -out:$(COMMON_BINDIR)/$(ENGINE_TARGET) \
-	            -recurse:$(ENGINE_SRCDIR)/*.cs
+$(C_BINDIR)/$(E_TARGET):
+	mkdir -p $(C_BINDIR)
+	$(E_COMPILER) $(E_FLAGS)                      \
+	            $(addprefix -lib:, $(E_LIBPATHS)) \
+	            $(addprefix -r:, $(E_LIBS))       \
+	            -out:$(C_BINDIR)/$(E_TARGET)      \
+	            -recurse:$(E_SRCDIR)/*.cs
 
-$(COMMON_BINDIR)/$(GAME_TARGET): engine
-	mkdir -p $(COMMON_BINDIR)
-	$(GAME_COMPILER) $(GAME_FLAGS)                   \
-	            $(addprefix -lib:, $(GAME_LIBPATHS)) \
-	            $(addprefix -r:, $(GAME_LIBS))       \
-	            -out:$(COMMON_BINDIR)/$(GAME_TARGET) \
-	            -recurse:$(GAME_SRCDIR)/*.cs
-
-engine: $(COMMON_BINDIR)/$(ENGINE_TARGET)
-
-game: $(COMMON_BINDIR)/$(GAME_TARGET)
+$(C_BINDIR)/$(G_TARGET): engine
+	mkdir -p $(C_BINDIR)
+	$(G_COMPILER) $(G_FLAGS)                      \
+	            $(addprefix -lib:, $(G_LIBPATHS)) \
+	            $(addprefix -r:, $(G_LIBS))       \
+	            -out:$(C_BINDIR)/$(G_TARGET)      \
+	            -recurse:$(G_SRCDIR)/*.cs
 
 #-------------------
 # GAME CONTENT
 #-------------------
 
 # Find all content to build with MonoGame Content Builder.
-CONTENT := $(shell find $(GAME_CONTENTDIR) -type f)
+CONTENT := $(shell find $(G_CONTENTDIR) -type f)
 
 # Kind of a hack to build content easily.
-.PHONY: $(GAME_CONTENTDIR)/*/* pre-content content
+.PHONY: $(G_CONTENTDIR)/*/* pre-content content
 
-$(GAME_CONTENTDIR)/Models/*.fbx:
-	@echo /build:$@ >> $(CONTENTFILE)
+$(G_CONTENTDIR)/Models/*.fbx:
+	@echo /build:$@ >> $(G_CONTENTFILE)
 
-$(GAME_CONTENTDIR)/Textures/*.png:
-	@echo /build:$@ >> $(CONTENTFILE)
+$(G_CONTENTDIR)/Textures/*.png:
+	@echo /build:$@ >> $(G_CONTENTFILE)
 
 pre-content:
-	@echo /compress                        > $(CONTENTFILE)
-	@echo /intermediateDir:$(GAME_OBJDIR) >> $(CONTENTFILE)
-	@echo /outputDir:$(COMMON_BINDIR)     >> $(CONTENTFILE)
-	@echo /quiet                          >> $(CONTENTFILE)
+	@echo /compress                     > $(G_CONTENTFILE)
+	@echo /intermediateDir:$(G_OBJDIR) >> $(G_CONTENTFILE)
+	@echo /outputDir:$(C_BINDIR)       >> $(G_CONTENTFILE)
+	@echo /quiet                       >> $(G_CONTENTFILE)
 
 content: pre-content $(CONTENT)
-	mkdir -p $(COMMON_BINDIR)
-	mgcb -@:$(CONTENTFILE)
-	rm -f $(CONTENTFILE)
+	mkdir -p $(C_BINDIR)
+	mgcb -@:$(G_CONTENTFILE)
+	rm -f $(G_CONTENTFILE)
