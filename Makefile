@@ -97,7 +97,6 @@ $(COMMON_BINDIR)/$(GAME_TARGET): engine
 
 engine: $(COMMON_BINDIR)/$(ENGINE_TARGET)
 
-
 game: $(COMMON_BINDIR)/$(GAME_TARGET)
 
 #-------------------
