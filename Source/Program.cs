@@ -6,6 +6,8 @@ namespace Sap6 {
 
 using System;
 
+using Base;
+
 /*--------------------------------------
  * CLASSES
  *------------------------------------*/
@@ -13,14 +15,17 @@ using System;
 /// <summary>Provides a program entry point.</summary>
 public static class Program {
     /*--------------------------------------
-     * PRIVATE METHODS
+     * NON-PUBLIC METHODS
      *------------------------------------*/
 
     /// <summary>Program entry point.</summary>
     /// <param name="args">The command line arguments.</param>
     [STAThread]
     private static void Main(string[] args) {
-        Console.WriteLine("Hello. :-)");
+        // TODO: Create initial scene.
+        using (var game = new Game1(null)) {
+            game.Run();
+        }
     }
 }
 

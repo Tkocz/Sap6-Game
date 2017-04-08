@@ -15,8 +15,11 @@ using System.Threading;
 /// <summary>Represents an entity.</summary>
 public sealed class EcsEntity {
     /*--------------------------------------
-     * PRIVATE FIELDS
+     * NON-PUBLIC FIELDS
      *------------------------------------*/
+
+    /// <summary>The scene that the entity is currently in.</summary>
+    internal Scene m_Scene;
 
     /// <summary>The attached components.</summary>
     private readonly Dictionary<Type, EcsComponent> m_Components =
@@ -32,6 +35,11 @@ public sealed class EcsEntity {
 
     /// <summary>Gets the unique entity ID.</summary>
     public int ID { get; } = Interlocked.Increment(ref s_NextID);
+
+    /// <summary>Gets the scen that the entity is in.</summary>
+    public Scene Scene {
+        get { return m_Scene; }
+    }
 
     /*--------------------------------------
      * PUBLIC METHODS
