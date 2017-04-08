@@ -8,11 +8,12 @@
 #---------------------------------------
 
 # Common config
-BINDIR = bin
+COMMON_BINDIR = bin
+COMMON_FLAGS  = -debug+ -define:DEBUG
 
 # Engine config
 ENGINE_COMPILER   = mcs
-ENGINE_FLAGS      = -debug+ -define:DEBUG -target:library
+ENGINE_FLAGS      = $(COMMON_FLAGS) -target:library
 ENGINE_LIBPATHS   = $(MONOGAME_PATH)
 ENGINE_LIBS       = MonoGame.Framework.dll
 ENGINE_SRCDIR     = Source/EngineName
@@ -21,8 +22,8 @@ ENGINE_TARGET     = EngineName.dll
 # Game config
 GAME_COMPILER   = mcs
 GAME_CONTENTDIR = Content
-GAME_FLAGS      = -debug+ -define:DEBUG -target:winexe
-GAME_LIBPATHS   = $(BINDIR) $(MONOGAME_PATH)
+GAME_FLAGS      = $(COMMON_FLAGS) -target:winexe
+GAME_LIBPATHS   = $(COMMON_BINDIR) $(MONOGAME_PATH)
 GAME_LIBS       = EngineName.dll MonoGame.Framework.dll
 GAME_OBJDIR     = obj
 GAME_SRCDIR     = Source/GameName
@@ -60,14 +61,14 @@ MONOGAME_PATH := $(MONOGAME_PATH)/Assemblies/DesktopGL
 all: game content libs
 
 clean:
-	rm -rf $(GAME_CONTENTFILE) $(BINDIR) $(GAME_OBJDIR)
+	rm -rf $(GAME_CONTENTFILE) $(COMMON_BINDIR) $(GAME_OBJDIR)
 
 libs:
-	mkdir -p $(BINDIR)
-	-cp -nr $(MONOGAME_PATH)/* $(BINDIR)
+	mkdir -p $(COMMON_BINDIR)
+	-cp -nr $(MONOGAME_PATH)/* $(COMMON_BINDIR)
 
 run:
-	cd $(BINDIR); \
+	cd $(COMMON_BINDIR); \
 	mono $(GAME_TARGET)
 
 #-------------------
@@ -75,29 +76,29 @@ run:
 #-------------------
 
 # Always recompile. Makes it easier to work on the project.
-.PHONY: $(BINDIR)/$(ENGINE_TARGET) engine
-.PHONY: $(BINDIR)/$(GAME_TARGET) game
+.PHONY: $(COMMON_BINDIR)/$(ENGINE_TARGET) engine
+.PHONY: $(COMMON_BINDIR)/$(GAME_TARGET) game
 
-$(BINDIR)/$(ENGINE_TARGET):
-	mkdir -p $(BINDIR)
-	$(ENGINE_COMPILER) $(ENGINE_FLAGS)                        \
+$(COMMON_BINDIR)/$(ENGINE_TARGET):
+	mkdir -p $(COMMON_BINDIR)
+	$(ENGINE_COMPILER) $(ENGINE_FLAGS)                 \
 	            $(addprefix -lib:, $(ENGINE_LIBPATHS)) \
 	            $(addprefix -r:, $(ENGINE_LIBS))       \
-	            -out:$(BINDIR)/$(ENGINE_TARGET)        \
+	            -out:$(COMMON_BINDIR)/$(ENGINE_TARGET) \
 	            -recurse:$(ENGINE_SRCDIR)/*.cs
 
-$(BINDIR)/$(GAME_TARGET): engine
-	mkdir -p $(BINDIR)
-	$(GAME_COMPILER) $(GAME_FLAGS)                        \
+$(COMMON_BINDIR)/$(GAME_TARGET): engine
+	mkdir -p $(COMMON_BINDIR)
+	$(GAME_COMPILER) $(GAME_FLAGS)                   \
 	            $(addprefix -lib:, $(GAME_LIBPATHS)) \
 	            $(addprefix -r:, $(GAME_LIBS))       \
-	            -out:$(BINDIR)/$(GAME_TARGET)        \
+	            -out:$(COMMON_BINDIR)/$(GAME_TARGET) \
 	            -recurse:$(GAME_SRCDIR)/*.cs
 
-engine: $(BINDIR)/$(ENGINE_TARGET)
+engine: $(COMMON_BINDIR)/$(ENGINE_TARGET)
 
 
-game: $(BINDIR)/$(GAME_TARGET)
+game: $(COMMON_BINDIR)/$(GAME_TARGET)
 
 #-------------------
 # MONOGAME
@@ -118,10 +119,10 @@ $(GAME_CONTENTDIR)/Textures/*.png:
 pre-content:
 	@echo /compress                        > $(CONTENTFILE)
 	@echo /intermediateDir:$(GAME_OBJDIR) >> $(CONTENTFILE)
-	@echo /outputDir:$(BINDIR)            >> $(CONTENTFILE)
+	@echo /outputDir:$(COMMON_BINDIR)            >> $(CONTENTFILE)
 	@echo /quiet                          >> $(CONTENTFILE)
 
 content: pre-content $(CONTENT)
-	mkdir -p $(BINDIR)
+	mkdir -p $(COMMON_BINDIR)
 	mgcb -@:$(CONTENTFILE)
 	rm -f $(CONTENTFILE)
