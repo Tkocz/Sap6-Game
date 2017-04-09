@@ -82,7 +82,7 @@ public class Game1: Game {
      *------------------------------------*/
 
     /// <summary>Enters the specified scene.</summary>
-    /// <param name="scene">The scene to display.</param
+    /// <param name="scene">The scene to display.</param>
     public void EnterScene(Scene scene) {
         scene.Init();
         m_Scenes.Push(scene);
@@ -132,6 +132,9 @@ public class Game1: Game {
         Scene.Init();
     }
 
+    /// <summary>Called before the game has exited.</summary>
+    /// <param name="sender">The object that generated the event.</param>
+    /// <param name="e">The event arguments.</param>
     protected override void OnExiting(object sender, EventArgs e) {
         Log.Get().Info("Exiting...");
     }

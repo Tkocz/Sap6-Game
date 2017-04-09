@@ -36,7 +36,7 @@ public sealed class EcsEntity {
     /// <summary>Gets the unique entity ID.</summary>
     public int ID { get; } = Interlocked.Increment(ref s_NextID);
 
-    /// <summary>Gets the scen that the entity is in.</summary>
+    /// <summary>Gets the scene that the entity is in.</summary>
     public Scene Scene {
         get { return m_Scene; }
     }
@@ -89,8 +89,8 @@ public sealed class EcsEntity {
     }
 
     /// <summary>Removes the component of the specified type.</summary>
-    /// <param name="component">The type of the component to remove from the
-    ///                         entity.</param>
+    /// <param name="type">The type of the component to remove from the
+    ///                    entity.</param>
     /// <returns><see langword="true"/> if a component of the specified type was
     ///          removed from the entity.</returns>
     public bool RemoveComponent(Type type) {

@@ -25,7 +25,7 @@ public class Log {
     private static StreamWriter s_File;
 
     /// <summary>The time that the <see cref="Log"/> class was
-    //           initialized.</summary>
+    ///          initialized.</summary>
     private static readonly DateTime s_InitTime = DateTime.UtcNow;
 
     /*--------------------------------------
@@ -50,7 +50,6 @@ public class Log {
     }
 
     /// <summary>Gets a log for the calling method.</summary>
-    /// <param name="name">The name of the log.</param>
     /// <returns>A log.</returns>
     public static Log Get() {
         var stackFrame = new StackFrame(1);

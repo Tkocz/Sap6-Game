@@ -9,7 +9,7 @@
 
 # Common config
 C_BINDIR = bin
-C_FLAGS  = -debug+ -define:DEBUG
+C_FLAGS  = -debug+ -define:DEBUG -doc:/dev/null
 
 # Engine config
 E_COMPILER   = mcs
@@ -56,10 +56,13 @@ MONOGAME_PATH := $(MONOGAME_PATH)/Assemblies/DesktopGL
 .PHONY: all clean libs run
 
 # Default target.
-all: game content libs
+all: doc game content libs
 
 clean:
-	rm -rf $(C_BINDIR) $(G_OBJDIR) $(G_CONTENTFILE)
+	rm -fr $(C_BINDIR) $(G_OBJDIR) $(G_CONTENTFILE) doc
+
+doc:
+	doxygen
 
 engine: $(C_BINDIR)/$(E_TARGET)
 
@@ -72,6 +75,9 @@ libs:
 run:
 	cd $(C_BINDIR); \
 	mono $(G_TARGET)
+
+show-doc: doc
+	sensible-browser doc/html/index.html
 
 #-------------------
 # ASSEMBLIES

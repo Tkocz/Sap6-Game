@@ -111,7 +111,7 @@ public abstract class Scene {
     ///          method on all systems in the scene.</summary>
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this
-    //                   method.</param>
+    ///                  method.</param>
     public virtual void Draw(float t, float dt) {
         foreach (var system in m_Systems) {
             system.Draw(t, dt);
@@ -173,7 +173,7 @@ public abstract class Scene {
     ///          scene.</summary>
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this
-    //                   method.</param>
+    ///                  method.</param>
     public virtual void Update(float t, float dt) {
         HandlePendingEntities();
 
@@ -215,8 +215,8 @@ public abstract class Scene {
         }
     }
 
-    /// <summary>Adds the specified entity to the scene.</summary>
-    /// <param name="entity">The entity to add to the scene.</param>
+    /// <summary>Handles pending entity operations (add-, remove- or
+    ///          update).</summary>
     private void HandlePendingEntities() {
         // NOTE: We don't have to lock here because we never touch
         //       m_Entitiespending between updates, only during.
