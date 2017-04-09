@@ -4,6 +4,7 @@ namespace EngineName {
  * USINGS
  *------------------------------------*/
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -70,6 +71,10 @@ public class Game1: Game {
         Graphics.PreparingDeviceSettings += (sender, e) => {
             e.GraphicsDeviceInformation.GraphicsProfile = GraphicsProfile.HiDef;
         };
+
+#if DEBUG
+        IsMouseVisible = true;
+#endif
     }
 
     /*--------------------------------------
@@ -86,6 +91,7 @@ public class Game1: Game {
     /// <summary>Leaves the currently displayed scene..</summary>
     public void LeaveScene() {
         if (m_Scenes.Count == 0) {
+            Log.Get().Warn("No scene to leave.");
             return;
         }
 
@@ -112,18 +118,22 @@ public class Game1: Game {
 
     /// <summary>Initializes the game.</summary>
     protected override void Initialize() {
-        // There is always an initial scene, so just init it here.
-        Scene.Init();
-
         var profile = Graphics.GraphicsDevice.GraphicsProfile;
         var width   = Graphics.PreferredBackBufferWidth;
         var height  = Graphics.PreferredBackBufferHeight;
         var vsync   = Graphics.SynchronizeWithVerticalRetrace;
 
         Log.Get().Info("Graphics device initialized.")
-                 .Info("  Profile: {0}", profile)
+                 .Info("  Profile:    {0}", profile)
                  .Info("  Resolution: {0}x{1}", width, height)
-                 .Info("  VSync: {0}", vsync);
+                 .Info("  VSync:      {0}", vsync);
+
+        // There is always an initial scene, so just init it here.
+        Scene.Init();
+    }
+
+    protected override void OnExiting(object sender, EventArgs e) {
+        Log.Get().Info("Exiting...");
     }
 
     /// <summary>Updates the current scene.</summary>

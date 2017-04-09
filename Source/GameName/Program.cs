@@ -38,6 +38,9 @@ public static class Program {
         using (var game = new Game1(new TestScene())) {
             game.Run();
         }
+
+        // This point is apparently never reached because MonoGame force quits
+        // the process intead of returning...
     }
 }
 

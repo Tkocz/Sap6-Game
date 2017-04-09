@@ -65,6 +65,7 @@ public class Log {
     /// <param name="args">The message arguments.</param>
     /// <returns>The log instance.</returns>
     public Log Debug(string message, params object[] args) {
+#if DEBUG
         var oldColor = Console.ForegroundColor;
         try {
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -73,6 +74,7 @@ public class Log {
         finally {
             Console.ForegroundColor = oldColor;
         }
+#endif
 
         return this;
     }
