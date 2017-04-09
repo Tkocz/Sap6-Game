@@ -76,9 +76,6 @@ run:
 	cd $(C_BINDIR); \
 	mono $(G_TARGET)
 
-show-doc: doc
-	sensible-browser doc/html/index.html
-
 #-------------------
 # ASSEMBLIES
 #-------------------
