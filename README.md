@@ -34,7 +34,7 @@
    ```
 2. Browse to the directory using File Explorer.
 3. Double-click the file named Sap6-Game.sln to load the solution in Visual Studio.
-4. Hit the F5 key to build and run the game.
+4. Press the F5 key to build and run the game.
 
 ## Compiling the documentation
    
