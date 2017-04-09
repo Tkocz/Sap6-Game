@@ -123,10 +123,10 @@ public class Game1: Game {
         var height  = Graphics.PreferredBackBufferHeight;
         var vsync   = Graphics.SynchronizeWithVerticalRetrace;
 
-        Log.Get().Info("Graphics device initialized.")
-                 .Info("  Profile:    {0}", profile)
-                 .Info("  Resolution: {0}x{1}", width, height)
-                 .Info("  VSync:      {0}", vsync);
+        Log.Get().Info( "Graphics device initialized."  )
+                 .Info($"  Profile:    {profile}"       )
+                 .Info($"  Resolution: {width}x{height}")
+                 .Info($"  VSync:      {vsync}"         );
 
         // There is always an initial scene, so just init it here.
         Scene.Init();
