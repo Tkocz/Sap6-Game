@@ -220,7 +220,7 @@ public abstract class Scene {
     ///          update).</summary>
     private void HandlePendingEntities() {
         // NOTE: We don't have to lock here because we never touch
-        //       m_Entitiespending between updates, only during.
+        //       m_EntitiesPending between updates, only during.
         foreach (var pending in m_EntitiesPending) {
             Debug.Assert((pending.Op == EntityOp.OP_ADD)
                       || (pending.Op == EntityOp.OP_REMOVE)
