@@ -1,6 +1,7 @@
-*csproj.user
+*.csproj.user
 .DS_Store
-.vs/
+.vs
 bin
 doc
 obj
+tmp

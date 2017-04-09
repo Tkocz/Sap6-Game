@@ -22,13 +22,14 @@ E_TARGET     = EngineName.dll
 # Game config
 G_COMPILER    = mcs
 G_CONTENTDIR  = Content
-G_CONTENTFILE = content.mgcb
+G_CONTENTFILE = Content.mgcb
 G_FLAGS       = $(C_FLAGS) -target:winexe
 G_LIBPATHS    = $(C_BINDIR) $(MONOGAME_PATH)
 G_LIBS        = EngineName.dll MonoGame.Framework.dll
 G_OBJDIR      = obj
 G_SRCDIR      = Source/GameName
 G_TARGET      = Program.exe
+G_TMPDIR      = tmp
 
 #---------------------------------------
 # INITIALIZATION
@@ -59,7 +60,7 @@ MONOGAME_PATH := $(MONOGAME_PATH)/Assemblies/DesktopGL
 all: doc game content libs
 
 clean:
-	rm -fr $(C_BINDIR) $(G_OBJDIR) $(G_CONTENTFILE) doc
+	rm -fr $(C_BINDIR) $(G_CONTENTFILE) $(G_OBJDIR) $(G_TMPDIR) doc
 
 doc:
 	doxygen
@@ -107,22 +108,32 @@ $(C_BINDIR)/$(G_TARGET): engine
 # Find all content to build with MonoGame Content Builder.
 CONTENT := $(shell find $(G_CONTENTDIR) -type f)
 
+ifeq "$(OS)" "Linux"
+PLATFORM = Linux
+endif
+
+ifeq "$(OS)" "Darwin"
+PLATFORM = MacOSX
+endif
+
 # Kind of a hack to build content easily.
 .PHONY: $(G_CONTENTDIR)/*/* pre-content content
 
 $(G_CONTENTDIR)/Models/*.fbx:
-	@echo /build:$@ >> $(G_CONTENTFILE)
+	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 $(G_CONTENTDIR)/Textures/*.png:
-	@echo /build:$@ >> $(G_CONTENTFILE)
+	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 pre-content:
-	@echo /compress                     > $(G_CONTENTFILE)
-	@echo /intermediateDir:$(G_OBJDIR) >> $(G_CONTENTFILE)
-	@echo /outputDir:$(C_BINDIR)       >> $(G_CONTENTFILE)
-	@echo /quiet                       >> $(G_CONTENTFILE)
+	mkdir -p $(G_TMPDIR)
+	@echo /compress                     > $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /intermediateDir:$(G_OBJDIR) >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /outputDir:$(C_BINDIR)       >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /platform:$(PLATFORM)        >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /profile:HiDef               >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /quiet                       >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 content: pre-content $(CONTENT)
 	mkdir -p $(C_BINDIR)
-	mgcb -@:$(G_CONTENTFILE)
-	rm -f $(G_CONTENTFILE)
+	mgcb -@:$(G_TMPDIR)/$(G_CONTENTFILE)
