@@ -39,8 +39,7 @@
 ## Compiling the documentation
    
 ### Prerequisites
-
-* [Doxygen](http://www.stack.nl/~dimitri/doxygen/) — *Doxygen is the de facto standard tool for generating documentation from annotated C++ sources, but it also supports other popular programming languages such as C, Objective-C, C#, PHP, Java, Python, IDL (Corba, Microsoft, and UNO/OpenOffice flavors), Fortran, VHDL, Tcl, and to some extent D.*
+* [Doxygen](http://www.stack.nl/~dimitri/doxygen/) — *The de facto standard tool for generating documentation from annotated C++ sources, but it also supports other popular programming languages such as C, Objective-C, C#, PHP, Java, Python, IDL (Corba, Microsoft, and UNO/OpenOffice flavors), Fortran, VHDL, Tcl, and to some extent D.*
 
 ### Linux/macOS
 1. Clone this repository:  
@@ -56,6 +55,9 @@
    ```bash
    sensible-browser doc/html/index.html
    ```
+   
+### Windows
+n/a
 
 ## Development team
 * **Philip Arvidsson** - *n/a* - [philiparvidsson](https://github.com/philiparvidsson)
