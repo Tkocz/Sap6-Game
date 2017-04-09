@@ -59,7 +59,7 @@
 ### Windows
 n/a
 
-## Development team <img align="right" alt="" src="Meta/Logo.png"/>
+## Development team <img align="right" alt="" src="Meta/Images/Logo.png" width="78"/>
 * **Philip Arvidsson** - *n/a* - [philiparvidsson](https://github.com/philiparvidsson)
 * **Martin Bergqvist** - *n/a* - [Tkocz](https://github.com/Tkocz)
 * **Jim Glansk** - *n/a* - [s141587](https://github.com/s141587)
