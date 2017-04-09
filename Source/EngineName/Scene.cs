@@ -226,7 +226,6 @@ public abstract class Scene {
                       || (pending.Op == EntityOp.OP_REMOVE)
                       || (pending.Op == EntityOp.OP_UPDATE));
 
-
             var e = pending.Entity;
 
                  if (pending.Op == EntityOp.OP_ADD   )    AddEntityInternal(e);
