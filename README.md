@@ -36,6 +36,27 @@
 3. Double-click the file named Sap6-Game.sln to load the solution in Visual Studio.
 4. Hit the F5 key to build and run the game.
 
+## Compiling the documentation
+   
+### Prerequisites
+
+* [Doxygen](http://www.stack.nl/~dimitri/doxygen/) — *Doxygen is the de facto standard tool for generating documentation from annotated C++ sources, but it also supports other popular programming languages such as C, Objective-C, C#, PHP, Java, Python, IDL (Corba, Microsoft, and UNO/OpenOffice flavors), Fortran, VHDL, Tcl, and to some extent D.*
+
+### Linux/macOS
+1. Clone this repository:  
+   ```bash
+   git clone https://github.com/philiparvidsson/Sap6-Game
+   ```
+2. Compile the documentation:  
+   ```bash
+   cd Sap6-Game
+   make doc
+   ```
+3. You can now display the documentation in your browser:  
+   ```bash
+   sensible-browser doc/html/index.html
+   ```
+
 ## Development team
 * **Philip Arvidsson** - *n/a* - [philiparvidsson](https://github.com/philiparvidsson)
 * **Martin Bergqvist** - *n/a* - [Tkocz](https://github.com/Tkocz)
