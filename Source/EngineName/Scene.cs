@@ -74,7 +74,8 @@ public abstract class Scene {
     /// <summary>Adds the specified entity to the scene.</summary>
     /// <param name="entity">The entity to add to the scene.</param>
     public void AddEntity(EcsEntity entity) {
-        Trace.Assert(AtomicUtil.CAS(ref entity.m_Scene, entity.m_Scene, this));
+        DebugUtil.Assert(AtomicUtil.CAS(ref entity.m_Scene, this, null),
+                         "entity.m_Scene is not null!");
 
         lock (m_EntitiesPending) {
             m_EntitiesPending.Enqueue(new EntityOp {
@@ -153,7 +154,7 @@ public abstract class Scene {
     /// <returns><see langword="true"/> if the entity existed in the scene and
     ///          was removed,</returns>
     public bool RemoveEntity(EcsEntity entity) {
-        if (AtomicUtil.CAS(ref entity.m_Scene, this, null)) {
+        if (AtomicUtil.CAS(ref entity.m_Scene, null, this)) {
             // The entity is someone else's responsibility.
             return false;
         }

@@ -6,7 +6,6 @@ namespace EngineName {
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -63,7 +62,8 @@ public class Game1: Game {
     /// <summary>Initializes the game singleton instance.</summary>
     /// <param name="scene">The scene to display initially.</param>
     public Game1(Scene scene) {
-        Trace.Assert(AtomicUtil.CAS(ref s_Inst, null, this));
+        DebugUtil.Assert(AtomicUtil.CAS(ref s_Inst, this, null),
+                         "s_Inst is not null!");
 
         m_Scenes.Push(scene);
 
@@ -75,6 +75,8 @@ public class Game1: Game {
 #if DEBUG
         IsMouseVisible = true;
 #endif
+
+        Window.Title = "Sap6 Game";
     }
 
     /*--------------------------------------
@@ -118,6 +120,8 @@ public class Game1: Game {
 
     /// <summary>Initializes the game.</summary>
     protected override void Initialize() {
+        base.Initialize();
+
         var profile = Graphics.GraphicsDevice.GraphicsProfile;
         var width   = Graphics.PreferredBackBufferWidth;
         var height  = Graphics.PreferredBackBufferHeight;

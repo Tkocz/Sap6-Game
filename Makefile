@@ -9,7 +9,7 @@
 
 # Common config
 C_BINDIR = bin
-C_FLAGS  = -debug+ -define:DEBUG -doc:/dev/null
+C_FLAGS  = -debug+ -define:DEBUG -define:TRACE -doc:/dev/null
 
 # Engine config
 E_COMPILER   = mcs
@@ -35,15 +35,20 @@ G_TMPDIR      = tmp
 # INITIALIZATION
 #---------------------------------------
 
+# Find all content to build with MonoGame Content Builder.
+CONTENT = $(shell find $(G_CONTENTDIR) -type f)
+
 # Linux and macOS have different paths to the MonoGame library files, so make
 # sure to set them up properly. No Windows support here, lol!
 OS := $(shell uname)
 
 ifeq "$(OS)" "Linux"
+MGCB_PLATFORM = Linux
 MONOGAME_PATH = /usr/lib/mono/xbuild/MonoGame/v3.0
 endif
 
 ifeq "$(OS)" "Darwin"
+MGCB_PLATFORM = MacOSX
 MONOGAME_PATH = /Library/Frameworks/MonoGame.framework/Current
 endif
 
@@ -87,34 +92,23 @@ run:
 
 $(C_BINDIR)/$(E_TARGET):
 	mkdir -p $(C_BINDIR)
-	$(E_COMPILER) $(E_FLAGS)                      \
-	            $(addprefix -lib:, $(E_LIBPATHS)) \
-	            $(addprefix -r:, $(E_LIBS))       \
-	            -out:$(C_BINDIR)/$(E_TARGET)      \
-	            -recurse:$(E_SRCDIR)/*.cs
+	$(E_COMPILER) $(E_FLAGS)                        \
+	              $(addprefix -lib:, $(E_LIBPATHS)) \
+	              $(addprefix -r:, $(E_LIBS))       \
+	              -out:$(C_BINDIR)/$(E_TARGET)      \
+	              -recurse:$(E_SRCDIR)/*.cs
 
 $(C_BINDIR)/$(G_TARGET): engine
 	mkdir -p $(C_BINDIR)
-	$(G_COMPILER) $(G_FLAGS)                      \
-	            $(addprefix -lib:, $(G_LIBPATHS)) \
-	            $(addprefix -r:, $(G_LIBS))       \
-	            -out:$(C_BINDIR)/$(G_TARGET)      \
-	            -recurse:$(G_SRCDIR)/*.cs
+	$(G_COMPILER) $(G_FLAGS)                        \
+	              $(addprefix -lib:, $(G_LIBPATHS)) \
+	              $(addprefix -r:, $(G_LIBS))       \
+	              -out:$(C_BINDIR)/$(G_TARGET)      \
+	              -recurse:$(G_SRCDIR)/*.cs
 
 #-------------------
 # GAME CONTENT
 #-------------------
-
-# Find all content to build with MonoGame Content Builder.
-CONTENT := $(shell find $(G_CONTENTDIR) -type f)
-
-ifeq "$(OS)" "Linux"
-PLATFORM = Linux
-endif
-
-ifeq "$(OS)" "Darwin"
-PLATFORM = MacOSX
-endif
 
 # Kind of a hack to build content easily.
 .PHONY: $(G_CONTENTDIR)/*/* pre-content content
@@ -130,7 +124,7 @@ pre-content:
 	@echo /compress                     > $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /intermediateDir:$(G_OBJDIR) >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /outputDir:$(C_BINDIR)       >> $(G_TMPDIR)/$(G_CONTENTFILE)
-	@echo /platform:$(PLATFORM)        >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /platform:$(MGCB_PLATFORM)        >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /profile:HiDef               >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /quiet                       >> $(G_TMPDIR)/$(G_CONTENTFILE)
 

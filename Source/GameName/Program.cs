@@ -16,6 +16,8 @@ using EngineName.Logging;
 // TODO: Remove this crap.
 public class TestScene: Scene {
     public override void Init() {
+        AddSystems(new EngineName.Systems.FpsCounterSystem(updatesPerSec: 10));
+
         base.Init();
 
         Log.Get().Debug("TestScene initialized.");

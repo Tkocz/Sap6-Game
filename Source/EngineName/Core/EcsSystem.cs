@@ -11,7 +11,7 @@ public abstract class EcsSystem {
      *------------------------------------*/
 
     /// <summary>Performs cleanup logic specific to the system.</summary>
-    public virtual void Cleanuo() {
+    public virtual void Cleanup() {
     }
 
     /// <summary>Performs draw logic specific to the system.</summary>
