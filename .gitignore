@@ -1,4 +1,5 @@
 *.csproj.user
+*.userprefs
 .DS_Store
 .vs
 bin
