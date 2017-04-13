@@ -25,7 +25,7 @@ public class Game1: Game {
      *------------------------------------*/
 
     /// <summary>The game scene stack.</summary>
-    private readonly Stack<Scene> m_Scenes = new Stack<Scene>();
+    private readonly Stack<Scene> mScenes = new Stack<Scene>();
 
     /// <summary>The game class singleton instance.</summary>
     private static Game1 s_Inst;
@@ -46,11 +46,11 @@ public class Game1: Game {
     public Scene Scene {
         get {
             // TODO: Possible race condition here, but probably unimportant.
-            if (m_Scenes.Count == 0) {
+            if (mScenes.Count == 0) {
                 return null;
             }
 
-            return m_Scenes.Peek();
+            return mScenes.Peek();
         }
     }
 
@@ -64,7 +64,7 @@ public class Game1: Game {
         DebugUtil.Assert(AtomicUtil.CAS(ref s_Inst, this, null),
                          "s_Inst is not null!");
 
-        m_Scenes.Push(scene);
+        mScenes.Push(scene);
 
         Graphics = new GraphicsDeviceManager(this);
         Graphics.PreparingDeviceSettings += (sender, e) => {
@@ -86,17 +86,17 @@ public class Game1: Game {
     /// <param name="scene">The scene to display.</param>
     public void EnterScene(Scene scene) {
         scene.Init();
-        m_Scenes.Push(scene);
+        mScenes.Push(scene);
     }
 
     /// <summary>Leaves the currently displayed scene..</summary>
     public void LeaveScene() {
-        if (m_Scenes.Count == 0) {
+        if (mScenes.Count == 0) {
             Log.Get().Warn("No scene to leave.");
             return;
         }
 
-        var scene = m_Scenes.Pop();
+        var scene = mScenes.Pop();
         scene.Cleanup();
     }
 
