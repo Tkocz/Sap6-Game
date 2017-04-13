@@ -28,7 +28,7 @@ public class Game1: Game {
     private readonly Stack<Scene> mScenes = new Stack<Scene>();
 
     /// <summary>The game class singleton instance.</summary>
-    private static Game1 s_Inst;
+    private static Game1 sInst;
 
     /*--------------------------------------
      * PUBLIC PROPERTIES
@@ -39,7 +39,7 @@ public class Game1: Game {
 
     /// <summary>Gets the game instance.</summary>
     public static Game1 Inst {
-        get { return s_Inst; }
+        get { return sInst; }
     }
 
     /// <summary>Gets the currently displayed game scene.</summary>
@@ -61,8 +61,8 @@ public class Game1: Game {
     /// <summary>Initializes the game singleton instance.</summary>
     /// <param name="scene">The scene to display initially.</param>
     public Game1(Scene scene) {
-        DebugUtil.Assert(AtomicUtil.CAS(ref s_Inst, this, null),
-                         "s_Inst is not null!");
+        DebugUtil.Assert(AtomicUtil.CAS(ref sInst, this, null),
+                         "sInst is not null!");
 
         mScenes.Push(scene);
 
