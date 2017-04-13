@@ -56,8 +56,7 @@ public abstract class Scene {
     private readonly HashSet<EcsEntity> mEntities = new HashSet<EcsEntity>();
 
     /// <summary>The pending entities waiting to be added or removed.</summary>
-    private readonly Queue<EntityOp> mEntitiesPending =
-        new Queue<EntityOp>();
+    private readonly Queue<EntityOp> mEntitiesPending = new Queue<EntityOp>();
 
     /// <summary>Used as a cache for entity retrieval.</summary>
     private readonly Dictionary<Type, HashSet<EcsEntity>> mEntityComponents =
