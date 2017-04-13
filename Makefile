@@ -62,7 +62,7 @@ MONOGAME_PATH := $(MONOGAME_PATH)/Assemblies/DesktopGL
 .PHONY: all clean libs run
 
 # Default target.
-all: doc game content libs
+all: game content libs
 
 clean:
 	rm -fr $(C_BINDIR) $(G_CONTENTFILE) $(G_OBJDIR) $(G_TMPDIR) doc
