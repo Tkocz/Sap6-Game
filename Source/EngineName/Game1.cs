@@ -38,21 +38,10 @@ public class Game1: Game {
     public GraphicsDeviceManager Graphics { get; }
 
     /// <summary>Gets the game instance.</summary>
-    public static Game1 Inst {
-        get { return sInst; }
-    }
+    public static Game1 Inst => sInst;
 
     /// <summary>Gets the currently displayed game scene.</summary>
-    public Scene Scene {
-        get {
-            // TODO: Possible race condition here, but probably unimportant.
-            if (mScenes.Count == 0) {
-                return null;
-            }
-
-            return mScenes.Peek();
-        }
-    }
+    public Scene Scene => (mScenes.Count > 0) ? mScenes.Peek() : null;
 
     /*--------------------------------------
      * CONSTRUCTORS
@@ -62,7 +51,7 @@ public class Game1: Game {
     /// <param name="scene">The scene to display initially.</param>
     public Game1(Scene scene) {
         DebugUtil.Assert(AtomicUtil.CAS(ref sInst, this, null),
-                         "sInst is not null!");
+                         $"{nameof (sInst)} is not null!");
 
         mScenes.Push(scene);
 

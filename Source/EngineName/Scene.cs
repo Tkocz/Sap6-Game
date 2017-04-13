@@ -73,7 +73,7 @@ public abstract class Scene {
     /// <param name="entity">The entity to add to the scene.</param>
     public void AddEntity(EcsEntity entity) {
         DebugUtil.Assert(AtomicUtil.CAS(ref entity.mScene, this, null),
-                         "entity.mScene is not null!");
+                         $"{nameof (entity.mScene)} is not null!");
 
         lock (mEntitiesPending) {
             mEntitiesPending.Enqueue(new EntityOp {

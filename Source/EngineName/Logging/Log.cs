@@ -5,8 +5,8 @@ namespace EngineName.Logging {
  *------------------------------------*/
 
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 /*--------------------------------------
  * CLASSES
@@ -51,12 +51,11 @@ public class Log {
 
     /// <summary>Gets a log for the calling method.</summary>
     /// <returns>A log.</returns>
-    public static Log Get() {
-        var stackFrame = new StackFrame(1);
-        var method     = stackFrame.GetMethod();
-        var type       = method.DeclaringType;
-
-        return Get(string.Format("{0}.{1}", type.Name, method.Name));
+    public static Log Get([CallerFilePath  ] string callerFilePath   = "",
+                          [CallerMemberName] string callerMemberName = "",
+                          [CallerLineNumber] int    callerLineNumber = 0)
+    {
+        return Get($"{Path.GetFileName(callerFilePath)}:{callerLineNumber}");
     }
 
     /// <summary>Writes a debug message to the log.</summary>
@@ -150,8 +149,8 @@ public class Log {
     private void Write(string type, string text) {
         var t  = (DateTime.UtcNow - sInitTime).TotalSeconds;
         var s0 = string.Format("({0})", type);
-        var s1 = string.Format("[{0:0.000}] {1,-5} {2}()", t, s0, mName);
-        var s2 = string.Format("{0}: {1}", s1, text);
+        var s1 = string.Format("{0:0.000} {1,-5} {2}", t, s0, mName);
+        var s2 = string.Format("{0,-32}: {1}", s1, text);
 
         Console.WriteLine(s2);
 
