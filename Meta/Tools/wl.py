@@ -19,7 +19,7 @@ VERSION = "0.1b"
 
 ERR_NO_SUCH_LOG = 3
 
-LOG_DIR = "../Meta/Work-Logs"
+LOG_DIR = "../Work-Logs"
 
 #---------------------------------------
 # FUNCTIONS
