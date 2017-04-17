@@ -19,7 +19,8 @@ VERSION = "0.1b"
 
 ERR_NO_SUCH_LOG = 3
 
-LOG_DIR = "../Work-Logs"
+LOG_DIR      = "../Work-Logs"
+LOG_FILE_EXT = ".wl"
 
 #---------------------------------------
 # FUNCTIONS
@@ -51,7 +52,7 @@ def parse_args():
         help="display work log statistics")
 
     ap.add_argument("-t", "--time", type=float,
-        help="specify work in number of hours")
+        help="specify work time in number of hours")
 
     args = ap.parse_args()
 
@@ -60,26 +61,17 @@ def parse_args():
         sys.exit(2)
 
     if args.user is None:
-        args.user = getpass.getuser().capitalize()
+        args.user = getpass.getuser()
+
+    args.user = args.user.capitalize()
 
     return args
 
-def parse_line(s):
-    a = s.split(":", 2)
-
-    r = lambda: None
-
-    r.timestamp = int(a[0])
-    r.worktime  = float(a[1])
-    r.desc     = a[2]
-
-    return r
-
 def show_statistics(args):
-    filename = os.path.join(LOG_DIR, args.user + ".wl")
+    filename = os.path.join(LOG_DIR, args.user + LOG_FILE_EXT)
 
     if not os.path.exists(filename):
-        print(f"No such log exists: {filename}")
+        print(f"No such log file exists: {filename}")
         sys.exit(ERR_NO_SUCH_LOG)
 
     with open(filename, "r") as f:
@@ -87,16 +79,27 @@ def show_statistics(args):
 
     print(f"\nStatistics for {args.user}")
 
-    parse_data = lambda: map(parse_line, data)
+    def parse_line(s):
+        a = s.split(":", 2)
+
+        r = lambda: None
+
+        r.timestamp = int(a[0])
+        r.worktime  = float(a[1])
+        r.desc      = a[2]
+
+        return r
+
+    parse_data = lambda fn: map(fn, map(parse_line, data))
 
     print(32*"-")
 
-    total_hours = sum(map(lambda d: d.worktime, parse_data()))
+    total_hours = sum(parse_data(lambda d: d.worktime))
 
     print(f"  Total hours    : {total_hours:.2f}")
 
-    start_timestamp = min(map(lambda d: d.timestamp, parse_data()))
-    end_timestamp   = max(map(lambda d: d.timestamp, parse_data()))
+    start_timestamp = min(parse_data(lambda d: d.timestamp))
+    end_timestamp   = max(parse_data(lambda d: d.timestamp))
     total_time      = (end_timestamp - start_timestamp) / 3600.0
     hours_per_week  = 168.0 * total_hours / total_time
 
@@ -118,19 +121,19 @@ def write_entry(args):
 
     print("Log entry written.")
 
-
 #---------------------------------------
 # ENTRY POINT
 #---------------------------------------
 
 if __name__ == "__main__":
+    print(f"Work Log Tool v{VERSION}\n"
+          f"  {AUTHOR}")
+
     args = parse_args()
 
     # Make sure the log directory exists.
     if not os.path.exists(LOG_DIR):
         os.mkdir(LOG_DIR)
 
-    if args.statistics:
-        show_statistics(args)
-    else:
-        write_entry(args)
+    if args.statistics : show_statistics(args)
+    else               : write_entry(args)
