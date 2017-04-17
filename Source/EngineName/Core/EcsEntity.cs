@@ -52,7 +52,7 @@ public sealed class EcsEntity {
 
         var scene = mScene;
         if (scene != null) {
-            mScene.NotifyComponentsChanged(this);
+            scene.NotifyComponentsChanged(this);
         }
     }
 
@@ -99,7 +99,7 @@ public sealed class EcsEntity {
         if (removed) {
             var scene = mScene;
             if (scene != null) {
-                mScene.NotifyComponentsChanged(this);
+                scene.NotifyComponentsChanged(this);
             }
         }
 
