@@ -98,7 +98,7 @@ def show_statistics(args):
     start_timestamp = min(map(lambda d: d.timestamp, parse_data()))
     end_timestamp   = max(map(lambda d: d.timestamp, parse_data()))
     total_time      = (end_timestamp - start_timestamp) / 3600.0
-    hours_per_week  = total_hours / total_time
+    hours_per_week  = 168.0 * total_hours / total_time
 
     print(f"  Hours per week : {hours_per_week:.2f}")
 
