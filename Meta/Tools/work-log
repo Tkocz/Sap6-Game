@@ -14,11 +14,14 @@ import time
 # CONSTANTS
 #---------------------------------------
 
+# Meta
 AUTHOR  = "Philip Arvidsson <philip@philiparvidsson.com>"
-VERSION = "0.1b"
+VERSION = "0.12b"
 
+# Error codes
 ERR_NO_SUCH_LOG = 3
 
+# Behavior
 LOG_DIR      = "../Work-Logs"
 LOG_FILE_EXT = ".wl"
 
@@ -77,7 +80,7 @@ def show_statistics(args):
     with open(filename, "r") as f:
         data = f.readlines()
 
-    print(f"\nStatistics for {args.user}")
+    print(f"Statistics for {args.user}")
 
     def parse_line(s):
         a = s.split(":", 2)
@@ -90,16 +93,16 @@ def show_statistics(args):
 
         return r
 
-    parse_data = lambda fn: map(fn, map(parse_line, data))
+    parse_data = lambda fn: map(lambda s: fn(parse_line(s)), data)
 
     print(32*"-")
 
-    total_hours = sum(parse_data(lambda d: d.worktime))
+    total_hours = sum(parse_data(lambda e: e.worktime))
 
     print(f"  Total hours    : {total_hours:.2f}")
 
-    start_timestamp = min(parse_data(lambda d: d.timestamp))
-    end_timestamp   = max(parse_data(lambda d: d.timestamp))
+    start_timestamp = min(parse_data(lambda e: e.timestamp))
+    end_timestamp   = max(parse_data(lambda e: e.timestamp))
     total_time      = (end_timestamp - start_timestamp) / 3600.0
     hours_per_week  = 168.0 * total_hours / total_time
 
@@ -127,7 +130,7 @@ def write_entry(args):
 
 if __name__ == "__main__":
     print(f"Work Log Tool v{VERSION}\n"
-          f"  {AUTHOR}")
+          f"  {AUTHOR}\n")
 
     args = parse_args()
 
