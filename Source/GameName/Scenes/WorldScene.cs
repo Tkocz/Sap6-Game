@@ -18,7 +18,12 @@ namespace GameName.Scenes
     {
         public override void Init()
         {
-            AddSystems(new FpsCounterSystem(updatesPerSec: 10), new RenderingSystem(), new CameraSystem(), new PhysicsSystem());
+            AddSystems(
+                new FpsCounterSystem(updatesPerSec: 10), 
+                new RenderingSystem(), 
+                new CameraSystem(), 
+                new PhysicsSystem()
+            );
 
             base.Init();
 
@@ -27,8 +32,8 @@ namespace GameName.Scenes
             AddComponent(camera, new CTransform() { Position = new Vector3(0, 0, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
 
             int id = AddEntity();
-            AddComponent(id, new CTransform() { Position = new Vector3(0, 0, -20), Rotation = Matrix.Identity, Scale = Vector3.One });
-            AddComponent<C3DRenderable>(id, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("chest") });
+            AddComponent(id, new CTransform() { Position = new Vector3(0, 0, 15), Rotation = Matrix.Identity, Scale = Vector3.One });
+            AddComponent<C3DRenderable>(id, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("rock") });
 
             Log.Get().Debug("TestScene initialized.");
         }

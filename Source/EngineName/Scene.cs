@@ -1,19 +1,19 @@
 namespace EngineName {
 
-/*--------------------------------------
- * USINGS
- *------------------------------------*/
+    /*--------------------------------------
+     * USINGS
+     *------------------------------------*/
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
 
-using Core;
-using Utils;
+    using Core;
+    using Utils;
 
     using EngineName.Components;
     using EngineName.Components.Renderable;
-
+    using Microsoft.Xna.Framework;
     /*--------------------------------------
      * CLASSES
      *------------------------------------*/
@@ -116,6 +116,7 @@ using Utils;
     /// <param name="dt">The game time, in seconds, since the last call to this
     ///                  method.</param>
     public virtual void Draw(float t, float dt) {
+        Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
         foreach (var system in m_Systems) {
             system.Draw(t, dt);
         }
@@ -147,10 +148,11 @@ using Utils;
     /// <returns><see langword="true"/> if the entity existed in the scene and
     ///          was removed,</returns>
     public bool RemoveEntity(EcsEntity entity) {
+            /*
         if (AtomicUtil.CAS(ref entity.m_Scene, null, this)) {
             // The entity is someone else's responsibility.
             return false;
-        }
+        }*/
         /*
         lock (m_EntitiesPending) {
             m_EntitiesPending.Enqueue(new EntityOp {

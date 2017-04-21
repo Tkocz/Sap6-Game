@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using EngineName.Components;
+using Microsoft.Xna.Framework;
 
 namespace EngineName.Systems
 {
@@ -21,16 +22,16 @@ namespace EngineName.Systems
             base.Update(t, dt);
         }
         public override void Draw(float t, float dt) {
-            foreach(CCamera camera in Game1.Inst.Scene.GetComponents<CCamera>().Values) {
-                foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>())
-                {
+            int counter = 0;
+            Vector3 meshPosition = new Vector3(), cameraPosition;
+            foreach (CCamera camera in Game1.Inst.Scene.GetComponents<CCamera>().Values) {
+                foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
                     var key = component.Key;
                     C3DRenderable model = (C3DRenderable)component.Value;
                     CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
-                    foreach (var mesh in model.model.Meshes)
-                    {
-                        foreach (BasicEffect effect in mesh.Effects)
-                        {
+                    meshPosition = transform.Position;
+                    foreach (var mesh in model.model.Meshes) {
+                        foreach (BasicEffect effect in mesh.Effects) {
                             effect.EnableDefaultLighting();
                             effect.PreferPerPixelLighting = true;
 
@@ -42,10 +43,12 @@ namespace EngineName.Systems
                                 pass.Apply();
                             }
                         }
-                        base.Draw(t, dt);
+                        counter++;
+                        mesh.Draw();
                     }
                 }
             }
+            Console.WriteLine(string.Format("{0} meshes drawn, model at {1}, {2}, {3}", counter, meshPosition.X, meshPosition.Y, meshPosition.Z));
         }
     }
 }
