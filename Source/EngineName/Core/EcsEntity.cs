@@ -19,26 +19,26 @@ public sealed class EcsEntity {
      *------------------------------------*/
 
     /// <summary>The attached components.</summary>
-    internal readonly Dictionary<Type, EcsComponent> m_Components =
+    internal readonly Dictionary<Type, EcsComponent> mComponents =
         new Dictionary<Type, EcsComponent>();
 
     /// <summary>The scene that the entity is currently in.</summary>
-    internal Scene m_Scene;
+    internal Scene mScene;
 
     /// <summary>The ID that will be assigned to the next entity
     ///          instance.</summary>
-    private static int s_NextID = 1;
+    private static int sNextID = 1;
 
     /*--------------------------------------
      * PUBLIC PROPERTIES
      *------------------------------------*/
 
     /// <summary>Gets the unique entity ID.</summary>
-    public int ID { get; } = Interlocked.Increment(ref s_NextID);
+    public int ID { get; } = Interlocked.Increment(ref sNextID);
 
     /// <summary>Gets the scene that the entity is in.</summary>
     public Scene Scene {
-        get { return m_Scene; }
+        get { return mScene; }
     }
 
     /*--------------------------------------
@@ -48,11 +48,11 @@ public sealed class EcsEntity {
     /// <summary>Adds a component to the entity.</summary>
     /// <param name="component">The component to add to the entity.</param>
     public void AddComponent(EcsComponent component) {
-        m_Components.Add(component.GetType(), component);
+        mComponents.Add(component.GetType(), component);
 
-        var scene = m_Scene;
+        var scene = mScene;
         if (scene != null) {
-            m_Scene.NotifyComponentsChanged(this);
+            scene.NotifyComponentsChanged(this);
         }
     }
 
@@ -60,7 +60,7 @@ public sealed class EcsEntity {
     /// <param name="type">The type of the component to retrieve.</param>
     /// <returns>The attached entity component of the specified type.</returns>
     public EcsComponent GetComponent(Type type) {
-        return m_Components[type];
+        return mComponents[type];
     }
 
     /// <summary>Retrieves the entity component of the specified type.</summary>
@@ -76,7 +76,7 @@ public sealed class EcsEntity {
     /// <returns><see langword="true"/> if the entity has a component of the
     ///          specified type.</returns>
     public bool HasComponent(Type type) {
-        return m_Components.ContainsKey(type);
+        return mComponents.ContainsKey(type);
     }
 
     /// <summary>Checks whether the entity has a component of the specified
@@ -94,12 +94,12 @@ public sealed class EcsEntity {
     /// <returns><see langword="true"/> if a component of the specified type was
     ///          removed from the entity.</returns>
     public bool RemoveComponent(Type type) {
-        bool removed = m_Components.Remove(type);
+        bool removed = mComponents.Remove(type);
 
         if (removed) {
-            var scene = m_Scene;
+            var scene = mScene;
             if (scene != null) {
-                m_Scene.NotifyComponentsChanged(this);
+                scene.NotifyComponentsChanged(this);
             }
         }
 

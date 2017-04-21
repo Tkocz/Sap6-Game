@@ -62,7 +62,7 @@ MONOGAME_PATH := $(MONOGAME_PATH)/Assemblies/DesktopGL
 .PHONY: all clean libs run
 
 # Default target.
-all: doc game content libs
+all: game content libs
 
 clean:
 	rm -fr $(C_BINDIR) $(G_CONTENTFILE) $(G_OBJDIR) $(G_TMPDIR) doc
@@ -124,7 +124,7 @@ pre-content:
 	@echo /compress                     > $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /intermediateDir:$(G_OBJDIR) >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /outputDir:$(C_BINDIR)       >> $(G_TMPDIR)/$(G_CONTENTFILE)
-	@echo /platform:$(MGCB_PLATFORM)        >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /platform:$(MGCB_PLATFORM)   >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /profile:HiDef               >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /quiet                       >> $(G_TMPDIR)/$(G_CONTENTFILE)
 

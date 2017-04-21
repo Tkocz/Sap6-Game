@@ -25,10 +25,10 @@ public class Game1: Game {
      *------------------------------------*/
 
     /// <summary>The game scene stack.</summary>
-    private readonly Stack<Scene> m_Scenes = new Stack<Scene>();
+    private readonly Stack<Scene> mScenes = new Stack<Scene>();
 
     /// <summary>The game class singleton instance.</summary>
-    private static Game1 s_Inst;
+    private static Game1 sInst;
 
     /*--------------------------------------
      * PUBLIC PROPERTIES
@@ -38,21 +38,10 @@ public class Game1: Game {
     public GraphicsDeviceManager Graphics { get; }
 
     /// <summary>Gets the game instance.</summary>
-    public static Game1 Inst {
-        get { return s_Inst; }
-    }
+    public static Game1 Inst => sInst;
 
     /// <summary>Gets the currently displayed game scene.</summary>
-    public Scene Scene {
-        get {
-            // TODO: Possible race condition here, but probably unimportant.
-            if (m_Scenes.Count == 0) {
-                return null;
-            }
-
-            return m_Scenes.Peek();
-        }
-    }
+    public Scene Scene => (mScenes.Count > 0) ? mScenes.Peek() : null;
 
     /*--------------------------------------
      * CONSTRUCTORS
@@ -61,10 +50,10 @@ public class Game1: Game {
     /// <summary>Initializes the game singleton instance.</summary>
     /// <param name="scene">The scene to display initially.</param>
     public Game1(Scene scene) {
-        DebugUtil.Assert(AtomicUtil.CAS(ref s_Inst, this, null),
-                         "s_Inst is not null!");
+        DebugUtil.Assert(AtomicUtil.CAS(ref sInst, this, null),
+                         $"{nameof (sInst)} is not null!");
 
-        m_Scenes.Push(scene);
+        mScenes.Push(scene);
 
         Graphics = new GraphicsDeviceManager(this);
         Graphics.PreparingDeviceSettings += (sender, e) => {
@@ -86,17 +75,17 @@ public class Game1: Game {
     /// <param name="scene">The scene to display.</param>
     public void EnterScene(Scene scene) {
         scene.Init();
-        m_Scenes.Push(scene);
+        mScenes.Push(scene);
     }
 
     /// <summary>Leaves the currently displayed scene..</summary>
     public void LeaveScene() {
-        if (m_Scenes.Count == 0) {
+        if (mScenes.Count == 0) {
             Log.Get().Warn("No scene to leave.");
             return;
         }
 
-        var scene = m_Scenes.Pop();
+        var scene = mScenes.Pop();
         scene.Cleanup();
     }
 

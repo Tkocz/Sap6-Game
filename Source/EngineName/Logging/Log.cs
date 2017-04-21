@@ -5,8 +5,8 @@ namespace EngineName.Logging {
  *------------------------------------*/
 
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 /*--------------------------------------
  * CLASSES
@@ -19,14 +19,14 @@ public class Log {
      *------------------------------------*/
 
     /// <summary>The name of the log.</summary>
-    private readonly string m_Name;
+    private readonly string mName;
 
     /// <summary>The file log, if file logging is enabled.</summary>
-    private static StreamWriter s_File;
+    private static StreamWriter sFile;
 
     /// <summary>The time that the <see cref="Log"/> class was
     ///          initialized.</summary>
-    private static readonly DateTime s_InitTime = DateTime.UtcNow;
+    private static readonly DateTime sInitTime = DateTime.UtcNow;
 
     /*--------------------------------------
      * CONSTRUCTORS
@@ -35,7 +35,7 @@ public class Log {
     /// <summary>Creates a new log with the specified name.</summary>
     /// <param name="name">The name of the log.</param>
     private Log(string name) {
-        m_Name = name;
+        mName = name;
     }
 
     /*--------------------------------------
@@ -51,12 +51,11 @@ public class Log {
 
     /// <summary>Gets a log for the calling method.</summary>
     /// <returns>A log.</returns>
-    public static Log Get() {
-        var stackFrame = new StackFrame(1);
-        var method     = stackFrame.GetMethod();
-        var type       = method.DeclaringType;
-
-        return Get(string.Format("{0}.{1}", type.Name, method.Name));
+    public static Log Get([CallerFilePath  ] string callerFilePath   = "",
+                          [CallerMemberName] string callerMemberName = "",
+                          [CallerLineNumber] int    callerLineNumber = 0)
+    {
+        return Get($"{Path.GetFileName(callerFilePath)}:{callerLineNumber}");
     }
 
     /// <summary>Writes a debug message to the log.</summary>
@@ -120,7 +119,7 @@ public class Log {
             fileName = Path.GetFileNameWithoutExtension(fileName) + ".log";
         }
 
-        s_File = new StreamWriter(fileName);
+        sFile = new StreamWriter(fileName);
     }
 
     /// <summary>Writes a warning message to the log.</summary>
@@ -148,17 +147,17 @@ public class Log {
     /// <param name="type">The message type.</param>
     /// <param name="text">The text to write.</param>
     private void Write(string type, string text) {
-        var t  = (DateTime.UtcNow - s_InitTime).TotalSeconds;
+        var t  = (DateTime.UtcNow - sInitTime).TotalSeconds;
         var s0 = string.Format("({0})", type);
-        var s1 = string.Format("[{0:0.000}] {1,-5} {2}()", t, s0, m_Name);
-        var s2 = string.Format("{0}: {1}", s1, text);
+        var s1 = string.Format("{0:0.000} {1,-5} {2}", t, s0, mName);
+        var s2 = string.Format("{0,-32}: {1}", s1, text);
 
         Console.WriteLine(s2);
 
-        if (s_File != null) {
-            lock (s_File) {
-                s_File.WriteLine(s2);
-                s_File.Flush();
+        if (sFile != null) {
+            lock (sFile) {
+                sFile.WriteLine(s2);
+                sFile.Flush();
             }
         }
     }
