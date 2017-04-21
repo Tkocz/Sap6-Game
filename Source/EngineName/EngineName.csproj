@@ -45,13 +45,26 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\CInput.cs" />
+    <Compile Include="Components\Renderable\C2DRenderable.cs" />
+    <Compile Include="Components\Renderable\CHeightmap.cs" />
+    <Compile Include="Components\Renderable\CImportedModel.cs" />
+    <Compile Include="Components\Renderable\C3DRenderable.cs" />
+    <Compile Include="Components\Renderable\CRenderable.cs" />
+    <Compile Include="Components\CTransform.cs" />
+    <Compile Include="Components\Renderable\CSprite.cs" />
+    <Compile Include="Components\Renderable\CText.cs" />
+    <Compile Include="Components\CCamera.cs" />
     <Compile Include="Core\EcsComponent.cs" />
     <Compile Include="Core\EcsEntity.cs" />
     <Compile Include="Core\EcsSystem.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="Scene.cs" />
+    <Compile Include="Systems\CameraSystem.cs" />
     <Compile Include="Systems\FpsCounterSystem.cs" />
+    <Compile Include="Systems\PhysicsSystem.cs" />
+    <Compile Include="Systems\RenderingSystem.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
   </ItemGroup>

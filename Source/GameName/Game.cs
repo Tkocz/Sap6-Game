@@ -8,24 +8,14 @@ using System;
 
 using EngineName;
 using EngineName.Logging;
+    using EngineName.Components;
+    using EngineName.Components.Renderable;
+    using EngineName.Systems;
+    using GameName.Scenes;
 
-/*--------------------------------------
- * CLASSES
- *------------------------------------*/
 
-// TODO: Remove this crap.
-public class TestScene: Scene {
-    public override void Init() {
-        AddSystems(new EngineName.Systems.FpsCounterSystem(updatesPerSec: 10));
-
-        base.Init();
-
-        Log.Get().Debug("TestScene initialized.");
-    }
-}
-
-/// <summary>Provides a program entry point.</summary>
-public static class Program {
+    /// <summary>Provides a program entry point.</summary>
+    public static class Program {
     /*--------------------------------------
      * NON-PUBLIC METHODS
      *------------------------------------*/
@@ -37,7 +27,7 @@ public static class Program {
         Log.ToFile();
 
         // TODO: Create initial scene.
-        using (var game = new Game1(new TestScene())) {
+        using (var game = new Game1(new WorldScene())) {
             game.Run();
         }
 

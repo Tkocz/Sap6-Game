@@ -131,6 +131,8 @@ public class Game1: Game {
                  .Info($"  Resolution: {width}x{height}")
                  .Info($"  VSync:      {vsync}"         );
 
+            Content.RootDirectory = "Content";
+
         // There is always an initial scene, so just init it here.
         Scene.Init();
     }
