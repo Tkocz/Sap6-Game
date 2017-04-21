@@ -63,6 +63,7 @@ n/a
 * **Philip Arvidsson** - *n/a* - [philiparvidsson](https://github.com/philiparvidsson)
 * **Martin Bergqvist** - *n/a* - [Tkocz](https://github.com/Tkocz)
 * **Jim Glansk** - *n/a* - [s141587](https://github.com/s141587)
+* **Rasmus Lundquist** - *n/a* - [&lt;missing&gt;](https://github.com/)
 * **Christoffer Olsson** - *n/a* - [crippa9](https://github.com/crippa9)
 * **Tobias Öhrström** - *n/a* - [tobohr](https://github.com/tobohr)
 * **Tobias Ånhed** - *n/a* - [tobiasanhed](https://github.com/tobiasanhed)
