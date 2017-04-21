@@ -11,11 +11,10 @@ using System.Threading.Tasks;
 namespace EngineName.Systems
 {
     public class CameraSystem : EcsSystem {
+        private GraphicsDevice mGraphicsDevice;
+
         public override void Init() {
-            GraphicsDevice mGraphicsDevice = Game1.Inst.GraphicsDevice;
-            foreach(CCamera camera in Game1.Inst.Scene.GetComponents<CCamera>().Values) {
-                camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver2, mGraphicsDevice.Viewport.AspectRatio, 0.1f, 1000f);
-            }
+            mGraphicsDevice = Game1.Inst.GraphicsDevice;
             base.Init();
         }
         public override void Update(float t, float dt)

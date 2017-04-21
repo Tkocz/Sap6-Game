@@ -30,6 +30,9 @@ namespace EngineName.Systems
                     C3DRenderable model = (C3DRenderable)component.Value;
                     CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
                     meshPosition = transform.Position;
+
+                    if (model.model == null) continue;
+
                     foreach (var mesh in model.model.Meshes) {
                         foreach (BasicEffect effect in mesh.Effects) {
                             effect.EnableDefaultLighting();

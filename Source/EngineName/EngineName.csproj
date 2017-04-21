@@ -63,6 +63,7 @@
     <Compile Include="Scene.cs" />
     <Compile Include="Systems\CameraSystem.cs" />
     <Compile Include="Systems\FpsCounterSystem.cs" />
+    <Compile Include="Systems\MapSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\RenderingSystem.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
