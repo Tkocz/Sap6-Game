@@ -66,6 +66,7 @@
     <Compile Include="Systems\MapSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\RenderingSystem.cs" />
+    <Compile Include="Core\VertexPositionNormalColor.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
   </ItemGroup>
