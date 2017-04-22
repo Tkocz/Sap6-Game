@@ -89,12 +89,12 @@ namespace EngineName.Systems {
 
                 for (int i = 0; i < vertices.Length; i++)
                     vertices[i].Normal.Normalize();
-                //
+                // set buffers
                 var vertexBuffer = new VertexBuffer(mGraphicsDevice, VertexPositionNormalColor.VertexDeclaration, vertices.Length, BufferUsage.None);
                 vertexBuffer.SetData(vertices);
                 var indexBuffer = new IndexBuffer(mGraphicsDevice, typeof(int), indices.Length, BufferUsage.None);
                 indexBuffer.SetData(indices);
-
+                // create model instance
                 var bones = new List<ModelBone>();
                 var meshes = new List<ModelMesh>();
 
@@ -107,7 +107,7 @@ namespace EngineName.Systems {
                 parts.Add(meshPart);
 
                 ModelMesh mesh = new ModelMesh(mGraphicsDevice, parts);
-                meshPart.Effect = new BasicEffect(mGraphicsDevice);
+                meshPart.Effect = new BasicEffect(mGraphicsDevice) { VertexColorEnabled = true };
                 mesh.Name = "Map";
                 ModelBone bone = new ModelBone();
                 bone.Name = "Map";

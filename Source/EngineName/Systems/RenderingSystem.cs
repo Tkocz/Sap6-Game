@@ -32,11 +32,9 @@ namespace EngineName.Systems
 
                     foreach (var mesh in model.model.Meshes) {
                         foreach (BasicEffect effect in mesh.Effects) {
-                            if(model.GetType() == typeof(CHeightmap))
-                                effect.VertexColorEnabled = true;
-
                             effect.EnableDefaultLighting();
                             effect.PreferPerPixelLighting = true;
+
                             effect.Projection = camera.Projection;
                             effect.View = camera.View;
                             effect.World = mesh.ParentBone.Transform * transform.Frame;
