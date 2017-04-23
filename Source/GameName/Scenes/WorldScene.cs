@@ -28,8 +28,12 @@ namespace GameName.Scenes
             base.Init();
             // Camera entity
             int camera = AddEntity();
+            float fieldofview = MathHelper.PiOver2;
+            float nearplane = 0.1f;
+            float farplane = 1000f;
             AddComponent(camera, new CCamera(){
-                Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver2, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, 0.1f, 1000f)
+                Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio,nearplane,farplane)
+                ,ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview*1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane*0.5f, farplane*1.2f)
             });
             AddComponent(camera, new CTransform() { Position = new Vector3(0, 100, 100), Rotation = Matrix.Identity, Scale = Vector3.One });
             // Tree model entity

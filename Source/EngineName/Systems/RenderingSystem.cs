@@ -27,14 +27,18 @@ namespace EngineName.Systems
                 foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
                     var key = component.Key;
                     C3DRenderable model = (C3DRenderable)component.Value;
-                    CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+                    CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);    
                     if (model.model == null) continue;
-
+                    
                     foreach (var mesh in model.model.Meshes) {
+
+                       if(camera.Frustum.Contains(mesh.BoundingSphere) == ContainmentType.Disjoint)
+                           continue;
+
                         foreach (BasicEffect effect in mesh.Effects) {
                             effect.EnableDefaultLighting();
                             effect.PreferPerPixelLighting = true;
-
+                            
                             effect.Projection = camera.Projection;
                             effect.View = camera.View;
                             effect.World = mesh.ParentBone.Transform * transform.Frame;
