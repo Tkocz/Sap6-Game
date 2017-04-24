@@ -6,6 +6,9 @@ using Core;
 using Microsoft.Xna.Framework;
 
 public sealed class CBody: EcsComponent {
+    /// <summary>Gets or sets the axis-aligned bounding box.</summary>
+    public BoundingBox Aabb { get; set; }
+
     /// <summary>Gets or sets the scalar inverse of the mass, in kilograms.</summary>
     public float InvMass { get; set; }
 
