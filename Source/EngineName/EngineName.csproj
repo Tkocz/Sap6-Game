@@ -69,6 +69,7 @@
     <Compile Include="Core\VertexPositionNormalColor.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
+    <Compile Include="Utils\Generic.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
