@@ -11,11 +11,6 @@ namespace GameName.Scenes
     public class WorldScene : Scene
     {
         public override void Init() {
-            // graphic debugging
-            RasterizerState s = new RasterizerState();
-            s.CullMode = CullMode.CullClockwiseFace;
-            //s.FillMode = FillMode.WireFrame;
-            //Game1.Inst.GraphicsDevice.RasterizerState = s;
 
             var mapSystem = new MapSystem();
             AddSystems(
