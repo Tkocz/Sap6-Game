@@ -14,9 +14,11 @@ namespace EngineName {
     using EngineName.Components;
     using EngineName.Components.Renderable;
     using Microsoft.Xna.Framework;
+    using System.Collections.Concurrent;
+
     /*--------------------------------------
-     * CLASSES
-     *------------------------------------*/
+* CLASSES
+*------------------------------------*/
 
     /// <summary>Represents a game scene.</summary>
     public abstract class Scene {
@@ -63,6 +65,7 @@ namespace EngineName {
 
         Dictionary<Type, Dictionary<int, EcsComponent>> Components = new Dictionary<Type, Dictionary<int, EcsComponent>>();
         private int EntityCounter = -1;
+        private ConcurrentQueue<Message> mMessages = new ConcurrentQueue<Message>();
 
         /*--------------------------------------
          * PUBLIC METHODS
@@ -109,6 +112,18 @@ namespace EngineName {
 
         m_Systems.Clear();
     }
+
+        internal void QueueMessage(Message message) {
+            mMessages.Enqueue(message);
+        }
+        internal void DispatchMessages() {
+            Message msg;
+            while(mMessages.TryDequeue(out msg)) {
+                foreach(var subsystem in m_Systems) {
+
+                }
+            }
+        }
 
     /// <summary>Draws the scene by invoking the <see cref="EcsSystem.Draw"/>
     ///          method on all systems in the scene.</summary>
@@ -271,4 +286,12 @@ namespace EngineName {
     }
 }
 
+    public class Message {
+        public string msgName;
+        public int senderId;
+        public int receiverId;
+        public float deliveryTime;
+        public int state; // maybe means which scene it belongs to? (copied from lecture AI in games)
+        public object data; // was a float in example, but object in starburst
+    }
 }

@@ -101,6 +101,7 @@ public class Game1: Game {
             var t  = (float)gameTime.TotalGameTime.TotalSeconds;
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             scene.Draw(t, dt);
+            scene.DispatchMessages();
         }
 
         base.Draw(gameTime);

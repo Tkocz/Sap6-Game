@@ -31,6 +31,8 @@ public abstract class EcsSystem {
     ///                  method.</param>
     public virtual void Update(float t, float dt) {
     }
+
+    public virtual void OnMessage(Message message) { }
 }
 
 }
