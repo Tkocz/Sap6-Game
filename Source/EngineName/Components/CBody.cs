@@ -5,6 +5,8 @@ using Core;
 
 using Microsoft.Xna.Framework;
 
+/// <summary>Provides a physical representation-component for simulating physical effects on
+/// entities in the game world.</summary>
 public sealed class CBody: EcsComponent {
     /// <summary>Gets or sets the axis-aligned bounding box.</summary>
     public BoundingBox Aabb { get; set; }

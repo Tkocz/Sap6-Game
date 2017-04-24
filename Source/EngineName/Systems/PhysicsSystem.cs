@@ -31,6 +31,8 @@ namespace EngineName.Systems
                                             Matrix.CreateTranslation(transformComponent.Position);
             }
 
+            // Basically, use semi-implicit Euler to integrate all positions and then sweep coarsely
+            // for AABB collisions. All potential collisions are passed on to the fine-phase solver.
             mPotentialColls.Clear();
             foreach (var e in Game1.Inst.Scene.GetComponents<CBody>()) {
                 var body = (CBody)e.Value;
