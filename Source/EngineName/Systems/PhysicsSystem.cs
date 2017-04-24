@@ -18,6 +18,14 @@ namespace EngineName.Systems
                                             transformComponent.Rotation *
                                             Matrix.CreateTranslation(transformComponent.Position);
             }
+
+            foreach (var e in Game1.Inst.Scene.GetComponent<CBody>().Values) {
+                var body = e.GetComponent<CBody>();
+
+                // Symplectic Euler is ok for now so compute force before updating position!
+                body.Position += dt*body.Velocity;
+            }
+
             base.Update(t, dt);
         }
     }
