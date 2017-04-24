@@ -1,9 +1,11 @@
 namespace EngineName.Components
 {
 
+using Core;
+
 using Microsoft.Xna.Framework;
 
-public sealed class CTransform: EcsComponent {
+public sealed class CBody: EcsComponent {
     /// <summary>Gets or sets the scalar inverse of the mass, in kilograms.</summary>
     public float InvMass { get; set; }
 
