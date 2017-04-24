@@ -144,6 +144,7 @@ namespace EngineName {
         Components.Add(typeof(CInput), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(C3DRenderable), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CCamera), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CBody), new Dictionary<int, EcsComponent>());
         foreach (var system in m_Systems) {
             system.Init();
         }

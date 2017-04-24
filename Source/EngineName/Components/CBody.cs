@@ -12,7 +12,7 @@ public sealed class CBody: EcsComponent {
     public BoundingBox Aabb { get; set; }
 
     /// <summary>Gets or sets the scalar inverse of the mass, in kilograms.</summary>
-    public float InvMass { get; set; }
+    public float InvMass { get; set; } = 1.0f;
 
     /// <summary>Gets or sets the position in world-space as a displacement from the origin, in
     ///          meters.</summary>

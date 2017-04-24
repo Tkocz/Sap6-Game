@@ -116,6 +116,9 @@ $(C_BINDIR)/$(G_TARGET): engine
 $(G_CONTENTDIR)/Models/*.fbx:
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
+$(G_CONTENTDIR)/Models/*.3ds:
+	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
+
 $(G_CONTENTDIR)/Textures/*.jpg:
 	@echo /processorParam:TextureFormat=Color >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /build:$@                           >> $(G_TMPDIR)/$(G_CONTENTFILE)

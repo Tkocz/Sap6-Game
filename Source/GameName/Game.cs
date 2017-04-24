@@ -27,7 +27,7 @@ using EngineName.Logging;
         Log.ToFile();
 
         // TODO: Create initial scene.
-        using (var game = new Game1(new WorldScene())) {
+        using (var game = new Game1(new Dev.CollTestScene1())) {
             game.Run();
         }
 
