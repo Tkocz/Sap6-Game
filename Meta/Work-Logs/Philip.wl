@@ -4,3 +4,4 @@
 1492435181:3.0:Wrote documentation, make script, README.md and created initial issues to get going. (This enty is added after the fact.)
 1493051395:1.0:Reworked VS project and moved some files + started work in physics domain.
 1493059579:2.5:Implemented fine collision solver for sphere-sphere interactions.
+1493090861:1.0:Refactored and optimize some code in PhysicsSystem.
