@@ -18,6 +18,7 @@ namespace GameName.Scenes
                 new RenderingSystem(),
                 new CameraSystem(),
                 new PhysicsSystem(),
+                new InputSystem(),
                 mapSystem
             );
             base.Init();
@@ -30,7 +31,7 @@ namespace GameName.Scenes
             int player = AddEntity();
             AddComponent(player, new CBody());
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform());
+            AddComponent(player, new CTransform() { Scale = new Vector3(10f) } );
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/DummySphere") });
 
 
