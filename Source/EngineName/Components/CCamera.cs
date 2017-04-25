@@ -15,5 +15,9 @@ namespace EngineName.Components
         // Altered projection for culling a bit outside of normal projection
         public Matrix ClipProjection;
         public BoundingFrustum Frustum => new BoundingFrustum(View * ClipProjection);
+        public Vector3 Target = Vector3.Zero;
+        public float Heading  = 0f;
+        public int Height     = -50;
+        public int Distance   = 50;
     }
 }

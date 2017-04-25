@@ -29,23 +29,31 @@ namespace GameName.Scenes
             float farplane = 1000f;
 
             int player = AddEntity();
-            AddComponent(player, new CBody());
+            AddComponent(player, new CBody() { Radius = 1000f, Aabb = new BoundingBox(-1000 * Vector3.One, 1000 * Vector3.One) } );
             AddComponent(player, new CInput());
             AddComponent(player, new CTransform() { Scale = new Vector3(10f) } );
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/DummySphere") });
 
-
+            int ball = AddEntity();
+            AddComponent(ball, new CBody() { Position = new Vector3(10f, 0, 10f), Radius = 1000f, Aabb = new BoundingBox(-1000 * Vector3.One, 1000 * Vector3.One) } );
+            AddComponent(ball, new CTransform() { Scale = new Vector3(10f) } );
+            AddComponent<C3DRenderable>(ball, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/DummySphere") });
 
 
             AddComponent(camera, new CCamera(){
                 Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio,nearplane,farplane)
                 ,ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview*1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane*0.5f, farplane*1.2f)
             });
-            AddComponent(camera, new CTransform() { Position = new Vector3(0, 100, 100), Rotation = Matrix.Identity, Scale = Vector3.One });
+            AddComponent(camera, new CInput());
+            AddComponent(camera, new CTransform() { Position = new Vector3(-50, 50, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
+            
+
             // Tree model entity
             /*int id = AddEntity();
             AddComponent<C3DRenderable>(id, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
             AddComponent(id, new CTransform() { Position = new Vector3(0, 0, 0), Rotation = Matrix.Identity, Scale = Vector3.One });*/
+            
+
             // Heightmap entity
             int id = AddEntity();
             AddComponent<C3DRenderable>(id, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/HeightMap") });
