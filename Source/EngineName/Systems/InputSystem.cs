@@ -19,54 +19,24 @@ namespace EngineName.Systems {
 
 
             foreach (var input in Game1.Inst.Scene.GetComponents<CInput>()) {
+                CBody body = null;
                 if(Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)){
-                    var body = Game1.Inst.Scene.GetComponentFromEntity<CBody>(input.Key);
+                    body = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(input.Key);
                 }else{
                     continue;
                 }
-                
+                CInput inputValue = (CInput)input.Value;
                 KeyboardState currentState = Keyboard.GetState();
 
-                if (currentState.IsKeyDown(input.ForwardMovementKey))
-                    body.Position.Z -= movementSpeed;
-                if (currentState.IsKeyDown(input.BackwardMovementKey))
-                    body.Position.Z += movementSpeed;
-                if (currentState.IsKeyDown(input.LeftMovementKey))
-                    body.Position.X -= movementSpeed;
-                if (currentState.IsKeyDown(input.RightMovementKey))
-                    body.Position.X += movementSpeed;
-                transformComponent.Position += Vector3.Transform(body.Position, transformComponent.Rotation);
-
-                // Clockwise around positive Y-axis
-                if (currentState.IsKeyDown(input.YRotationPlus))
-                    yaw -= rotationSpeed;
-
-                // Clockwise around negative Y-axis
-                if (currentState.IsKeyDown(input.YRotationMinus))
-                    yaw += rotationSpeed;
-                /*
-                // Clockwise around positive X-axis
-                if (currentState.IsKeyDown(input.XRotationPlus))
-                    pitch -= rotationSpeed;
-
-                // Clockwise around negative X-axis
-                if (currentState.IsKeyDown(input.XRotationMinus))
-                    pitch += rotationSpeed;
-                    *//*
-                // Clockwise around positive Z-axis
-                if (currentState.IsKeyDown(input.ZRotationPlus))
-                    roll += rotationSpeed;
-
-                // Clockwise around negative Z-axis
-                if (currentState.IsKeyDown(input.ZRotationMinus))
-                    roll -= rotationSpeed;
-                    */
-                //float angle = -elapsedGameTime * 0.01f;
-                Quaternion rot = Quaternion.CreateFromAxisAngle(transformComponent.Rotation.Right, pitch) *
-                    Quaternion.CreateFromAxisAngle(transformComponent.Rotation.Up, yaw) *
-                    Quaternion.CreateFromAxisAngle(transformComponent.Rotation.Backward, roll);
-                rot.Normalize();
-                transformComponent.Rotation *= Matrix.CreateFromQuaternion(rot);
+                if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
+                    body.Velocity.Z -= 5f;
+                if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
+                    body.Position.Z += 5f;
+                if (currentState.IsKeyDown(inputValue.LeftMovementKey))
+                    body.Position.X -= 5f;
+                if (currentState.IsKeyDown(inputValue.RightMovementKey))
+                    body.Position.X += 5f;
+                
                 
             }
         }

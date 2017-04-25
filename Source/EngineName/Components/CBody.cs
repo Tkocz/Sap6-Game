@@ -9,17 +9,17 @@ using Microsoft.Xna.Framework;
 /// entities in the game world.</summary>
 public sealed class CBody: EcsComponent {
     /// <summary>The axis-aligned bounding box.</summary>
-    public BoundingBox Aabb
+    public BoundingBox Aabb;
 
     /// <summary>The scalar inverse of the mass, in kilograms.</summary>
     public float InvMass = 1.0f;
 
     /// <summary>The position in world-space as a displacement from the origin, in
     ///          meters.</summary>
-    public Vector3 Position
+    public Vector3 Position;
 
     /// <summary>The velocity, in meters per second.</summary>
-    public Vector3 Velocity
+    public Vector3 Velocity;
 }
 
 }
