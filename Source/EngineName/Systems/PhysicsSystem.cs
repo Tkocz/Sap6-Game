@@ -34,6 +34,10 @@ namespace EngineName.Systems
             }
         }
 
+        /// <summary>Gets or sets the world gravity vector, in meters per seconds
+        ///          squraed..</summary>
+        public Vector3 Gravity { get; set; } = new Vector3(0.0f, -9.81f, 0.0f);
+
         // Private field to avoid reallocs.
         /// <summary>Contains a list of potential collisions each frame.</summary>
         private List<Pair<int, int>> mPotentialColls = new List<Pair<int, int>>();
@@ -55,6 +59,7 @@ namespace EngineName.Systems
                 var body = (CBody)e.Value;
 
                 // Symplectic Euler is ok for now so compute force before updating position!
+                body.Velocity += dt*Gravity;
                 body.Position += dt*body.Velocity;
 
                 // Not sure what else to do. Need to update transform to match physical body
