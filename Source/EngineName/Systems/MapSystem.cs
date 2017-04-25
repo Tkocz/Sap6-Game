@@ -239,16 +239,14 @@ namespace EngineName.Systems {
             Vector3 FORWARD = new Vector3(0, 0, 1); // +Z
             Vector3 BACKWARD = new Vector3(0, 0, -1); // -Z
 
-            Color groundColor = Color.Brown;
+            Color groundColor = Color.SaddleBrown;
             var vertexList = new List<VertexPositionNormalColor>();
             // Front and back
-            for(int x = 0; x < width-1; x++)
-            {
+            for(int x = 0; x < width-1; x++) {
                 // Front Face
                 var z = depth - 1;
                 var currY = heightmap.HeightData[x, z];
                 var nextY = heightmap.HeightData[x + 1, z];
-                z -= 0;
                 var FRONT_TOP_LEFT = new Vector3(x, currY, z);
                 var FRONT_TOP_RIGHT = new Vector3(x + 1, nextY, z);
                 var FRONT_BOTTOM_LEFT = new Vector3(x, -height, z);
@@ -264,23 +262,55 @@ namespace EngineName.Systems {
                 z = 0;
                 currY = heightmap.HeightData[x, z];
                 nextY = heightmap.HeightData[x+1, z];
-                var BACK_TOP_RIGHT = new Vector3(x, currY, 0);
-                var BACK_TOP_LEFT = new Vector3(x+1, nextY, 0);
-                var BACK_BOTTOM_RIGHT = new Vector3(x, -height, 0);
-                var BACK_BOTTOM_LEFT = new Vector3(x+1, -height, 0);
+                var BACK_TOP_RIGHT = new Vector3(x, currY, z);
+                var BACK_TOP_LEFT = new Vector3(x+1, nextY, z);
+                var BACK_BOTTOM_RIGHT = new Vector3(x, -height, z);
+                var BACK_BOTTOM_LEFT = new Vector3(x+1, -height, z);
                 vertexList.Add(new VertexPositionNormalColor(BACK_TOP_LEFT,        BACKWARD, groundColor));
                 vertexList.Add(new VertexPositionNormalColor(BACK_BOTTOM_RIGHT,    BACKWARD, groundColor));
                 vertexList.Add(new VertexPositionNormalColor(BACK_BOTTOM_LEFT,     BACKWARD, groundColor));
                 vertexList.Add(new VertexPositionNormalColor(BACK_TOP_LEFT,        BACKWARD, groundColor));
                 vertexList.Add(new VertexPositionNormalColor(BACK_TOP_RIGHT,       BACKWARD, groundColor));
                 vertexList.Add(new VertexPositionNormalColor(BACK_BOTTOM_RIGHT,    BACKWARD, groundColor));
-                
             }
-            
+            // Left and right
+            for (int z = 0; z < depth - 1; z++)
+            {
+                // Left face
+                var x = 0;
+                var currY = heightmap.HeightData[x, z];
+                var nextY = heightmap.HeightData[x, z+1];
+                var BACK_TOP_LEFT = new Vector3(x, currY, z);
+                var BACK_TOP_RIGHT = new Vector3(x, nextY, z+1);
+                var BACK_BOTTOM_LEFT = new Vector3(x, -height, z);
+                var BACK_BOTTOM_RIGHT = new Vector3(x, -height, z+1);
+                vertexList.Add(new VertexPositionNormalColor(BACK_TOP_LEFT,         LEFT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(BACK_BOTTOM_RIGHT,     LEFT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(BACK_BOTTOM_LEFT,      LEFT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(BACK_TOP_LEFT,         LEFT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(BACK_TOP_RIGHT,        LEFT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(BACK_BOTTOM_RIGHT,     LEFT, groundColor));
+                // Right face
+                x = depth - 1;
+                currY = heightmap.HeightData[x, z];
+                nextY = heightmap.HeightData[x, z+1];
+                var FRONT_TOP_RIGHT = new Vector3(x, currY, z);
+                var FRONT_TOP_LEFT = new Vector3(x, nextY, z+1);
+                var FRONT_BOTTOM_RIGHT = new Vector3(x, -height, z);
+                var FRONT_BOTTOM_LEFT = new Vector3(x, -height, z+1);
+                vertexList.Add(new VertexPositionNormalColor(FRONT_TOP_LEFT,        RIGHT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_BOTTOM_RIGHT,    RIGHT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_BOTTOM_LEFT,     RIGHT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_TOP_LEFT,        RIGHT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_TOP_RIGHT,       RIGHT, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_BOTTOM_RIGHT,    RIGHT, groundColor));
+            }
+
             var vertices = vertexList.ToArray();
             // indicies
-            List<short> indexList = new List<short>(width*6*2);
-            for (short i = 0; i < width*6*2; ++i)
+            var indexLength = (width * 6 * 2) + (depth * 6 * 2);
+            List<short> indexList = new List<short>(indexLength);
+            for (short i = 0; i < indexLength; ++i)
                 indexList.Add(i);
             var indices = indexList.ToArray();
 
