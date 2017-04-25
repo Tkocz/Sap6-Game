@@ -120,7 +120,7 @@ namespace EngineName.Systems
 
                 if (i1 > 0.0f && i2 < 0.0f) {
                     // Moving away from each other, so don't bother with collision.
-                    // TODO: We could normalize n after this check.
+                    // TODO: We could normalize n after this check, for better performance.
                     continue;
                 }
 
