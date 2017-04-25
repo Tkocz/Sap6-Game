@@ -1,5 +1,9 @@
 namespace GameName.Dev {
 
+//--------------------------------------
+// USINGS
+//--------------------------------------
+
 using System;
 
 using EngineName;
@@ -10,11 +14,20 @@ using EngineName.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+//--------------------------------------
+// CLASSES
+//--------------------------------------
+
 // NOTE: Do not change anything here. Rather, create a copy of the scene and modify the copy. We
 //       want to keep test cases consistent!
 /// <summary>Provides a simple test case for collisions. Running it, you should see four spheres
 //           colliding on the screen in a sane manner (in 3D).</summary>
 public sealed class CollTestScene2: Scene {
+    //--------------------------------------
+    // PUBLIC METHODS
+    //--------------------------------------
+
+    /// <summary>Initializes the scene.</summary>
     public override void Init() {
         AddSystems(new    PhysicsSystem(),
                    new     CameraSystem(),
@@ -27,10 +40,16 @@ public sealed class CollTestScene2: Scene {
 
         for (var i = 0; i < 5; i++) {
             for (var j = 0; j < 5; j++) {
-                CreateBall(new Vector3(2.0f*i-4.0f,  2.0f*j-4.0f, i+j), new Vector3( i-2.0f,  j-3.0f, i-j), 1.0f);
+                CreateBall(new Vector3(2.0f*i-4.0f,  2.0f*j-4.0f, i+j),
+                           new Vector3(i-2.0f     ,  j-3.0f     , i-j),
+                           1.0f);
             }
         }
     }
+
+    //--------------------------------------
+    // NON-PUBLIC METHODS
+    //--------------------------------------
 
     /// <summary>Creates a new ball in the scene with the given position and velocity.</summary>
     /// <param name="p">The ball position, in world-space.</param>
