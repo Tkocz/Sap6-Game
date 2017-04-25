@@ -29,24 +29,20 @@ namespace EngineName.Systems
         public override void Draw(float t, float dt)
         {
             mSpriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied);
-            foreach (CCamera camera in Game1.Inst.Scene.GetComponents<CCamera>().Values)
+            foreach (var component in Game1.Inst.Scene.GetComponents<C2DRenderable>())
             {
-                foreach (var component in Game1.Inst.Scene.GetComponents<C2DRenderable>())
+                var key = component.Key;
+                if (component.Value.GetType() == typeof(CSprite))
                 {
-                    var key = component.Key;
-                    if (component.Value.GetType() == typeof(CSprite))
-                    {
-                        CSprite sprite = (CSprite)component.Value;
-                        DrawSprite(t, dt, sprite);
-                    }
-                    if (component.Value.GetType() == typeof(CText))
-                    {
-                        CText text = (CText)component.Value;
-                        DrawText(t, dt, text);
-                    }
+                    CSprite sprite = (CSprite)component.Value;
+                    DrawSprite(t, dt, sprite);
+                }
+                if (component.Value.GetType() == typeof(CText))
+                {
+                    CText text = (CText)component.Value;
+                    DrawText(t, dt, text);
                 }
             }
-
             mSpriteBatch.End();
             base.Draw(t, dt);
         }
