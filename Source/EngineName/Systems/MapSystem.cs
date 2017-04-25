@@ -241,16 +241,33 @@ namespace EngineName.Systems {
 
             Color groundColor = Color.Brown;
             var vertexList = new List<VertexPositionNormalColor>();
-            for(int x = 0; x < width-1; x++) {
-                //Back face
-                var z = 0;
+            // Front and back
+            for(int x = 0; x < width-1; x++)
+            {
+                // Front Face
+                var z = depth - 1;
                 var currY = heightmap.HeightData[x, z];
-                var nextY = heightmap.HeightData[x+1, z];
+                var nextY = heightmap.HeightData[x + 1, z];
+                z -= 0;
+                var FRONT_TOP_LEFT = new Vector3(x, currY, z);
+                var FRONT_TOP_RIGHT = new Vector3(x + 1, nextY, z);
+                var FRONT_BOTTOM_LEFT = new Vector3(x, -height, z);
+                var FRONT_BOTTOM_RIGHT = new Vector3(x + 1, -height, z);
+                vertexList.Add(new VertexPositionNormalColor(FRONT_TOP_LEFT, FORWARD, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_BOTTOM_RIGHT, FORWARD, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_BOTTOM_LEFT, FORWARD, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_TOP_LEFT, FORWARD, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_TOP_RIGHT, FORWARD, groundColor));
+                vertexList.Add(new VertexPositionNormalColor(FRONT_BOTTOM_RIGHT, FORWARD, groundColor));
+
+                //Back face
+                z = 0;
+                currY = heightmap.HeightData[x, z];
+                nextY = heightmap.HeightData[x+1, z];
                 var BACK_TOP_RIGHT = new Vector3(x, currY, 0);
                 var BACK_TOP_LEFT = new Vector3(x+1, nextY, 0);
                 var BACK_BOTTOM_RIGHT = new Vector3(x, -height, 0);
                 var BACK_BOTTOM_LEFT = new Vector3(x+1, -height, 0);
-
                 vertexList.Add(new VertexPositionNormalColor(BACK_TOP_LEFT,        BACKWARD, groundColor));
                 vertexList.Add(new VertexPositionNormalColor(BACK_BOTTOM_RIGHT,    BACKWARD, groundColor));
                 vertexList.Add(new VertexPositionNormalColor(BACK_BOTTOM_LEFT,     BACKWARD, groundColor));
@@ -258,21 +275,6 @@ namespace EngineName.Systems {
                 vertexList.Add(new VertexPositionNormalColor(BACK_TOP_RIGHT,       BACKWARD, groundColor));
                 vertexList.Add(new VertexPositionNormalColor(BACK_BOTTOM_RIGHT,    BACKWARD, groundColor));
                 
-                // Front Face
-                z = depth-1;
-                currY = heightmap.HeightData[x, z];
-                nextY = heightmap.HeightData[x + 1, z];
-                var FRONT_TOP_LEFT = new Vector3(x, currY, depth);
-                var FRONT_TOP_RIGHT = new Vector3(x + 1, nextY, depth);
-                var FRONT_BOTTOM_LEFT = new Vector3(x, -height, depth);
-                var FRONT_BOTTOM_RIGHT = new Vector3(x + 1, -height, depth);
-
-                vertexList.Add(new VertexPositionNormalColor(FRONT_TOP_LEFT,         FORWARD, groundColor));
-                vertexList.Add(new VertexPositionNormalColor(FRONT_BOTTOM_RIGHT,     FORWARD, groundColor));
-                vertexList.Add(new VertexPositionNormalColor(FRONT_BOTTOM_LEFT,      FORWARD, groundColor));
-                vertexList.Add(new VertexPositionNormalColor(FRONT_TOP_LEFT,         FORWARD, groundColor));
-                vertexList.Add(new VertexPositionNormalColor(FRONT_TOP_RIGHT,        FORWARD, groundColor));
-                vertexList.Add(new VertexPositionNormalColor(FRONT_BOTTOM_RIGHT,     FORWARD, groundColor));
             }
             
             var vertices = vertexList.ToArray();
