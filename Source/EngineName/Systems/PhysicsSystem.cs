@@ -134,6 +134,8 @@ namespace EngineName.Systems
         /// <summary>Finds and solves sphere-sphere collisions using an a posteriori
         ///          approach.</summary>
         private void SolveCollisions() {
+            // TODO: There's some clinging sometimes when collisions happen. Needs to be figured
+            // out. Proably something to do with "Moving away from each other" check.
             var scene = Game1.Inst.Scene;
 
             // Iterate over the collision pairs and solve actual collisions.
