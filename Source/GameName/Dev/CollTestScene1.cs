@@ -37,7 +37,7 @@ public sealed class CollTestScene1: Scene {
         });
 
         AddComponent<C3DRenderable>(ball, new CImportedModel {
-            model = Game1.Inst.Content.Load<Model>("Models/DummySphere")
+            model = Game1.Inst.Content.Load<Model>("Models/DummySphere2")
         });
 
         AddComponent(ball, new CTransform {
