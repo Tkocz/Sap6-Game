@@ -113,10 +113,10 @@ $(C_BINDIR)/$(G_TARGET): engine
 # Kind of a hack to build content easily.
 .PHONY: $(G_CONTENTDIR)/*/* pre-content content
 
-$(G_CONTENTDIR)/Models/*.fbx:
+$(G_CONTENTDIR)/Fonts/*.spritefont:
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
-$(G_CONTENTDIR)/Models/*.3ds:
+$(G_CONTENTDIR)/Models/*.fbx:
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 $(G_CONTENTDIR)/Textures/*.jpg:

@@ -14,7 +14,7 @@ using EngineName.Components;
 using EngineName.Components.Renderable;
 using EngineName.Systems;
 
-using Dev;
+using Scenes;
 
 /// <summary>Provides a program entry point.</summary>
 public static class Program {
@@ -28,7 +28,7 @@ public static class Program {
     private static void Main(string[] args) {
         Log.ToFile();
 
-        using (var game = new Game1(new CollTestScene2())) {
+        using (var game = new Game1(new MainMenu())) {
             game.Run();
         }
 
