@@ -85,14 +85,11 @@ public abstract class MenuScene: Scene {
 
         AddComponent<C2DRenderable>(AddEntity(), mSelHighlight = new CText {
             color    = Color.Black,
-            font     = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
+            font     = Font,
             format   = "--->",
             origin   = Vector2.Zero,
             position = new Vector2(150, 0)
         });
-
-        // TODO: Renndering2DSystem refuses to draw text without this hack.
-        AddComponent(AddEntity(), new CCamera {});
     }
 
     /// <summary>Performs draw logic (and, in the case of the <see cref="MenuScene"/> class, some
