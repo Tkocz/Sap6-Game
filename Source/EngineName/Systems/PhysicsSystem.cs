@@ -120,11 +120,16 @@ namespace EngineName.Systems
 
                 if (i1 > 0.0f && i2 < 0.0f) {
                     // Moving away from each other, so don't bother with collision.
-                    // TODO: We could normalize n after this check.
+                    // TODO: We could normalize n after this check, for better performance.
                     continue;
                 }
 
-                var p = n*(2.0f*(i1 - i2)) * 0.5f; // * 0.5 = / sums of masses, so leave it here
+                // TODO: There is probably some way around this double-inversion of the masses, but
+                //       I'm too lazy to figure it out until it becomes a problem!
+                var m1 = ((float)Abs(body .InvMass) > 0.0001f) ? 1.0f/body .InvMass : 0.0f;
+                var m2 = ((float)Abs(body2.InvMass) > 0.0001f) ? 1.0f/body2.InvMass : 0.0f;
+                var im = 1.0f/(m1 + m2);
+                var p  = n*(2.0f*(i1 - i2))*im;
 
                 s1.Velocity -= p*s1.InvMass;
                 s2.Velocity += p*s2.InvMass;
