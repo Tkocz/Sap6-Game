@@ -6,7 +6,11 @@ namespace EngineName.Core {
         public Vector3 Position;
         public Color Color;
         public Vector3 Normal;
-
+        public VertexPositionNormalColor(Vector3 Position, Vector3 Normal, Color Color) {
+            this.Position = Position;
+            this.Normal = Normal;
+            this.Color = Color;
+        }
         public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration
         (
             new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),

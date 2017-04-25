@@ -64,6 +64,7 @@
     <Compile Include="Scene.cs" />
     <Compile Include="Systems\CameraSystem.cs" />
     <Compile Include="Systems\FpsCounterSystem.cs" />
+    <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\MapSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\RenderingSystem.cs" />
@@ -71,7 +72,6 @@
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
     <Compile Include="Utils\GraphicsUtil.cs" />
-    <Compile Include="Systems\InputSystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
