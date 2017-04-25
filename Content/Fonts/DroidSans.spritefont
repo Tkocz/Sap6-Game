@@ -8,9 +8,9 @@ with.
 <XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
   <Asset Type="Graphics:FontDescription">
 
-    <FontName>Sector034</FontName>
+    <FontName>DroidSans</FontName>
 
-    <Size>12</Size>
+    <Size>16</Size>
 
     <Spacing>0</Spacing>
 

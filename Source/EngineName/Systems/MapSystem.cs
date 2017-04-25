@@ -12,7 +12,7 @@ using EngineName.Utils;
 namespace EngineName.Systems {
     public class MapSystem : EcsSystem {
         private GraphicsDevice mGraphicsDevice;
-        private int chunksplit = 20;
+        private int chunksplit = 1;
         private BasicEffect basicEffect;
 
         public override void Init() {
@@ -103,18 +103,8 @@ namespace EngineName.Systems {
                 for (int y = 0; y < terrainHeight; y++)
                     compHeight.HeightData[x, y] = heightMapColors[x + y * terrainWidth].R;
 
-            float minHeight = float.MaxValue;
-            float maxHeight = float.MinValue;
-            for (int x = 0; x < terrainWidth; x++)
-            {
-                for (int y = 0; y < terrainHeight; y++)
-                {
-                    if (compHeight.HeightData[x, y] < minHeight)
-                        minHeight = compHeight.HeightData[x, y];
-                    if (compHeight.HeightData[x, y] > maxHeight)
-                        maxHeight = compHeight.HeightData[x, y];
-                }
-            }
+            compHeight.HeighestPoint = compHeight.HeightData.Cast<float>().Max();
+            compHeight.LowestPoint = compHeight.HeightData.Cast<float>().Min();
         }
 
         private void CreateVerticesChunks(CHeightmap cheightmap,

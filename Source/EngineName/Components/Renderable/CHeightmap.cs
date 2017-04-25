@@ -12,5 +12,7 @@ namespace EngineName.Components.Renderable
         public Texture2D Image;
         public float[,] HeightData;
         internal Color[,] ColorMap;
+        public float HeighestPoint;
+        public float LowestPoint;
     }
 }

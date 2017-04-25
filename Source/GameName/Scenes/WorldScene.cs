@@ -13,15 +13,17 @@ namespace GameName.Scenes
         public override void Init() {
 
             var mapSystem = new MapSystem();
+            var waterSys = new WaterSystem();
             AddSystems(
                 new SkyBoxSystem(),
-                new FpsCounterSystem(updatesPerSec: 10),
                 new RenderingSystem(),
                 new CameraSystem(),
                 new PhysicsSystem(),
                 new InputSystem(),
-                new Rendering2DSystem(),
-            mapSystem
+                mapSystem,
+                waterSys,
+                new Rendering2DSystem()
+      
             );
             base.Init();
             // Camera entity
@@ -74,9 +76,10 @@ namespace GameName.Scenes
             // Heightmap entity
             int id = AddEntity();
             AddComponent<C3DRenderable>(id, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/HeightMap") });
-            AddComponent(id, new CTransform() { Position = new Vector3(-590, -900, -590) * 0.01f, Rotation = Matrix.Identity, Scale = new Vector3(0.01f) });
+            AddComponent(id, new CTransform() { Position = new Vector3(-590, -900, -590) *0.01f, Rotation = Matrix.Identity, Scale = new Vector3(0.01f) });
             // manually start loading all heightmap components, should be moved/automated
             mapSystem.Load();
+            waterSys.Load();
 
             Log.Get().Debug("TestScene initialized.");
         }

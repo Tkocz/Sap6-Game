@@ -28,7 +28,7 @@ namespace EngineName.Systems
         }
         public override void Draw(float t, float dt)
         {
-            mSpriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied);
+            mSpriteBatch.Begin();
             foreach (var component in Game1.Inst.Scene.GetComponents<C2DRenderable>())
             {
                 var key = component.Key;
@@ -44,6 +44,9 @@ namespace EngineName.Systems
                 }
             }
             mSpriteBatch.End();
+            Game1.Inst.Graphics.GraphicsDevice.BlendState = BlendState.Opaque;
+            Game1.Inst.Graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            Game1.Inst.Graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
             base.Draw(t, dt);
         }
         private void DrawSprite(float t, float dt, CSprite sprite)

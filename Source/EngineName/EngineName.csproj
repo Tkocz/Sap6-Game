@@ -71,6 +71,7 @@
     <Compile Include="Systems\RenderingSystem.cs" />
     <Compile Include="Core\VertexPositionNormalColor.cs" />
     <Compile Include="Systems\SkyBoxSystem.cs" />
+    <Compile Include="Systems\WaterSystem.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
     <Compile Include="Utils\GraphicsUtil.cs" />
