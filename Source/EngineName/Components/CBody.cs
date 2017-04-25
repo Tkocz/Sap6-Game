@@ -20,6 +20,9 @@ public sealed class CBody: EcsComponent {
     /// <summary>The scalar inverse of the mass, in kilograms.</summary>
     public float InvMass = 1.0f;
 
+    /// <summary>The linear drag to apply to the body.</summary>
+    public float LinDrag = 0.0f;
+
     /// <summary>The position in world-space as a displacement from the origin, in
     ///          meters.</summary>
     public Vector3 Position;
