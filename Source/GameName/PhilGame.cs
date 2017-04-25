@@ -28,7 +28,7 @@ public static class Program {
     private static void Main(string[] args) {
         Log.ToFile();
 
-        using (var game = new Game1(new CollTestScene1())) {
+        using (var game = new Game1(new CollTestScene2())) {
             game.Run();
         }
 
