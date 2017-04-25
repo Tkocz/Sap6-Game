@@ -27,7 +27,7 @@ public sealed class MainMenu: MenuScene {
 
         // Ugly, but useful during development.
         foreach (var type in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()) {
-            if (!type.IsSubclassOf(typeof (Scene))) {
+            if (!type.IsSubclassOf(typeof (Scene)) || type == GetType()) {
                 continue;
             }
 
