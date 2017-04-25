@@ -93,6 +93,10 @@ namespace EngineName {
         public EcsComponent GetComponentFromEntity<T>(int id) where T : EcsComponent {
             return Components[typeof(T)][id];
         }
+
+        public bool EntityHasComponent<T>(int id) where T : EcsComponent {
+            return Components[typeof(T)].ContainsKey(id);
+        }
     /// <summary>Add the specified system to the scene.</summary>
     /// <param name="system">The system to add.</param>
     public void AddSystem(EcsSystem system) {
