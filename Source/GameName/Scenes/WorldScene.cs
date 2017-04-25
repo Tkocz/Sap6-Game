@@ -15,7 +15,6 @@ namespace GameName.Scenes
             var mapSystem = new MapSystem();
             AddSystems(
                 new SkyBoxSystem(),
-                new FpsCounterSystem(updatesPerSec: 10),
                 new RenderingSystem(),
                 new CameraSystem(),
                 new PhysicsSystem(),

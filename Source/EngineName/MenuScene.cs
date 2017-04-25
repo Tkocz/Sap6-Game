@@ -59,7 +59,7 @@ public abstract class MenuScene: Scene {
 
     /// <summary>Indicates whether the selection can be changed in the menu. Used to prevent
     ///          selection spamming.</summary>
-    private bool mCanMove = true;
+    private bool mCanInteract = true;
 
     /// <summary>The item that have been added to the menu.</summary>
     private readonly List<MenuItem> mItems = new List<MenuItem>();
@@ -77,8 +77,7 @@ public abstract class MenuScene: Scene {
 
     /// <summary>Initializes the menu.</summary>
     public override void Init() {
-        AddSystems(new Rendering2DSystem(),
-                   new FpsCounterSystem(updatesPerSec: 10));
+        AddSystems(new Rendering2DSystem());
 
         base.Init();
 
@@ -101,13 +100,16 @@ public abstract class MenuScene: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt) {
+        // Position the selection highlight before delegating drawing.
+        mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
+
         base.Draw(t, dt);
 
         var keyboard = Keyboard.GetState();
         var canMove  = true;
 
         if (keyboard.IsKeyDown(MoveUpKey)) {
-            if (mCanMove) {
+            if (mCanInteract) {
                 mSelIndex -= 1;
                 if (mSelIndex < 0) {
                     mSelIndex = mItems.Count - 1;
@@ -118,7 +120,7 @@ public abstract class MenuScene: Scene {
         }
 
         if (keyboard.IsKeyDown(MoveDownKey)) {
-            if (mCanMove) {
+            if (mCanInteract) {
                 mSelIndex += 1;
                 if (mSelIndex >= mItems.Count) {
                     mSelIndex = 0;
@@ -129,7 +131,7 @@ public abstract class MenuScene: Scene {
         }
 
         if (keyboard.IsKeyDown(SelectKey)) {
-            if (mCanMove) {
+            if (mCanInteract) {
                 var s = mItems[mSelIndex].Text.format;
                 Log.Get().Debug($"Selecting menu item: {s}");
                 mItems[mSelIndex].Select();
@@ -138,14 +140,17 @@ public abstract class MenuScene: Scene {
             canMove = false;
         }
 
-        mCanMove = canMove;
-        mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
+        mCanInteract = canMove;
     }
 
     //--------------------------------------
     // NON-PUBLIC METHODS
     //--------------------------------------
 
+    /// <summary>Creates a selectable menu label with the specified text and callback.</summary>
+    /// <param name="text">The text to display on the label, in the menu.</param>
+    /// <param name="cb">The label callback to invoke when the label is selected.</param>
+    /// <param name="color">The label text color.</param>
     protected void CreateLabel(string text, Action cb, Color? color=null) {
         // TODO: Super messy solution but it's ok for now. Need better positioning of items.
 
@@ -155,6 +160,8 @@ public abstract class MenuScene: Scene {
         if (mItems.Count > 0) {
             y = (int)mItems[mItems.Count - 1].Text.position.Y + 30;
         }
+
+        // ---
 
         var label = new MenuItem {
             Select = cb,
