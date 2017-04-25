@@ -126,8 +126,8 @@ namespace EngineName.Systems
 
                 // TODO: There is probably some way around this double-inversion of the masses, but
                 //       I'm too lazy to figure it out until it becomes a problem!
-                var m1 = ((float)Abs(body .InvMass) > 0.0001f) ? 1.0f/body .InvMass : 0.0f;
-                var m2 = ((float)Abs(body2.InvMass) > 0.0001f) ? 1.0f/body2.InvMass : 0.0f;
+                var m1 = ((float)Abs(s1.InvMass) > 0.0001f) ? 1.0f/s1.InvMass : 0.0f;
+                var m2 = ((float)Abs(s2.InvMass) > 0.0001f) ? 1.0f/s2.InvMass : 0.0f;
                 var im = 1.0f/(m1 + m2);
                 var p  = n*(2.0f*(i1 - i2))*im;
 
