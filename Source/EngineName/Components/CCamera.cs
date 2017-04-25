@@ -19,5 +19,10 @@ namespace EngineName.Components
         public float Heading  = 0f;
         public int Height     = -50;
         public int Distance   = 50;
+        public CCamera(){}
+        public CCamera(int height, int distance){
+            Height = height;
+            Distance = distance;
+        }
     }
 }
