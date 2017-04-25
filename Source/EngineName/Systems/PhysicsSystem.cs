@@ -37,7 +37,7 @@ namespace EngineName.Systems
         /// <summary>Gets or sets the world bounds, as a bounding box with dimensions specified in
         ///          meters.</summary>
         public BoundingBox Bounds { get; set; } =
-            new BoundingBox(-4.0f*Vector3.One, 4.0f*Vector3.One);
+            new BoundingBox(-10.0f*Vector3.One, 10.0f*Vector3.One);
 
         /// <summary>Gets or sets the world gravity vector, in meters per seconds
         ///          squraed..</summary>
