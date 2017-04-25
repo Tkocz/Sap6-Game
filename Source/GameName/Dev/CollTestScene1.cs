@@ -44,7 +44,7 @@ public sealed class CollTestScene1: Scene {
         var ball = AddEntity();
 
         AddComponent(ball, new CBody {
-            Aabb     = new BoundingBox(-Vector3.One, Vector3.One),
+            Aabb     = new BoundingBox(-Vector3.One*r, Vector3.One*r),
             Radius   = r,
             Position = p,
             Velocity = v

@@ -34,6 +34,11 @@ namespace EngineName.Systems
             }
         }
 
+        /// <summary>Gets or sets the world bounds, as a bounding box with dimensions specified in
+        ///          meters.</summary>
+        public BoundingBox Bounds { get; set; } =
+            new BoundingBox(-4.0f*Vector3.One, 4.0f*Vector3.One);
+
         /// <summary>Gets or sets the world gravity vector, in meters per seconds
         ///          squraed..</summary>
         public Vector3 Gravity { get; set; } = new Vector3(0.0f, -9.81f, 0.0f);
@@ -62,6 +67,40 @@ namespace EngineName.Systems
                 body.Velocity += dt*Gravity;
                 body.Position += dt*body.Velocity;
 
+                // Setup the AABBs and see if they intersect (inner loop). Intersection means we
+                // have a *potential* collision. It needs to be verified and resolved by the
+                // fine-phase solver.
+                var p1    = body.Position;
+                var aabb1 = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
+
+                // TODO: Maybe refactor into own function? Looks messy.
+                if (aabb1.Min.X < Bounds.Min.X) {
+                    body.Position.X = Bounds.Min.X - body.Aabb.Min.X;
+                    body.Velocity.X *= -1.0f;
+                }
+                else if (aabb1.Max.X > Bounds.Max.X) {
+                    body.Position.X = Bounds.Max.X - body.Aabb.Max.X;
+                    body.Velocity.X *= -1.0f;
+                }
+
+                if (aabb1.Min.Y < Bounds.Min.Y) {
+                    body.Position.Y = Bounds.Min.Y - body.Aabb.Min.Y;
+                    body.Velocity.Y *= -1.0f;
+                }
+                else if (aabb1.Max.Y > Bounds.Max.Y) {
+                    body.Position.Y = Bounds.Max.Y - body.Aabb.Max.Y;
+                    body.Velocity.Y *= -1.0f;
+                }
+
+                if (aabb1.Min.Z < Bounds.Min.Z) {
+                    body.Position.Z = Bounds.Min.Z - body.Aabb.Min.Z;
+                    body.Velocity.Z *= -1.0f;
+                }
+                else if (aabb1.Max.Z > Bounds.Max.Z) {
+                    body.Position.Z = Bounds.Max.Z - body.Aabb.Max.Z;
+                    body.Velocity.Z *= -1.0f;
+                }
+
                 // Not sure what else to do. Need to update transform to match physical body
                 // position.
                 ((CTransform)scene.GetComponentFromEntity<CTransform>(e.Key)).Position =
@@ -75,12 +114,7 @@ namespace EngineName.Systems
                         continue;
                     }
 
-                    // Setup the two AABBs and see if they intersect. Intersection means we have a
-                    // *potential* collision. It needs to be verified and resolved by the fine-phase
-                    // solver.
-                    var p1    = body .Position;
                     var p2    = body2.Position;
-                    var aabb1 = new BoundingBox(p1 + body .Aabb.Min, p1 + body .Aabb.Max);
                     var aabb2 = new BoundingBox(p2 + body2.Aabb.Min, p2 + body2.Aabb.Max);
 
                     if (!aabb1.Intersects(aabb2)) {
