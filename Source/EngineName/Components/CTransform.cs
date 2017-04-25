@@ -10,9 +10,9 @@ namespace EngineName.Components
 {
     public class CTransform:EcsComponent
     {
-        public Vector3 Position;
-        public Vector3 Scale;
-        public Matrix Rotation;
-        public Matrix Frame;
+        public Vector3 Position = Vector3.Zero;
+        public Vector3 Scale = Vector3.One;
+        public Matrix Rotation = Matrix.Identity;
+        public Matrix Frame = Matrix.Identity;
     }
 }

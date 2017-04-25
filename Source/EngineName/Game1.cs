@@ -110,6 +110,9 @@ public class Game1: Game {
     protected override void Initialize() {
         base.Initialize();
 
+        Graphics.PreferredBackBufferWidth = 1920;
+        Graphics.PreferredBackBufferHeight = 1080;
+
         var profile = Graphics.GraphicsDevice.GraphicsProfile;
         var width   = Graphics.PreferredBackBufferWidth;
         var height  = Graphics.PreferredBackBufferHeight;
