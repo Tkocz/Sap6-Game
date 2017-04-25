@@ -102,8 +102,8 @@ namespace EngineName.Systems
                 var s1 = ((CBody)scene.GetComponentFromEntity<CBody>(cp.First));
                 var s2 = ((CBody)scene.GetComponentFromEntity<CBody>(cp.Second));
 
-                // TODO: Simple sum of radii, need to be able to set this on each sphere.
-                var minDist = 1.0f + 1.0f;
+                // Any closer than this and the bodies are colliding
+                var minDist = s1.Radius + s2.Radius;
 
                 // Collision normal
                 var n = s1.Position - s2.Position;

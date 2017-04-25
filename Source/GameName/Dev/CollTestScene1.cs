@@ -26,10 +26,11 @@ public sealed class CollTestScene1: Scene {
         InitCam();
 
         //                  -- position --                  -- velocity --
-        CreateBall(new Vector3(-3.5f,  0.0f, 0.0f), new Vector3( 1.0f,  0.0f, 0.0f));
-        CreateBall(new Vector3( 3.5f,  1.0f, 0.0f), new Vector3(-1.0f,  0.0f, 0.0f));
-        CreateBall(new Vector3( 3.5f, 14.0f, 0.0f), new Vector3(-1.0f, -3.0f, 0.0f));
-        CreateBall(new Vector3(-3.5f, 14.0f, 0.0f), new Vector3( 0.5f, -4.0f, 0.0f));
+        CreateBall(new Vector3(-3.5f,  0.0f, 0.0f), new Vector3( 1.0f,  0.0f, 0.0f), 1.0f);
+        CreateBall(new Vector3( 3.5f,  1.0f, 0.0f), new Vector3(-1.0f,  0.0f, 0.0f), 0.5f);
+        CreateBall(new Vector3( 3.5f, 14.0f, 0.0f), new Vector3(-1.0f, -3.0f, 0.0f), 1.5f);
+        CreateBall(new Vector3(-3.5f, 14.0f, 0.0f), new Vector3( 0.5f, -4.0f, 0.0f), 0.75f);
+        CreateBall(new Vector3(3.5f,  -8.0f, 0.0f), new Vector3(-0.5f,  2.0f, 0.0f), 0.75f);
     }
 
     /// <summary>Creates a new ball in the scene with the given position and velocity.</summary>
@@ -44,6 +45,7 @@ public sealed class CollTestScene1: Scene {
 
         AddComponent(ball, new CBody {
             Aabb     = new BoundingBox(-Vector3.One, Vector3.One),
+            Radius   = r,
             Position = p,
             Velocity = v
         });
@@ -55,7 +57,7 @@ public sealed class CollTestScene1: Scene {
         AddComponent(ball, new CTransform {
             Position = p,
             Rotation = Matrix.Identity,
-            Scale    = Vector3.One
+            Scale    = Vector3.One * r
         });
 
         return ball;
