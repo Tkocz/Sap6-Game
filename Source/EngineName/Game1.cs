@@ -76,6 +76,8 @@ public class Game1: Game {
     public void EnterScene(Scene scene) {
         scene.Init();
         mScenes.Push(scene);
+
+        Log.Get().Info($"Entered scene: {scene.GetType().Name}");
     }
 
     /// <summary>Leaves the currently displayed scene..</summary>
@@ -87,6 +89,8 @@ public class Game1: Game {
 
         var scene = mScenes.Pop();
         scene.Cleanup();
+
+        Log.Get().Info($"Left scene: {scene.GetType().Name}");
     }
 
     /*--------------------------------------

@@ -153,6 +153,8 @@ namespace EngineName {
         foreach (var system in m_Systems) {
             system.Init();
         }
+
+        Logging.Log.Get().Info($"Initialized scene: {GetType().Name}");
     }
 
     /// <summary>Removes the specified entity from the scene.</summary>

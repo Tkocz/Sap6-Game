@@ -5,16 +5,8 @@ namespace GameName.Scenes {
 //--------------------------------------
 
 using System;
-using System.Collections.Generic;
 
 using EngineName;
-using EngineName.Components;
-using EngineName.Components.Renderable;
-using EngineName.Systems;
-
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 //--------------------------------------
 // CLASSES
@@ -33,16 +25,19 @@ public sealed class MainMenu: MenuScene {
     public override void Init() {
         base.Init();
 
-        CreateLabel("Alice", () => {
-            EngineName.Logging.Log.Get().Debug("Alice selected");
-        });
+        // Ugly, but useful during development.
+        foreach (var type in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()) {
+            if (!type.IsSubclassOf(typeof (Scene))) {
+                continue;
+            }
 
-        CreateLabel("Bob", () => {
-            EngineName.Logging.Log.Get().Debug("Bob selected");
-        });
+            CreateLabel(type.Name, () => {
+                Game1.Inst.EnterScene((Scene)Activator.CreateInstance(type));
+            });
+        }
 
-        CreateLabel("Charlie", () => {
-            EngineName.Logging.Log.Get().Debug("Charlie selected");
+        CreateLabel("Quit", () => {
+            Game1.Inst.Exit();
         });
     }
 
