@@ -42,6 +42,7 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Dev\CollTestScene1.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
   </ItemGroup>
@@ -61,7 +62,9 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="Content.mgcb" />
+    <MonoGameContentReference Include="..\..\Content\Content.mgcb">
+      <Link>Content.mgcb</Link>
+    </MonoGameContentReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />

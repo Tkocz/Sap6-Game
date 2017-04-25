@@ -30,10 +30,11 @@ namespace EngineName.Systems
                     if (model.model == null) continue;
                     CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);    
                     
-                    foreach (var mesh in model.model.Meshes) {
+                    foreach (var mesh in model.model.Meshes)
+                    {
 
-                       if(camera.Frustum.Contains(mesh.BoundingSphere) == ContainmentType.Disjoint)
-                           continue;
+                        if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
+                            continue;
 
                         foreach (BasicEffect effect in mesh.Effects) {
                             effect.EnableDefaultLighting();

@@ -85,8 +85,14 @@ namespace EngineName {
             Components[typeof(T)].Add(id, component);
         }
         public Dictionary<int, EcsComponent> GetComponents<T>() where T : EcsComponent {
-            return Components[typeof(T)];
+            Dictionary<int, EcsComponent> r;
+            if (!Components.TryGetValue(typeof (T), out r)) {
+                return new Dictionary<int, EcsComponent>{};
+            }
+
+            return r;
         }
+
         public EcsComponent GetComponentFromEntity<T>(int id) where T : EcsComponent {
             return Components[typeof(T)][id];
         }
@@ -153,6 +159,7 @@ namespace EngineName {
         Components.Add(typeof(CInput), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(C3DRenderable), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CCamera), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CBody), new Dictionary<int, EcsComponent>());
         foreach (var system in m_Systems) {
             system.Init();
         }

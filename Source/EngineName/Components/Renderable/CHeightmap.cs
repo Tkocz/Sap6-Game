@@ -9,7 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace EngineName.Components.Renderable
 {
     public class CHeightmap : C3DRenderable {
-        public Texture2D image;
-        internal Color[,] colorMap;
+        public Texture2D Image;
+        public float[,] HeightData;
+        internal Color[,] ColorMap;
     }
 }

@@ -14,9 +14,9 @@ namespace GameName.Scenes
 
             var mapSystem = new MapSystem();
             AddSystems(
-                new FpsCounterSystem(updatesPerSec: 10), 
-                new RenderingSystem(), 
-                new CameraSystem(), 
+                new FpsCounterSystem(updatesPerSec: 10),
+                new RenderingSystem(),
+                new CameraSystem(),
                 new PhysicsSystem(),
                 mapSystem
             );
@@ -33,11 +33,11 @@ namespace GameName.Scenes
             AddComponent(camera, new CTransform() { Position = new Vector3(0, 100, 100), Rotation = Matrix.Identity, Scale = Vector3.One });
             // Tree model entity
             int id = AddEntity();
-            AddComponent<C3DRenderable>(id, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("tree") });
+            AddComponent<C3DRenderable>(id, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
             AddComponent(id, new CTransform() { Position = new Vector3(0, 0, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
             // Heightmap entity
             id = AddEntity();
-            AddComponent<C3DRenderable>(id, new CHeightmap() { image = Game1.Inst.Content.Load<Texture2D>("HeightMap") });
+            AddComponent<C3DRenderable>(id, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/HeightMap") });
             AddComponent(id, new CTransform() { Position = new Vector3(-590, -50, -590), Rotation = Matrix.Identity, Scale = Vector3.One });
             // manually start loading all heightmap components, should be moved/automated
             mapSystem.Load();

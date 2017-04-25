@@ -45,6 +45,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\CBody.cs" />
     <Compile Include="Components\CInput.cs" />
     <Compile Include="Components\Renderable\C2DRenderable.cs" />
     <Compile Include="Components\Renderable\CHeightmap.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Core\VertexPositionNormalColor.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
+    <Compile Include="Utils\GraphicsUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
