@@ -14,10 +14,10 @@ namespace EngineName.Components
         public Keys BackwardMovementKey = Keys.S;
         public Keys LeftMovementKey = Keys.A;
         public Keys RightMovementKey = Keys.D;
-        public Keys XRotationPlus = Keys.Up;
-        public Keys XRotationMinus = Keys.Down;
-        public Keys YRotationPlus = Keys.Right;
-        public Keys YRotationMinus = Keys.Left;
+        public Keys CameraMovementForward = Keys.Up;
+        public Keys CameraMovementBackward = Keys.Down;
+        public Keys CameraMovementRight = Keys.Right;
+        public Keys CameraMovementLeft = Keys.Left;
         public Keys ZRotationPlus = Keys.Z;
         public Keys ZRotationMinus = Keys.C;
     }
