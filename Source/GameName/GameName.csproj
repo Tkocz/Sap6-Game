@@ -42,6 +42,7 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Dev\CollTestScene1.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
   </ItemGroup>
