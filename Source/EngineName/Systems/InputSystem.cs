@@ -29,7 +29,7 @@ namespace EngineName.Systems {
                 KeyboardState currentState = Keyboard.GetState();
 
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
-                    body.Velocity.Z -= 5f;
+                    body.Velocity.Z -= 500f;
                 if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
                     body.Position.Z += 5f;
                 if (currentState.IsKeyDown(inputValue.LeftMovementKey))
