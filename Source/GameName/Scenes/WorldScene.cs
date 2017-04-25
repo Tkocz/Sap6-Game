@@ -19,7 +19,8 @@ namespace GameName.Scenes
                 new CameraSystem(),
                 new PhysicsSystem(),
                 new InputSystem(),
-                mapSystem
+                new Rendering2DSystem(),
+            mapSystem
             );
             base.Init();
             // Camera entity
@@ -46,13 +47,28 @@ namespace GameName.Scenes
             });
             AddComponent(camera, new CInput());
             AddComponent(camera, new CTransform() { Position = new Vector3(-5, 5, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
-            
+
+            int eid = AddEntity();
+            AddComponent<C2DRenderable>(eid, new CText
+            {
+                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
+                format = "Sap my Low-Poly Game",
+                color = Color.White,
+                position = new Vector2(300, 20)
+            });
+            eid = AddEntity();
+            AddComponent<C2DRenderable>(eid, new CSprite
+            {
+                texture = Game1.Inst.Content.Load<Texture2D>("Textures/clubbing"),
+                position = new Vector2(300, 300),
+                color = Color.White
+            });
 
             // Tree model entity
             /*int id = AddEntity();
             AddComponent<C3DRenderable>(id, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
             AddComponent(id, new CTransform() { Position = new Vector3(0, 0, 0), Rotation = Matrix.Identity, Scale = Vector3.One });*/
-            
+
 
             // Heightmap entity
             int id = AddEntity();
