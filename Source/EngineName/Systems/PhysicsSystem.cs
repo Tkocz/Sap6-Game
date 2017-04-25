@@ -64,7 +64,7 @@ namespace EngineName.Systems
                 var body = (CBody)e.Value;
 
                 // Symplectic Euler is ok for now so compute force before updating position!
-                body.Velocity += dt*Gravity;
+                body.Velocity += dt* (Gravity - body.LinDrag*body.Velocity);
                 body.Position += dt*body.Velocity;
 
                 // Setup the AABBs and see if they intersect (inner loop). Intersection means we

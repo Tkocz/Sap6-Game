@@ -31,8 +31,7 @@ public sealed class CollTestScene2: Scene {
     public override void Init() {
         AddSystems(new    PhysicsSystem(),
                    new     CameraSystem(),
-                   new  RenderingSystem(),
-                   new FpsCounterSystem(updatesPerSec: 10));
+                   new  RenderingSystem());
 
         base.Init();
 

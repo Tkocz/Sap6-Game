@@ -16,7 +16,6 @@ namespace GameName.Scenes
             var waterSys = new WaterSystem();
             AddSystems(
                 new SkyBoxSystem(),
-                new FpsCounterSystem(updatesPerSec: 10),
                 new RenderingSystem(),
                 new CameraSystem(),
                 new PhysicsSystem(),

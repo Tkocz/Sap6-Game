@@ -150,9 +150,16 @@ namespace EngineName {
         Components.Add(typeof(C2DRenderable), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CCamera), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CBody), new Dictionary<int, EcsComponent>());
+
+#if DEBUG
+        AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));
+#endif
+
         foreach (var system in m_Systems) {
             system.Init();
         }
+
+        Logging.Log.Get().Info($"Initialized scene: {GetType().Name}");
     }
 
     /// <summary>Removes the specified entity from the scene.</summary>
