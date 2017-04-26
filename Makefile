@@ -122,6 +122,9 @@ $(G_CONTENTDIR)/Models/*.fbx:
 $(G_CONTENTDIR)/Models/*.x:
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
+$(G_CONTENTDIR)/Sounds/Effects/*.mp3:
+	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
+
 $(G_CONTENTDIR)/Sounds/Effects/*.wav:
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
