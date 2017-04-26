@@ -44,7 +44,7 @@ public sealed class MainMenu: MenuScene {
 
         SfxUtil.PlayMusic("Sounds/Music/MainMenu");
 
-        OnEvent("SelChanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
+        OnEvent("selchanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
     }
 
 }

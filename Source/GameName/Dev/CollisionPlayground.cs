@@ -43,7 +43,7 @@ public sealed class CollisionPlayground: Scene {
         CreateBall(new Vector3(-3.5f, 14.0f, 0.0f), new Vector3( 0.5f, -4.0f, 0.0f), 0.75f);
         CreateBall(new Vector3(3.5f,  -8.0f, 0.0f), new Vector3(-0.5f,  2.0f, 0.0f), 0.75f);
 
-        OnEvent("Collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
+        OnEvent("collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
     }
 
     //--------------------------------------

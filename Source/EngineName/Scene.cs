@@ -76,6 +76,9 @@ namespace EngineName {
         /// <param name="name">The name of the event to raise.</param>
         /// <param name="data">The event data.</param>
         public void Raise(string name, object data) {
+            // Event name is case insensitive.
+            name = name.ToLower();
+
             List<Action<object>> cbs;
             if (!mEventCBs.TryGetValue(name, out cbs)) {
                 // No events registered for this event name.
@@ -91,6 +94,9 @@ namespace EngineName {
         /// <param name="name">The name of the event.</param>
         /// <param name="cb">The callback to invoke after the event is raised.</param>
         public void OnEvent(string name, Action<object> cb) {
+            // Event name is case insensitive.
+            name = name.ToLower();
+
             List<Action<object>> cbs;
             if (!mEventCBs.TryGetValue(name, out cbs)) {
                 mEventCBs[name] = cbs = new List<Action<object>>();
