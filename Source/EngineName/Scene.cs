@@ -132,6 +132,7 @@ namespace EngineName {
     /// <param name="system">The system to add.</param>
     public void AddSystem(EcsSystem system) {
         m_Systems.Add(system);
+        system.Scene = this;
     }
 
     /// <summary>Add the specified systems to the scene.</summary>
