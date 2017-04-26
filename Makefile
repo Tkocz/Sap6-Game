@@ -116,11 +116,10 @@ $(C_BINDIR)/$(G_TARGET): engine
 $(G_CONTENTDIR)/Fonts/*.spritefont:
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
-# TODO: REMOVE THIS, SHOULD NOT BE HERE
-$(G_CONTENTDIR)/Textures/*.x:
+$(G_CONTENTDIR)/Models/*.fbx:
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
-$(G_CONTENTDIR)/Models/*.fbx:
+$(G_CONTENTDIR)/Models/*.x:
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 $(G_CONTENTDIR)/Sounds/Effects/*.wav:
