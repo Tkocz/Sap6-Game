@@ -72,6 +72,18 @@ public class PhysicsSystem: EcsSystem {
     private List<Pair<int, int>> mPotentialColls = new List<Pair<int, int>>();
 
     //--------------------------------------
+    // NON-PUBLIC CONSTRUCTORS
+    //--------------------------------------
+
+#if DEBUG
+    /// <summary>Private constructor, used to register some strings in the debug
+    ///          overlay. This will bug out if many physics systems are created, but w/e.</summary>
+    public PhysicsSystem() {
+        DebugOverlay.DbgStr((t, dt) => $"Coll checks: {mPotentialColls.Count}");
+    }
+#endif
+
+    //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
 

@@ -6,6 +6,7 @@ namespace EngineName.Systems {
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using Components;
@@ -35,7 +36,7 @@ public sealed class DebugOverlay: EcsSystem {
     private SpriteBatch mSB;
 
     /// <summary>All registered debug strings.</summary>
-    private readonly List<Func<float, float, string>> mStrFns =
+    private static readonly List<Func<float, float, string>> sStrFns =
         new List<Func<float, float, string>>();
 
     //--------------------------------------
@@ -53,7 +54,7 @@ public sealed class DebugOverlay: EcsSystem {
 
         mSB = new SpriteBatch(Game1.Inst.GraphicsDevice);
 
-        // Add as many strings as you like here. Anything needed to debug game.
+        // NOTE: Do not add strings here! Add them where they make sense!
         DbgStr((t, dt) => $"Time:     {t:0.00}"           );
         DbgStr((t, dt) => $"FPS:      {1.0f/dt:0.00}"     );
         DbgStr((t, dt) => $"Entities: {Scene.NumEntities}");
@@ -74,12 +75,19 @@ public sealed class DebugOverlay: EcsSystem {
 
         mSB.Begin();
 
-        foreach (var fn in mStrFns) {
+        foreach (var fn in sStrFns) {
             GfxUtil.DrawText(mSB, x, y, fn(t, dt), GfxUtil.DefFont, Color.Magenta);
             y += 24.0f;
         }
 
         mSB.End();
+    }
+
+    /// <summary>Adds a debug string to the overlay.</summary>
+    /// <param name="fn">The debug string callback function.</param>
+    [Conditional("DEBUG")]
+    public static void DbgStr(Func<float, float, string> fn) {
+        sStrFns.Add(fn);
     }
 
     //--------------------------------------
@@ -116,12 +124,6 @@ public sealed class DebugOverlay: EcsSystem {
         }
 
         mAabb = v;
-    }
-
-    /// <summary>Adds a debug string to the overlay.</summary>
-    /// <param name="fn">The debug string callback function.</param>
-    private void DbgStr(Func<float, float, string> fn) {
-        mStrFns.Add(fn);
     }
 
     /// <summary>Draws bounding boxes for all physical bodies.</summary>
