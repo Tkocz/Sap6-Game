@@ -27,29 +27,22 @@ using Core;
 
     /// <summary>Number of update calls since last update.</summary>
     private int mNumUpdates;
-
-    /// <summary>The original window title.</summary>
-    private string mOrigTitle;
-
+        
     /// <summary>The timer used to update the title.</summary>
     private float mTimer;
 
-        private GraphicsDevice mGraphicsDevice;
-        private SpriteBatch mSpriteBatch;
-        private SpriteFont mFont;
-        private Vector2 mPosition;
-        private Vector2 mOrigin;
-        private string s;
+    /// <summary>FPS string composite.</summary>
+    private string s;
 
-        /*--------------------------------------
-         * CONSTRUCTORS
-         *------------------------------------*/
+    /*--------------------------------------
+        * CONSTRUCTORS
+        *------------------------------------*/
 
-        /// <summary>Initializes a new instance of the system.</summary>
-        /// <param name="updatesPerSec">The number of times to update the
-        ///                             information each second.</param>
-        public FpsCounterSystem(int updatesPerSec) {
-        mInvUpdateInterval = 1.0f / updatesPerSec;
+    /// <summary>Initializes a new instance of the system.</summary>
+    /// <param name="updatesPerSec">The number of times to update the
+    ///                             information each second.</param>
+    public FpsCounterSystem(int updatesPerSec) {
+    mInvUpdateInterval = 1.0f / updatesPerSec;
     }
 
     /*--------------------------------------
