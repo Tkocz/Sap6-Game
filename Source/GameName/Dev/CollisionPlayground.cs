@@ -90,7 +90,7 @@ public sealed class CollisionPlayground: Scene {
     /// <param name="fovDeg">The camera field of view, in degrees.</param>
     /// <param name="zNear">The Z-near clip plane, in meters from the camera.</param>
     /// <param name="zFar">The Z-far clip plane, in meters from the camera..</param>
-    private int InitCam(float fovDeg=90.0f, float zNear=0.01f, float zFar=100.0f) {
+    private int InitCam(float fovDeg=60.0f, float zNear=0.01f, float zFar=100.0f) {
         var aspect = Game1.Inst.GraphicsDevice.Viewport.AspectRatio;
         var cam    = AddEntity();
         var fovRad = fovDeg*2.0f*(float)Math.PI/360.0f;
@@ -102,7 +102,7 @@ public sealed class CollisionPlayground: Scene {
         });
 
         AddComponent(cam, new CTransform {
-            Position = new Vector3(0.0f, 0.0f, 10.0f),
+            Position = new Vector3(0.0f, 0.0f, 18.0f),
             Rotation = Matrix.Identity,
             Scale    = Vector3.One
         });
