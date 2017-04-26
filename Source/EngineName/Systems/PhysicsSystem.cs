@@ -212,7 +212,7 @@ public class PhysicsSystem: EcsSystem {
                 continue;
             }
 
-            // TODO: Resitution is missing here.
+            // TODO: Restitution is missing here.
             // TODO: There is probably some way around this double-inversion of the masses, but
             //       I'm too lazy to figure it out until it becomes a problem!
             var m1 = ((float)Abs(s1.InvMass) > 0.0001f) ? 1.0f/s1.InvMass : 0.0f;
