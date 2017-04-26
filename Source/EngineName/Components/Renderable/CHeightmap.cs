@@ -10,7 +10,7 @@ namespace EngineName.Components.Renderable
 {
     public class CHeightmap : C3DRenderable {
         public Texture2D Image;
-        public float[,] HeightData;
+        public Color[,] HeightData;
         internal Color[,] ColorMap;
         public float HeighestPoint;
         public float LowestPoint;
