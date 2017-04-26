@@ -37,13 +37,11 @@ public sealed class CollisionPlayground: Scene {
         InitCam();
 
         //                  -- position --                  -- velocity --
-        CreateBall(new Vector3(-3.5f,  0.0f, 0.0f), new Vector3( 1.0f,  0.0f, 0.0f), 1.0f );
-        CreateBall(new Vector3( 3.5f,  1.0f, 0.0f), new Vector3(-1.0f,  0.0f, 0.0f), 0.5f );
-        CreateBall(new Vector3( 3.5f, 14.0f, 0.0f), new Vector3(-1.0f, -3.0f, 0.0f), 1.5f );
-        CreateBall(new Vector3(-3.5f, 14.0f, 0.0f), new Vector3( 0.5f, -4.0f, 0.0f), 0.75f);
-        CreateBall(new Vector3(3.5f,  -8.0f, 0.0f), new Vector3(-0.5f,  2.0f, 0.0f), 0.75f);
+        for (var i = 0; i < 20; i++) {
+            CreateBall(new Vector3(-3.5f+i*0.9f,  i*0.3f, 0.0f), new Vector3( 1.0f,  0.0f, 0.0f), 1.0f );
+        }
 
-        OnEvent("collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
+        //OnEvent("collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
     }
 
     //--------------------------------------
@@ -55,14 +53,12 @@ public sealed class CollisionPlayground: Scene {
     /// <param name="v">The initial velocity to give to the ball.</param>
     /// <param name="r">The ball radius.</param>
     private int CreateBall(Vector3 p, Vector3 v, float r=1.0f) {
-        // TODO: Radius is unsupported. Scale ball by radius *and make sure to implement support in
-        // the physics system*.
-
         var ball = AddEntity();
 
         AddComponent(ball, new CBody {
             Aabb     = new BoundingBox(-Vector3.One*r, Vector3.One*r),
             Radius   = r,
+            LinDrag  = 1.0f,
             Position = p,
             Velocity = v
         });
