@@ -11,5 +11,6 @@ namespace EngineName.Components.Renderable
     {
         public Vector2 position;
         public Color color;
+        public Vector2 origin;
     }
 }

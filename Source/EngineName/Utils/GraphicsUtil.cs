@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EngineName.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using EngineName.Components.Renderable;
 
 namespace EngineName.Utils
 {
@@ -36,6 +37,15 @@ namespace EngineName.Utils
             // Create the bounding box
             BoundingBox box = new BoundingBox(meshMin, meshMax);
             return box;
+        }
+        public static Vector2 MeasureString(SpriteFont font, string text)
+        {
+            return font.MeasureString(text);
+        }
+        public static Vector2 MeasureString(int entityID)
+        {
+            var cText = (CText)Game1.Inst.Scene.GetComponentFromEntity<C2DRenderable>(entityID);
+            return cText.font.MeasureString(cText.format);
         }
     }
 }

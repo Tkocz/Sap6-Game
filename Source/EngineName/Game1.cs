@@ -74,8 +74,8 @@ public class Game1: Game {
     /// <summary>Enters the specified scene.</summary>
     /// <param name="scene">The scene to display.</param>
     public void EnterScene(Scene scene) {
-        scene.Init();
         mScenes.Push(scene);
+        scene.Init();
 
         Log.Get().Info($"Entered scene: {scene.GetType().Name}");
     }

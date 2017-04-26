@@ -3,6 +3,7 @@ using EngineName.Components;
 using EngineName.Components.Renderable;
 using EngineName.Logging;
 using EngineName.Systems;
+using EngineName.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -57,8 +58,9 @@ namespace GameName.Scenes
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
                 format = "Sap my Low-Poly Game",
                 color = Color.White,
-                position = new Vector2(300, 20)
-            });
+                position = new Vector2(300, 20),
+                origin = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034").MeasureString("Sap my Low-Poly Game") / 2
+        });
             eid = AddEntity();
             AddComponent<C2DRenderable>(eid, new CSprite
             {

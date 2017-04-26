@@ -23,7 +23,7 @@ namespace EngineName.Systems
         public override void Init()
         {
             world = Matrix.Identity;
-            skyModel = Game1.Inst.Content.Load<Model>("Textures/skybox");
+            skyModel = Game1.Inst.Content.Load<Model>("Models/skybox");
             skyEffect = (BasicEffect)skyModel.Meshes[0].Effects[0];
             graphics = Game1.Inst.Graphics;
         }
@@ -41,9 +41,6 @@ namespace EngineName.Systems
         public override void Draw(float t, float dt)
         {
             graphics.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-            RasterizerState rs = new RasterizerState();
-            rs.CullMode = CullMode.None;
-            graphics.GraphicsDevice.RasterizerState = rs;
             skyEffect.World = skyworldM;
             skyEffect.View = viewM;
             skyEffect.Projection = projM;
