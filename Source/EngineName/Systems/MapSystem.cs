@@ -1,4 +1,4 @@
-﻿using EngineName.Components.Renderable;
+using EngineName.Components.Renderable;
 using EngineName.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using EngineName.Utils;
 
 namespace EngineName.Systems {
+<<<<<<< Updated upstream
     public class MapSystem : EcsSystem {
         private GraphicsDevice mGraphicsDevice;
         private int chunksplit = 1;
@@ -24,6 +25,37 @@ namespace EngineName.Systems {
             
       
 
+=======
+	public class MapSystem : EcsSystem
+	{
+		private GraphicsDevice mGraphicsDevice;
+		private int chunksplit = 20;
+		private BasicEffect basicEffect;
+
+		public override void Init()
+		{
+			mGraphicsDevice = Game1.Inst.GraphicsDevice;
+			basicEffect = new BasicEffect(mGraphicsDevice);
+			basicEffect.VertexColorEnabled = true;
+			base.Init();
+		}
+
+		private Color materialPick(int decimalCode)
+		{
+			switch (decimalCode)
+			{
+				case 255:
+					return Color.Brown;
+				case 250:
+					return Color.Pink;
+				case 240:
+					return Color.Yellow;
+				default:
+					return Color.Pink;
+			}	
+		}
+           
+>>>>>>> Stashed changes
         private void CreateIndicesChunk(CHeightmap heightMap, ref Dictionary<int, int[]> indicesdict, int reCurisiveCounter)
         {
             int terrainWidthChunk = heightMap.Image.Width / chunksplit;
@@ -53,9 +85,8 @@ namespace EngineName.Systems {
             indicesdict.Add(reCurisiveCounter, indices);
             if (reCurisiveCounter + 1 < chunksplit * chunksplit)
                 CreateIndicesChunk(heightMap, ref indicesdict, reCurisiveCounter + 1);
-
-
         }
+
         private void CalculateNormals(ref VertexPositionNormalColor[] vertices, ref int[] indices)
         {
             for (int i = 0; i < vertices.Length; i++)
@@ -70,14 +101,11 @@ namespace EngineName.Systems {
                 Vector3 side1 = vertices[index1].Position - vertices[index3].Position;
                 Vector3 side2 = vertices[index1].Position - vertices[index2].Position;
                 Vector3 normal = Vector3.Cross(side1, side2);
-
+				normal.Normalize();
                 vertices[index1].Normal += normal;
                 vertices[index2].Normal += normal;
                 vertices[index3].Normal += normal;
             }
-
-            for (int i = 0; i < vertices.Length; i++)
-                vertices[i].Normal.Normalize();
         }
 
         private ModelMeshPart CreateModelPart(VertexPositionNormalColor[] vertices, int[] indices)
@@ -95,16 +123,31 @@ namespace EngineName.Systems {
             int terrainWidth = compHeight.Image.Width;
             int terrainHeight = compHeight.Image.Height;
 
-            Color[] heightMapColors = new Color[terrainWidth * terrainHeight];
-            compHeight.Image.GetData(heightMapColors);
+			var colorMap = new Color[terrainWidth * terrainHeight];
+            compHeight.Image.GetData(colorMap);
 
-            compHeight.HeightData = new float[terrainWidth, terrainHeight];
+            compHeight.HeightData = new Color[terrainWidth, terrainHeight];
             for (int x = 0; x < terrainWidth; x++)
                 for (int y = 0; y < terrainHeight; y++)
-                    compHeight.HeightData[x, y] = heightMapColors[x + y * terrainWidth].R;
+                    compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
 
+<<<<<<< Updated upstream
             compHeight.HeighestPoint = compHeight.HeightData.Cast<float>().Max();
             compHeight.LowestPoint = compHeight.HeightData.Cast<float>().Min();
+=======
+            float minHeight = float.MaxValue;
+            float maxHeight = float.MinValue;
+            for (int x = 0; x < terrainWidth; x++)
+            {
+                for (int y = 0; y < terrainHeight; y++)
+                {
+                    if (compHeight.HeightData[x, y].R < minHeight)
+                        minHeight = compHeight.HeightData[x, y].R;
+                    if (compHeight.HeightData[x, y].R > maxHeight)
+                        maxHeight = compHeight.HeightData[x, y].R;
+                }
+            }
+>>>>>>> Stashed changes
         }
 
         private void CreateVerticesChunks(CHeightmap cheightmap,
@@ -132,9 +175,10 @@ namespace EngineName.Systems {
                         yOffset = yOffset - reCurisiveCounter % chunksplit;
                     globalx = x + xOffset;
                     globaly = y + yOffset;
-                    int height = (int)cheightmap.HeightData[globalx, globaly];
+                    int height = (int)cheightmap.HeightData[globalx, globaly].R;
                     vertices[x + y * terrainWidth].Position = new Vector3(globalx, height, globaly);
-                    vertices[x + y * terrainWidth].Color = Color.Red;
+					vertices[x + y * terrainWidth].Color = materialPick(cheightmap.HeightData[globalx, globaly].G);
+
                     //vertices[x + y * terrainWidth].TextureCoordinate = new Vector2((float) x / terrainWidth,
                     //(float) y / terrainHeight);
                 }
