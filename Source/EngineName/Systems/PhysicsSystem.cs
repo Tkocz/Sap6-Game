@@ -5,14 +5,12 @@
 // USINGS
 //--------------------------------------
 
+using System.Collections.Generic;
+
 using EngineName.Components;
 using EngineName.Core;
+
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using static System.Math;
 
