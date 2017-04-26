@@ -128,6 +128,8 @@ public abstract class MenuScene: Scene {
                 if (mSelIndex < 0) {
                     mSelIndex = mItems.Count - 1;
                 }
+
+                OnSelChanged(mSelIndex);
             }
 
             canMove = false;
@@ -139,6 +141,8 @@ public abstract class MenuScene: Scene {
                 if (mSelIndex >= mItems.Count) {
                     mSelIndex = 0;
                 }
+
+                OnSelChanged(mSelIndex);
             }
 
             canMove = false;
@@ -190,6 +194,11 @@ public abstract class MenuScene: Scene {
 
         AddComponent<C2DRenderable>(AddEntity(), label.Text);
         mItems.Add(label);
+    }
+
+    /// <summary>Called after the menu selection has been changed.</summary>
+    /// <param name="selIndex">The index of the selected menu item (subject to change!!).</param>
+    protected virtual void OnSelChanged(int selIndex) {
     }
 }
 
