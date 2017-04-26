@@ -129,7 +129,7 @@ public abstract class MenuScene: Scene {
                     mSelIndex = mItems.Count - 1;
                 }
 
-                Raise("SelChanged", mSelIndex);
+                Raise("selchanged", mSelIndex);
             }
 
             canMove = false;
@@ -142,7 +142,7 @@ public abstract class MenuScene: Scene {
                     mSelIndex = 0;
                 }
 
-                Raise("SelChanged", mSelIndex);
+                Raise("selchanged", mSelIndex);
             }
 
             canMove = false;

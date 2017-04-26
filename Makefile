@@ -138,7 +138,7 @@ $(G_CONTENTDIR)/Sounds/Effects/*.mp3:
 $(G_CONTENTDIR)/Sounds/Effects/*.wav:
 	@echo /importer:WavImporter           >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /processor:SoundEffectProcessor >> $(G_TMPDIR)/$(G_CONTENTFILE)
-	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /build:$@                        >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 $(G_CONTENTDIR)/Sounds/Music/*.mp3:
 	@echo /importer:Mp3Importer    >> $(G_TMPDIR)/$(G_CONTENTFILE)
@@ -146,9 +146,9 @@ $(G_CONTENTDIR)/Sounds/Music/*.mp3:
 	@echo /build:$@                >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 $(G_CONTENTDIR)/Textures/*.jpg:
-	@echo /importer:TextureImporter           >> $(G_TMPDIR)/$(G_CONTENTFILE)
-	@echo /processor:TextureProcessor         >> $(G_TMPDIR)/$(G_CONTENTFILE)
-	@echo /build:$@                           >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /importer:TextureImporter   >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:TextureProcessor >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /build:$@                   >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 $(G_CONTENTDIR)/Textures/*.png:
 	@echo /importer:TextureImporter   >> $(G_TMPDIR)/$(G_CONTENTFILE)
