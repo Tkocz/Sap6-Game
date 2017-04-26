@@ -51,7 +51,6 @@ using Core;
 
     /// <summary>Retsores the original window title.</summary>
     public override void Cleanup() {
-        Game1.Inst.Window.Title = mOrigTitle;
     }
 
     /// <summary>Performs draw logic specific to the system.</summary>
