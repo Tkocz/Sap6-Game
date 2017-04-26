@@ -1,10 +1,22 @@
 namespace EngineName.Utils {
 
+//--------------------------------------
+// USINGS
+//--------------------------------------
+
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Audio;
 
+//--------------------------------------
+// CLASSES
+//--------------------------------------
+
 /// <summary>Provides basic functionality for audio playback.</summary>
 public static class SfxUtil {
+
+//--------------------------------------
+// PUBLIC METHODS
+//--------------------------------------
 
 /// <summary>Loads and plays the specified sound.</summary>
 /// <param name="name">The name of the sound asset to play.</param>
