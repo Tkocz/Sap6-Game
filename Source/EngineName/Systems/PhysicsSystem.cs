@@ -154,6 +154,7 @@ namespace EngineName.Systems
                     continue;
                 }
 
+                var d = n.Length();
                 n.Normalize();
 
                 var i1 = Vector3.Dot(s1.Velocity, n);
@@ -170,10 +171,15 @@ namespace EngineName.Systems
                 var m1 = ((float)Abs(s1.InvMass) > 0.0001f) ? 1.0f/s1.InvMass : 0.0f;
                 var m2 = ((float)Abs(s2.InvMass) > 0.0001f) ? 1.0f/s2.InvMass : 0.0f;
                 var im = 1.0f/(m1 + m2);
-                var p  = n*(2.0f*(i1 - i2))*im;
+                var p  = n*(2.0f*(i2 - i1))*im;
 
-                s1.Velocity -= p*s1.InvMass;
-                s2.Velocity += p*s2.InvMass;
+                d = (minDist - d)*im;
+
+                s1.Position += n*d*s1.InvMass;
+                s1.Velocity += p*s1.InvMass;
+
+                s2.Position -= n*d*s2.InvMass;
+                s2.Velocity -= p*s2.InvMass;
             }
         }
     }
