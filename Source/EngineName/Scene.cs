@@ -20,6 +20,9 @@ namespace EngineName {
 
     /// <summary>Represents a game scene.</summary>
     public abstract class Scene {
+        public int NumEntities {
+            get { return m_Entities.Count; }
+        }
         /*--------------------------------------
          * NESTED TYPES
          *------------------------------------*/

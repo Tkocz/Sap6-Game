@@ -32,6 +32,10 @@ public sealed class CollisionPlayground: Scene {
                    new     CameraSystem(),
                    new  RenderingSystem());
 
+#if DEBUG
+        AddSystem(new DebugOverlay());
+#endif
+
         base.Init();
 
         InitCam();

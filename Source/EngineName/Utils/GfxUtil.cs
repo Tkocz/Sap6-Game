@@ -1,8 +1,5 @@
 namespace EngineName.Utils {
 
-// TODO: Not yet in use.
-#if false
-
 //--------------------------------------
 // USINGS
 //--------------------------------------
@@ -74,7 +71,5 @@ public static class GfxUtil {
                       layerDepth : 0.5f);
     }
 }
-
-#endif
 
 }
