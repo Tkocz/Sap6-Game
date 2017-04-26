@@ -23,10 +23,6 @@ namespace ContentPipeline {
             for (var y = 0; y < bmp.Height; y++) {
                 image[y] = bmp.GetRow(y);
             }
-            PositionCollection pc = new PositionCollection(); pc.Add()
-            MeshContent mc = new MeshContent() {  }
-            GeometryContent g = new GeometryContent() {  }
-
             context.Logger.LogMessage("test");
             return new TOutput();
         }
