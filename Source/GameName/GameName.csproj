@@ -42,10 +42,8 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Dev\CollTestScene1.cs" />
-    <Compile Include="Dev\CollTestScene2.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="PhilGame.cs" />
+    <Compile Include="Scenes\MainMenu.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +59,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Dev\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

@@ -193,3 +193,9 @@
 /processorParam:TextureFormat=Color
 /build:Textures/skybox_texture.jpg
 
+#begin tobbesEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:tobbesEffect.fx
+

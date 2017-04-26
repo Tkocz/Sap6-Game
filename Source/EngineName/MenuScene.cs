@@ -98,7 +98,7 @@ public abstract class MenuScene: Scene {
 
         base.Init();
 
-        mFont = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans");
+        mFont = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034");
 
         AddComponent<C2DRenderable>(AddEntity(), mSelHighlight = new CText {
             color    = Color.Black,

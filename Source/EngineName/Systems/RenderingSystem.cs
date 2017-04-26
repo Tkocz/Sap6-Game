@@ -35,18 +35,37 @@ namespace EngineName.Systems
 
                         if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
                             continue;
-
-                        foreach (BasicEffect effect in mesh.Effects) {
-                            effect.EnableDefaultLighting();
-                            effect.PreferPerPixelLighting = true;
-                            
-                            effect.Projection = camera.Projection;
-                            effect.View = camera.View;
-                            effect.World = mesh.ParentBone.Transform * transform.Frame;
-                            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                        if (model.model.Tag =="water")
+                        {
+                            foreach (var effect in mesh.Effects)
                             {
-                                pass.Apply();
+
+                                /*effect.Projection = camera.Projection;
+                                effect.View = camera.View;
+                                effect.World = mesh.ParentBone.Transform * transform.Frame;
+                                
+                                */
+
+                                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                                {
+                                    pass.Apply();
+                                }
                             }
+                        }
+                            else { 
+                            foreach (BasicEffect effect in mesh.Effects) {
+                                effect.EnableDefaultLighting();
+                                effect.PreferPerPixelLighting = true;
+                                
+                                effect.Projection = camera.Projection;
+                                effect.View = camera.View;
+                                effect.World = mesh.ParentBone.Transform * transform.Frame;
+                                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                                {
+                                    pass.Apply();
+                                }
+                            }
+
                         }
                         counter++;
                         mesh.Draw();

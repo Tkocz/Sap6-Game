@@ -24,7 +24,7 @@ namespace EngineName.Systems
         {
             mGraphicsDevice = Game1.Inst.GraphicsDevice;
             base.Init();
-            bEffect = new BasicEffect(mGraphicsDevice) { VertexColorEnabled = true };
+            bEffect = Game1.Inst.Content.Load<Effect>("TobbesEffect");
         }
 
         public void Load()
@@ -124,7 +124,7 @@ namespace EngineName.Systems
 
                 mesh.Name = "water";
                 ModelBone bone = new ModelBone();
-                bone.Name = "Water";
+                bone.Name = "water";
                 bone.AddMesh(mesh);
                 bone.Transform = Matrix.Identity;
                 mesh.ParentBone = bone;
@@ -132,7 +132,7 @@ namespace EngineName.Systems
                 bones.Add(bone);
                 meshes.Add(mesh);
                 model = new Model(Game1.Inst.GraphicsDevice,bones,meshes);
- 
+                model.Tag = "water";
 
             }
             int id = Game1.Inst.Scene.AddEntity();
