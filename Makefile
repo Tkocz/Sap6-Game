@@ -114,29 +114,46 @@ $(C_BINDIR)/$(G_TARGET): engine
 .PHONY: $(G_CONTENTDIR)/*/* $(G_CONTENTDIR)/*/*/* pre-content content
 
 $(G_CONTENTDIR)/Fonts/*.spritefont:
-	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /importer:FontDescriptionImporter   >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:FontDescriptionProcessor >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /build:$@                           >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 $(G_CONTENTDIR)/Models/*.fbx:
-	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
-
-$(G_CONTENTDIR)/Models/*.x:
-	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
-
-$(G_CONTENTDIR)/Sounds/Effects/*.mp3:
-	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
-
-$(G_CONTENTDIR)/Sounds/Effects/*.wav:
-	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
-
-$(G_CONTENTDIR)/Sounds/Music/*.mp3:
-	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
-
-$(G_CONTENTDIR)/Textures/*.jpg:
+	@echo /importer:FbxImporter               >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:ModelProcessor           >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /processorParam:TextureFormat=Color >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /build:$@                           >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
-$(G_CONTENTDIR)/Textures/*.png:
+$(G_CONTENTDIR)/Models/*.x:
+	@echo /importer:OpenAssetImporter         >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:ModelProcessor           >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processorParam:TextureFormat=Color >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /build:$@                           >> $(G_TMPDIR)/$(G_CONTENTFILE)
+
+$(G_CONTENTDIR)/Sounds/Effects/*.mp3:
+	@echo /importer:Mp3Importer           >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:SoundEffectProcessor >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /build:$@                       >> $(G_TMPDIR)/$(G_CONTENTFILE)
+
+$(G_CONTENTDIR)/Sounds/Effects/*.wav:
+	@echo /importer:WavImporter           >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:SoundEffectProcessor >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
+
+$(G_CONTENTDIR)/Sounds/Music/*.mp3:
+	@echo /importer:Mp3Importer    >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:SongProcessor >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /build:$@                >> $(G_TMPDIR)/$(G_CONTENTFILE)
+
+$(G_CONTENTDIR)/Textures/*.jpg:
+	@echo /importer:TextureImporter           >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:TextureProcessor         >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /build:$@                           >> $(G_TMPDIR)/$(G_CONTENTFILE)
+
+$(G_CONTENTDIR)/Textures/*.png:
+	@echo /importer:TextureImporter   >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:TextureProcessor >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /build:$@                   >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 pre-content:
 	mkdir -p $(G_TMPDIR)
