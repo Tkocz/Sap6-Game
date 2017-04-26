@@ -122,6 +122,9 @@ $(G_CONTENTDIR)/Models/*.fbx:
 $(G_CONTENTDIR)/Sounds/Effects/*.wav:
 	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
+$(G_CONTENTDIR)/Sounds/Music/*.mp3:
+	@echo /build:$@ >> $(G_TMPDIR)/$(G_CONTENTFILE)
+
 $(G_CONTENTDIR)/Textures/*.jpg:
 	@echo /processorParam:TextureFormat=Color >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /build:$@                           >> $(G_TMPDIR)/$(G_CONTENTFILE)

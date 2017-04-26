@@ -41,6 +41,8 @@ public sealed class MainMenu: MenuScene {
         CreateLabel("Quit", () => {
             Game1.Inst.Exit();
         });
+
+        SfxUtil.PlayMusic("Sounds/Music/MainMenu");
     }
 
     /// <summary>Play a sound when the menu selection is changed.</summary>
