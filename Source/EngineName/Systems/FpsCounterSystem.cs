@@ -5,13 +5,16 @@ namespace EngineName.Systems {
  *------------------------------------*/
 
 using Core;
+    using EngineName.Components.Renderable;
+    using Microsoft.Xna.Framework;
+    using Microsoft.Xna.Framework.Graphics;
 
-/*--------------------------------------
- * CLASSES
- *------------------------------------*/
+    /*--------------------------------------
+     * CLASSES
+     *------------------------------------*/
 
-/// <summary>Displays frames-per-second in the window title.</summary>
-public sealed class FpsCounterSystem: EcsSystem {
+    /// <summary>Displays frames-per-second in the window title.</summary>
+    public sealed class FpsCounterSystem: EcsSystem {
     /*--------------------------------------
      * NON-PUBLIC FIELDS
      *------------------------------------*/
@@ -31,14 +34,21 @@ public sealed class FpsCounterSystem: EcsSystem {
     /// <summary>The timer used to update the title.</summary>
     private float mTimer;
 
-    /*--------------------------------------
-     * CONSTRUCTORS
-     *------------------------------------*/
+        private GraphicsDevice mGraphicsDevice;
+        private SpriteBatch mSpriteBatch;
+        private SpriteFont mFont;
+        private Vector2 mPosition;
+        private Vector2 mOrigin;
+        private string s;
 
-    /// <summary>Initializes a new instance of the system.</summary>
-    /// <param name="updatesPerSec">The number of times to update the
-    ///                             information each second.</param>
-    public FpsCounterSystem(int updatesPerSec) {
+        /*--------------------------------------
+         * CONSTRUCTORS
+         *------------------------------------*/
+
+        /// <summary>Initializes a new instance of the system.</summary>
+        /// <param name="updatesPerSec">The number of times to update the
+        ///                             information each second.</param>
+        public FpsCounterSystem(int updatesPerSec) {
         mInvUpdateInterval = 1.0f / updatesPerSec;
     }
 
@@ -57,29 +67,10 @@ public sealed class FpsCounterSystem: EcsSystem {
     ///                  method.</param>
     public override void Draw(float t, float dt) {
         mNumDraws++;
-
-        mTimer += dt;
-
-        if (mTimer < mInvUpdateInterval) {
-            // Nothing to do yet.
-            return;
-        }
-
-        var dps = mNumDraws / mInvUpdateInterval;
-        var ups = mNumUpdates / mInvUpdateInterval;
-        var s   = $"(draws/s: {dps}, updates/s: {ups})";
-
-        Game1.Inst.Window.Title = string.Format($"{mOrigTitle} {s}");
-
-        mNumDraws   = 0;
-        mNumUpdates = 0;
-
-        mTimer -= mInvUpdateInterval;
     }
 
     /// <summary>Initializes the system.</summary>
     public override void Init() {
-        mOrigTitle = Game1.Inst.Window.Title;
     }
 
     /// <summary>Performs update logic specific to the system.</summary>
@@ -88,7 +79,32 @@ public sealed class FpsCounterSystem: EcsSystem {
     ///                  method.</param>
     public override void Update(float t, float dt) {
         mNumUpdates++;
-    }
-}
 
+        mTimer += dt;
+
+        if (mTimer < mInvUpdateInterval)
+        {
+            // Nothing to do yet.
+            return;
+        }
+
+        var dps = mNumDraws / mInvUpdateInterval;
+        var ups = mNumUpdates / mInvUpdateInterval;
+        s = $"(draws/s: {dps}, updates/s: {ups})";
+
+        foreach (var component in Game1.Inst.Scene.GetComponents<C2DRenderable>())
+        {
+            var key = component.Key;
+            if (component.Value.GetType() == typeof(CFPS))
+            {
+                CFPS text = (CFPS)component.Value;
+                text.format = s;
+            }
+        }
+        mNumDraws = 0;
+        mNumUpdates = 0;
+
+        mTimer -= mInvUpdateInterval;
+        }
+    }
 }

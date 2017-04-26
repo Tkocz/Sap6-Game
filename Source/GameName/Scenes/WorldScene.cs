@@ -16,6 +16,7 @@ namespace GameName.Scenes
             var mapSystem = new MapSystem();
             var waterSys = new WaterSystem();
             AddSystems(
+                new FpsCounterSystem(updatesPerSec: 10),
                 new SkyBoxSystem(),
                 new RenderingSystem(),
                 new CameraSystem(),
@@ -53,13 +54,13 @@ namespace GameName.Scenes
             AddComponent(camera, new CTransform() { Position = new Vector3(-5, 5, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
 
             int eid = AddEntity();
-            AddComponent<C2DRenderable>(eid, new CText
+            AddComponent<C2DRenderable>(eid, new CFPS
             {
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
                 format = "Sap my Low-Poly Game",
                 color = Color.White,
                 position = new Vector2(300, 20),
-                origin = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034").MeasureString("Sap my Low-Poly Game") / 2
+                origin = Vector2.Zero// Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034").MeasureString("Sap my Low-Poly Game") / 2
         });
             eid = AddEntity();
             AddComponent<C2DRenderable>(eid, new CSprite

@@ -37,7 +37,7 @@ namespace EngineName.Systems
                     CSprite sprite = (CSprite)component.Value;
                     DrawSprite(t, dt, sprite);
                 }
-                if (component.Value.GetType() == typeof(CText))
+                if (component.Value.GetType() == typeof(CText) || component.Value.GetType() == typeof(CFPS))
                 {
                     CText text = (CText)component.Value;
                     DrawText(t, dt, text);
