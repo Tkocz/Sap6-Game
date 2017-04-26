@@ -18,11 +18,9 @@ using Microsoft.Xna.Framework.Graphics;
 // CLASSES
 //--------------------------------------
 
-// NOTE: Do not change anything here. Rather, create a copy of the scene and modify the copy. We
-//       want to keep test cases consistent!
 /// <summary>Provides a simple test case for collisions. Running it, you should see four spheres
 //           colliding on the screen in a sane manner.</summary>
-public sealed class CollTestScene1: Scene {
+public sealed class CollisionPlayground: Scene {
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
