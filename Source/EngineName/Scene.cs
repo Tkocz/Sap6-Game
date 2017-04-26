@@ -55,6 +55,10 @@ namespace EngineName {
          * NON-PUBLIC FIELDS
          *------------------------------------*/
 
+        /// <summary>The event callbacks registered in the scene.</summary>
+        private readonly Dictionary<string, List<Action<object>>> mEventCBs =
+            new Dictionary<string, List<Action<object>>>();
+
         private List<int> m_Entities = new List<int>();
 
         /// <summary>The systems in use by the scene.</summary>
@@ -67,6 +71,33 @@ namespace EngineName {
         /*--------------------------------------
          * PUBLIC METHODS
          *------------------------------------*/
+
+        /// <summary>Raises the specified event in the scene.</summary>
+        /// <param name="name">The name of the event to raise.</param>
+        /// <param name="data">The event data.</param>
+        public void Raise(string name, object data) {
+            List<Action<object>> cbs;
+            if (!mEventCBs.TryGetValue(name, out cbs)) {
+                // No events registered for this event name.
+                return;
+            }
+
+            foreach (var cb in cbs) {
+                cb(data);
+            }
+        }
+
+        /// <summary>Registers a callback for a specific event.</summary>
+        /// <param name="name">The name of the event.</param>
+        /// <param name="cb">The callback to invoke after the event is raised.</param>
+        public void OnEvent(string name, Action<object> cb) {
+            List<Action<object>> cbs;
+            if (!mEventCBs.TryGetValue(name, out cbs)) {
+                mEventCBs[name] = cbs = new List<Action<object>>();
+            }
+
+            cbs.Add(cb);
+        }
 
         /// <summary>Adds the specified entity to the scene.</summary>
         /// <param name="entity">The entity to add to the scene.</param>

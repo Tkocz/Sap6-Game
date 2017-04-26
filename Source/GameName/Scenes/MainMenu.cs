@@ -43,12 +43,8 @@ public sealed class MainMenu: MenuScene {
         });
 
         SfxUtil.PlayMusic("Sounds/Music/MainMenu");
-    }
 
-    /// <summary>Play a sound when the menu selection is changed.</summary>
-    /// <param name="selIndex">Not used.</param>
-    protected override void OnSelChanged(int selIndex) {
-        SfxUtil.PlaySound("Sounds/Effects/Click");
+        OnEvent("SelChanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
     }
 
 }
