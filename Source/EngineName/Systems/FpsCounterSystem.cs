@@ -67,18 +67,6 @@ using Core;
     ///                  method.</param>
     public override void Draw(float t, float dt) {
         mNumDraws++;
-    }
-
-    /// <summary>Initializes the system.</summary>
-    public override void Init() {
-    }
-
-    /// <summary>Performs update logic specific to the system.</summary>
-    /// <param name="t">The total game time, in seconds.</param>
-    /// <param name="dt">The time, in seconds, since the last call to this
-    ///                  method.</param>
-    public override void Update(float t, float dt) {
-        mNumUpdates++;
 
         mTimer += dt;
 
@@ -105,6 +93,18 @@ using Core;
         mNumUpdates = 0;
 
         mTimer -= mInvUpdateInterval;
+        }
+
+        /// <summary>Initializes the system.</summary>
+        public override void Init() {
+    }
+
+    /// <summary>Performs update logic specific to the system.</summary>
+    /// <param name="t">The total game time, in seconds.</param>
+    /// <param name="dt">The time, in seconds, since the last call to this
+    ///                  method.</param>
+    public override void Update(float t, float dt) {
+        mNumUpdates++;
         }
     }
 }
