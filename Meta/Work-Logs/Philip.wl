@@ -10,3 +10,4 @@
 1493127278:1.5:Started work on menu functionality
 1493133405:1.5:Further work on menu functionality.
 1493197197:3.0:Worked on menu and some other tweaks, did some code review etc.
+1493219366:1.5:Debugging functionality + much else.
