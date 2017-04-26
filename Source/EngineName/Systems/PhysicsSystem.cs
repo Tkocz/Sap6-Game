@@ -181,7 +181,7 @@ namespace EngineName.Systems
                 s2.Position -= n*d*s2.InvMass;
                 s2.Velocity -= p*s2.InvMass;
 
-                // TODO: We probably want to psas the ids of the two objects colliding here.
+                // TODO: We probably want to pass the ids of the two objects colliding here.
                 Scene.Raise("Collision", null);
             }
         }
