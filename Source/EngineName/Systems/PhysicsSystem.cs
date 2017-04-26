@@ -18,6 +18,7 @@ using static System.Math;
 // CLASSES
 //--------------------------------------
 
+/// <summary>Provides real-time simulation of a physical world.</summary>
 public class PhysicsSystem: EcsSystem {
     //--------------------------------------
     // NESTED TYPES
@@ -226,7 +227,8 @@ public class PhysicsSystem: EcsSystem {
             s2.Position -= n*d*s2.InvMass;
             s2.Velocity -= p*s2.InvMass;
 
-            // TODO: We probably want to pass the ids of the two objects colliding here.
+            // TODO: We probably want to pass the ids of the two objects colliding here. As well as
+            //       collision force etc.
             Scene.Raise("collision", null);
         }
     }
