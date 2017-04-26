@@ -1,19 +1,20 @@
-﻿using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using System.Text;
-using System.Threading.Tasks;
-
-using TInput = Microsoft.Xna.Framework.Content.Pipeline.Graphics.NodeContent;
-using TOutput = Microsoft.Xna.Framework.Content.Pipeline.Processors.ModelContent;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System.Text.RegularExpressions;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using EngineName.Animation;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System.ComponentModel;
+
+using TInput = Microsoft.Xna.Framework.Content.Pipeline.Graphics.NodeContent;
+using TOutput = Microsoft.Xna.Framework.Content.Pipeline.Processors.ModelContent;
 
 namespace ContentPipeline
 {
@@ -66,9 +67,9 @@ namespace ContentPipeline
 
       ((Dictionary<string, object>)output.Tag).Add("AnimationSet",
           BuildAnimationSet(input, ref output, context));
-
+            /*
             ((Dictionary<string, object>)output.Tag).Add("BoundsInfo",
-                new BoundsInfo(maxScale_, maxOffset_));
+                new BoundsInfo(maxScale_, maxOffset_));*/
 
             return output;
         }

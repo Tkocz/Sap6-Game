@@ -45,6 +45,13 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Animation\Animation.cs" />
+    <Compile Include="Animation\AnimationInstance.cs" />
+    <Compile Include="Animation\AnimationSet.cs" />
+    <Compile Include="Animation\AnimationTrack.cs" />
+    <Compile Include="Animation\IAnimationInstance.cs" />
+    <Compile Include="Animation\KeyFrame.cs" />
+    <Compile Include="Animation\SkinnedBone.cs" />
     <Compile Include="Components\CBody.cs" />
     <Compile Include="Components\CInput.cs" />
     <Compile Include="Components\Renderable\C2DRenderable.cs" />
