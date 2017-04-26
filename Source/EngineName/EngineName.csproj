@@ -65,6 +65,7 @@
     <Compile Include="MenuScene.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="Systems\CameraSystem.cs" />
+    <Compile Include="Systems\DebugOverlay.cs" />
     <Compile Include="Systems\FpsCounterSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\MapSystem.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Systems\WaterSystem.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
+    <Compile Include="Utils\GfxUtil.cs" />
     <Compile Include="Utils\GraphicsUtil.cs" />
     <Compile Include="Utils\SfxUtil.cs" />
   </ItemGroup>
