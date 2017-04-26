@@ -11,6 +11,11 @@ namespace GameName.Scenes
 {
     public class WorldScene : Scene
     {
+        public override void Draw(float t, float dt) {
+            Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
+            base.Draw(t, dt);
+        }
+
         public override void Init() {
 
             var mapSystem = new MapSystem();
@@ -25,8 +30,13 @@ namespace GameName.Scenes
                 mapSystem,
                 waterSys,
                 new Rendering2DSystem()
-      
+
             );
+
+#if DEBUG
+        AddSystem(new DebugOverlay());
+#endif
+
             base.Init();
             // Camera entity
             int camera = AddEntity();

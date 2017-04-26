@@ -167,7 +167,6 @@ namespace EngineName {
     /// <param name="dt">The game time, in seconds, since the last call to this
     ///                  method.</param>
     public virtual void Draw(float t, float dt) {
-        Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
         foreach (var system in m_Systems) {
             system.Draw(t, dt);
         }

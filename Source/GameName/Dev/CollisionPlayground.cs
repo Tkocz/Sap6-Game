@@ -48,6 +48,12 @@ public sealed class CollisionPlayground: Scene {
         //OnEvent("collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
     }
 
+    public override void Draw(float t, float dt)  {
+        Game1.Inst.GraphicsDevice.Clear(Color.White);
+
+        base.Draw(t, dt);
+    }
+
     //--------------------------------------
     // NON-PUBLIC METHODS
     //--------------------------------------
@@ -62,7 +68,7 @@ public sealed class CollisionPlayground: Scene {
         AddComponent(ball, new CBody {
             Aabb     = new BoundingBox(-Vector3.One*r, Vector3.One*r),
             Radius   = r,
-            LinDrag  = 1.0f,
+            LinDrag  = 0.1f,
             Position = p,
             Velocity = v
         });

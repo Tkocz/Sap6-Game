@@ -117,6 +117,7 @@ public abstract class MenuScene: Scene {
         // Position the selection highlight before delegating drawing.
         mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
 
+        Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
 
         var keyboard = Keyboard.GetState();

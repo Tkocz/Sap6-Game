@@ -16,7 +16,7 @@ with.
 
     <UseKerning>true</UseKerning>
 
-    <Style>Bold</Style>
+    <Style>Regular</Style>
 
     <CharacterRegions>
       <CharacterRegion>

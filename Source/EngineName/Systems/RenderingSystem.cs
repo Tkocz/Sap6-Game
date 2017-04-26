@@ -22,14 +22,18 @@ namespace EngineName.Systems
             base.Update(t, dt);
         }
         public override void Draw(float t, float dt) {
+            base.Draw(t, dt);
+
+            Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
             int counter = 0;
             foreach (CCamera camera in Game1.Inst.Scene.GetComponents<CCamera>().Values) {
                 foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
                     var key = component.Key;
                     C3DRenderable model = (C3DRenderable)component.Value;
                     if (model.model == null) continue;
-                    CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);    
-                    
+                    CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+
                     foreach (var mesh in model.model.Meshes)
                     {
 
@@ -39,7 +43,7 @@ namespace EngineName.Systems
                         foreach (BasicEffect effect in mesh.Effects) {
                             effect.EnableDefaultLighting();
                             effect.PreferPerPixelLighting = true;
-                            
+
                             effect.Projection = camera.Projection;
                             effect.View = camera.View;
                             effect.World = mesh.ParentBone.Transform * transform.Frame;

@@ -40,12 +40,19 @@ namespace EngineName.Systems
         }
         public override void Draw(float t, float dt)
         {
+            base.Draw(t, dt);
+
+            Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.None;
+
             graphics.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             skyEffect.World = skyworldM;
             skyEffect.View = viewM;
             skyEffect.Projection = projM;
             skyModel.Meshes[0].Draw();
             graphics.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+
+            Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
         }
     }
 }
