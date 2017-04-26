@@ -54,6 +54,7 @@
     <Compile Include="Components\Renderable\CRenderable.cs" />
     <Compile Include="Components\CTransform.cs" />
     <Compile Include="Components\Renderable\CSprite.cs" />
+    <Compile Include="Components\Renderable\CFPS.cs" />
     <Compile Include="Components\Renderable\CText.cs" />
     <Compile Include="Components\CCamera.cs" />
     <Compile Include="Core\EcsComponent.cs" />
