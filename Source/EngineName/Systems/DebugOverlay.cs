@@ -178,6 +178,7 @@ public sealed class DebugOverlay: EcsSystem {
             var body = (CBody)component;
 
             // Figure out the size of the aabb and scale our pre-computed aabb model accordingly.
+            // TODO: This probably only works for models centered on the origin, but ok for now.
             var x = body.Aabb.Max.X - body.Aabb.Min.X;
             var y = body.Aabb.Max.Y - body.Aabb.Min.Y;
             var z = body.Aabb.Max.Z - body.Aabb.Min.Z;
