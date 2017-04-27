@@ -72,20 +72,15 @@ public class PhysicsSystem: EcsSystem {
     private List<Pair<int, int>> mPotentialColls = new List<Pair<int, int>>();
 
     //--------------------------------------
-    // NON-PUBLIC CONSTRUCTORS
-    //--------------------------------------
-
-#if DEBUG
-    /// <summary>Private constructor, used to register some strings in the debug
-    ///          overlay. This will bug out if many physics systems are created, but w/e.</summary>
-    public PhysicsSystem() {
-        DebugOverlay.DbgStr((t, dt) => $"Coll checks: {mPotentialColls.Count}");
-    }
-#endif
-
-    //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
+
+    /// <summary>Initializes the physics system.</summary>
+    public override void Init() {
+#if DEBUG
+        DebugOverlay.Inst.DbgStr((t, dt) => $"Coll checks: {mPotentialColls.Count}");
+#endif
+    }
 
     /// <summary>Updates all physical bodies (<see cref="CBody"/>) and solves collisions.</summary>
     /// <param name="t">The total game time, in seconds.</param>
