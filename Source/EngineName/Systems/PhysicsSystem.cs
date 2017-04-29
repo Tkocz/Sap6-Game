@@ -24,6 +24,22 @@ public class PhysicsSystem: EcsSystem {
     // NESTED TYPES
     //--------------------------------------
 
+    /// <summary>Contains information about a collision.</summary>
+    public struct CollisionInfo {
+        /// <summary>The id of first entity involved in the collision.</summary>
+        public int Entity1;
+        /// <summary>The id of the second entity involved in the collision, or negative one if the
+        //           collision happened with a world bounary.</summary>
+        public int Entity2;
+
+        /// <summary>The collision force (unspecified unit).</summary>
+        public float Force;
+
+        /// <summary>The collision normal (the vector along which the collision force was applied to
+        ///          resolve the collision).</summary>
+        public Vector3 Normal;
+    }
+
     // TODO: This should be moved somewhere else. I would use the Tuple type but it's a ref type
     //       so better to create a generic pair *value* type to avoid performance issues with
     //       the garbage collector.
@@ -229,19 +245,24 @@ public class PhysicsSystem: EcsSystem {
             var m1 = ((float)Abs(s1.InvMass) > 0.0001f) ? 1.0f/s1.InvMass : 0.0f;
             var m2 = ((float)Abs(s2.InvMass) > 0.0001f) ? 1.0f/s2.InvMass : 0.0f;
             var im = 1.0f/(m1 + m2);
-            var p  = n*(2.0f*(i2 - i1))*im;
+            var p  = (2.0f*(i2 - i1))*im;
 
             d = (minDist - d)*im;
 
             s1.Position += n*d*s1.InvMass;
-            s1.Velocity += p*s1.InvMass;
+            s1.Velocity += n*p*s1.InvMass;
 
             s2.Position -= n*d*s2.InvMass;
-            s2.Velocity -= p*s2.InvMass;
+            s2.Velocity -= n*p*s2.InvMass;
 
             // TODO: We probably want to pass the ids of the two objects colliding here. As well as
             //       collision force etc.
-            Scene.Raise("collision", null);
+            Scene.Raise("collision", new CollisionInfo {
+                    Entity1 = cp.First,
+                    Entity2 = cp.Second,
+                    Force = p,
+                    Normal = n
+            });
         }
     }
 }
