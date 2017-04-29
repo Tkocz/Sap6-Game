@@ -49,6 +49,10 @@ public sealed class CollisionPlayground: Scene {
         //OnEvent("collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
     }
 
+    /// <summary>Draws the scene by invoking the <see cref="EcsSystem.Draw"/>
+    ///          method on all systems in the scene.</summary>
+    /// <param name="t">The total game time, in seconds.</param>
+    /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
         Game1.Inst.GraphicsDevice.Clear(Color.White);
 
@@ -81,7 +85,7 @@ public sealed class CollisionPlayground: Scene {
         AddComponent(ball, new CTransform {
             Position = p,
             Rotation = Matrix.Identity,
-            Scale    = Vector3.One * r
+            Scale    = r*Vector3.One
         });
 
         return ball;

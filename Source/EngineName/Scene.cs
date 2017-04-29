@@ -164,8 +164,7 @@ namespace EngineName {
     /// <summary>Draws the scene by invoking the <see cref="EcsSystem.Draw"/>
     ///          method on all systems in the scene.</summary>
     /// <param name="t">The total game time, in seconds.</param>
-    /// <param name="dt">The game time, in seconds, since the last call to this
-    ///                  method.</param>
+    /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public virtual void Draw(float t, float dt) {
         foreach (var system in m_Systems) {
             system.Draw(t, dt);
@@ -242,8 +241,7 @@ namespace EngineName {
      *------------------------------------*/
 
     /// <summary>Updates the component cache for the entity.</summary>
-    /// <param name="entity">The entitiy to update the component cache
-    ///                      for.</param>
+    /// <param name="entity">The entitiy to update the component cache for.</param>
     internal void NotifyComponentsChanged(EcsEntity entity) {
             /*
         lock (m_EntitiesPending) {

@@ -75,7 +75,7 @@ public class PhysicsSystem: EcsSystem {
     public BoundingBox Bounds { get; set; } =
         new BoundingBox(-10.0f*Vector3.One, 10.0f*Vector3.One);
 
-    /// <summary>Gets or sets the world gravity vector, in meters per seconds squraed..</summary>
+    /// <summary>Gets or sets the world gravity vector, in meters per seconds squraed.</summary>
     public Vector3 Gravity { get; set; } = new Vector3(0.0f, -9.81f, 0.0f);
 
     //--------------------------------------
@@ -201,8 +201,7 @@ public class PhysicsSystem: EcsSystem {
     // NON-PUBLIC METHODS
     //--------------------------------------
 
-    /// <summary>Finds and solves sphere-sphere collisions using an a posteriori
-    ///          approach.</summary>
+    /// <summary>Finds and solves sphere-sphere collisions using an a posteriori approach.</summary>
     private void SolveCollisions() {
         // TODO: There's some clinging sometimes when collisions happen. Needs to be figured out.
         // Proably something to do with "Moving away from each other" check.
@@ -254,12 +253,10 @@ public class PhysicsSystem: EcsSystem {
 
             // TODO: We probably want to pass the ids of the two objects colliding here. As well as
             //       collision force etc.
-            Scene.Raise("collision", new CollisionInfo {
-                    Entity1 = cp.First,
-                    Entity2 = cp.Second,
-                    Force = p,
-                    Normal = n
-            });
+            Scene.Raise("collision", new CollisionInfo { Entity1 = cp.First,
+                                                         Entity2 = cp.Second,
+                                                         Force   = p,
+                                                         Normal  = n });
         }
     }
 }
