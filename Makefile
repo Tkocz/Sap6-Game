@@ -9,7 +9,7 @@
 
 # Common config
 C_BINDIR = bin
-C_FLAGS  = -debug+ -define:DEBUG -define:TRACE -doc:/dev/null
+C_FLAGS  = -debug+ -define:DEBUG -define:TRACE
 
 # Engine config
 E_COMPILER   = mcs
