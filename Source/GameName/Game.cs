@@ -22,7 +22,6 @@ using EngineName.Logging;
 
     /// <summary>Program entry point.</summary>
     /// <param name="args">The command line arguments.</param>
-#if !philip
     [STAThread]
     private static void Main(string[] args) {
         Log.ToFile();
@@ -35,7 +34,6 @@ using EngineName.Logging;
         // This point is apparently never reached because MonoGame force quits
         // the process intead of returning...
     }
-#endif
 }
 
 }
