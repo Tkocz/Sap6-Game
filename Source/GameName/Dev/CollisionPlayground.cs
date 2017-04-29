@@ -40,9 +40,11 @@ public sealed class CollisionPlayground: Scene {
 
         InitCam();
 
-        //                  -- position --                  -- velocity --
+        // Spawn a few balls.
         for (var i = 0; i < 20; i++) {
-            CreateBall(new Vector3(-3.5f+i*0.9f,  i*0.3f, 0.0f), new Vector3( 1.0f,  0.0f, 0.0f), 1.0f );
+            CreateBall(new Vector3(-3.5f+i*0.9f,  i*0.3f, 0.0f),
+                       new Vector3( 1.0f,  0.0f, 0.0f),
+                       1.0f );
         }
 
         //OnEvent("collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
