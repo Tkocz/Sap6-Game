@@ -40,9 +40,9 @@ public class PhysicsSystem: EcsSystem {
         public Vector3 Normal;
     }
 
-    // TODO: This should be moved somewhere else. I would use the Tuple type but it's a ref type
-    //       so better to create a generic pair *value* type to avoid performance issues with
-    //       the garbage collector.
+    // TODO: This should be moved somewhere else. I would use the Tuple type but it's a ref type so
+    //       better to create a generic pair *value* type to avoid performance issues with the
+    //       garbage collector.
     /// <summary>Represents a pair of two items.</summary>
     /// <typeparam name="T1">Specifies the type of the first item in the pair.</typeparam>
     /// <typeparam name="T2">Specifies the type of the second item in the pair.</typeparam>
@@ -75,8 +75,7 @@ public class PhysicsSystem: EcsSystem {
     public BoundingBox Bounds { get; set; } =
         new BoundingBox(-10.0f*Vector3.One, 10.0f*Vector3.One);
 
-    /// <summary>Gets or sets the world gravity vector, in meters per seconds
-    ///          squraed..</summary>
+    /// <summary>Gets or sets the world gravity vector, in meters per seconds squraed..</summary>
     public Vector3 Gravity { get; set; } = new Vector3(0.0f, -9.81f, 0.0f);
 
     //--------------------------------------
@@ -92,8 +91,8 @@ public class PhysicsSystem: EcsSystem {
     //--------------------------------------
 
 #if DEBUG
-    /// <summary>Private constructor, used to register some strings in the debug
-    ///          overlay. This will bug out if many physics systems are created, but w/e.</summary>
+    /// <summary>Private constructor, used to register some strings in the debug overlay. This will
+    ///          bug out if many physics systems are created, but w/e.</summary>
     public PhysicsSystem() {
         DebugOverlay.DbgStr((t, dt) => $"Coll checks: {mPotentialColls.Count}");
     }
@@ -116,8 +115,8 @@ public class PhysicsSystem: EcsSystem {
                 Matrix.CreateTranslation(transformComponent.Position);
         }
 
-        // Basically, use semi-implicit Euler to integrate all positions and then sweep coarsely
-        // for AABB collisions. All potential collisions are passed on to the fine-phase solver.
+        // Basically, use semi-implicit Euler to integrate all positions and then sweep coarsely for
+        // AABB collisions. All potential collisions are passed on to the fine-phase solver.
         mPotentialColls.Clear();
         var scene = Game1.Inst.Scene;
         foreach (var e in scene.GetComponents<CBody>()) {
@@ -128,9 +127,8 @@ public class PhysicsSystem: EcsSystem {
             body.Velocity += dt*(Gravity - body.InvMass*body.LinDrag*body.Velocity);
             body.Position += dt*body.Velocity;
 
-            // Setup the AABBs and see if they intersect (inner loop). Intersection means we
-            // have a *potential* collision. It needs to be verified and resolved by the
-            // fine-phase solver.
+            // Setup the AABBs and see if they intersect (inner loop). Intersection means we have a
+            // *potential* collision. It needs to be verified and resolved by the fine-phase solver.
             var p1    = body.Position;
             var aabb1 = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
 
@@ -166,8 +164,7 @@ public class PhysicsSystem: EcsSystem {
                 body.Velocity.Z *= -1.0f;
             }
 
-            // Not sure what else to do. Need to update transform to match physical body
-            // position.
+            // Not sure what else to do. Need to update transform to match physical body position.
             ((CTransform)scene.GetComponentFromEntity<CTransform>(e.Key)).Position =
                 body.Position;
 
@@ -207,8 +204,8 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>Finds and solves sphere-sphere collisions using an a posteriori
     ///          approach.</summary>
     private void SolveCollisions() {
-        // TODO: There's some clinging sometimes when collisions happen. Needs to be figured
-        // out. Proably something to do with "Moving away from each other" check.
+        // TODO: There's some clinging sometimes when collisions happen. Needs to be figured out.
+        // Proably something to do with "Moving away from each other" check.
         var scene = Game1.Inst.Scene;
 
         // Iterate over the collision pairs and solve actual collisions.
@@ -240,8 +237,8 @@ public class PhysicsSystem: EcsSystem {
             }
 
             // TODO: Restitution is missing here.
-            // TODO: There is probably some way around this double-inversion of the masses, but
-            //       I'm too lazy to figure it out until it becomes a problem!
+            // TODO: There is probably some way around this double-inversion of the masses, but I'm
+            //       too lazy to figure it out until it becomes a problem!
             var m1 = ((float)Abs(s1.InvMass) > 0.0001f) ? 1.0f/s1.InvMass : 0.0f;
             var m2 = ((float)Abs(s2.InvMass) > 0.0001f) ? 1.0f/s2.InvMass : 0.0f;
             var im = 1.0f/(m1 + m2);
