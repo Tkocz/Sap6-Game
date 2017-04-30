@@ -5,9 +5,11 @@
 #---------------------------------------
 
 import argparse
+import datetime
 import getpass
 import os
 import sys
+import textwrap
 import time
 
 #---------------------------------------
@@ -48,8 +50,8 @@ def parse_args():
     ap.add_argument("-d", "--description", nargs="+", type=str,
         help="specify work description")
 
-    ap.add_argument("-u", "--user", default=None, type=str,
-        help="specify user name")
+    ap.add_argument("-p", "--print", action="store_true",
+        help="print work log")
 
     ap.add_argument("-s", "--statistics", action="store_true",
         help="display work log statistics")
@@ -57,9 +59,12 @@ def parse_args():
     ap.add_argument("-t", "--time", type=float,
         help="specify work time in number of hours")
 
+    ap.add_argument("-u", "--user", default=None, type=str,
+        help="specify user name")
+
     args = ap.parse_args()
 
-    if args.description is None and not args.statistics:
+    if args.description is None and not args.statistics and not args.print:
         ap.print_help()
         sys.exit(2)
 
@@ -69,6 +74,58 @@ def parse_args():
     args.user = args.user.capitalize()
 
     return args
+
+def print_log(args):
+    filename = os.path.join(LOG_DIR, args.user + LOG_FILE_EXT)
+
+    if not os.path.exists(filename):
+        print(f"No such log file exists: {filename}")
+        sys.exit(ERR_NO_SUCH_LOG)
+
+    with open(filename, "r") as f:
+        data = f.readlines()
+
+    print(f"Log for {args.user}")
+    print(32*"-")
+    print()
+
+    def parse_line(s):
+        a = s.split(":", 2)
+
+        r = lambda: None
+
+        r.timestamp = int(a[0])
+        r.worktime  = float(a[1])
+        r.desc      = a[2]
+
+        return r
+
+    parse_data = lambda fn: map(lambda s: fn(parse_line(s)), data)
+
+    entries = list(parse_data(lambda x: x))
+
+    t = 0
+    tw = 0
+    while len(entries) > 0:
+        e = entries[0]
+        entries = entries[1:]
+
+        d = e.timestamp - t
+        if (d > 86400.0):
+            if tw > 0:
+                print(f"\n  {tw} hrs total\n")
+                tw = 0
+            t = e.timestamp
+            e_date = datetime.date.fromtimestamp(t)
+            print(e_date)
+            print("-"*16)
+
+        s = "\n       ".join(textwrap.wrap(e.desc, 68))
+        print(f"  {e.worktime}  {s}")
+        tw += e.worktime
+
+    if tw > 0:
+        print(f"\n  {tw} hrs total")
 
 def show_statistics(args):
     filename = os.path.join(LOG_DIR, args.user + LOG_FILE_EXT)
@@ -138,5 +195,6 @@ if __name__ == "__main__":
     if not os.path.exists(LOG_DIR):
         os.mkdir(LOG_DIR)
 
-    if args.statistics : show_statistics(args)
-    else               : write_entry(args)
+    if   args.statistics : show_statistics(args)
+    elif args.print      : print_log(args)
+    else                 : write_entry(args)
