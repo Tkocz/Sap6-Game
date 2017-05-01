@@ -26,7 +26,10 @@ public sealed class CollisionPlayground: Scene {
     // NON-PUBLIC FIELDS
     //--------------------------------------
 
+    /// <summary>The distortion pixel shader.</summary>
     private Effect mDistortFX;
+
+    /// <summary>Off-screen render-target used as texture for the pixel shader.</summary>
     private RenderTarget2D mRT;
 
     //--------------------------------------
