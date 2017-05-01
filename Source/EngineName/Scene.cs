@@ -118,8 +118,20 @@ namespace EngineName {
             return EntityCounter;
         }
 
+        public void RemoveEntity(int eid) {
+            foreach (var e in Components) {
+                e.Value.Remove(eid);
+            }
+
+            m_Entities.Remove(eid);
+        }
+
+        public void AddComponent(int id, EcsComponent component, Type type) {
+            Components[type].Add(id, component);
+        }
+
         public void AddComponent<T>(int id, T component) where T : EcsComponent {
-            Components[typeof(T)].Add(id, component);
+            AddComponent(id, component, typeof (T));
         }
         public Dictionary<int, EcsComponent> GetComponents<T>() where T : EcsComponent {
             Dictionary<int, EcsComponent> r;
@@ -189,6 +201,7 @@ namespace EngineName {
         Components.Add(typeof(C2DRenderable), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CCamera), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CBody), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CParticle), new Dictionary<int, EcsComponent>());
 
 #if DEBUG
         AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));

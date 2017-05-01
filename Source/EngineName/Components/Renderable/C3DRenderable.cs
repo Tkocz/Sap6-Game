@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace EngineName.Components.Renderable
 {
-    public abstract class C3DRenderable:CRenderable
+    public class C3DRenderable:CRenderable
     {
         public Model model;
     }
