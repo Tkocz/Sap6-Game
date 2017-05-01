@@ -44,6 +44,24 @@ public static class GfxUtil {
     // PUBLIC METHODS
     //--------------------------------------
 
+    /// <summary>Creaters a new render target.</summary>
+    /// <returns>A new render target.</returns>
+    /// <seealso cref="SetRT"/>
+    public static RenderTarget2D CreateRT() =>
+        new RenderTarget2D(Game1.Inst.GraphicsDevice,
+                           Game1.Inst.GraphicsDevice.PresentationParameters.BackBufferWidth,
+                           Game1.Inst.GraphicsDevice.PresentationParameters.BackBufferHeight,
+                           false,
+                           Game1.Inst.GraphicsDevice.PresentationParameters.BackBufferFormat,
+                           DepthFormat.Depth24);
+
+    /// <summary>Sets the current render target (pass <see langword="null"/> to restore the default
+    ///          render target) to the specified render target.</summary>
+    /// <param name="rt">The render target to activate.</param>
+    /// <seealso cref="CreateRT"/>
+    public static void SetRT(RenderTarget2D rt) => Game1.Inst.GraphicsDevice.SetRenderTarget(rt);
+
+
     /// <summary>Draws text on the screen, using the specified sprite batch object.</summary>
     /// <param name="sb">The sprite batch to use to draw the text.</param>
     /// <param name="x">The x-coordinate of the position to draw the text at, in screen
