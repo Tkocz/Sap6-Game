@@ -11,3 +11,4 @@
 1493133405:1.5:Further work on menu functionality.
 1493197197:3.0:Worked on menu and some other tweaks, did some code review etc.
 1493219366:1.5:Debugging functionality + much else.
+1493568403:0.5:Added --print flag in work log script

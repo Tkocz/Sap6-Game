@@ -36,8 +36,39 @@ public sealed class DebugOverlay: EcsSystem {
     private SpriteBatch mSB;
 
     /// <summary>All registered debug strings.</summary>
-    private static readonly List<Func<float, float, string>> sStrFns =
+    private readonly List<Func<float, float, string>> mStrFns =
         new List<Func<float, float, string>>();
+
+    /// <summary>The debug overlay instance.</summary>
+    private static DebugOverlay sInst;
+
+    //--------------------------------------
+    // PUBLIC PROPERTIES
+    //--------------------------------------
+
+    /// <summary>Gets the debug overlay instance.</summary>
+    public static DebugOverlay Inst {
+        get {
+            if (sInst == null) {
+                // sInst will be set in the constructor of this class.
+                return new DebugOverlay();
+            }
+
+            return sInst;
+        }
+    }
+
+    //--------------------------------------
+    // PUBLIC CONSTRUCTORS
+    //--------------------------------------
+
+    /// <summary>Initializes a new debug overlay.</summary>
+    public DebugOverlay() {
+        // Set sInst to this without checking for already-existing isntance. This has the effect
+        // that the singleton instance can change, but it's not an issue for the purpose of this
+        // class and its usage.
+        sInst = this;
+    }
 
     //--------------------------------------
     // PUBLIC METHODS
@@ -75,7 +106,7 @@ public sealed class DebugOverlay: EcsSystem {
 
         mSB.Begin();
 
-        foreach (var fn in sStrFns) {
+        foreach (var fn in mStrFns) {
             GfxUtil.DrawText(mSB, x, y, fn(t, dt), GfxUtil.DefFont, Color.Magenta);
             y += 24.0f;
         }
@@ -86,8 +117,8 @@ public sealed class DebugOverlay: EcsSystem {
     /// <summary>Adds a debug string to the overlay.</summary>
     /// <param name="fn">The debug string callback function.</param>
     [Conditional("DEBUG")]
-    public static void DbgStr(Func<float, float, string> fn) {
-        sStrFns.Add(fn);
+    public void DbgStr(Func<float, float, string> fn) {
+        mStrFns.Add(fn);
     }
 
     //--------------------------------------
@@ -96,6 +127,8 @@ public sealed class DebugOverlay: EcsSystem {
 
     /// <summary>Creates the initial aabb model used to draw bounding boxes.</summary>
     private void CreateAabb() {
+        // TODO: This is a pretty ugly way of generating the vertices, should probably clean this
+        //       up later.
         var n = 0;
         var v = new VertexPosition[24];
 
@@ -130,11 +163,12 @@ public sealed class DebugOverlay: EcsSystem {
     private void DrawAABBs() {
         var cam = (CCamera)Scene.GetComponents<CCamera>().Values.FirstOrDefault();
 
-        // No cam, so we can't really draw anything.
         if (cam == null) {
+            // No cam, so we can't really draw anything.
             return;
         }
 
+        // We don't want the bounding boxes to affect the depth buffer.
         Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 
         mAabbEffect.Projection = cam.Projection;
@@ -144,6 +178,7 @@ public sealed class DebugOverlay: EcsSystem {
             var body = (CBody)component;
 
             // Figure out the size of the aabb and scale our pre-computed aabb model accordingly.
+            // TODO: This probably only works for models centered on the origin, but ok for now.
             var x = body.Aabb.Max.X - body.Aabb.Min.X;
             var y = body.Aabb.Max.Y - body.Aabb.Min.Y;
             var z = body.Aabb.Max.Z - body.Aabb.Min.Z;
@@ -151,6 +186,7 @@ public sealed class DebugOverlay: EcsSystem {
             mAabbEffect.World = Matrix.CreateScale(x, y, z)
                               * Matrix.CreateTranslation(body.Position);
 
+            // Draw the 12 lines making up the bounding box.
             mAabbEffect.CurrentTechnique.Passes[0].Apply();
             Game1.Inst.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, mAabb, 0, 12);
         }
