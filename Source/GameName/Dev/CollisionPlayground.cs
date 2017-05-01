@@ -9,6 +9,7 @@ using System;
 using EngineName;
 using EngineName.Components;
 using EngineName.Components.Renderable;
+using EngineName.Core;
 using EngineName.Systems;
 using EngineName.Utils;
 
@@ -32,15 +33,20 @@ public sealed class CollisionPlayground: Scene {
     /// <summary>Off-screen render-target used as texture for the pixel shader.</summary>
     private RenderTarget2D mRT;
 
+    /// <summary>We store a refernece to the particle system so we can spawn particles
+    ///          easily.</summary>
+    private ParticleSystem mParticleSys;
+
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
 
     /// <summary>Initializes the scene.</summary>
     public override void Init() {
-        AddSystems(new    PhysicsSystem(),
-                   new     CameraSystem(),
-                   new  RenderingSystem());
+        AddSystems(mParticleSys = new ParticleSystem(),
+                   new                 PhysicsSystem(),
+                   new                  CameraSystem(),
+                   new               RenderingSystem());
 
 #if DEBUG
         AddSystem(new DebugOverlay());
@@ -51,13 +57,29 @@ public sealed class CollisionPlayground: Scene {
         InitCam();
 
         // Spawn a few balls.
-        for (var i = 0; i < 20; i++) {
+        for (var i = 0; i < 10; i++) {
             CreateBall(new Vector3(0.9f*i - 3.5f, 0.3f*i, 0.0f), // Position
                        new Vector3(         1.0f, 0.0f  , 0.0f), // Velocity
                        1.0f);                                    // Radius
         }
 
-        //OnEvent("collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
+        var rnd = new Random();
+        Func<Vector3> rndVel = () => new Vector3((float)rnd.NextDouble() - 0.5f,
+                                                    (float)rnd.NextDouble() - 0.5f,
+                                                    (float)rnd.NextDouble() - 0.5f);
+
+        Func<float> rndSize = () => 0.05f + 0.1f*(float)rnd.NextDouble();
+
+        OnEvent("collision", data =>
+            mParticleSys.SpawnParticles(3, () => new EcsComponent[] {
+                new CParticle     { Position = ((PhysicsSystem.CollisionInfo)data).Position,
+                                    Velocity = 12.0f*rndVel(),
+                                    Life     = 0.7f,
+                                    F        = () => new Vector3(0.0f, -9.81f, 0.0f) },
+                new C3DRenderable { model = Game1.Inst.Content.Load<Model>("Models/DummySphere") },
+                new CTransform    { Position = ((PhysicsSystem.CollisionInfo)data).Position,
+                                    Rotation = Matrix.Identity,
+                                    Scale    = rndSize()*Vector3.One } }));
 
         mRT = GfxUtil.CreateRT();
 
@@ -70,12 +92,12 @@ public sealed class CollisionPlayground: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
-        GfxUtil.SetRT(mRT);
+        //GfxUtil.SetRT(mRT);
         Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
-        GfxUtil.SetRT(null);
+        //GfxUtil.SetRT(null);
 
-        GfxUtil.DrawFsQuad(mDistortFX);
+        //GfxUtil.DrawFsQuad(mDistortFX);
     }
 
     //--------------------------------------
