@@ -46,7 +46,9 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>Represents a pair of two items.</summary>
     /// <typeparam name="T1">Specifies the type of the first item in the pair.</typeparam>
     /// <typeparam name="T2">Specifies the type of the second item in the pair.</typeparam>
-    private struct Pair<T1, T2> {
+    private struct Pair<T1, T2> where T1: struct
+                                where T2: struct
+    {
         //--------------------------------------
         // PUBLIC FIELDS
         //--------------------------------------
