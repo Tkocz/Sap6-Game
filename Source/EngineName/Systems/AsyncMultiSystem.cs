@@ -1,4 +1,10 @@
-namespace Engine.Systems {
+namespace EngineName.Systems {
+
+//--------------------------------------
+// USINGS
+//--------------------------------------
+
+using Core;
 
 //--------------------------------------
 // CLASSES
