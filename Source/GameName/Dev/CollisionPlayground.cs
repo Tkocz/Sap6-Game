@@ -64,11 +64,10 @@ public sealed class CollisionPlayground: Scene {
         }
 
         var rnd = new Random();
-        Func<Vector3> rndVel = () => new Vector3((float)rnd.NextDouble() - 0.5f,
-                                                    (float)rnd.NextDouble() - 0.5f,
-                                                    (float)rnd.NextDouble() - 0.5f);
-
         Func<float> rndSize = () => 0.05f + 0.1f*(float)rnd.NextDouble();
+        Func<Vector3> rndVel = () => new Vector3((float)rnd.NextDouble() - 0.5f,
+                                                 (float)rnd.NextDouble() - 0.5f,
+                                                 (float)rnd.NextDouble() - 0.5f);
 
         OnEvent("collision", data =>
             mParticleSys.SpawnParticles(3, () => new EcsComponent[] {
