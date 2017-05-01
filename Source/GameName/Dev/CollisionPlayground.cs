@@ -92,12 +92,12 @@ public sealed class CollisionPlayground: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
-        //GfxUtil.SetRT(mRT);
+        GfxUtil.SetRT(mRT);
         Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
-        //GfxUtil.SetRT(null);
+        GfxUtil.SetRT(null);
 
-        //GfxUtil.DrawFsQuad(mDistortFX);
+        GfxUtil.DrawFsQuad(mDistortFX);
     }
 
     //--------------------------------------
