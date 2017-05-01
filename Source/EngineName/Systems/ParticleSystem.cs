@@ -57,7 +57,6 @@ public class ParticleSystem: EcsSystem {
 
             var components = cb();
             foreach (var component in cb()) {
-                Logging.Log.Get().Warn($"{component.GetType()}");
                 Scene.AddComponent(eid, component, component.GetType());
             }
         }
