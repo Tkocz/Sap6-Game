@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Game.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
+    <Compile Include="Scenes\ChatScene.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
   </ItemGroup>
   <ItemGroup>

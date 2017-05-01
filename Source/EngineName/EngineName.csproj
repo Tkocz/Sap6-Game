@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Components\CBody.cs" />
     <Compile Include="Components\CInput.cs" />
+    <Compile Include="Components\NetworkComponent.cs" />
     <Compile Include="Components\Renderable\C2DRenderable.cs" />
     <Compile Include="Components\Renderable\CHeightmap.cs" />
     <Compile Include="Components\Renderable\CImportedModel.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Systems\FpsCounterSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\MapSystem.cs" />
+    <Compile Include="Systems\NetworkSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\Rendering2DSystem.cs" />
     <Compile Include="Systems\RenderingSystem.cs" />
@@ -82,6 +84,10 @@
     <Compile Include="Utils\SfxUtil.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Lidgren.Network.1.0.2\lib\net451\Lidgren.Network.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
