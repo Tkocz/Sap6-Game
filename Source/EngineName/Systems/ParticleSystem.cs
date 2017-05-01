@@ -86,6 +86,9 @@ public class ParticleSystem: EcsSystem {
         }
     }
 
+    /// <summary>Spawns <paramref="n"/> particles on the next frame.</summary>
+    /// <param name="n">The number of particles to spawn.</param>
+    /// <param name="cb">The particle spawning callback function.</param>
     public void SpawnParticles(int n, Func<EcsComponent[]> cb) {
         for (var i = 0; i < n; i++) {
             mPartsToSpawn.Add(cb);
