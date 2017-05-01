@@ -41,9 +41,9 @@ public sealed class CollisionPlayground: Scene {
         InitCam();
 
         for (var i = 0; i < 20; i++) {
-            CreateBall(new Vector3(-3.5f + 0.9f*i,  0.3f*i, 0.0f), // Position
-                       new Vector3( 1.0f         ,  0.0f  , 0.0f), // Velocity
-                       1.0f);                                      // Radius
+            CreateBall(new Vector3(0.9f*i - 3.5f, 0.3f*i, 0.0f), // Position
+                       new Vector3(         1.0f, 0.0f  , 0.0f), // Velocity
+                       1.0f);                                    // Radius
         }
 
         //OnEvent("collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
@@ -70,23 +70,19 @@ public sealed class CollisionPlayground: Scene {
     private int CreateBall(Vector3 p, Vector3 v, float r=1.0f) {
         var ball = AddEntity();
 
-        AddComponent(ball, new CBody {
-            Aabb     = new BoundingBox(-Vector3.One*r, Vector3.One*r),
-            Radius   = r,
-            LinDrag  = 0.1f,
-            Position = p,
-            Velocity = v
-        });
+        AddComponent(ball, new CBody { Aabb     = new BoundingBox(-r*Vector3.One, r*Vector3.One),
+                                       Radius   = r,
+                                       LinDrag  = 0.1f,
+                                       Position = p,
+                                       Velocity = v });
 
         AddComponent<C3DRenderable>(ball, new CImportedModel {
             model = Game1.Inst.Content.Load<Model>("Models/DummySphere")
         });
 
-        AddComponent(ball, new CTransform {
-            Position = p,
-            Rotation = Matrix.Identity,
-            Scale    = r*Vector3.One
-        });
+        AddComponent(ball, new CTransform { Position = p,
+                                            Rotation = Matrix.Identity,
+                                            Scale    = r*Vector3.One });
 
         return ball;
     }
@@ -101,16 +97,12 @@ public sealed class CollisionPlayground: Scene {
         var fovRad = fovDeg*2.0f*(float)Math.PI/360.0f;
         var proj   = Matrix.CreatePerspectiveFieldOfView(fovRad, aspect, zNear, zFar);
 
-        AddComponent(cam, new CCamera {
-            ClipProjection = proj,
-            Projection     = proj,
-        });
+        AddComponent(cam, new CCamera { ClipProjection = proj,
+                                        Projection     = proj });
 
-        AddComponent(cam, new CTransform {
-            Position = new Vector3(0.0f, 0.0f, 18.0f),
-            Rotation = Matrix.Identity,
-            Scale    = Vector3.One
-        });
+        AddComponent(cam, new CTransform { Position = new Vector3(0.0f, 0.0f, 18.0f),
+                                           Rotation = Matrix.Identity,
+                                           Scale    = Vector3.One });
 
         return cam;
     }

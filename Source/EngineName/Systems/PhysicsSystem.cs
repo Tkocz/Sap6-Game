@@ -165,8 +165,7 @@ public class PhysicsSystem: EcsSystem {
             }
 
             // Not sure what else to do. Need to update transform to match physical body position.
-            ((CTransform)scene.GetComponentFromEntity<CTransform>(e.Key)).Position =
-                body.Position;
+            ((CTransform)scene.GetComponentFromEntity<CTransform>(e.Key)).Position = body.Position;
 
             //----------------------------
             // Body-body collisions
@@ -243,7 +242,7 @@ public class PhysicsSystem: EcsSystem {
             var im = 1.0f/(m1 + m2);
             var p  = (2.0f*(i2 - i1))*im;
 
-            d = (minDist - d)*im;
+            d = (minDist - d)*im; // Mass adjusted penetration distance
 
             s1.Position += n*d*s1.InvMass;
             s1.Velocity += n*p*s1.InvMass;
