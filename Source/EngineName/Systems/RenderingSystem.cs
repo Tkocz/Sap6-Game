@@ -26,9 +26,17 @@ namespace EngineName.Systems
 
             Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
+            foreach (CTransform transformComponent in Game1.Inst.Scene.GetComponents<CTransform>().Values)
+            {
+                transformComponent.Frame = Matrix.CreateScale(transformComponent.Scale) *
+                    transformComponent.Rotation *
+                    Matrix.CreateTranslation(transformComponent.Position);
+            }
+
             int counter = 0;
             foreach (CCamera camera in Game1.Inst.Scene.GetComponents<CCamera>().Values) {
                 foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
+
                     var key = component.Key;
                     C3DRenderable model = (C3DRenderable)component.Value;
                     if (model.model == null) continue;
