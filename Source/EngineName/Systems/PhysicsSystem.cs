@@ -38,6 +38,9 @@ public class PhysicsSystem: EcsSystem {
         /// <summary>The collision normal (the vector along which the collision force was applied to
         ///          resolve the collision).</summary>
         public Vector3 Normal;
+
+        /// <summary>The point in world-space where the collision occurred.</summary>
+        public Vector3 Position;
     }
 
     // TODO: This should be moved somewhere else. I would use the Tuple type but it's a ref type so
@@ -247,10 +250,13 @@ public class PhysicsSystem: EcsSystem {
             s2.Position -= n*d*s2.InvMass;
             s2.Velocity -= n*p*s2.InvMass;
 
-            Scene.Raise("collision", new CollisionInfo { Entity1 = cp.First,
-                                                         Entity2 = cp.Second,
-                                                         Force   = p,
-                                                         Normal  = n });
+            var c = 0.5f*(s1.Position + s2.Position);
+
+            Scene.Raise("collision", new CollisionInfo { Entity1  = cp.First,
+                                                         Entity2  = cp.Second,
+                                                         Force    = p,
+                                                         Normal   = n,
+                                                         Position = c });
         }
     }
 }
