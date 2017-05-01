@@ -21,8 +21,6 @@ namespace StandaloneNetworkApp
             NetIncomingMessage _msg;
             public P2P()
             {
-                Random rnd = new Random();
-                int month = rnd.Next(5000, 13);
                 _config = new NetPeerConfiguration("Sap6");
                 _config.Port = 50001;
                 _config.AcceptIncomingConnections = true;
