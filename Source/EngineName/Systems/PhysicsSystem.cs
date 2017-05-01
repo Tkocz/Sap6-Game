@@ -245,8 +245,6 @@ public class PhysicsSystem: EcsSystem {
             s2.Position -= n*d*s2.InvMass;
             s2.Velocity -= n*p*s2.InvMass;
 
-            // TODO: We probably want to pass the ids of the two objects colliding here. As well as
-            //       collision force etc.
             Scene.Raise("collision", new CollisionInfo { Entity1 = cp.First,
                                                          Entity2 = cp.Second,
                                                          Force   = p,
