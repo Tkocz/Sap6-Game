@@ -202,6 +202,7 @@ namespace EngineName {
         Components.Add(typeof(CCamera), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CBody), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CParticle), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CLogic), new Dictionary<int, EcsComponent>());
 
 #if DEBUG
         AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));

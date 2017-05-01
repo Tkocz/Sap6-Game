@@ -15,3 +15,4 @@
 1493614746:1.0:Cleaned up some code
 1493635160:2.0:Implemented basic shader support
 1493641542:2.0:Implemented particle system.
+1493664210:2.0:Added support for environment mapping

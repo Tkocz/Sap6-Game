@@ -219,3 +219,15 @@
 /processorParam:TextureFormat=Compressed
 /build:Models/DummySphere.blend
 
+#begin Effects/CubeMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/CubeMap.fx
+
+#begin Effects/DebugMaterial.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/DebugMaterial.fx
+

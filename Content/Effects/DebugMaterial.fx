@@ -2,12 +2,9 @@
  * UNIFORMS
  *-----------------------------------*/
 
-uniform extern texture SrcTex;
-
-sampler texSampler = sampler_state {
-        Texture   = <SrcTex>;
-        mipfilter = LINEAR;
-};
+uniform extern float4x4 Model;
+uniform extern float4x4 Proj;
+uniform extern float4x4 View;
 
 /*-------------------------------------
  * STRUCTS
@@ -32,14 +29,14 @@ struct VS_OUTPUT {
  *-----------------------------------*/
 
 void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
-     float2 texCoord = float2(vsOut.texCoord.x + 0.2f*sin(vsOut.texCoord.y*3.141592f),
-                              vsOut.texCoord.y + 0.2f*cos(vsOut.texCoord.x*3.141592f*2.0f));
-     psOut.color = tex2D(texSampler, texCoord).rgba;
+     psOut.color = float4(1.0f, 0.0f, 1.0f, 0.5f);
 }
 
 void vsMain(in VS_INPUT vsIn, out VS_OUTPUT vsOut) {
-  vsOut.pos      = vsIn.pos;
-  vsOut.texCoord = vsIn.texCoord;
+  float4 worldPos = mul(vsIn.pos, Model);
+  float4 viewPos  = mul(worldPos, View);
+  vsOut.pos       = mul(viewPos, Proj);
+  vsOut.texCoord  = vsIn.texCoord;
 }
 
 technique T1 {
