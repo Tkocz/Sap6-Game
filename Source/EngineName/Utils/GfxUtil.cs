@@ -61,7 +61,6 @@ public static class GfxUtil {
     /// <seealso cref="CreateRT"/>
     public static void SetRT(RenderTarget2D rt) => Game1.Inst.GraphicsDevice.SetRenderTarget(rt);
 
-
     /// <summary>Draws text on the screen, using the specified sprite batch object.</summary>
     /// <param name="sb">The sprite batch to use to draw the text.</param>
     /// <param name="x">The x-coordinate of the position to draw the text at, in screen
