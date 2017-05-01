@@ -16,14 +16,36 @@ namespace EngineName.Systems
 		private GraphicsDevice mGraphicsDevice;
 		private int chunksplit = 20;
 		private BasicEffect basicEffect;
+        private int[,] mHeightData;
 
-		public override void Init()
+        public override void Init()
 		{
 			mGraphicsDevice = Game1.Inst.GraphicsDevice;
 			basicEffect = new BasicEffect(mGraphicsDevice);
 			basicEffect.VertexColorEnabled = true;
 			base.Init();
 		}
+        // Note: X is correct axis, but Y in this case actually is Z in game world (Y is for height)
+        public float HeightPosition(float x, float y) {
+            if (x < 0 || x > 255 || y < 0 || y > 255)
+                return 0;
+            // get four closest vertices
+            int lowX =  (int)Math.Floor(x);
+            int highX = (int)Math.Floor(x+1);
+            int lowY =  (int)Math.Floor(y);
+            int highY = (int)Math.Floor(y+1);
+
+            var A = mHeightData[lowX, lowY];
+            var B = mHeightData[highX, lowY];
+            var C = mHeightData[lowX, highY];
+            var D = mHeightData[highX, highY];
+
+            // P = (x, y)
+            // f(a,b,x) = xa + (1-x)b
+            // Pz = f(f(A,B,Px), f(C, D, Px), Py
+            
+            return A;
+        }
 
 		private Color materialPick(int decimalCode)
 		{
@@ -111,9 +133,13 @@ namespace EngineName.Systems
 			compHeight.Image.GetData(colorMap);
 
 			compHeight.HeightData = new Color[terrainWidth, terrainHeight];
-			for (int x = 0; x < terrainWidth; x++)
-				for (int y = 0; y < terrainHeight; y++)
-					compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
+            mHeightData = new int[terrainWidth, terrainHeight];
+            for (int x = 0; x < terrainWidth; x++) {
+                for (int y = 0; y < terrainHeight; y++) {
+                    compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
+                    mHeightData[x, y] = colorMap[x + y * terrainWidth].R;
+                }
+            }
 
 			float minHeight = float.MaxValue;
 			float maxHeight = float.MinValue;

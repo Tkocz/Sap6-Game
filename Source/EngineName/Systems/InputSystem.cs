@@ -14,8 +14,14 @@ using EngineName.Components;
 
 namespace EngineName.Systems {
     public class InputSystem : EcsSystem {
-        private CInput inputValue = null;
+        private MapSystem _mapSystem;
         private const float CAMERASPEED = 0.1f;
+
+        public InputSystem() { }
+
+        public InputSystem(MapSystem mapSystem) {
+            _mapSystem = mapSystem;
+        }
 
         public override void Update(float t, float dt){
             KeyboardState currentState = Keyboard.GetState();
@@ -23,11 +29,17 @@ namespace EngineName.Systems {
                 Game1.Inst.Exit();
 
             foreach (var input in Game1.Inst.Scene.GetComponents<CInput>()) {
-                if(Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key)){
-                    var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(input.Key);                
-                    inputValue = (CInput)input.Value;
+                CBody body = null;
+                if (Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
+                    body = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(input.Key);
+                }
+                if (Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key)){
+                    var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(input.Key);
+                    var inputValue = (CInput)input.Value;
                     CCamera cameraComponent = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(input.Key);
-                    
+
+
+
                     if (currentState.IsKeyDown(inputValue.CameraMovementForward)){
                         transform.Position     += CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
                         cameraComponent.Target += CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
@@ -45,24 +57,35 @@ namespace EngineName.Systems {
                         transform.Position = Vector3.Subtract(cameraComponent.Target, new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), cameraComponent.Height, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f))));
 
                     }
+
+                    if (!Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
+                        continue;
+                    }
+
+                    if (_mapSystem != null)
+                        body.Position.Y = _mapSystem.HeightPosition(body.Position.X, body.Position.Z);
+
+                    if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
+                        body.Velocity.Z -= 5f;
+                    if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
+                        body.Velocity.Z += 5f;
+                    if (currentState.IsKeyDown(inputValue.LeftMovementKey))
+                        body.Velocity.X -= 5f;
+                    if (currentState.IsKeyDown(inputValue.RightMovementKey))
+                        body.Velocity.X += 5f;
+
+                    if (
+                        !currentState.IsKeyDown(inputValue.ForwardMovementKey) &&
+                        !currentState.IsKeyDown(inputValue.BackwardMovementKey) &&
+                        !currentState.IsKeyDown(inputValue.LeftMovementKey) &&
+                        !currentState.IsKeyDown(inputValue.RightMovementKey)
+                    )
+                    body.Velocity *= dt * 0.9f;
+
+                    body.Velocity.X = Math.Max(body.Velocity.X, 10);
+                    body.Velocity.Y = Math.Max(body.Velocity.Y, 10);
                 }
 
-                CBody body = null;
-                if(Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)){
-                    body = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(input.Key);
-                }else{
-                    continue;
-                }
-                inputValue = (CInput)input.Value;
-
-                if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
-                    body.Velocity.Z -= 5f;
-                if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
-                    body.Velocity.Z += 5f;
-                if (currentState.IsKeyDown(inputValue.LeftMovementKey))
-                    body.Velocity.X -= 5f;
-                if (currentState.IsKeyDown(inputValue.RightMovementKey))
-                    body.Velocity.X += 5f;
                 
                 /*
 
