@@ -3,6 +3,7 @@
 .DS_Store
 .vs
 bin
+dna.txt
 doc
 obj
 tmp

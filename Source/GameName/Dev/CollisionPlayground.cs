@@ -23,6 +23,13 @@ using Microsoft.Xna.Framework.Graphics;
 //           colliding on the screen in a sane manner.</summary>
 public sealed class CollisionPlayground: Scene {
     //--------------------------------------
+    // NON-PUBLIC FIELDS
+    //--------------------------------------
+
+    private Effect mDistortFX;
+    private RenderTarget2D mRT;
+
+    //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
 
@@ -48,6 +55,11 @@ public sealed class CollisionPlayground: Scene {
         }
 
         //OnEvent("collision", data => SfxUtil.PlaySound("Sounds/Effects/Collide"));
+
+        mRT = GfxUtil.CreateRT();
+
+        mDistortFX = Game1.Inst.Content.Load<Effect>("Effects/Distort");
+        mDistortFX.Parameters["SrcTex"].SetValue(mRT);
     }
 
     /// <summary>Draws the scene by invoking the <see cref="EcsSystem.Draw"/>
@@ -55,9 +67,12 @@ public sealed class CollisionPlayground: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
+        GfxUtil.SetRT(mRT);
         Game1.Inst.GraphicsDevice.Clear(Color.White);
-
         base.Draw(t, dt);
+        GfxUtil.SetRT(null);
+
+        GfxUtil.DrawFsQuad(mDistortFX);
     }
 
     //--------------------------------------
