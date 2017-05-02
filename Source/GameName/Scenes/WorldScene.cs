@@ -21,6 +21,7 @@ namespace GameName.Scenes
             var mapSystem = new MapSystem();
             var waterSys = new WaterSystem();
             var physicsSys = new PhysicsSystem();
+            physicsSys.Bounds = new BoundingBox(-200.0f*Vector3.One, 200.0f*Vector3.One);
             AddSystems(
                 new FpsCounterSystem(updatesPerSec: 10),
                 new SkyBoxSystem(),

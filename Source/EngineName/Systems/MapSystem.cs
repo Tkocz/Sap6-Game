@@ -52,11 +52,21 @@ namespace EngineName.Systems
                 var C = mHeightData[lowX, highY];
                 var D = mHeightData[highX, highY];
 
+                // lerp func
+                Func<float, float, float, float> f = (a, b, sigma) => (1.0f-sigma)*a + sigma*b;
+
+                // fractional parts
+                var fX = x - lowX;
+                var fY = y - lowY;
+
+                // 2d-interpolate over the square
+                var h = f(f(A, B, fX), f(C, D, fX), fY);
+
                 // P = (x, y)
                 // f(a,b,x) = xa + (1-x)b
                 // Pz = f(f(A,B,Px), f(C, D, Px), Py
 
-                return A;
+                return h;
             }
             return 0;
         }
@@ -223,10 +233,10 @@ namespace EngineName.Systems
 					continue;
 				CHeightmap heightmap = (CHeightmap)renderable.Value;
                 int key = renderable.Key;
-				/* use each color channel for different data, e.g. 
-				 * R for height, 
-				 * G for texture/material/terrain type, 
-				 * B for fixed spawned models/entities (houses, trees etc.), 
+				/* use each color channel for different data, e.g.
+				 * R for height,
+				 * G for texture/material/terrain type,
+				 * B for fixed spawned models/entities (houses, trees etc.),
 				 * A for additional data
 				*/
 
