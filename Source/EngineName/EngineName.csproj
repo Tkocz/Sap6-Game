@@ -49,6 +49,7 @@
     <Compile Include="Components\CInput.cs" />
     <Compile Include="Components\CLogic.cs" />
     <Compile Include="Components\CParticle.cs" />
+    <Compile Include="Core\Enums.cs" />
     <Compile Include="Components\Renderable\C2DRenderable.cs" />
     <Compile Include="Components\Renderable\CHeightmap.cs" />
     <Compile Include="Components\Renderable\CImportedModel.cs" />
@@ -70,11 +71,13 @@
     <Compile Include="Shaders\MaterialShader.cs" />
     <Compile Include="Systems\AsyncMultiSystem.cs" />
     <Compile Include="Systems\CameraSystem.cs" />
+    <Compile Include="Systems\ChatSystem.cs" />
     <Compile Include="Systems\DebugOverlay.cs" />
     <Compile Include="Systems\FpsCounterSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\LogicSystem.cs" />
     <Compile Include="Systems\MapSystem.cs" />
+    <Compile Include="Systems\NetworkSystem.cs" />
     <Compile Include="Systems\ParticleSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\Rendering2DSystem.cs" />
@@ -87,8 +90,10 @@
     <Compile Include="Utils\GfxUtil.cs" />
     <Compile Include="Utils\GraphicsUtil.cs" />
     <Compile Include="Utils\SfxUtil.cs" />
+    <Compile Include="Utils\XNAExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Lidgren.Network, Version=3.5.1.1679, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>

@@ -15,7 +15,7 @@ C_FLAGS  = -debug+ -define:DEBUG -define:TRACE
 E_COMPILER   = mcs
 E_FLAGS      = $(C_FLAGS) -target:library
 E_LIBPATHS   = $(MONOGAME_PATH)
-E_LIBS       = MonoGame.Framework.dll
+E_LIBS       = MonoGame.Framework.dll Lidgren.Network.dll
 E_SRCDIR     = Source/EngineName
 E_TARGET     = EngineName.dll
 
