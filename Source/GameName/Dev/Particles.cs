@@ -21,28 +21,16 @@ using Microsoft.Xna.Framework.Graphics;
 // CLASSES
 //--------------------------------------
 
-/// <summary>Provides a simple test case for collisions. Running it, you should see four spheres
-//           colliding on the screen in a sane manner.</summary>
-public sealed class CollisionPlayground: Scene {
+/// <summary>Provides a simple test case for particle systems. Running it, be able to see particle
+/// effects.</summary>
+public sealed class Particles: Scene {
     //--------------------------------------
     // NON-PUBLIC FIELDS
     //--------------------------------------
 
-    /// <summary>The distortion pixel shader.</summary>
-    private Effect mDistortFX;
-
-    /// <summary>Off-screen render-target used as texture for the pixel shader.</summary>
-    private RenderTarget2D mRT;
-
     /// <summary>We store a refernece to the particle system so we can spawn particles
     ///          easily.</summary>
     private ParticleSystem mParticleSys;
-
-    /// <summary>Used to create environment maps.</summary>
-    private RenderingSystem mRenderer;
-
-    /// <summary>The skybox renderer.</summary>
-    private SkyBoxSystem mSkybox;
 
     //--------------------------------------
     // PUBLIC METHODS
@@ -50,12 +38,10 @@ public sealed class CollisionPlayground: Scene {
 
     /// <summary>Initializes the scene.</summary>
     public override void Init() {
-        AddSystems(new                    LogicSystem(),
-                   mParticleSys = new  ParticleSystem(),
+        AddSystems(mParticleSys = new  ParticleSystem(),
                    new                  PhysicsSystem(),
                    new                   CameraSystem(),
-                   mSkybox      = new SkyBoxSystem(),
-                   mRenderer    = new RenderingSystem());
+                   new                RenderingSystem());
 
 #if DEBUG
         AddSystem(new DebugOverlay());
@@ -66,12 +52,10 @@ public sealed class CollisionPlayground: Scene {
         InitCam();
 
         // Spawn a few balls.
-        for (var i = 0; i < 10; i++) {
-            var r = i == 0 ? 3.0f : 1.0f;
+        for (var i = 0; i < 20; i++) {
             CreateBall(new Vector3(0.9f*i - 3.5f, 0.3f*i, 0.0f), // Position
                        new Vector3(         1.0f, 0.0f  , 0.0f), // Velocity
-                       r,                                        // Radius
-                       i == 0);                                  // Reflective
+                       1.0f);                                    // Radius
         }
 
         var rnd = new Random();
@@ -90,11 +74,6 @@ public sealed class CollisionPlayground: Scene {
                 new CTransform    { Position = ((PhysicsSystem.CollisionInfo)data).Position,
                                     Rotation = Matrix.Identity,
                                     Scale    = rndSize()*Vector3.One } }));
-
-        mRT = GfxUtil.CreateRT();
-
-        mDistortFX = Game1.Inst.Content.Load<Effect>("Effects/Distort");
-        mDistortFX.Parameters["SrcTex"].SetValue(mRT);
     }
 
     /// <summary>Draws the scene by invoking the <see cref="EcsSystem.Draw"/>
@@ -102,12 +81,8 @@ public sealed class CollisionPlayground: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
-        GfxUtil.SetRT(mRT);
         Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
-        GfxUtil.SetRT(null);
-
-        GfxUtil.DrawFsQuad(mDistortFX);
     }
 
     //--------------------------------------
@@ -118,7 +93,7 @@ public sealed class CollisionPlayground: Scene {
     /// <param name="p">The ball position, in world-space.</param>
     /// <param name="v">The initial velocity to give to the ball.</param>
     /// <param name="r">The ball radius.</param>
-    private int CreateBall(Vector3 p, Vector3 v, float r=1.0f, bool reflective=false) {
+    private int CreateBall(Vector3 p, Vector3 v, float r=1.0f) {
         var ball = AddEntity();
 
         AddComponent(ball, new CBody { Aabb     = new BoundingBox(-r*Vector3.One, r*Vector3.One),
@@ -131,21 +106,7 @@ public sealed class CollisionPlayground: Scene {
                                             Rotation = Matrix.Identity,
                                             Scale    = r*Vector3.One });
 
-        EnvMapMaterial envMap = null;
-
-        if (reflective) {
-            envMap = new EnvMapMaterial(mRenderer,
-                                        ball,
-                                        (CTransform)GetComponentFromEntity<CTransform>(ball),
-                                        EnvMapMaterial.CubeMapFX,
-                                        mSkybox);
-
-            AddComponent(ball, new CLogic { Fn    = (t, dt) => envMap.Update(),
-                                            InvHz = 1.0f/30.0f });
-        }
-
         AddComponent<C3DRenderable>(ball, new CImportedModel {
-            material = reflective ? envMap : null,
             model  = Game1.Inst.Content.Load<Model>("Models/DummySphere")
         });
 

@@ -42,6 +42,10 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Dev\Collisions.cs" />
+    <Compile Include="Dev\Materials.cs" />
+    <Compile Include="Dev\Particles.cs" />
+    <Compile Include="Dev\PostFx.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
@@ -59,7 +63,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Dev\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

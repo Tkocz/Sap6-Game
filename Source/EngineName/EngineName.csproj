@@ -73,6 +73,7 @@
     <Compile Include="Systems\DebugOverlay.cs" />
     <Compile Include="Systems\FpsCounterSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
+    <Compile Include="Systems\LogicSystem.cs" />
     <Compile Include="Systems\MapSystem.cs" />
     <Compile Include="Systems\ParticleSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />

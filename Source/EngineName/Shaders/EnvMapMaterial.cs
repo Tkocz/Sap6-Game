@@ -108,12 +108,12 @@ public class EnvMapMaterial: MaterialShader {
 
         // TODO: Cache cameras, don't need to realloc them here.
         var cams = new CCamera[6];
-        cams[0] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Right   , Vector3.Up  ) };
-        cams[1] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Left    , Vector3.Up  ) };
-        cams[2] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Up      , Vector3.Left) };
-        cams[3] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Down    , Vector3.Left) };
-        cams[4] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Backward, Vector3.Up  ) };
-        cams[5] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Forward , Vector3.Up  ) };
+        cams[0] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Right   , Vector3.Down    ) };
+        cams[1] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Left    , Vector3.Down    ) };
+        cams[2] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Up      , Vector3.Backward) };
+        cams[3] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Down    , Vector3.Forward ) };
+        cams[4] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Backward, Vector3.Down    ) };
+        cams[5] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Forward , Vector3.Down    ) };
 
         var aspect = 1.0f;
         var fovRad = 90.0f*2.0f*MathHelper.Pi/360.0f;
