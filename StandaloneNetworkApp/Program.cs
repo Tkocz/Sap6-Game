@@ -1,6 +1,7 @@
 ﻿using Lidgren.Network;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -17,12 +18,11 @@ namespace StandaloneNetworkApp
             private NetPeer _peer;
             private NetPeerConfiguration _config;
             private NetClient _client;
-
             NetIncomingMessage _msg;
             public P2P()
             {
-                _config = new NetPeerConfiguration("Sap6");
-                _config.Port = 50001;
+                _config = new NetPeerConfiguration("Sap6_Networking");
+                _config.Port = 50002;
                 _config.AcceptIncomingConnections = true;
                 _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
                 _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
@@ -34,21 +34,20 @@ namespace StandaloneNetworkApp
                 _peer.DiscoverLocalPeers(50001);
                 Console.WriteLine("listening on " + _config.Port.ToString());
             }
-            public void SendMessage(string message)
+            /// <summary>Checks if have peers, so its possible to send stuff</summary>
+            private bool havePeers()
             {
-                if (_peer.Connections == null || _peer.Connections.Count == 0)
-                {
-                    Console.WriteLine("No connections to send to.");
-                    return;
-                }
-                NetOutgoingMessage msg = _peer.CreateMessage();
-                msg.Write((int)MessageType.StringMessage);
-                msg.Write(message);
-                _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                return _peer.Connections != null && _peer.Connections.Count > 0;
             }
+            /// <summary>Send information about newly connected peer to all other peers </summary>
             public void SendPeerInfo(IPAddress ip, int port)
             {
-                Console.WriteLine(string.Format("Broadcasting {0}:{1} to all (count: {2})", ip.ToString(),
+                if (!havePeers())
+                {
+                    Debug.WriteLine("No connections to send to.");
+                    return;
+                }
+                Debug.WriteLine(string.Format("Broadcasting {0}:{1} to all (count: {2})", ip.ToString(),
                     port.ToString(), _peer.ConnectionsCount));
                 NetOutgoingMessage msg = _peer.CreateMessage();
                 msg.Write((int)MessageType.PeerInformation);
@@ -56,6 +55,19 @@ namespace StandaloneNetworkApp
                 msg.Write(addressBytes.Length);
                 msg.Write(addressBytes);
                 msg.Write(port);
+                _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+            }
+            /// <summary>Send simple string to all peers </summary>
+            public void SendMessage(string message)
+            {
+                if (!havePeers())
+                {
+                    Debug.WriteLine("No connections to send to.");
+                    return;
+                }
+                NetOutgoingMessage msg = _peer.CreateMessage();
+                msg.Write((int)MessageType.StringMessage);
+                msg.Write(message);
                 _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
             }
             enum MessageType
@@ -104,13 +116,15 @@ namespace StandaloneNetworkApp
                                 //connect
                                 IPEndPoint endPoint = new IPEndPoint(ip, port);
                                 if (_peer.GetConnection(endPoint) == null)
-                                {//are we already connected?
+                                {
+//are we already connected?
                                     //Don't try to connect to ourself!
                                     if (_peer.Configuration.LocalAddress.GetHashCode() != endPoint.Address.GetHashCode()
-                                            || _peer.Configuration.Port.GetHashCode() != endPoint.Port.GetHashCode())
+                                        || _peer.Configuration.Port.GetHashCode() != endPoint.Port.GetHashCode())
                                     {
-                                        Console.WriteLine(string.Format("Data::PeerInfo::Initiate new connection to: {0}:{1}",
-                                            endPoint.Address.ToString(), endPoint.Port.ToString()));
+                                        Console.WriteLine(
+                                            string.Format("Data::PeerInfo::Initiate new connection to: {0}:{1}",
+                                                endPoint.Address.ToString(), endPoint.Port.ToString()));
                                         _peer.Connect(endPoint);
                                     }
                                 }
@@ -141,7 +155,6 @@ namespace StandaloneNetworkApp
                             break;
                     }
                 }
-
             }
 
             public static void Main(string[] args)

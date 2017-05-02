@@ -19,30 +19,63 @@ namespace EngineName.Systems
         private NetPeer _peer;
         private NetPeerConfiguration _config;
         private NetClient _client;
-        private int port = 50001;
-        NetIncomingMessage _msg;
+        private int _port = 50001;
+        private NetIncomingMessage _msg;
+
+        //fuggly remove
         private int textHeight = 320;
+
+        /// <summary>Inits networkssystems configures settings for lidgrens networks framework.</summary>
         public override void Init()
         {
-            _config = new NetPeerConfiguration("Sap6");
-            _config.Port = port;
-            _config.AcceptIncomingConnections = true;
+            _config = new NetPeerConfiguration("Sap6_Networking")
+            {
+                Port = _port,
+                AcceptIncomingConnections = true
+                
+                
+            };
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
             _config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
-            //Setup Connection First check if server is being hosted
+
             _peer = new NetPeer(_config);
             _peer.Start();
-            _peer.DiscoverLocalPeers(port);
-            Console.WriteLine("listening on " + _config.Port.ToString());
+            _peer.DiscoverLocalPeers(50002);
+
+            Debug.WriteLine("Listening on " + _config.Port.ToString());
             base.Init();
         }
+        /// <summary>Checks if have peers, so its possible to send stuff</summary>
+        private bool havePeers()
+        {
+            return _peer.Connections != null && _peer.Connections.Count > 0;
+        }
+        /// <summary>Send information about newly connected peer to all other peers </summary>
+        public void SendPeerInfo(IPAddress ip, int port)
+        {
+            if (!havePeers())
+            {
+                Debug.WriteLine("No connections to send to.");
+                return;
+            }
+            Debug.WriteLine(string.Format("Broadcasting {0}:{1} to all (count: {2})", ip.ToString(),
+                port.ToString(), _peer.ConnectionsCount));
+            NetOutgoingMessage msg = _peer.CreateMessage();
+            msg.Write((int)MessageType.PeerInformation);
+            byte[] addressBytes = ip.GetAddressBytes();
+            msg.Write(addressBytes.Length);
+            msg.Write(addressBytes);
+            msg.Write(port);
+            _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+        }
+        /// <summary>Send simple string to all peers </summary>
         public void SendMessage(string message)
         {
-            if (_peer.Connections == null || _peer.Connections.Count == 0)
+            if (!havePeers())
             {
-                Console.WriteLine("No connections to send to.");
+                Debug.WriteLine("No connections to send to.");
                 return;
             }
             NetOutgoingMessage msg = _peer.CreateMessage();
@@ -55,41 +88,40 @@ namespace EngineName.Systems
             StringMessage,
             PeerInformation
         }
-
+        /// <summary> Message loop to check type of message and handle it accordingly </summary>
         public void MessageLoop()
         {
-            NetIncomingMessage msg;
-            while ((msg = _peer.ReadMessage()) != null)
+            while ((_msg = _peer.ReadMessage()) != null)
             {
-                switch (msg.MessageType)
+                switch (_msg.MessageType)
                 {
 
                     case NetIncomingMessageType.DiscoveryRequest:
                         Debug.WriteLine("ReceivePeersData DiscoveryRequest");
-                        _peer.SendDiscoveryResponse(null, msg.SenderEndPoint);
+                        _peer.SendDiscoveryResponse(null, _msg.SenderEndPoint);
                         break;
                     case NetIncomingMessageType.DiscoveryResponse:
                         // just connect to first server discovered
                         Debug.WriteLine("ReceivePeersData DiscoveryResponse CONNECT");
-                        _peer.Connect(msg.SenderEndPoint);
+                        _peer.Connect(_msg.SenderEndPoint);
                         break;
                     case NetIncomingMessageType.ConnectionApproval:
                         Debug.WriteLine("ReceivePeersData ConnectionApproval");
-                        msg.SenderConnection.Approve();
+                        _msg.SenderConnection.Approve();
                         //broadcast this to all connected clients
-                        //netManager.SendPeerInfo(msg.SenderEndPoint.Address, msg.SenderEndPoint.Port);
+                        //SendPeerInfo(msg.SenderEndPoint.Address, msg.SenderEndPoint.Port);
                         break;
                     case NetIncomingMessageType.Data:
                         //another client sent us data
                         Debug.WriteLine("BEGIN ReceivePeersData Data");
-                        MessageType mType = (MessageType) msg.ReadInt32();
+                        MessageType mType = (MessageType) _msg.ReadInt32();
                         if (mType == MessageType.StringMessage)
                         {
                             int eid = Game1.Inst.Scene.AddEntity();
                             Game1.Inst.Scene.AddComponent<C2DRenderable>(eid, new CText()
                             {
                                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
-                                format = msg.ReadString(),
+                                format = _msg.ReadString(),
                                 color = Color.White,
                                 position = new Vector2(320, textHeight),
                                 origin = Vector2.Zero// Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034").MeasureString("Sap my Low-Poly Game") / 2
@@ -98,10 +130,10 @@ namespace EngineName.Systems
                         }
                         else if (mType == MessageType.PeerInformation)
                         {
-                            int byteLenth = msg.ReadInt32();
-                            byte[] addressBytes = msg.ReadBytes(byteLenth);
+                            int byteLenth = _msg.ReadInt32();
+                            byte[] addressBytes = _msg.ReadBytes(byteLenth);
                             IPAddress ip = new IPAddress(addressBytes);
-                            int port = msg.ReadInt32();
+                            int port = _msg.ReadInt32();
                             //connect
                             IPEndPoint endPoint = new IPEndPoint(ip, port);
                             Debug.WriteLine("Data::PeerInfo::Detecting if we're connected");
@@ -121,25 +153,30 @@ namespace EngineName.Systems
                         Console.WriteLine("END ReceivePeersData Data");
                         break;
                     case NetIncomingMessageType.UnconnectedData:
-                        string orphanData = msg.ReadString();
-                        Debug.WriteLine("UnconnectedData: " + orphanData);
+                        Debug.WriteLine("UnconnectedData: " + _msg.ReadString());
                         break;
                     case NetIncomingMessageType.VerboseDebugMessage:
+                        Debug.WriteLine(_msg.ReadString());
+                        break;
                     case NetIncomingMessageType.DebugMessage:
+                        Debug.WriteLine(_msg.ReadString());
+                        break;
                     case NetIncomingMessageType.WarningMessage:
+                        Debug.WriteLine(_msg.ReadString());
+                        break;
                     case NetIncomingMessageType.ErrorMessage:
-                        Debug.WriteLine(msg.ReadString());
+                        Debug.WriteLine(_msg.ReadString());
                         break;
                     default:
-                        Debug.WriteLine("ReceivePeersData Unknown type: " + msg.MessageType.ToString());
+                        Debug.WriteLine("ReceivePeersData Unknown type: " + _msg.MessageType.ToString());
                         try
                         {
-                            Debug.WriteLine(msg.SenderConnection);
-                            if (msg.SenderConnection.Status == NetConnectionStatus.Disconnected)
+                            Debug.WriteLine(_msg.SenderConnection);
+                            if (_msg.SenderConnection.Status == NetConnectionStatus.Disconnected)
                             {
-                                
+                                //try to reconnect
                             }
-                            Debug.WriteLine(msg.ReadString());
+                            Debug.WriteLine(_msg.ReadString());
                         }
                         catch
                         {
@@ -147,12 +184,12 @@ namespace EngineName.Systems
                         }
                         break;
                 }
-                // process message here
             }
         }
 
         public override void Update(float t, float dt)
         {
+            //Fuggly way of sending message better to use messageSystem when implmented
             foreach (var netComp in Game1.Inst.Scene.GetComponents<NetworkComponent>())
             {
                 var mescomp = (NetworkComponent)netComp.Value;
@@ -161,8 +198,8 @@ namespace EngineName.Systems
 
                 SendMessage(mescomp.StringMessage);
                 mescomp.StringMessage = null;
+                //Delete entity when it is sent!
             }
-           
 
             MessageLoop();
             base.Update(t, dt);
