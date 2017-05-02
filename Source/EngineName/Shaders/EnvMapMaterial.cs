@@ -67,7 +67,7 @@ public class EnvMapMaterial: MaterialShader {
                                             512,
                                             false,
                                             device.PresentationParameters.BackBufferFormat,
-                                            DepthFormat.None,
+                                            DepthFormat.Depth24,
                                             1,
                                             RenderTargetUsage.PreserveContents); // TODO: Needed?
         }
