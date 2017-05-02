@@ -8,15 +8,15 @@ uniform extern float4x4 View;
 
 // TODO: Would prefer an array here but MonoGame doesn't seem to support it? See EnvMapMaterial.cs
 //       etc.
-uniform extern texture EnvTex0;
-uniform extern texture EnvTex1;
-uniform extern texture EnvTex2;
-uniform extern texture EnvTex3;
-uniform extern texture EnvTex4;
-uniform extern texture EnvTex5;
+extern uniform texture EnvTex0;
+extern uniform texture EnvTex1;
+extern uniform texture EnvTex2;
+extern uniform texture EnvTex3;
+extern uniform texture EnvTex4;
+extern uniform texture EnvTex5;
 
 // NOTE: MUST BE 512x512 PIXELS!!
-uniform extern texture BumpMap;
+extern uniform texture BumpMap;
 
 sampler envMap0 = sampler_state { Texture = <EnvTex0>; mipfilter = LINEAR; };
 sampler envMap1 = sampler_state { Texture = <EnvTex1>; mipfilter = LINEAR; };
@@ -26,9 +26,10 @@ sampler envMap4 = sampler_state { Texture = <EnvTex4>; mipfilter = LINEAR; };
 sampler envMap5 = sampler_state { Texture = <EnvTex5>; mipfilter = LINEAR; };
 sampler bumpMap = sampler_state { Texture = <BumpMap>; mipfilter = LINEAR; };
 
+extern uniform float3 CamPos;
+
 // TODO: These should really be uniforms.
 static const float  Shininess = 10.0f;
-static const float3 CamPos    = float3(9.0f, 12.0f, 18.0f);
 static const float3 LightPos  = float3(0.0f, 10.0f, 1.0f);
 
 /*-------------------------------------
