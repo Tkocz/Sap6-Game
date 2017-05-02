@@ -33,9 +33,10 @@ namespace EngineName.Systems {
                 if (Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
                     body = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(input.Key);
                 }
+                var inputValue = (CInput)input.Value;
+
                 if (Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key)){
                     var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(input.Key);
-                    var inputValue = (CInput)input.Value;
                     CCamera cameraComponent = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(input.Key);
 
 
@@ -58,35 +59,26 @@ namespace EngineName.Systems {
 
                     }
 
-                    if (!Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
-                        continue;
-                    }
-
-                    if (_mapSystem != null)
-                        body.Position.Y = _mapSystem.HeightPosition(body.Position.X, body.Position.Z);
-
-                    if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
-                        body.Velocity.Z -= 5f;
-                    if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
-                        body.Velocity.Z += 5f;
-                    if (currentState.IsKeyDown(inputValue.LeftMovementKey))
-                        body.Velocity.X -= 5f;
-                    if (currentState.IsKeyDown(inputValue.RightMovementKey))
-                        body.Velocity.X += 5f;
-
-                    if (
-                        !currentState.IsKeyDown(inputValue.ForwardMovementKey) &&
-                        !currentState.IsKeyDown(inputValue.BackwardMovementKey) &&
-                        !currentState.IsKeyDown(inputValue.LeftMovementKey) &&
-                        !currentState.IsKeyDown(inputValue.RightMovementKey)
-                    )
-                    body.Velocity *= dt * 0.9f;
-
-                    body.Velocity.X = Math.Max(body.Velocity.X, 10);
-                    body.Velocity.Y = Math.Max(body.Velocity.Y, 10);
                 }
 
-                
+                if (!Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
+                    continue;
+                }
+
+                if (_mapSystem != null)
+                    body.Position.Y = _mapSystem.HeightPosition(body.Position.X, body.Position.Z);
+
+                if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
+                    body.Velocity.Z -= 5f * dt;
+                if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
+                    body.Velocity.Z += 5f * dt;
+                if (currentState.IsKeyDown(inputValue.LeftMovementKey))
+                    body.Velocity.X -= 5f * dt;
+                if (currentState.IsKeyDown(inputValue.RightMovementKey))
+                    body.Velocity.X += 5f * dt;
+
+                //removed stuff beacuse it is already done in Physicssystem
+
                 /*
 
                 //((LookAtCamera)Camera).Target = new Vector3(m.M41, m.M42*0.0f, m.M43);
@@ -112,7 +104,7 @@ namespace EngineName.Systems {
                 return Matrix.CreateLookAt(Position, (Vector3)m_Target, Up);
 
             */
-                
+
             }
         }
     }
