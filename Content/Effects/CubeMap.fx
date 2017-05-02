@@ -120,14 +120,16 @@ void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
     float3 h = reflect(v, n);
     float3 l = normalize(LightPos - vsOut.worldPos.xyz);
     float3 r = reflect(l, n);
+
+    // Phong specularity
     float3 s = float3(1.0f, 1.0f, 1.0f) * (pow(max(0.0f, dot(r, v)), Shininess));
 
-        int i = -1;
+    int    i  = -1;
     float2 tc = cubeMap(h.xyz, i);
 
     // Not very neat, but it seems to do the job. :-)
     psOut.color = float4(1.0f, 0.0f, 1.0f, 1.0f);
-    if (i == 0) psOut.color = tex2D(envMap0, tc).rgba;
+         if (i == 0) psOut.color = tex2D(envMap0, tc).rgba;
     else if (i == 1) psOut.color = tex2D(envMap1, tc).rgba;
     else if (i == 2) psOut.color = tex2D(envMap2, tc).rgba;
     else if (i == 3) psOut.color = tex2D(envMap3, tc).rgba;
