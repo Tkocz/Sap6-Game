@@ -41,7 +41,7 @@ public sealed class Materials: Scene {
     /// <summary>Initializes the scene.</summary>
     public override void Init() {
         AddSystems(new                    LogicSystem(),
-                   new                  PhysicsSystem(),
+                   new                  PhysicsSystem() { Gravity = Vector3.Zero },
                    new                   CameraSystem(),
                    mSkybox         = new SkyBoxSystem(),
                    mRenderer    = new RenderingSystem());
@@ -56,11 +56,11 @@ public sealed class Materials: Scene {
 
         // Spawn a few balls.
         for (var i = 0; i < 10; i++) {
-            var r = i == 0 ? 3.0f : 1.0f;
-            CreateBall(new Vector3(0.9f*i - 3.5f, 0.3f*i, 0.0f), // Position
-                       new Vector3(         1.0f, 0.0f  , 0.0f), // Velocity
-                       r,                                        // Radius
-                       i == 0);                                  // Reflective
+            var r = i == 0 ? 6.0f : 1.0f;
+            CreateBall(new Vector3(0.9f*i - 3.5f, 0.3f*i, 0.7f*i), // Position
+                       new Vector3(         3.0f*(i-4), 2.0f*i  , 3.0f-i),   // Velocity
+                       r,                                          // Radius
+                       i == 0);                                    // Reflective
         }
     }
 
@@ -91,19 +91,27 @@ public sealed class Materials: Scene {
                                        Position = p,
                                        Velocity = v });
 
-        AddComponent(ball, new CTransform { Position = p,
-                                            Rotation = Matrix.Identity,
-                                            Scale    = r*Vector3.One });
+        CTransform transf;
+        AddComponent(ball, transf = new CTransform { Position = p,
+                                                     Rotation = Matrix.Identity,
+                                                     Scale    = r*Vector3.One });
 
         EnvMapMaterial envMap = null;
 
         if (reflective) {
+            var rot = 0.0f;
             envMap = new EnvMapMaterial(mRenderer,
                                         ball,
                                         (CTransform)GetComponentFromEntity<CTransform>(ball),
                                         mSkybox);
 
-            AddComponent(ball, new CLogic { Fn    = (t, dt) => envMap.Update(),
+            AddComponent(ball, new CLogic { Fn    = (t, dt) => {
+                                                rot += 1.0f*dt;
+                                                transf.Rotation = Matrix.CreateRotationX(rot)
+                                                                * Matrix.CreateRotationY(0.7f*rot);
+                                                envMap.Update();
+
+                                            },
                                             InvHz = 1.0f/30.0f });
         }
 
@@ -128,7 +136,7 @@ public sealed class Materials: Scene {
         AddComponent(cam, new CCamera { ClipProjection = proj,
                                         Projection     = proj });
 
-        AddComponent(cam, new CTransform { Position = new Vector3(0.0f, 0.0f, 18.0f),
+        AddComponent(cam, new CTransform { Position = new Vector3(9.0f, 12.0f, 18.0f),
                                            Rotation = Matrix.Identity,
                                            Scale    = Vector3.One });
 

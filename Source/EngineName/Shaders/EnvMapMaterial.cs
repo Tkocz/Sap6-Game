@@ -67,10 +67,13 @@ public class EnvMapMaterial: MaterialShader {
                                             512,
                                             false,
                                             device.PresentationParameters.BackBufferFormat,
-                                            DepthFormat.Depth24,
+                                            DepthFormat.None,
                                             1,
                                             RenderTargetUsage.PreserveContents); // TODO: Needed?
         }
+
+        var bumpTex = Game1.Inst.Content.Load<Texture2D>("Textures/Bumpmap0");
+        mEffect.Parameters["BumpMap"].SetValue(bumpTex);
     }
 
     /// <summary>Initializes a new environment map.</summary>

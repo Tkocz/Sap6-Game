@@ -15,17 +15,21 @@ uniform extern texture EnvTex3;
 uniform extern texture EnvTex4;
 uniform extern texture EnvTex5;
 
+// NOTE: MUST BE 512x512 PIXELS!!
+uniform extern texture BumpMap;
+
 sampler envMap0 = sampler_state { Texture = <EnvTex0>; mipfilter = LINEAR; };
 sampler envMap1 = sampler_state { Texture = <EnvTex1>; mipfilter = LINEAR; };
 sampler envMap2 = sampler_state { Texture = <EnvTex2>; mipfilter = LINEAR; };
 sampler envMap3 = sampler_state { Texture = <EnvTex3>; mipfilter = LINEAR; };
 sampler envMap4 = sampler_state { Texture = <EnvTex4>; mipfilter = LINEAR; };
 sampler envMap5 = sampler_state { Texture = <EnvTex5>; mipfilter = LINEAR; };
+sampler bumpMap = sampler_state { Texture = <BumpMap>; mipfilter = LINEAR; };
 
 // TODO: These should really be uniforms.
-static const float3 CamPos   = float3(0.0f, 0.0f, 18.0f);
-static const float Shininess = 10.0f;
-static const float3 LightPos = float3(0.0f, 10.0f, 1.0f);
+static const float  Shininess = 10.0f;
+static const float3 CamPos    = float3(0.0f, 0.0f, 18.0f);
+static const float3 LightPos  = float3(0.0f, 10.0f, 1.0f);
 
 /*-------------------------------------
  * STRUCTS
@@ -51,6 +55,21 @@ struct VS_OUTPUT {
 /*-------------------------------------
  * FUNCTIONS
  *-----------------------------------*/
+
+float3 bump(float2 uv) {
+    return tex2D(bumpMap, uv*2.0).rgb;
+    /* float2 a = uv; */
+    /* float2 b = uv + float2(1.0f/512.0f, 0.0f/512.0f); */
+    /* float2 c = uv + float2(0.0f/512.0f, 1.0f/512.0f); */
+
+    /* float sa = tex2D(bumpMap, a).r; */
+    /* float sb = tex2D(bumpMap, b).r; */
+    /* float sc = tex2D(bumpMap, c).r; */
+
+    /* float3 disp = normalize(float3(sb - sa, sc - sa, 1.0f)); */
+
+    /* return disp; */
+}
 
 // Map point to uv by mapping it onto the inside of a cube.
 float2 cubeMap(float3 p, out int i) {
@@ -109,13 +128,12 @@ float2 cubeMap(float3 p, out int i) {
         i  = 5;
     }
 
-
     return float2(0.5f * (uc/mA + 1.0f), 0.5f * (vc / mA + 1.0f));
 }
 
 void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
     // TODO: Camera pos should not be hardcoded here!!!
-    float3 n = normalize(vsOut.norm);
+    float3 n = normalize(vsOut.norm + 0.2f*bump(vsOut.texCoord));
     float3 v = normalize(vsOut.worldPos.xyz - CamPos);
     float3 h = reflect(v, n);
     float3 l = normalize(LightPos - vsOut.worldPos.xyz);
@@ -136,7 +154,7 @@ void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
     else if (i == 4) psOut.color = tex2D(envMap4, tc).rgba;
     else if (i == 5) psOut.color = tex2D(envMap5, tc).rgba;
 
-    psOut.color += float4(s, 1.0f);
+    psOut.color += float4(s, 0.0f);
 }
 
 void vsMain(in VS_INPUT vsIn, out VS_OUTPUT vsOut) {
@@ -145,7 +163,7 @@ void vsMain(in VS_INPUT vsIn, out VS_OUTPUT vsOut) {
     vsOut.screenPos = mul(viewPos, Proj);
     vsOut.worldPos  = worldPos.xyz;
     vsOut.texCoord  = vsIn.texCoord;
-    vsOut.norm      = normalize(vsIn.norm);
+    vsOut.norm      = normalize(mul(float4(vsIn.norm.xyz, 0.0f), Model).xyz);
 }
 
 technique T1 {
