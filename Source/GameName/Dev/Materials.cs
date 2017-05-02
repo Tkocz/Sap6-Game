@@ -105,10 +105,13 @@ public sealed class Materials: Scene {
                                         (CTransform)GetComponentFromEntity<CTransform>(ball),
                                         mSkybox);
 
+            // TODO: If the camera moves, this needs to be done every frame.
+            envMap.SetCameraPos(new Vector3(9.0f, 12.0f, 18.0f));
             AddComponent(ball, new CLogic { Fn    = (t, dt) => {
                                                 rot += 1.0f*dt;
                                                 transf.Rotation = Matrix.CreateRotationX(rot)
                                                                 * Matrix.CreateRotationY(0.7f*rot);
+
                                                 envMap.Update();
 
                                             },

@@ -28,7 +28,7 @@ sampler bumpMap = sampler_state { Texture = <BumpMap>; mipfilter = LINEAR; };
 
 // TODO: These should really be uniforms.
 static const float  Shininess = 10.0f;
-static const float3 CamPos    = float3(0.0f, 0.0f, 18.0f);
+static const float3 CamPos    = float3(9.0f, 12.0f, 18.0f);
 static const float3 LightPos  = float3(0.0f, 10.0f, 1.0f);
 
 /*-------------------------------------
