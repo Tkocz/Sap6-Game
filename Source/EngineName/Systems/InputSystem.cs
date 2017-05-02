@@ -63,11 +63,8 @@ namespace EngineName.Systems {
                 if (!Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
                     continue;
                 }
-
-                //if (_mapSystem != null)
-                //  body.Position.Y = _mapSystem.HeightPosition(body.Position.X, body.Position.Z);
                 
-                var movementSpeed = dt*1f;
+                var movementSpeed = dt*3f;
                 
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
                     body.Velocity.Z -= movementSpeed;

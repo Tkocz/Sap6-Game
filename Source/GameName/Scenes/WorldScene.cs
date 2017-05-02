@@ -46,9 +46,9 @@ namespace GameName.Scenes
             float farplane = 1000f;
 
             int player = AddEntity();
-            AddComponent(player, new CBody() { Radius = 1, Aabb = new BoundingBox(-1 * Vector3.One, 1 * Vector3.One) } );
+            AddComponent(player, new CBody() { Radius = 1, Aabb = new BoundingBox(new Vector3(-1, 0, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f, Position = new Vector3(0, 5, 0) } );
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -40, 0), Scale = new Vector3(.1f) } );
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(.05f) } );
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
             /*
             int ball = AddEntity();
@@ -90,7 +90,7 @@ namespace GameName.Scenes
             // Heightmap entity
             int id = AddEntity();
             AddComponent<C3DRenderable>(id, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/HeightMap") });
-            AddComponent(id, new CTransform() { Position = new Vector3(-590, -255, -590), Rotation = Matrix.Identity, Scale = new Vector3(1) });
+            AddComponent(id, new CTransform() { Position = new Vector3(-590, -50, -590), Rotation = Matrix.Identity, Scale = new Vector3(1) });
             // manually start loading all heightmap components, should be moved/automated
             mapSystem.Load();
             waterSys.Load();

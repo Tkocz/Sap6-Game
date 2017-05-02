@@ -28,24 +28,37 @@ namespace EngineName.Systems
 		}
         // Note: X is correct axis, but Y in this case actually is Z in game world (Y is for height)
         public float HeightPosition(float x, float y) {
-            if (x < 0 || x > 255 || y < 0 || y > 255)
-                return 0;
-            // get four closest vertices
-            int lowX =  (int)Math.Floor(x);
-            int highX = (int)Math.Floor(x+1);
-            int lowY =  (int)Math.Floor(y);
-            int highY = (int)Math.Floor(y+1);
+            foreach (var renderable in Game1.Inst.Scene.GetComponents<C3DRenderable>())
+            {
+                if (renderable.Value.GetType() != typeof(CHeightmap))
+                    continue;
+                var heightmap = (CHeightmap)renderable.Value;
+                var key = renderable.Key;
+                CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
 
-            var A = mHeightData[lowX, lowY];
-            var B = mHeightData[highX, lowY];
-            var C = mHeightData[lowX, highY];
-            var D = mHeightData[highX, highY];
+                x -= transform.Position.X;
+                y -= transform.Position.Z;
 
-            // P = (x, y)
-            // f(a,b,x) = xa + (1-x)b
-            // Pz = f(f(A,B,Px), f(C, D, Px), Py
-            
-            return A;
+                if (x < 0 || x > heightmap.Image.Width || y < 0 || y > heightmap.Image.Height)
+                    return 0;
+                // get four closest vertices
+                int lowX = (int)Math.Floor(x);
+                int highX = (int)Math.Floor(x + 1);
+                int lowY = (int)Math.Floor(y);
+                int highY = (int)Math.Floor(y + 1);
+
+                var A = mHeightData[lowX, lowY];
+                var B = mHeightData[highX, lowY];
+                var C = mHeightData[lowX, highY];
+                var D = mHeightData[highX, highY];
+
+                // P = (x, y)
+                // f(a,b,x) = xa + (1-x)b
+                // Pz = f(f(A,B,Px), f(C, D, Px), Py
+
+                return A;
+            }
+            return 0;
         }
 
 		private Color materialPick(int decimalCode)

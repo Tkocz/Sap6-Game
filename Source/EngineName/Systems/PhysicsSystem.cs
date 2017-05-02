@@ -166,8 +166,7 @@ using static System.Math;
                     var mapHeight = MapSystem.HeightPosition(body.Position.X, body.Position.Z);
 
                     if(aabb1.Min.Y < mapHeight) {
-                        body.Position.Y = mapHeight - body.Aabb.Min.Y;
-                        //body.Velocity.Y *= -1.0f;
+                        body.Position.Y = mapHeight;
                         body.Velocity.Y = 0;
                     }
 
