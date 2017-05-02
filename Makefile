@@ -118,6 +118,12 @@ $(G_CONTENTDIR)/Fonts/*.spritefont:
 	@echo /processor:FontDescriptionProcessor >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /build:$@                           >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
+$(G_CONTENTDIR)/Models/*.blend:
+	@echo /importer:OpenAssetImporter               >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processor:ModelProcessor           >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /processorParam:TextureFormat=Color >> $(G_TMPDIR)/$(G_CONTENTFILE)
+	@echo /build:$@                           >> $(G_TMPDIR)/$(G_CONTENTFILE)
+
 $(G_CONTENTDIR)/Models/*.fbx:
 	@echo /importer:FbxImporter               >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /processor:ModelProcessor           >> $(G_TMPDIR)/$(G_CONTENTFILE)

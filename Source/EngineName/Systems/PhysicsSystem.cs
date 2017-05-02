@@ -38,6 +38,9 @@ public class PhysicsSystem: EcsSystem {
         /// <summary>The collision normal (the vector along which the collision force was applied to
         ///          resolve the collision).</summary>
         public Vector3 Normal;
+
+        /// <summary>The point in world-space where the collision occurred.</summary>
+        public Vector3 Position;
     }
 
     // TODO: This should be moved somewhere else. I would use the Tuple type but it's a ref type so
@@ -46,7 +49,9 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>Represents a pair of two items.</summary>
     /// <typeparam name="T1">Specifies the type of the first item in the pair.</typeparam>
     /// <typeparam name="T2">Specifies the type of the second item in the pair.</typeparam>
-    private struct Pair<T1, T2> {
+    private struct Pair<T1, T2> where T1: struct
+                                where T2: struct
+    {
         //--------------------------------------
         // PUBLIC FIELDS
         //--------------------------------------
@@ -78,6 +83,8 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>Gets or sets the world gravity vector, in meters per seconds squraed.</summary>
     public Vector3 Gravity { get; set; } = new Vector3(0.0f, -9.81f, 0.0f);
 
+    public MapSystem MapSystem;
+
     //--------------------------------------
     // NON-PUBLIC FIELDS
     //--------------------------------------
@@ -102,14 +109,6 @@ public class PhysicsSystem: EcsSystem {
     /// <param name="dt">The time, in seconds, since the last call to this
     ///                  method.</param>
     public override void Update(float t, float dt) {
-        // TODO: Why is this here? It has nothing to do with physics??
-        foreach (CTransform transformComponent in Game1.Inst.Scene.GetComponents<CTransform>().Values)
-        {
-            transformComponent.Frame = Matrix.CreateScale(transformComponent.Scale) *
-                transformComponent.Rotation *
-                Matrix.CreateTranslation(transformComponent.Position);
-        }
-
         // Basically, use semi-implicit Euler to integrate all positions and then sweep coarsely for
         // AABB collisions. All potential collisions are passed on to the fine-phase solver.
         mPotentialColls.Clear();
@@ -127,38 +126,49 @@ public class PhysicsSystem: EcsSystem {
             var p1    = body.Position;
             var aabb1 = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
 
-            //----------------------------
-            // Body-world collisions
-            //----------------------------
+                //----------------------------
+                // Body-world collisions
+                //----------------------------
 
-            // TODO: Maybe refactor into own function? Looks messy.
-            if (aabb1.Min.X < Bounds.Min.X) {
-                body.Position.X = Bounds.Min.X - body.Aabb.Min.X;
-                body.Velocity.X *= -1.0f;
-            }
-            else if (aabb1.Max.X > Bounds.Max.X) {
-                body.Position.X = Bounds.Max.X - body.Aabb.Max.X;
-                body.Velocity.X *= -1.0f;
-            }
+                if (MapSystem == null) {
 
-            if (aabb1.Min.Y < Bounds.Min.Y) {
-                body.Position.Y = Bounds.Min.Y - body.Aabb.Min.Y;
-                body.Velocity.Y *= -1.0f;
-            }
-            else if (aabb1.Max.Y > Bounds.Max.Y) {
-                body.Position.Y = Bounds.Max.Y - body.Aabb.Max.Y;
-                body.Velocity.Y *= -1.0f;
-            }
+                    // TODO: Maybe refactor into own function? Looks messy.
+                    if (aabb1.Min.X < Bounds.Min.X) {
+                        body.Position.X = Bounds.Min.X - body.Aabb.Min.X;
+                        body.Velocity.X *= -1.0f;
+                    }
+                    else if (aabb1.Max.X > Bounds.Max.X) {
+                        body.Position.X = Bounds.Max.X - body.Aabb.Max.X;
+                        body.Velocity.X *= -1.0f;
+                    }
 
-            if (aabb1.Min.Z < Bounds.Min.Z) {
-                body.Position.Z = Bounds.Min.Z - body.Aabb.Min.Z;
-                body.Velocity.Z *= -1.0f;
-            }
-            else if (aabb1.Max.Z > Bounds.Max.Z) {
-                body.Position.Z = Bounds.Max.Z - body.Aabb.Max.Z;
-                body.Velocity.Z *= -1.0f;
-            }
+                    if (aabb1.Min.Y < Bounds.Min.Y) {
+                        body.Position.Y = Bounds.Min.Y - body.Aabb.Min.Y;
+                        body.Velocity.Y *= -1.0f;
+                    }
+                    else if (aabb1.Max.Y > Bounds.Max.Y) {
+                        body.Position.Y = Bounds.Max.Y - body.Aabb.Max.Y;
+                        body.Velocity.Y *= -1.0f;
+                    }
 
+                    if (aabb1.Min.Z < Bounds.Min.Z) {
+                        body.Position.Z = Bounds.Min.Z - body.Aabb.Min.Z;
+                        body.Velocity.Z *= -1.0f;
+                    }
+                    else if (aabb1.Max.Z > Bounds.Max.Z) {
+                        body.Position.Z = Bounds.Max.Z - body.Aabb.Max.Z;
+                        body.Velocity.Z *= -1.0f;
+                    }
+                }
+                else {
+                    var bodyPositionY = body.Position.Y;
+                    var mapHeight = MapSystem.HeightPosition(body.Position.X, body.Position.Z);
+
+                    if(aabb1.Min.Y < mapHeight) {
+                        body.Position.Y = mapHeight - body.Aabb.Min.Y;
+                        body.Velocity.Y *= -1.0f;
+                    }
+                }
             // Not sure what else to do. Need to update transform to match physical body position.
             ((CTransform)scene.GetComponentFromEntity<CTransform>(e.Key)).Position = body.Position;
 
@@ -245,12 +255,13 @@ public class PhysicsSystem: EcsSystem {
             s2.Position -= n*d*s2.InvMass;
             s2.Velocity -= n*p*s2.InvMass;
 
-            // TODO: We probably want to pass the ids of the two objects colliding here. As well as
-            //       collision force etc.
-            Scene.Raise("collision", new CollisionInfo { Entity1 = cp.First,
-                                                         Entity2 = cp.Second,
-                                                         Force   = p,
-                                                         Normal  = n });
+            var c = 0.5f*(s1.Position + s2.Position);
+
+            Scene.Raise("collision", new CollisionInfo { Entity1  = cp.First,
+                                                         Entity2  = cp.Second,
+                                                         Force    = p,
+                                                         Normal   = n,
+                                                         Position = c });
         }
     }
 }

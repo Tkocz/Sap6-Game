@@ -13,3 +13,7 @@
 1493219366:1.5:Debugging functionality + much else.
 1493568403:0.5:Added --print flag in work log script
 1493614746:1.0:Cleaned up some code
+1493635160:2.0:Implemented basic shader support
+1493641542:2.0:Implemented particle system.
+1493664210:2.0:Added support for environment mapping
+1493700845:1.0:Debugged and tweaked environment maps
