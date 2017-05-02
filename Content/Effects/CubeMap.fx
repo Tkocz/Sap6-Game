@@ -141,7 +141,7 @@ void vsMain(in VS_INPUT vsIn, out VS_OUTPUT vsOut) {
     float4 worldPos = mul(vsIn.pos, Model);
     float4 viewPos  = mul(worldPos, View);
     vsOut.screenPos = mul(viewPos, Proj);
-    vsOut.worldPos  = viewPos.xyz;
+    vsOut.worldPos  = worldPos.xyz;
     vsOut.texCoord  = vsIn.texCoord;
     vsOut.norm      = normalize(vsIn.norm);
 }
