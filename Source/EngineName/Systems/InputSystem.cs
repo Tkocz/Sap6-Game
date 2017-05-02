@@ -17,16 +17,19 @@ namespace EngineName.Systems {
         private MapSystem _mapSystem;
         private const float CAMERASPEED = 0.1f;
 
+        private Keys[] lastPressedKeys;
         public InputSystem() { }
 
-        public InputSystem(MapSystem mapSystem) {
+        public InputSystem(MapSystem mapSystem)
+        {
             _mapSystem = mapSystem;
         }
 
-        public override void Update(float t, float dt){
+        public override void Update(float t, float dt)
+        {
             KeyboardState currentState = Keyboard.GetState();
-            if(currentState.IsKeyDown(Keys.Escape))
-                Game1.Inst.Exit();
+            Keys[] pressedKeys = currentState.GetPressedKeys();
+            Game1.Inst.Exit();
 
             foreach (var input in Game1.Inst.Scene.GetComponents<CInput>()) {
                 CBody body = null;
@@ -75,6 +78,19 @@ namespace EngineName.Systems {
                 if (currentState.IsKeyDown(inputValue.RightMovementKey))
                     body.Velocity.X += movementSpeed;
 
+                //For Network Chat
+                {
+                    foreach (Keys key in pressedKeys)
+                    {
+                        if (!lastPressedKeys.Contains(key))
+                        {
+                            Game1.Inst.RaiseInScene("key_to_write", key);
+
+                        }
+                    }
+                    //save the currently pressed keys so we can compare on the next update
+                    lastPressedKeys = pressedKeys;
+                }
 
                 /*
 
