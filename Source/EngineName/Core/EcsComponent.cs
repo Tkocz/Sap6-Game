@@ -1,13 +1,11 @@
-using System;
-
 namespace EngineName.Core {
 
-    /*--------------------------------------
-     * CLASSES
-     *------------------------------------*/
+/*--------------------------------------
+ * CLASSES
+ *------------------------------------*/
 
-    /// <summary>Represents an entity component.</summary>
-    public abstract class EcsComponent {
+/// <summary>Represents an entity component.</summary>
+public abstract class EcsComponent {
     // Could also be an interface (IEcsComponent).
 }
 
