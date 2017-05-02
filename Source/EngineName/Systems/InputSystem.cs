@@ -16,16 +16,19 @@ namespace EngineName.Systems {
     public class InputSystem : EcsSystem {
         private MapSystem _mapSystem;
         private const float CAMERASPEED = 0.1f;
-
+        private Keys[] lastPressedKeys;
         public InputSystem() { }
 
         public InputSystem(MapSystem mapSystem) {
             _mapSystem = mapSystem;
         }
+       
+
 
         public override void Update(float t, float dt){
             KeyboardState currentState = Keyboard.GetState();
-            if(currentState.IsKeyDown(Keys.Escape))
+            Keys[] pressedKeys = currentState.GetPressedKeys();
+            if (currentState.IsKeyDown(Keys.Escape))
                 Game1.Inst.Exit();
 
             foreach (var input in Game1.Inst.Scene.GetComponents<CInput>()) {
@@ -83,10 +86,24 @@ namespace EngineName.Systems {
                     body.Velocity *= dt * 0.9f;
 
                     body.Velocity.X = Math.Max(body.Velocity.X, 10);
-                    body.Velocity.Y = Math.Max(body.Velocity.Y, 10);
+                    body.Velocity.Y = Math.Max(body.Velocity.Y, 10);                    
+                    
+                }
+                //TempChat
+               
+                {
+                    foreach (Keys key in pressedKeys)
+                    {
+                        if (!lastPressedKeys.Contains(key))
+                        {    
+                            Game1.Inst.RaiseInScene("KeyToType",key);
+ 
+                        } 
+                    }
+                    //save the currently pressed keys so we can compare on the next update
+                    lastPressedKeys = pressedKeys;
                 }
 
-                
                 /*
 
                 //((LookAtCamera)Camera).Target = new Vector3(m.M41, m.M42*0.0f, m.M43);
@@ -112,7 +129,7 @@ namespace EngineName.Systems {
                 return Matrix.CreateLookAt(Position, (Vector3)m_Target, Up);
 
             */
-                
+
             }
         }
     }

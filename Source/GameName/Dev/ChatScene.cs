@@ -23,8 +23,9 @@ namespace GameName.Scenes
             AddSystems(
                 new FpsCounterSystem(updatesPerSec: 10),
                 new NetworkSystem(),
-                new Rendering2DSystem()
-
+                new Rendering2DSystem(),
+                new InputSystem(),
+                new ChatSystem()
             );
 
 #if DEBUG
@@ -33,7 +34,18 @@ namespace GameName.Scenes
 
             base.Init();
 
-
+            int player = AddEntity();
+            AddComponent(player, new CInput());
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -40, 0), Scale = new Vector3(1f) });
+            AddComponent(player, new CChatOutput() {Message = "temp"});
+            AddComponent<C2DRenderable>(player, new CText()
+            {
+                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
+                format = "temp",
+                color = Color.White,
+                position = new Vector2(300, 600),
+                origin = Vector2.Zero
+            });
 
             int eid = AddEntity();
             AddComponent<C2DRenderable>(eid, new CFPS
@@ -42,7 +54,7 @@ namespace GameName.Scenes
                 format = "Sap my Low-Poly Game",
                 color = Color.White,
                 position = new Vector2(300, 20),
-                origin = Vector2.Zero// Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034").MeasureString("Sap my Low-Poly Game") / 2
+                origin = Vector2.Zero//
             });
             eid = AddEntity();
             AddComponent<C2DRenderable>(eid, new CSprite
@@ -51,7 +63,8 @@ namespace GameName.Scenes
                 position = new Vector2(300, 300),
                 color = Color.White
             });
-
+            
+  
 
             Log.Get().Debug("TestScene initialized.");
         }

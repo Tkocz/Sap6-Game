@@ -44,6 +44,8 @@ namespace EngineName.Systems
             _peer.Start();
             _peer.DiscoverLocalPeers(50002);
 
+            Game1.Inst.Scene.OnEvent("SendToPeer", data => this.SendMessage((string)data));
+       
             Debug.WriteLine("Listening on " + _config.Port.ToString());
             base.Init();
         }
@@ -71,6 +73,20 @@ namespace EngineName.Systems
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
         /// <summary>Send simple string to all peers </summary>
+        public void SendObject(object message,Type type)
+        {
+            if (!havePeers())
+            {
+                Debug.WriteLine("No connections to send to.");
+                return;
+            }
+            NetOutgoingMessage msg = _peer.CreateMessage();
+            msg.Write((byte)MessageType.Object);
+            msg.Write(type.FullName);
+            msg.WriteAllProperties(message);
+            _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+        }
+        /// <summary>Send simple string to all peers </summary>
         public void SendMessage(string message)
         {
             if (!havePeers())
@@ -79,14 +95,16 @@ namespace EngineName.Systems
                 return;
             }
             NetOutgoingMessage msg = _peer.CreateMessage();
-            msg.Write((int)MessageType.StringMessage);
+
+            msg.Write((byte)MessageType.StringMessage);
             msg.Write(message);
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
         enum MessageType
         {
             StringMessage,
-            PeerInformation
+            PeerInformation,
+            Object
         }
         /// <summary> Message loop to check type of message and handle it accordingly </summary>
         public void MessageLoop()
@@ -115,6 +133,7 @@ namespace EngineName.Systems
                         //another client sent us data
                         Debug.WriteLine("BEGIN ReceivePeersData Data");
                         MessageType mType = (MessageType) _msg.ReadInt32();
+
                         if (mType == MessageType.StringMessage)
                         {
                             int eid = Game1.Inst.Scene.AddEntity();
@@ -124,7 +143,7 @@ namespace EngineName.Systems
                                 format = _msg.ReadString(),
                                 color = Color.White,
                                 position = new Vector2(320, textHeight),
-                                origin = Vector2.Zero// Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034").MeasureString("Sap my Low-Poly Game") / 2
+                                origin = Vector2.Zero// 
                             });
                             textHeight=textHeight+20;
                         }
@@ -149,6 +168,16 @@ namespace EngineName.Systems
                                     _peer.Connect(endPoint);
                                 }
                             }
+                        }
+                        else if (mType == MessageType.Object)
+                        {
+
+                            string type = _msg.ReadString();
+                            switch (type)
+                            {
+                                case : "TransForm";
+                            }
+                            byte[] addressBytes = _msg.ReadAllProperties()
                         }
                         Console.WriteLine("END ReceivePeersData Data");
                         break;
@@ -189,18 +218,6 @@ namespace EngineName.Systems
 
         public override void Update(float t, float dt)
         {
-            //Fuggly way of sending message better to use messageSystem when implmented
-            foreach (var netComp in Game1.Inst.Scene.GetComponents<NetworkComponent>())
-            {
-                var mescomp = (NetworkComponent)netComp.Value;
-                if (mescomp.StringMessage == null)
-                    continue;
-
-                SendMessage(mescomp.StringMessage);
-                mescomp.StringMessage = null;
-                //Delete entity when it is sent!
-            }
-
             MessageLoop();
             base.Update(t, dt);
         }
