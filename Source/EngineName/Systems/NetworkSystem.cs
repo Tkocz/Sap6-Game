@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using EngineName.Components;
 using EngineName.Components.Renderable;
 using EngineName.Core;
+using EngineName.Utils;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using Lidgren.Network;
 namespace EngineName.Systems
 {
     public class NetworkSystem : EcsSystem
@@ -19,18 +24,19 @@ namespace EngineName.Systems
         private NetPeer _peer;
         private NetPeerConfiguration _config;
         private NetClient _client;
-        private int _port = 50001;
+        private int _localport = 50001;
+        private int _searchport = 50001;
         private NetIncomingMessage _msg;
+        private bool _bot = false; 
 
         //fuggly remove
         private int textHeight = 320;
-
         /// <summary>Inits networkssystems configures settings for lidgrens networks framework.</summary>
         public override void Init()
         {
             _config = new NetPeerConfiguration("Sap6_Networking")
             {
-                Port = _port,
+                Port = _localport,
                 AcceptIncomingConnections = true
                 
                 
@@ -42,12 +48,37 @@ namespace EngineName.Systems
 
             _peer = new NetPeer(_config);
             _peer.Start();
-            _peer.DiscoverLocalPeers(50002);
+            _peer.DiscoverLocalPeers(_searchport);
 
-            Game1.Inst.Scene.OnEvent("SendToPeer", data => this.SendMessage((string)data));
-       
+            if (!_bot) { 
+                Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendMessage((string)data));
+            }
+
             Debug.WriteLine("Listening on " + _config.Port.ToString());
             base.Init();
+        }
+
+
+        ///For testing only
+        public void Bot()
+        {
+            _bot = true;
+            int counter = 0;
+            _localport = 50002;
+            Init();
+            while (true)
+            {
+                counter++;
+                Thread.Sleep(1000);
+                MessageLoop();
+                if (counter % 5 == 0 && counter != 0)
+                {
+                    counter++;
+                    SendObject(new CTransform() {Position = new Vector3(2,4,5)});
+                    SendMessage("hej from bot " + counter);
+                }
+
+            }
         }
         /// <summary>Checks if have peers, so its possible to send stuff</summary>
         private bool havePeers()
@@ -65,26 +96,29 @@ namespace EngineName.Systems
             Debug.WriteLine(string.Format("Broadcasting {0}:{1} to all (count: {2})", ip.ToString(),
                 port.ToString(), _peer.ConnectionsCount));
             NetOutgoingMessage msg = _peer.CreateMessage();
-            msg.Write((int)MessageType.PeerInformation);
+            msg.Write((int)Enums.MessageType.PeerInformation);
             byte[] addressBytes = ip.GetAddressBytes();
             msg.Write(addressBytes.Length);
             msg.Write(addressBytes);
             msg.Write(port);
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
+
         /// <summary>Send simple string to all peers </summary>
-        public void SendObject(object message,Type type)
+        public void SendObject(object datatosend)
         {
             if (!havePeers())
             {
                 Debug.WriteLine("No connections to send to.");
                 return;
             }
+            
             NetOutgoingMessage msg = _peer.CreateMessage();
-            msg.Write((byte)MessageType.Object);
-            msg.Write(type.FullName);
-            msg.WriteAllProperties(message);
-            _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+            msg.Write((byte)Enums.MessageType.Object);
+            //ability to send diffrent types of data with ease
+            var tranform = (CTransform)datatosend;
+            msg.WriteCTransform(tranform);
+            _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
         }
         /// <summary>Send simple string to all peers </summary>
         public void SendMessage(string message)
@@ -96,15 +130,9 @@ namespace EngineName.Systems
             }
             NetOutgoingMessage msg = _peer.CreateMessage();
 
-            msg.Write((byte)MessageType.StringMessage);
+            msg.Write((byte)Enums.MessageType.StringMessage);
             msg.Write(message);
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
-        }
-        enum MessageType
-        {
-            StringMessage,
-            PeerInformation,
-            Object
         }
         /// <summary> Message loop to check type of message and handle it accordingly </summary>
         public void MessageLoop()
@@ -115,39 +143,30 @@ namespace EngineName.Systems
                 {
 
                     case NetIncomingMessageType.DiscoveryRequest:
-                        Debug.WriteLine("ReceivePeersData DiscoveryRequest");
+                        //Debug.WriteLine("ReceivePeersData DiscoveryRequest");
                         _peer.SendDiscoveryResponse(null, _msg.SenderEndPoint);
                         break;
                     case NetIncomingMessageType.DiscoveryResponse:
                         // just connect to first server discovered
-                        Debug.WriteLine("ReceivePeersData DiscoveryResponse CONNECT");
+                        //Debug.WriteLine("ReceivePeersData DiscoveryResponse CONNECT");
                         _peer.Connect(_msg.SenderEndPoint);
                         break;
                     case NetIncomingMessageType.ConnectionApproval:
                         Debug.WriteLine("ReceivePeersData ConnectionApproval");
                         _msg.SenderConnection.Approve();
                         //broadcast this to all connected clients
-                        //SendPeerInfo(msg.SenderEndPoint.Address, msg.SenderEndPoint.Port);
+                        SendPeerInfo(_msg.SenderEndPoint.Address, _msg.SenderEndPoint.Port);
                         break;
                     case NetIncomingMessageType.Data:
                         //another client sent us data
-                        Debug.WriteLine("BEGIN ReceivePeersData Data");
-                        MessageType mType = (MessageType) _msg.ReadInt32();
-
-                        if (mType == MessageType.StringMessage)
+                        //Read TypeData First
+                        Enums.MessageType mType = (Enums.MessageType) _msg.ReadByte();
+           
+                        if (mType == Enums.MessageType.StringMessage)
                         {
-                            int eid = Game1.Inst.Scene.AddEntity();
-                            Game1.Inst.Scene.AddComponent<C2DRenderable>(eid, new CText()
-                            {
-                                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
-                                format = _msg.ReadString(),
-                                color = Color.White,
-                                position = new Vector2(320, textHeight),
-                                origin = Vector2.Zero// 
-                            });
-                            textHeight=textHeight+20;
+                            Game1.Inst.Scene.Raise("network_data_text", _msg.ReadString());
                         }
-                        else if (mType == MessageType.PeerInformation)
+                        else if (mType == Enums.MessageType.PeerInformation)
                         {
                             int byteLenth = _msg.ReadInt32();
                             byte[] addressBytes = _msg.ReadBytes(byteLenth);
@@ -169,15 +188,12 @@ namespace EngineName.Systems
                                 }
                             }
                         }
-                        else if (mType == MessageType.Object)
+                        else if (mType == Enums.MessageType.Object)
                         {
-
-                            string type = _msg.ReadString();
-                            switch (type)
-                            {
-                                case : "TransForm";
-                            }
-                            byte[] addressBytes = _msg.ReadAllProperties()
+                            //determine what type of data
+                            //
+                            var data = _msg.ReadCTransform();
+                            Game1.Inst.Scene.Raise("network_data", data);
                         }
                         Console.WriteLine("END ReceivePeersData Data");
                         break;
@@ -203,7 +219,7 @@ namespace EngineName.Systems
                             Debug.WriteLine(_msg.SenderConnection);
                             if (_msg.SenderConnection.Status == NetConnectionStatus.Disconnected)
                             {
-                                //try to reconnect
+                                //Maybe try to reconnect
                             }
                             Debug.WriteLine(_msg.ReadString());
                         }

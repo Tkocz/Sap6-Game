@@ -1,4 +1,5 @@
-﻿using EngineName;
+﻿using System.Threading;
+using EngineName;
 using EngineName.Components;
 using EngineName.Components.Renderable;
 using EngineName.Logging;
@@ -37,13 +38,12 @@ namespace GameName.Scenes
             int player = AddEntity();
             AddComponent(player, new CInput());
             AddComponent(player, new CTransform() { Position = new Vector3(0, -40, 0), Scale = new Vector3(1f) });
-            AddComponent(player, new CChatOutput() {Message = "temp"});
             AddComponent<C2DRenderable>(player, new CText()
             {
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
-                format = "temp",
+                format = "Type Here",
                 color = Color.White,
-                position = new Vector2(300, 600),
+                position = new Vector2(300, 750),
                 origin = Vector2.Zero
             });
 
@@ -63,10 +63,17 @@ namespace GameName.Scenes
                 position = new Vector2(300, 300),
                 color = Color.White
             });
-            
-  
 
+
+
+            new Thread(NewThread).Start();
             Log.Get().Debug("TestScene initialized.");
+        }
+       
+        static void NewThread()
+        {
+            var test = new NetworkSystem();
+            test.Bot();
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using EngineName.Components;
 
 namespace StandaloneNetworkApp
 {
@@ -39,6 +40,18 @@ namespace StandaloneNetworkApp
             {
                 return _peer.Connections != null && _peer.Connections.Count > 0;
             }
+            public void SendObject(object data)
+            {
+                if (!havePeers())
+                {
+                    Debug.WriteLine("No connections to send to.");
+                    return;
+                }
+                NetOutgoingMessage msg = _peer.CreateMessage();
+                msg.Write((byte)Enums.MessageType.Object);
+                msg.WriteAllProperties(data);
+                _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+            }
             /// <summary>Send information about newly connected peer to all other peers </summary>
             public void SendPeerInfo(IPAddress ip, int port)
             {
@@ -50,7 +63,7 @@ namespace StandaloneNetworkApp
                 Debug.WriteLine(string.Format("Broadcasting {0}:{1} to all (count: {2})", ip.ToString(),
                     port.ToString(), _peer.ConnectionsCount));
                 NetOutgoingMessage msg = _peer.CreateMessage();
-                msg.Write((int)MessageType.PeerInformation);
+                msg.Write((int)Enums.MessageType.PeerInformation);
                 byte[] addressBytes = ip.GetAddressBytes();
                 msg.Write(addressBytes.Length);
                 msg.Write(addressBytes);
@@ -66,14 +79,9 @@ namespace StandaloneNetworkApp
                     return;
                 }
                 NetOutgoingMessage msg = _peer.CreateMessage();
-                msg.Write((int)MessageType.StringMessage);
+                msg.Write((int)Enums.MessageType.StringMessage);
                 msg.Write(message);
                 _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
-            }
-            enum MessageType
-            {
-                StringMessage,
-                PeerInformation
             }
             public void loop()
             {
@@ -102,12 +110,12 @@ namespace StandaloneNetworkApp
                         case NetIncomingMessageType.Data:
                             //another client sent us data
                             Console.WriteLine("BEGIN ReceivePeersData Data");
-                            MessageType mType = (MessageType)msg.ReadInt32();
-                            if (mType == MessageType.StringMessage)
+                            Enums.MessageType mType = (Enums.MessageType)msg.ReadInt32();
+                            if (mType == Enums.MessageType.StringMessage)
                             {
                                 Console.WriteLine("Message From" + msg.SenderEndPoint.Address+ " "  + msg.ReadString());
                             }
-                            else if (mType == MessageType.PeerInformation)
+                            else if (mType == Enums.MessageType.PeerInformation)
                             {
                                 int byteLenth = msg.ReadInt32();
                                 byte[] addressBytes = msg.ReadBytes(byteLenth);
@@ -170,6 +178,7 @@ namespace StandaloneNetworkApp
                     {
                         counter++;
                         stuff.SendMessage("hej" + counter);
+                        stuff.SendObject(new CTransform());
                     }
                     
                 }

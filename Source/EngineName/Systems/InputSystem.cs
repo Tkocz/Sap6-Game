@@ -96,7 +96,7 @@ namespace EngineName.Systems {
                     {
                         if (!lastPressedKeys.Contains(key))
                         {    
-                            Game1.Inst.RaiseInScene("KeyToType",key);
+                            Game1.Inst.RaiseInScene("key_to_write", key);
  
                         } 
                     }

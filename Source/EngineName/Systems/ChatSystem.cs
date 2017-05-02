@@ -6,20 +6,37 @@ using System.Threading.Tasks;
 using EngineName.Components;
 using EngineName.Components.Renderable;
 using EngineName.Core;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace EngineName.Systems
 {
     public class ChatSystem : EcsSystem
     {
+        private int textheight = 320;
         public override void Init()
         {
-            Game1.Inst.Scene.OnEvent("KeyToType", data => WriteToScreen((Keys)data));
+            Game1.Inst.Scene.OnEvent("key_to_write", data => handleKey((Keys)data));
+            Game1.Inst.Scene.OnEvent("network_data_text", data => writeToChat((string)data));
         }
 
-        private void WriteToScreen(Keys key)
+        private void writeToChat(string chatmessage)
         {
-            var text = (CText)Game1.Inst.Scene.GetComponentFromEntity<C2DRenderable>(0);
+            var id = Game1.Inst.Scene.AddEntity();
+            Game1.Inst.Scene.AddComponent<C2DRenderable>(id, new CText()
+            {
+                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
+                format = chatmessage,
+                color = Color.White,
+                position = new Vector2(300, textheight+=20),
+                origin = Vector2.Zero
+            });
+        }
+
+        private void handleKey(Keys key)
+        {
+           var text = (CText)Game1.Inst.Scene.GetComponentFromEntity<C2DRenderable>(0);
 
             if (key == Keys.Back)
             {
@@ -28,7 +45,7 @@ namespace EngineName.Systems
             }
             else if (key == Keys.Enter)
             {
-                Game1.Inst.Scene.Raise("SendToPeer",text.format);
+                Game1.Inst.Scene.Raise("send_to_peer",text.format);
                 text.format = "";
             }
             else
