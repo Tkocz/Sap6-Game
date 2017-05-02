@@ -46,6 +46,7 @@ namespace EngineName.Systems
             else if (key == Keys.Enter)
             {
                 Game1.Inst.Scene.Raise("send_to_peer",text.format);
+                writeToChat(text.format);
                 text.format = "";
             }
             else

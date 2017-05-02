@@ -1,23 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using EngineName.Components.Renderable;
 using EngineName.Core;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EngineName.Utils;
 using EngineName.Components;
 
 namespace EngineName.Systems {
     public class InputSystem : EcsSystem {
         private MapSystem _mapSystem;
         private const float CAMERASPEED = 0.1f;
-
         private Keys[] lastPressedKeys;
+
         public InputSystem() { }
 
         public InputSystem(MapSystem mapSystem)
@@ -29,7 +22,6 @@ namespace EngineName.Systems {
         {
             KeyboardState currentState = Keyboard.GetState();
             Keys[] pressedKeys = currentState.GetPressedKeys();
-            Game1.Inst.Exit();
 
             foreach (var input in Game1.Inst.Scene.GetComponents<CInput>()) {
                 CBody body = null;
@@ -63,6 +55,17 @@ namespace EngineName.Systems {
                         transform.Position = Vector3.Subtract(cameraComponent.Target, new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), cameraComponent.Height, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f))));
                     }
                 }
+
+                //For Network Chat           
+                foreach (Keys key in pressedKeys)
+                {
+                    if (!lastPressedKeys.Contains(key))
+                    {
+                        Game1.Inst.RaiseInScene("key_to_write", key);
+
+                    }
+                }
+                lastPressedKeys = pressedKeys;
                 if (!Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
                     continue;
                 }
@@ -78,19 +81,10 @@ namespace EngineName.Systems {
                 if (currentState.IsKeyDown(inputValue.RightMovementKey))
                     body.Velocity.X += movementSpeed;
 
-                //For Network Chat
-                {
-                    foreach (Keys key in pressedKeys)
-                    {
-                        if (!lastPressedKeys.Contains(key))
-                        {
-                            Game1.Inst.RaiseInScene("key_to_write", key);
 
-                        }
-                    }
-                    //save the currently pressed keys so we can compare on the next update
-                    lastPressedKeys = pressedKeys;
-                }
+
+                //save the currently pressed keys so we can compare on the next update
+             
 
                 /*
 

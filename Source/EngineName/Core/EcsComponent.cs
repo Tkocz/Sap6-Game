@@ -7,7 +7,6 @@ namespace EngineName.Core {
      *------------------------------------*/
 
     /// <summary>Represents an entity component.</summary>
-    [Serializable] 
     public abstract class EcsComponent {
     // Could also be an interface (IEcsComponent).
 }

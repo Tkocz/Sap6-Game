@@ -1,22 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using EngineName.Components;
-using EngineName.Components.Renderable;
 using EngineName.Core;
 using EngineName.Utils;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Lidgren.Network;
 namespace EngineName.Systems
 {
     public class NetworkSystem : EcsSystem
@@ -29,8 +19,6 @@ namespace EngineName.Systems
         private NetIncomingMessage _msg;
         private bool _bot = false; 
 
-        //fuggly remove
-        private int textHeight = 320;
         /// <summary>Inits networkssystems configures settings for lidgrens networks framework.</summary>
         public override void Init()
         {
@@ -164,7 +152,8 @@ namespace EngineName.Systems
            
                         if (mType == Enums.MessageType.StringMessage)
                         {
-                            Game1.Inst.Scene.Raise("network_data_text", _msg.ReadString());
+                            if (!_bot)
+                                Game1.Inst.Scene.Raise("network_data_text", _msg.ReadString());
                         }
                         else if (mType == Enums.MessageType.PeerInformation)
                         {

@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework;
 
 namespace EngineName.Components
 {
-    [Serializable]
     public class CTransform:EcsComponent 
     {
         public Vector3 Position = Vector3.Zero;
