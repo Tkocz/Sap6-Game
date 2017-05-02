@@ -101,6 +101,12 @@ public class EnvMapMaterial: MaterialShader {
         }
     }
 
+    /// <summary>Sets the camera position.</summary>
+    /// <param name="pos">The camera position, in world-space.</param>
+    public void SetCameraPos(Vector3 pos) {
+        mEffect.Parameters["CamPos"].SetValue(pos);
+    }
+
     /// <summary>Updates the cube map by rendering each environment mapped cube face. NOTE: This is
     ///          really slow so don't do this too often.</summary>
     public void Update() {
