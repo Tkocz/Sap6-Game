@@ -36,24 +36,6 @@ public class EnvMapMaterial: MaterialShader {
     /// <summary>Skybox renderer.</summary>
     private readonly SkyBoxSystem mSkybox;
 
-    /// <summary>The default cube map material shader.,</summary>
-    private static Effect sCubeMapFX;
-
-    //--------------------------------------
-    // PUBLIC PROPERTIES
-    //--------------------------------------
-
-    /// <summary>Gets the default cube map material shader.</summary>
-    public static Effect CubeMapFX {
-        get {
-            if (sCubeMapFX == null) {
-                sCubeMapFX = Game1.Inst.Content.Load<Effect>("Effects/CubeMap");
-            }
-
-            return sCubeMapFX;
-        }
-    }
-
     //--------------------------------------
     // PUBLIC CONSTRUCTORS
     //--------------------------------------
@@ -62,8 +44,8 @@ public class EnvMapMaterial: MaterialShader {
     /// <param name="renderer">The renderer to use when rendering the environment maps.</param>
     /// <param name="eid">The id of the entity to which the environment map belongs.</param>
     /// <param name="transf">The transform component of the entity to environment map.</param>
-    /// <param name="material">The effect to use as material. Normally this should be set to
-    ///                        <see cref="EnvMapMaterial.CubeMapFX"/></param>
+    /// <param name="material">The effect to use as material. Normally this should be set to a cube
+    ///                        map shader.</param>
     /// <param name="skybox">The skybox renderer.</param>
     public EnvMapMaterial(RenderingSystem renderer,
                           int             eid,
@@ -79,7 +61,6 @@ public class EnvMapMaterial: MaterialShader {
 
         var device = Game1.Inst.GraphicsDevice;
 
-        // Set up the shader params.
         for (var i = 0; i < 6; i++) {
             mEnvRTs[i] = new RenderTarget2D(device,
                                             512,
@@ -89,14 +70,33 @@ public class EnvMapMaterial: MaterialShader {
                                             DepthFormat.None,
                                             1,
                                             RenderTargetUsage.PreserveContents); // TODO: Needed?
-
-            material.Parameters["EnvTex" + i.ToString()].SetValue(mEnvRTs[i]);
         }
+    }
+
+    /// <summary>Initializes a new environment map.</summary>
+    /// <param name="renderer">The renderer to use when rendering the environment maps.</param>
+    /// <param name="eid">The id of the entity to which the environment map belongs.</param>
+    /// <param name="transf">The transform component of the entity to environment map.</param>
+    /// <param name="skybox">The skybox renderer.</param>
+    public EnvMapMaterial(RenderingSystem renderer,
+                          int             eid,
+                          CTransform      transf,
+                          SkyBoxSystem    skybox=null)
+        : this(renderer, eid, transf, Game1.Inst.Content.Load<Effect>("Effects/CubeMap"), skybox)
+    {
     }
 
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
+
+    /// <summary>Called just before the material is rendered.</summary>
+    public override void Prerender() {
+        // Set up the shader params.
+        for (var i = 0; i < 6; i++) {
+            mEffect.Parameters["EnvTex" + i.ToString()].SetValue(mEnvRTs[i]);
+        }
+    }
 
     /// <summary>Updates the cube map by rendering each environment mapped cube face. NOTE: This is
     ///          really slow so don't do this too often.</summary>

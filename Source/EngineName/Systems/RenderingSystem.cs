@@ -68,9 +68,7 @@ namespace EngineName.Systems
                         model.material.Model = mesh.ParentBone.Transform * transform.Frame;
                         model.material.View  = camera.View;
                         model.material.Proj  = camera.Projection;
-                        // foreach (var pass in model.material.mEffect.CurrentTechnique.Passes) {
-                        //     pass.Apply();
-                        // }
+                        model.material.Prerender();
 
                         var device = Game1.Inst.GraphicsDevice;
 

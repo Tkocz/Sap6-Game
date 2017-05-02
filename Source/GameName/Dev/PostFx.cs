@@ -64,8 +64,7 @@ public sealed class PostFx: Scene {
         for (var i = 0; i < 10; i++) {
             CreateBall(new Vector3(0.9f*i - 3.5f, 0.3f*i, 0.0f), // Position
                        new Vector3(         1.0f, 0.0f  , 0.0f), // Velocity
-                       1.0f,                                     // Radius
-                       false);                                   // Reflective
+                       1.0f);                                    // Radius
         }
 
         mRT = GfxUtil.CreateRT();
@@ -95,7 +94,7 @@ public sealed class PostFx: Scene {
     /// <param name="p">The ball position, in world-space.</param>
     /// <param name="v">The initial velocity to give to the ball.</param>
     /// <param name="r">The ball radius.</param>
-    private int CreateBall(Vector3 p, Vector3 v, float r=1.0f, bool reflective=false) {
+    private int CreateBall(Vector3 p, Vector3 v, float r=1.0f) {
         var ball = AddEntity();
 
         AddComponent(ball, new CBody { Aabb     = new BoundingBox(-r*Vector3.One, r*Vector3.One),
@@ -110,19 +109,7 @@ public sealed class PostFx: Scene {
 
         EnvMapMaterial envMap = null;
 
-        if (reflective) {
-            envMap = new EnvMapMaterial(mRenderer,
-                                        ball,
-                                        (CTransform)GetComponentFromEntity<CTransform>(ball),
-                                        EnvMapMaterial.CubeMapFX,
-                                        mSkybox);
-
-            AddComponent(ball, new CLogic { Fn    = (t, dt) => envMap.Update(),
-                                            InvHz = 1.0f/30.0f });
-        }
-
         AddComponent<C3DRenderable>(ball, new CImportedModel {
-            material = reflective ? envMap : null,
             model  = Game1.Inst.Content.Load<Model>("Models/DummySphere")
         });
 

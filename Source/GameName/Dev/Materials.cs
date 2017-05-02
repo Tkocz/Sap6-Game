@@ -81,6 +81,7 @@ public sealed class Materials: Scene {
     /// <param name="p">The ball position, in world-space.</param>
     /// <param name="v">The initial velocity to give to the ball.</param>
     /// <param name="r">The ball radius.</param>
+    /// <param name="reflective">Whether to use an environment mapped material.</param>
     private int CreateBall(Vector3 p, Vector3 v, float r=1.0f, bool reflective=false) {
         var ball = AddEntity();
 
@@ -100,7 +101,6 @@ public sealed class Materials: Scene {
             envMap = new EnvMapMaterial(mRenderer,
                                         ball,
                                         (CTransform)GetComponentFromEntity<CTransform>(ball),
-                                        EnvMapMaterial.CubeMapFX,
                                         mSkybox);
 
             AddComponent(ball, new CLogic { Fn    = (t, dt) => envMap.Update(),

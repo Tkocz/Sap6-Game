@@ -92,6 +92,11 @@ public class MaterialShader {
         mProjParam  = effect.Parameters["Proj"];
         mViewParam  = effect.Parameters["View"];
     }
+
+    /// <summary>Called just before the material is rendered.</summary>
+    public virtual void Prerender() {
+
+    }
 }
 
 }
