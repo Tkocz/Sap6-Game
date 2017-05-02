@@ -13,13 +13,14 @@ using EngineName.Core;
 using Microsoft.Xna.Framework;
 
 using static System.Math;
+    using System;
 
-//--------------------------------------
-// CLASSES
-//--------------------------------------
+    //--------------------------------------
+    // CLASSES
+    //--------------------------------------
 
-/// <summary>Provides real-time simulation of a physical world.</summary>
-public class PhysicsSystem: EcsSystem {
+    /// <summary>Provides real-time simulation of a physical world.</summary>
+    public class PhysicsSystem: EcsSystem {
     //--------------------------------------
     // NESTED TYPES
     //--------------------------------------
@@ -166,8 +167,11 @@ public class PhysicsSystem: EcsSystem {
 
                     if(aabb1.Min.Y < mapHeight) {
                         body.Position.Y = mapHeight - body.Aabb.Min.Y;
-                        body.Velocity.Y *= -1.0f;
+                        //body.Velocity.Y *= -1.0f;
+                        body.Velocity.Y = 0;
                     }
+
+                    Console.Out.WriteLine(string.Format("Player position: {0}", body.Position));
                 }
             // Not sure what else to do. Need to update transform to match physical body position.
             ((CTransform)scene.GetComponentFromEntity<CTransform>(e.Key)).Position = body.Position;

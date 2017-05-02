@@ -48,7 +48,7 @@ namespace GameName.Scenes
             int player = AddEntity();
             AddComponent(player, new CBody() { Radius = 1, Aabb = new BoundingBox(-1 * Vector3.One, 1 * Vector3.One) } );
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -40, 0), Scale = new Vector3(1f) } );
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -40, 0), Scale = new Vector3(.1f) } );
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
             /*
             int ball = AddEntity();
@@ -57,7 +57,7 @@ namespace GameName.Scenes
             AddComponent<C3DRenderable>(ball, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/DummySphere") });
             */
 
-            AddComponent(camera, new CCamera(-5, 5){
+            AddComponent(camera, new CCamera(-5, 5) {
                 Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio,nearplane,farplane)
                 ,ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview*1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane*0.5f, farplane*1.2f)
             });

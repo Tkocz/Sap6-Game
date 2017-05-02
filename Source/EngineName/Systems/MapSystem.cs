@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EngineName.Utils;
+using EngineName.Components;
 
 namespace EngineName.Systems
 {
@@ -16,7 +17,7 @@ namespace EngineName.Systems
 		private GraphicsDevice mGraphicsDevice;
 		private int chunksplit = 20;
 		private BasicEffect basicEffect;
-        private int[,] mHeightData;
+        private float[,] mHeightData;
 
         public override void Init()
 		{
@@ -124,8 +125,10 @@ namespace EngineName.Systems
 			return new ModelMeshPart { VertexBuffer = vertexBuffer, IndexBuffer = indexBuffer, NumVertices = indices.Length, PrimitiveCount = indices.Length / 3 };
 		}
 
-		private void CalculateHeightData(CHeightmap compHeight)
+		private void CalculateHeightData(CHeightmap compHeight, int key)
 		{
+            CTransform transformComponent = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+
 			int terrainWidth = compHeight.Image.Width;
 			int terrainHeight = compHeight.Image.Height;
 
@@ -133,11 +136,11 @@ namespace EngineName.Systems
 			compHeight.Image.GetData(colorMap);
 
 			compHeight.HeightData = new Color[terrainWidth, terrainHeight];
-            mHeightData = new int[terrainWidth, terrainHeight];
+            mHeightData = new float[terrainWidth, terrainHeight];
             for (int x = 0; x < terrainWidth; x++) {
                 for (int y = 0; y < terrainHeight; y++) {
                     compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
-                    mHeightData[x, y] = colorMap[x + y * terrainWidth].R;
+                    mHeightData[x, y] = colorMap[x + y * terrainWidth].R + transformComponent.Position.Y;
                 }
             }
 
@@ -206,6 +209,7 @@ namespace EngineName.Systems
 				if (renderable.Value.GetType() != typeof(CHeightmap))
 					continue;
 				CHeightmap heightmap = (CHeightmap)renderable.Value;
+                int key = renderable.Key;
 				/* use each color channel for different data, e.g. 
 				 * R for height, 
 				 * G for texture/material/terrain type, 
@@ -221,7 +225,7 @@ namespace EngineName.Systems
 				var vertices = new Dictionary<int, VertexPositionNormalColor[]>();
 
 				CreateIndicesChunk(heightmap, ref indices, 0);
-				CalculateHeightData(heightmap);
+				CalculateHeightData(heightmap, key);
 				CreateVerticesChunks(heightmap, ref vertices, 0, 0);
 				basicEffect.Texture = heightmap.Image;
 				for (int j = 0; j < vertices.Values.Count; j++)
