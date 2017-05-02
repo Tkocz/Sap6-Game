@@ -21,6 +21,7 @@ namespace GameName.Scenes
             var mapSystem = new MapSystem();
             var waterSys = new WaterSystem();
             var physicsSys = new PhysicsSystem();
+            physicsSys.Bounds = new BoundingBox(-200.0f*Vector3.One, 200.0f*Vector3.One);
             AddSystems(
                 new FpsCounterSystem(updatesPerSec: 10),
                 new SkyBoxSystem(),
@@ -46,9 +47,9 @@ namespace GameName.Scenes
             float farplane = 1000f;
 
             int player = AddEntity();
-            AddComponent(player, new CBody() { Radius = 1, Aabb = new BoundingBox(-1 * Vector3.One, 1 * Vector3.One) } );
+            AddComponent(player, new CBody() { Radius = 1, Aabb = new BoundingBox(new Vector3(-1, 0, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f, Position = new Vector3(0, 5, 0) } );
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -40, 0), Scale = new Vector3(1f) } );
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(.05f) } );
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
             /*
             int ball = AddEntity();
@@ -57,7 +58,7 @@ namespace GameName.Scenes
             AddComponent<C3DRenderable>(ball, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/DummySphere") });
             */
 
-            AddComponent(camera, new CCamera(-5, 5){
+            AddComponent(camera, new CCamera(-5, 5) {
                 Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio,nearplane,farplane)
                 ,ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview*1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane*0.5f, farplane*1.2f)
             });
@@ -90,7 +91,7 @@ namespace GameName.Scenes
             // Heightmap entity
             int id = AddEntity();
             AddComponent<C3DRenderable>(id, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/HeightMap") });
-            AddComponent(id, new CTransform() { Position = new Vector3(-590, -255, -590), Rotation = Matrix.Identity, Scale = new Vector3(1) });
+            AddComponent(id, new CTransform() { Position = new Vector3(-590, -50, -590), Rotation = Matrix.Identity, Scale = new Vector3(1) });
             // manually start loading all heightmap components, should be moved/automated
             mapSystem.Load();
             waterSys.Load();

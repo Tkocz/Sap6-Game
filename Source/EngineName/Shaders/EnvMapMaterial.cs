@@ -67,10 +67,13 @@ public class EnvMapMaterial: MaterialShader {
                                             512,
                                             false,
                                             device.PresentationParameters.BackBufferFormat,
-                                            DepthFormat.Depth24,
+                                            DepthFormat.None,
                                             1,
                                             RenderTargetUsage.PreserveContents); // TODO: Needed?
         }
+
+        var bumpTex = Game1.Inst.Content.Load<Texture2D>("Textures/Bumpmap0");
+        mEffect.Parameters["BumpMap"].SetValue(bumpTex);
     }
 
     /// <summary>Initializes a new environment map.</summary>
@@ -96,6 +99,12 @@ public class EnvMapMaterial: MaterialShader {
         for (var i = 0; i < 6; i++) {
             mEffect.Parameters["EnvTex" + i.ToString()].SetValue(mEnvRTs[i]);
         }
+    }
+
+    /// <summary>Sets the camera position.</summary>
+    /// <param name="pos">The camera position, in world-space.</param>
+    public void SetCameraPos(Vector3 pos) {
+        mEffect.Parameters["CamPos"].SetValue(pos);
     }
 
     /// <summary>Updates the cube map by rendering each environment mapped cube face. NOTE: This is

@@ -16,19 +16,16 @@ namespace EngineName.Systems {
     public class InputSystem : EcsSystem {
         private MapSystem _mapSystem;
         private const float CAMERASPEED = 0.1f;
-        private Keys[] lastPressedKeys;
+
         public InputSystem() { }
 
         public InputSystem(MapSystem mapSystem) {
             _mapSystem = mapSystem;
         }
-       
-
 
         public override void Update(float t, float dt){
             KeyboardState currentState = Keyboard.GetState();
-            Keys[] pressedKeys = currentState.GetPressedKeys();
-            if (currentState.IsKeyDown(Keys.Escape))
+            if(currentState.IsKeyDown(Keys.Escape))
                 Game1.Inst.Exit();
 
             foreach (var input in Game1.Inst.Scene.GetComponents<CInput>()) {
@@ -36,73 +33,48 @@ namespace EngineName.Systems {
                 if (Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
                     body = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(input.Key);
                 }
-                if (Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key)){
-                    var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(input.Key);
-                    var inputValue = (CInput)input.Value;
+                var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(input.Key);
+                var inputValue = (CInput)input.Value;
+                if (Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key))
+                {
                     CCamera cameraComponent = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(input.Key);
 
-
-
-                    if (currentState.IsKeyDown(inputValue.CameraMovementForward)){
-                        transform.Position     += CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
+                    if (currentState.IsKeyDown(inputValue.CameraMovementForward))
+                    {
+                        transform.Position += CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
                         cameraComponent.Target += CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
-                    }           
-                    if (currentState.IsKeyDown(inputValue.CameraMovementBackward)){
-                        transform.Position     -= CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
+                    }
+                    if (currentState.IsKeyDown(inputValue.CameraMovementBackward))
+                    {
+                        transform.Position -= CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
                         cameraComponent.Target -= CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
                     }
-                    if (currentState.IsKeyDown(inputValue.CameraMovementLeft)){
+                    if (currentState.IsKeyDown(inputValue.CameraMovementLeft))
+                    {
                         cameraComponent.Heading -= 0.05f;
                         transform.Position = Vector3.Subtract(cameraComponent.Target, new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), cameraComponent.Height, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f))));
-                    }       
-                    if (currentState.IsKeyDown(inputValue.CameraMovementRight)){
+                    }
+                    if (currentState.IsKeyDown(inputValue.CameraMovementRight))
+                    {
                         cameraComponent.Heading += 0.05f;
                         transform.Position = Vector3.Subtract(cameraComponent.Target, new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), cameraComponent.Height, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f))));
-
                     }
-
-                    if (!Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
-                        continue;
-                    }
-
-                    if (_mapSystem != null)
-                        body.Position.Y = _mapSystem.HeightPosition(body.Position.X, body.Position.Z);
-
-                    if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
-                        body.Velocity.Z -= 5f;
-                    if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
-                        body.Velocity.Z += 5f;
-                    if (currentState.IsKeyDown(inputValue.LeftMovementKey))
-                        body.Velocity.X -= 5f;
-                    if (currentState.IsKeyDown(inputValue.RightMovementKey))
-                        body.Velocity.X += 5f;
-
-                    if (
-                        !currentState.IsKeyDown(inputValue.ForwardMovementKey) &&
-                        !currentState.IsKeyDown(inputValue.BackwardMovementKey) &&
-                        !currentState.IsKeyDown(inputValue.LeftMovementKey) &&
-                        !currentState.IsKeyDown(inputValue.RightMovementKey)
-                    )
-                    body.Velocity *= dt * 0.9f;
-
-                    body.Velocity.X = Math.Max(body.Velocity.X, 10);
-                    body.Velocity.Y = Math.Max(body.Velocity.Y, 10);                    
-                    
                 }
-                //TempChat
-               
-                {
-                    foreach (Keys key in pressedKeys)
-                    {
-                        if (!lastPressedKeys.Contains(key))
-                        {    
-                            Game1.Inst.RaiseInScene("key_to_write", key);
- 
-                        } 
-                    }
-                    //save the currently pressed keys so we can compare on the next update
-                    lastPressedKeys = pressedKeys;
+                if (!Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
+                    continue;
                 }
+                
+                var movementSpeed = dt*3f;
+                
+                if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
+                    body.Velocity.Z -= movementSpeed;
+                if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
+                    body.Velocity.Z += movementSpeed;
+                if (currentState.IsKeyDown(inputValue.LeftMovementKey))
+                    body.Velocity.X -= movementSpeed;
+                if (currentState.IsKeyDown(inputValue.RightMovementKey))
+                    body.Velocity.X += movementSpeed;
+
 
                 /*
 

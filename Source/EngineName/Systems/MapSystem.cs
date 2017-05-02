@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EngineName.Utils;
+using EngineName.Components;
 
 namespace EngineName.Systems
 {
@@ -16,7 +17,7 @@ namespace EngineName.Systems
 		private GraphicsDevice mGraphicsDevice;
 		private int chunksplit = 20;
 		private BasicEffect basicEffect;
-        private int[,] mHeightData;
+        private float[,] mHeightData;
 
         public override void Init()
 		{
@@ -27,24 +28,47 @@ namespace EngineName.Systems
 		}
         // Note: X is correct axis, but Y in this case actually is Z in game world (Y is for height)
         public float HeightPosition(float x, float y) {
-            if (x < 0 || x > 255 || y < 0 || y > 255)
-                return 0;
-            // get four closest vertices
-            int lowX =  (int)Math.Floor(x);
-            int highX = (int)Math.Floor(x+1);
-            int lowY =  (int)Math.Floor(y);
-            int highY = (int)Math.Floor(y+1);
+            foreach (var renderable in Game1.Inst.Scene.GetComponents<C3DRenderable>())
+            {
+                if (renderable.Value.GetType() != typeof(CHeightmap))
+                    continue;
+                var heightmap = (CHeightmap)renderable.Value;
+                var key = renderable.Key;
+                CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
 
-            var A = mHeightData[lowX, lowY];
-            var B = mHeightData[highX, lowY];
-            var C = mHeightData[lowX, highY];
-            var D = mHeightData[highX, highY];
+                x -= transform.Position.X;
+                y -= transform.Position.Z;
 
-            // P = (x, y)
-            // f(a,b,x) = xa + (1-x)b
-            // Pz = f(f(A,B,Px), f(C, D, Px), Py
-            
-            return A;
+                if (x < 0 || x > heightmap.Image.Width || y < 0 || y > heightmap.Image.Height)
+                    return 0;
+                // get four closest vertices
+                int lowX = (int)Math.Floor(x);
+                int highX = (int)Math.Floor(x + 1);
+                int lowY = (int)Math.Floor(y);
+                int highY = (int)Math.Floor(y + 1);
+
+                var A = mHeightData[lowX, lowY];
+                var B = mHeightData[highX, lowY];
+                var C = mHeightData[lowX, highY];
+                var D = mHeightData[highX, highY];
+
+                // lerp func
+                Func<float, float, float, float> f = (a, b, sigma) => (1.0f-sigma)*a + sigma*b;
+
+                // fractional parts
+                var fX = x - lowX;
+                var fY = y - lowY;
+
+                // 2d-interpolate over the square
+                var h = f(f(A, B, fX), f(C, D, fX), fY);
+
+                // P = (x, y)
+                // f(a,b,x) = xa + (1-x)b
+                // Pz = f(f(A,B,Px), f(C, D, Px), Py
+
+                return h;
+            }
+            return 0;
         }
 
 		private Color materialPick(int decimalCode)
@@ -124,8 +148,10 @@ namespace EngineName.Systems
 			return new ModelMeshPart { VertexBuffer = vertexBuffer, IndexBuffer = indexBuffer, NumVertices = indices.Length, PrimitiveCount = indices.Length / 3 };
 		}
 
-		private void CalculateHeightData(CHeightmap compHeight)
+		private void CalculateHeightData(CHeightmap compHeight, int key)
 		{
+            CTransform transformComponent = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+
 			int terrainWidth = compHeight.Image.Width;
 			int terrainHeight = compHeight.Image.Height;
 
@@ -133,11 +159,11 @@ namespace EngineName.Systems
 			compHeight.Image.GetData(colorMap);
 
 			compHeight.HeightData = new Color[terrainWidth, terrainHeight];
-            mHeightData = new int[terrainWidth, terrainHeight];
+            mHeightData = new float[terrainWidth, terrainHeight];
             for (int x = 0; x < terrainWidth; x++) {
                 for (int y = 0; y < terrainHeight; y++) {
                     compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
-                    mHeightData[x, y] = colorMap[x + y * terrainWidth].R;
+                    mHeightData[x, y] = colorMap[x + y * terrainWidth].R + transformComponent.Position.Y;
                 }
             }
 
@@ -206,10 +232,11 @@ namespace EngineName.Systems
 				if (renderable.Value.GetType() != typeof(CHeightmap))
 					continue;
 				CHeightmap heightmap = (CHeightmap)renderable.Value;
-				/* use each color channel for different data, e.g. 
-				 * R for height, 
-				 * G for texture/material/terrain type, 
-				 * B for fixed spawned models/entities (houses, trees etc.), 
+                int key = renderable.Key;
+				/* use each color channel for different data, e.g.
+				 * R for height,
+				 * G for texture/material/terrain type,
+				 * B for fixed spawned models/entities (houses, trees etc.),
 				 * A for additional data
 				*/
 
@@ -221,7 +248,7 @@ namespace EngineName.Systems
 				var vertices = new Dictionary<int, VertexPositionNormalColor[]>();
 
 				CreateIndicesChunk(heightmap, ref indices, 0);
-				CalculateHeightData(heightmap);
+				CalculateHeightData(heightmap, key);
 				CreateVerticesChunks(heightmap, ref vertices, 0, 0);
 				basicEffect.Texture = heightmap.Image;
 				for (int j = 0; j < vertices.Values.Count; j++)
