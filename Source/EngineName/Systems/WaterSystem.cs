@@ -24,7 +24,8 @@ namespace EngineName.Systems
         {
             mGraphicsDevice = Game1.Inst.GraphicsDevice;
             base.Init();
-            bEffect = new BasicEffect(mGraphicsDevice) { VertexColorEnabled = true };
+            bEffect = Game1.Inst.Content.Load<Effect>("Effects/Water");
+            bEffect.CurrentTechnique = bEffect.Techniques["BasicColorDrawing"];
         }
 
         public void Load()
@@ -54,7 +55,7 @@ namespace EngineName.Systems
                     for (int y = 0; y < terrainHeight; y++)
                     {
 
-                        vertices[x + y * terrainWidth].Position = new Vector3(x, heightmap.LowestPoint+10, y);
+                        vertices[x + y * terrainWidth].Position = new Vector3(x, heightmap.LowestPoint+200, y);
                         var color = Color.Blue;
                         color.A = 100;
                         vertices[x + y * terrainWidth].Color = color;
@@ -121,11 +122,12 @@ namespace EngineName.Systems
 
                 ModelMesh mesh = new ModelMesh(mGraphicsDevice, parts);
                 meshPart.Effect = bEffect;
+                
 
                 mesh.Name = "water";
                 mesh.BoundingSphere = BoundingSphere.CreateFromBoundingBox(new BoundingBox(new Vector3(0, heightmap.LowestPoint, 0), new Vector3(1081, heightmap.HeighestPoint, 1081)));
                 ModelBone bone = new ModelBone();
-                bone.Name = "Water";
+                bone.Name = "water";
                 bone.AddMesh(mesh);
                 bone.Transform = Matrix.Identity;
                 mesh.ParentBone = bone;
@@ -133,7 +135,7 @@ namespace EngineName.Systems
                 bones.Add(bone);
                 meshes.Add(mesh);
                 model = new Model(Game1.Inst.GraphicsDevice,bones,meshes);
- 
+                model.Tag = "water";
 
             }
             int id = Game1.Inst.Scene.AddEntity();

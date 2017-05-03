@@ -64,7 +64,23 @@ namespace EngineName.Systems
                         continue;
 
                     // TODO: This might bug out with multiple mesh parts.
-                    if (model.material != null) {
+                    if (model.model.Tag == "water") {
+
+                        foreach (ModelMesh shit in model.model.Meshes) {
+
+                            foreach (ModelMeshPart part in mesh.MeshParts) {
+                                part.Effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * transform.Frame);
+                                part.Effect.Parameters["View"].SetValue(camera.View);
+                                part.Effect.Parameters["Projection"].SetValue(camera.Projection);
+                                
+                                foreach (var pass in part.Effect.CurrentTechnique.Passes) {
+                                    pass.Apply();
+                                }
+                            }
+                            shit.Draw();
+                        }
+                    }
+                    else if (model.material != null) {
                         model.material.Model = mesh.ParentBone.Transform * transform.Frame;
                         model.material.View  = camera.View;
                         model.material.Proj  = camera.Projection;
