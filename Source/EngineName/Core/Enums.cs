@@ -10,10 +10,14 @@ namespace EngineName.Components
     {
         public enum MessageType
         {
-            StringMessage,
+            String,
             PeerInformation,
-            Object,
             CTransform,
+            Vector3,
+            Int,
+            Unknown,
+
+
         }
     }
 }

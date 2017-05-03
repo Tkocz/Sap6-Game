@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using EngineName.Components;
@@ -39,7 +40,8 @@ namespace EngineName.Systems
             _peer.DiscoverLocalPeers(_searchport);
 
             if (!_bot) { 
-                Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendMessage((string)data));
+                Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data , "metadata"));
+                Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
             }
 
             Debug.WriteLine("Listening on " + _config.Port.ToString());
@@ -62,8 +64,8 @@ namespace EngineName.Systems
                 if (counter % 5 == 0 && counter != 0)
                 {
                     counter++;
-                    SendObject(new CTransform() {Position = new Vector3(2,4,5)});
-                    SendMessage("hej from bot " + counter);
+                    SendObject(new CTransform() {Position = new Vector3(2,4,5)},"Player 1 Transform");
+                    SendObject(counter + "hej from bot","chatmessage");
                 }
 
             }
@@ -84,7 +86,7 @@ namespace EngineName.Systems
             Debug.WriteLine(string.Format("Broadcasting {0}:{1} to all (count: {2})", ip.ToString(),
                 port.ToString(), _peer.ConnectionsCount));
             NetOutgoingMessage msg = _peer.CreateMessage();
-            msg.Write((int)Enums.MessageType.PeerInformation);
+            msg.Write((byte)Enums.MessageType.PeerInformation);
             byte[] addressBytes = ip.GetAddressBytes();
             msg.Write(addressBytes.Length);
             msg.Write(addressBytes);
@@ -93,7 +95,7 @@ namespace EngineName.Systems
         }
 
         /// <summary>Send simple string to all peers </summary>
-        public void SendObject(object datatosend)
+        public void SendObject(object datatosend, string metadata)
         {
             if (!havePeers())
             {
@@ -101,11 +103,50 @@ namespace EngineName.Systems
                 return;
             }
             
+            Enums.MessageType type = Enums.MessageType.Unknown;
+            Enum.TryParse(datatosend.GetType().Name, out type);
+            if(type== Enums.MessageType.Unknown)
+                return;
+
             NetOutgoingMessage msg = _peer.CreateMessage();
-            msg.Write((byte)Enums.MessageType.Object);
+            switch (type)
+            {
+                case Enums.MessageType.CTransform:
+                    var dataTransform = (CTransform)datatosend;
+                    msg.Write((byte)type);
+                    msg.Write(metadata);
+                    msg.WriteCTransform(dataTransform);
+                    break;
+                case Enums.MessageType.Vector3:
+                    var datavector = (Vector3)datatosend;
+                    msg.Write((byte)type);
+                    msg.Write(metadata);
+                    msg.WriteUnitVector3(datavector, 1);
+                    break;
+                case Enums.MessageType.Int:
+                    int dataint = (int)datatosend;
+                    msg.Write((byte)type);
+                    msg.Write(metadata);
+                    msg.Write(dataint);
+                    break;
+                case Enums.MessageType.String:
+                    var datastring = (string)datatosend;
+                    msg.Write((byte)type);
+                    msg.Write(metadata);
+                    msg.Write(datastring);
+                    break;
+                default:
+                    Debug.WriteLine("unknownType");
+                    break;
+
+            }
+
+
+            
+
+            
+        
             //ability to send diffrent types of data with ease
-            var tranform = (CTransform)datatosend;
-            msg.WriteCTransform(tranform);
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
         }
         /// <summary>Send simple string to all peers </summary>
@@ -118,7 +159,7 @@ namespace EngineName.Systems
             }
             NetOutgoingMessage msg = _peer.CreateMessage();
 
-            msg.Write((byte)Enums.MessageType.StringMessage);
+            msg.Write((byte)Enums.MessageType.String);
             msg.Write(message);
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
@@ -138,6 +179,7 @@ namespace EngineName.Systems
                         // just connect to first server discovered
                         //Debug.WriteLine("ReceivePeersData DiscoveryResponse CONNECT");
                         _peer.Connect(_msg.SenderEndPoint);
+                        Game1.Inst.Scene.Raise("peer_data", _peer.Connections.Select(x => x.RemoteEndPoint.Address.ToString()).ToList());
                         break;
                     case NetIncomingMessageType.ConnectionApproval:
                         Debug.WriteLine("ReceivePeersData ConnectionApproval");
@@ -150,10 +192,13 @@ namespace EngineName.Systems
                         //Read TypeData First
                         Enums.MessageType mType = (Enums.MessageType) _msg.ReadByte();
            
-                        if (mType == Enums.MessageType.StringMessage)
+                        if (mType == Enums.MessageType.String)
                         {
                             if (!_bot)
-                                Game1.Inst.Scene.Raise("network_data_text", _msg.ReadString());
+                            {
+                                var metadata = _msg.ReadString();
+                                Game1.Inst.Scene.Raise("network_data_text", _msg.ReadString());                               
+                            }
                         }
                         else if (mType == Enums.MessageType.PeerInformation)
                         {
@@ -177,14 +222,25 @@ namespace EngineName.Systems
                                 }
                             }
                         }
-                        else if (mType == Enums.MessageType.Object)
+                        else if (mType == Enums.MessageType.CTransform)
                         {
-                            //determine what type of data
-                            //
+                            var metadata = _msg.ReadString();
                             var data = _msg.ReadCTransform();
                             Game1.Inst.Scene.Raise("network_data", data);
                         }
-                        Console.WriteLine("END ReceivePeersData Data");
+                        else if (mType == Enums.MessageType.Vector3)
+                        {
+                            var metadata = _msg.ReadString();
+                            var data = _msg.ReadCTransform();
+                            Game1.Inst.Scene.Raise("network_data", data);
+                        }
+                        else if (mType == Enums.MessageType.Int)
+                        {
+                            var metadata = _msg.ReadString();
+                            var data = _msg.ReadInt32();
+                            Game1.Inst.Scene.Raise("network_data", data);
+                        }
+                        //Console.WriteLine("END ReceivePeersData Data");
                         break;
                     case NetIncomingMessageType.UnconnectedData:
                         Debug.WriteLine("UnconnectedData: " + _msg.ReadString());

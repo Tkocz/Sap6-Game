@@ -40,23 +40,24 @@ namespace GameName.Scenes
             AddComponent(player, new CTransform() { Position = new Vector3(0, -40, 0), Scale = new Vector3(1f) });
             AddComponent<C2DRenderable>(player, new CText()
             {
-                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
+                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
                 format = "Type Here",
                 color = Color.White,
                 position = new Vector2(300, 750),
                 origin = Vector2.Zero
             });
 
-            int eid = AddEntity();
-            AddComponent<C2DRenderable>(eid, new CFPS
+            AddComponent<C2DRenderable>(AddEntity(), new CText()
             {
-                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
-                format = "Sap my Low-Poly Game",
+                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
+                format = "O peers",
                 color = Color.White,
                 position = new Vector2(300, 20),
-                origin = Vector2.Zero//
+                origin = Vector2.Zero
             });
-            eid = AddEntity();
+
+            int eid = AddEntity();
+      
             AddComponent<C2DRenderable>(eid, new CSprite
             {
                 texture = Game1.Inst.Content.Load<Texture2D>("Textures/clubbing"),
