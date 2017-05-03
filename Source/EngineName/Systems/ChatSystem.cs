@@ -14,7 +14,7 @@ namespace EngineName.Systems
 {
     public class ChatSystem : EcsSystem
     {
-        private int textheight = 320;
+        private int textheight = 100;
         public override void Init()
         {
             Game1.Inst.Scene.OnEvent("key_to_write", data => handleKey((Keys)data));
@@ -30,7 +30,7 @@ namespace EngineName.Systems
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
                 format = chatmessage,
                 color = Color.White,
-                position = new Vector2(300, textheight+=20),
+                position = new Vector2(300, textheight+=30),
                 origin = Vector2.Zero
             });
         }
@@ -38,8 +38,8 @@ namespace EngineName.Systems
         private void updatePeerStatus(List<string> peerdata)
         {
             var peer = (CText)Game1.Inst.Scene.GetComponentFromEntity<C2DRenderable>(1);
-            peer.format = "";
-            peer.format = peerdata.Count + " ";
+            peer.format = "Connected to ";
+            peer.format =+ peerdata.Count + " peers ";
             peerdata.ForEach(x => peer.format += " " + x);
 
         }
@@ -83,7 +83,8 @@ namespace EngineName.Systems
                 else
                     text.format += key.ToString();
             }
-           
+            text.format =  text.format.ToLower();
+
         }
         public override void Update(float t, float dt)
         {

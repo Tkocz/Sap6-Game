@@ -67,7 +67,7 @@ namespace GameName.Scenes
 
 
 
-            new Thread(NewThread).Start();
+            //new Thread(NewThread).Start();
             Log.Get().Debug("TestScene initialized.");
         }
        
