@@ -10,13 +10,13 @@ with.
 
     <FontName>DroidSans</FontName>
 
-    <Size>16</Size>
+    <Size>20</Size>
 
     <Spacing>0</Spacing>
 
     <UseKerning>true</UseKerning>
 
-    <Style>Bold</Style>
+    <Style>Regular</Style>
 
     <CharacterRegions>
       <CharacterRegion>

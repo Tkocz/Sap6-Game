@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Components\CBody.cs" />
     <Compile Include="Components\CInput.cs" />
+    <Compile Include="Components\CLogic.cs" />
+    <Compile Include="Components\CParticle.cs" />
     <Compile Include="Components\Renderable\C2DRenderable.cs" />
     <Compile Include="Components\Renderable\CHeightmap.cs" />
     <Compile Include="Components\Renderable\CImportedModel.cs" />
@@ -54,6 +56,7 @@
     <Compile Include="Components\Renderable\CRenderable.cs" />
     <Compile Include="Components\CTransform.cs" />
     <Compile Include="Components\Renderable\CSprite.cs" />
+    <Compile Include="Components\Renderable\CFPS.cs" />
     <Compile Include="Components\Renderable\CText.cs" />
     <Compile Include="Components\CCamera.cs" />
     <Compile Include="Core\EcsComponent.cs" />
@@ -63,10 +66,16 @@
     <Compile Include="Logging\Log.cs" />
     <Compile Include="MenuScene.cs" />
     <Compile Include="Scene.cs" />
+    <Compile Include="Shaders\EnvMapMaterial.cs" />
+    <Compile Include="Shaders\MaterialShader.cs" />
+    <Compile Include="Systems\AsyncMultiSystem.cs" />
     <Compile Include="Systems\CameraSystem.cs" />
+    <Compile Include="Systems\DebugOverlay.cs" />
     <Compile Include="Systems\FpsCounterSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
+    <Compile Include="Systems\LogicSystem.cs" />
     <Compile Include="Systems\MapSystem.cs" />
+    <Compile Include="Systems\ParticleSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\Rendering2DSystem.cs" />
     <Compile Include="Systems\RenderingSystem.cs" />
@@ -75,7 +84,9 @@
     <Compile Include="Systems\WaterSystem.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
+    <Compile Include="Utils\GfxUtil.cs" />
     <Compile Include="Utils\GraphicsUtil.cs" />
+    <Compile Include="Utils\SfxUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

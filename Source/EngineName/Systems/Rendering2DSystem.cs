@@ -37,7 +37,7 @@ namespace EngineName.Systems
                     CSprite sprite = (CSprite)component.Value;
                     DrawSprite(t, dt, sprite);
                 }
-                if (component.Value.GetType() == typeof(CText))
+                if (component.Value.GetType() == typeof(CText) || component.Value.GetType() == typeof(CFPS))
                 {
                     CText text = (CText)component.Value;
                     DrawText(t, dt, text);
@@ -57,13 +57,8 @@ namespace EngineName.Systems
         private void DrawText(float t, float dt, CText text)
         {
             if (text.format == null) return;
-            text.origin = MeasureString(text.font, text.format) / 2; //Center in middle of text
 
             mSpriteBatch.DrawString(text.font, text.format, text.position, text.color, 0f, text.origin, 1f, SpriteEffects.None, 0f);
-        }
-        private static Vector2 MeasureString(SpriteFont font, string text)
-        {
-            return font.MeasureString(text);
         }
     }
 }

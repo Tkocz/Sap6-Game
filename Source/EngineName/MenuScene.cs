@@ -117,6 +117,7 @@ public abstract class MenuScene: Scene {
         // Position the selection highlight before delegating drawing.
         mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
 
+        Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
 
         var keyboard = Keyboard.GetState();
@@ -128,6 +129,8 @@ public abstract class MenuScene: Scene {
                 if (mSelIndex < 0) {
                     mSelIndex = mItems.Count - 1;
                 }
+
+                Raise("selchanged", mSelIndex);
             }
 
             canMove = false;
@@ -139,6 +142,8 @@ public abstract class MenuScene: Scene {
                 if (mSelIndex >= mItems.Count) {
                     mSelIndex = 0;
                 }
+
+                Raise("selchanged", mSelIndex);
             }
 
             canMove = false;

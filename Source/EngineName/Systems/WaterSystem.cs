@@ -24,7 +24,8 @@ namespace EngineName.Systems
         {
             mGraphicsDevice = Game1.Inst.GraphicsDevice;
             base.Init();
-            bEffect = Game1.Inst.Content.Load<Effect>("TobbesEffect");
+            bEffect = Game1.Inst.Content.Load<Effect>("Effects/Water");
+            bEffect.CurrentTechnique = bEffect.Techniques["BasicColorDrawing"];
         }
 
         public void Load()
@@ -54,7 +55,7 @@ namespace EngineName.Systems
                     for (int y = 0; y < terrainHeight; y++)
                     {
 
-                        vertices[x + y * terrainWidth].Position = new Vector3(x, heightmap.LowestPoint+10, y);
+                        vertices[x + y * terrainWidth].Position = new Vector3(x, heightmap.LowestPoint+200, y);
                         var color = Color.Blue;
                         color.A = 100;
                         vertices[x + y * terrainWidth].Color = color;
@@ -121,8 +122,10 @@ namespace EngineName.Systems
 
                 ModelMesh mesh = new ModelMesh(mGraphicsDevice, parts);
                 meshPart.Effect = bEffect;
+                
 
                 mesh.Name = "water";
+                mesh.BoundingSphere = BoundingSphere.CreateFromBoundingBox(new BoundingBox(new Vector3(0, heightmap.LowestPoint, 0), new Vector3(1081, heightmap.HeighestPoint, 1081)));
                 ModelBone bone = new ModelBone();
                 bone.Name = "water";
                 bone.AddMesh(mesh);
@@ -137,7 +140,7 @@ namespace EngineName.Systems
             }
             int id = Game1.Inst.Scene.AddEntity();
            
-            Game1.Inst.Scene.AddComponent(id, new CTransform() { Position = new Vector3(-590, -900, -590) * 0.01f, Rotation = Matrix.Identity, Scale = new Vector3(0.01f) });
+            Game1.Inst.Scene.AddComponent(id, new CTransform() { Position = new Vector3(-590, -275, -590), Rotation = Matrix.Identity, Scale = new Vector3(1f) });
             CModel = new CImportedModel() { model = model };
             Game1.Inst.Scene.AddComponent<C3DRenderable>(id, CModel);
         }

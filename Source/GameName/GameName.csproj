@@ -42,6 +42,8 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Dev\CollTestScene1.cs" />
+    <Compile Include="Dev\CollTestScene2.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
@@ -77,3 +79,7 @@
   </Target>
   -->
 </Project>
+    <Compile Include="Dev\Collisions.cs" />
+    <Compile Include="Dev\Materials.cs" />
+    <Compile Include="Dev\Particles.cs" />
+    <Compile Include="Dev\PostFx.cs" />
