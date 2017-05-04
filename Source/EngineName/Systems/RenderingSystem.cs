@@ -27,16 +27,16 @@ namespace EngineName.Systems
             Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
 
-            foreach (CCamera camera in Game1.Inst.Scene.GetComponents<CCamera>().Values) {
-                DrawScene(camera);
+            foreach (var camera in Game1.Inst.Scene.GetComponents<CCamera>().Keys) {
+                DrawScene(camera, t, dt);
             }
             // debugging for software culling
             //Console.WriteLine(string.Format("{0} meshes drawn", counter));
         }
 
-        public void DrawScene(CCamera camera, int excludeEid=-1) {
+        public void DrawScene(int cameraID, float t, float dt, int excludeEid=-1) {
             // TODO: Clean code below up, hard to read.
-
+            CCamera camera = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(cameraID);
             foreach (CTransform transformComponent in Game1.Inst.Scene.GetComponents<CTransform>().Values)
             {
                 transformComponent.Frame = Matrix.CreateScale(transformComponent.Scale) *
@@ -72,7 +72,8 @@ namespace EngineName.Systems
                                 part.Effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * transform.Frame);
                                 part.Effect.Parameters["View"].SetValue(camera.View);
                                 part.Effect.Parameters["Projection"].SetValue(camera.Projection);
-                                
+                                part.Effect.Parameters["Time"].SetValue(t);                                CTransform cameraTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(cameraID);
+                                part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
                                 foreach (var pass in part.Effect.CurrentTechnique.Passes) {
                                     pass.Apply();
                                 }

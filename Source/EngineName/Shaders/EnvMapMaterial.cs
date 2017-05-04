@@ -138,7 +138,7 @@ public class EnvMapMaterial: MaterialShader {
                 mSkybox.DrawSkybox(cams[i]);
             }
 
-            mRenderer.DrawScene(cams[i], mEid);
+            //mRenderer.DrawScene(cams[i], mEid);
         }
 
         GfxUtil.SetRT(null);
