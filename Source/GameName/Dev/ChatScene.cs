@@ -50,7 +50,7 @@ namespace GameName.Scenes
             AddComponent<C2DRenderable>(AddEntity(), new CText()
             {
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
-                format = "O peers",
+                format = "0 peers",
                 color = Color.White,
                 position = new Vector2(300, 20),
                 origin = Vector2.Zero

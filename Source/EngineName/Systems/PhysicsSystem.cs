@@ -165,6 +165,7 @@ using static System.Math;
                 var mapHeight = MapSystem.HeightPosition(transform.Position.X, transform.Position.Z);
 
                 if(aabb1.Min.Y < mapHeight) {
+                    Scene.Raise("collisionwithground", null);
                     transform.Position.Y = mapHeight - body.Aabb.Min.Y;
                     body.Velocity.Y *= -0.5f;
                 }

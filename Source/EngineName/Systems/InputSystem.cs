@@ -12,12 +12,19 @@ namespace EngineName.Systems {
         private Keys[] lastPressedKeys;
         private Matrix addRot;
         private float yaw = 0, pitch = 0, roll = 0;
-
+        private bool isInAir = false;
         public InputSystem() { }
 
         public InputSystem(MapSystem mapSystem)
         {
             _mapSystem = mapSystem;
+        }
+
+        public override void Init()
+        {
+            Game1.Inst.Scene.OnEvent("collisionwithground", data => isInAir = false);
+            
+            base.Init();
         }
 
         public override void Update(float t, float dt)
@@ -90,6 +97,11 @@ namespace EngineName.Systems {
                 {
                     //body.Velocity.X += movementSpeed;
                     yaw = -dt;
+                }
+                if (currentState.IsKeyDown(Keys.Space) && !isInAir)
+                {
+                    body.Velocity.Y += 15f;
+                    isInAir = true;
                 }
                 addRot = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
                 
