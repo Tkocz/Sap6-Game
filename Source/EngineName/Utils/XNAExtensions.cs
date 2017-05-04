@@ -306,8 +306,8 @@ namespace EngineName.Utils
         {
             message.Write(transform.Position);
             message.Write(transform.Scale);
-            message.WriteMatrix(transform.Frame);
             message.WriteMatrix(transform.Rotation);
+            message.WriteMatrix(transform.Frame);
         }
     }
 }

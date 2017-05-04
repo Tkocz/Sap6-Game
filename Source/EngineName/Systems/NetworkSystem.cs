@@ -18,8 +18,8 @@ namespace EngineName.Systems
         private int _localport = 50001;
         private int _searchport = 50001;
         private NetIncomingMessage _msg;
-        private bool _bot = false; 
-
+        private bool _bot = false;
+        private Thread _scanThread;
         /// <summary>Inits networkssystems configures settings for lidgrens networks framework.</summary>
         public override void Init()
         {
@@ -27,8 +27,6 @@ namespace EngineName.Systems
             {
                 Port = _localport,
                 AcceptIncomingConnections = true
-                
-                
             };
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
@@ -44,10 +42,19 @@ namespace EngineName.Systems
                 Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
             }
 
-            Debug.WriteLine("Listening on " + _config.Port.ToString());
+            _scanThread = new Thread(ScanForNewPeers);
+            _scanThread.Start();
             base.Init();
         }
-
+        /// <summary>Periodically scan for new peers</summary>
+        private void ScanForNewPeers()
+        {
+            while (true)
+            {
+                _peer.DiscoverLocalPeers(_searchport);
+                Thread.Sleep(30000);
+            }   
+        }
 
         ///For testing only
         public void Bot()
@@ -67,7 +74,6 @@ namespace EngineName.Systems
                     SendObject(new CTransform() {Position = new Vector3(2,4,5)},"Player 1 Transform");
                     SendObject(counter + "hej from bot","chatmessage");
                 }
-
             }
         }
         /// <summary>Checks if have peers, so its possible to send stuff</summary>
@@ -75,7 +81,7 @@ namespace EngineName.Systems
         {
             return _peer.Connections != null && _peer.Connections.Count > 0;
         }
-        /// <summary>Send information about newly connected peer to all other peers </summary>
+        /// <summary>Send information about newly connected peer to all other peers for faster discovery </summary>
         public void SendPeerInfo(IPAddress ip, int port)
         {
             if (!havePeers())
@@ -140,28 +146,10 @@ namespace EngineName.Systems
                     break;
 
             }
-
-
-            
-
             
         
             //ability to send diffrent types of data with ease
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
-        }
-        /// <summary>Send simple string to all peers </summary>
-        public void SendMessage(string message)
-        {
-            if (!havePeers())
-            {
-                Debug.WriteLine("No connections to send to.");
-                return;
-            }
-            NetOutgoingMessage msg = _peer.CreateMessage();
-
-            msg.Write((byte)Enums.MessageType.String);
-            msg.Write(message);
-            _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
         /// <summary> Message loop to check type of message and handle it accordingly </summary>
         public void MessageLoop()
@@ -275,6 +263,13 @@ namespace EngineName.Systems
                         break;
                 }
             }
+        }
+
+        public override void Cleanup()
+        {
+            _scanThread.Abort();
+            _peer.Shutdown("Shutting Down");
+            base.Cleanup();
         }
 
         public override void Update(float t, float dt)
