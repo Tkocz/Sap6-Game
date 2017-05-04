@@ -1,3 +1,5 @@
+
+
 /*-------------------------------------
  * UNIFORMS
  *-----------------------------------*/
@@ -30,7 +32,7 @@ extern uniform float3 CamPos;
 
 // TODO: These should really be uniforms.
 static const float  Shininess = 10.0f;
-static const float3 LightPos  = float3(0.0f, 10.0f, 1.0f);
+static const float3 LightPos  = float3(0.0, 10.0, 1.0);
 
 /*-------------------------------------
  * STRUCTS
@@ -60,14 +62,14 @@ struct VS_OUTPUT {
 float3 bump(float2 uv) {
     return tex2D(bumpMap, uv*2.0).rgb;
     /* float2 a = uv; */
-    /* float2 b = uv + float2(1.0f/512.0f, 0.0f/512.0f); */
-    /* float2 c = uv + float2(0.0f/512.0f, 1.0f/512.0f); */
+    /* float2 b = uv + float2(1.0f/512.0, 0.0f/512.0); */
+    /* float2 c = uv + float2(0.0f/512.0, 1.0f/512.0); */
 
     /* float sa = tex2D(bumpMap, a).r; */
     /* float sb = tex2D(bumpMap, b).r; */
     /* float sc = tex2D(bumpMap, c).r; */
 
-    /* float3 disp = normalize(float3(sb - sa, sc - sa, 1.0f)); */
+    /* float3 disp = normalize(float3(sb - sa, sc - sa, 1.0)); */
 
     /* return disp; */
 }
@@ -129,7 +131,7 @@ float2 cubeMap(float3 p, out int i) {
         i  = 5;
     }
 
-    return float2(0.5f * (uc/mA + 1.0f), 0.5f * (vc / mA + 1.0f));
+    return float2(0.5f * (uc/mA + 1.0), 0.5f * (vc / mA + 1.0));
 }
 
 void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
@@ -141,13 +143,13 @@ void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
     float3 r = reflect(l, n);
 
     // Phong specularity
-    float3 s = float3(1.0f, 1.0f, 1.0f) * (pow(max(0.0f, dot(r, v)), Shininess));
+    float3 s = float3(1.0, 1.0, 1.0) * (pow(max(0.0, dot(r, v)), Shininess));
 
     int    i  = -1;
     float2 tc = cubeMap(h.xyz, i);
 
     // Not very neat, but it seems to do the job. :-)
-    psOut.color = float4(1.0f, 0.0f, 1.0f, 1.0f);
+    psOut.color = float4(1.0, 0.0, 1.0, 1.0);
          if (i == 0) psOut.color = tex2D(envMap0, tc).rgba;
     else if (i == 1) psOut.color = tex2D(envMap1, tc).rgba;
     else if (i == 2) psOut.color = tex2D(envMap2, tc).rgba;
@@ -155,7 +157,7 @@ void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
     else if (i == 4) psOut.color = tex2D(envMap4, tc).rgba;
     else if (i == 5) psOut.color = tex2D(envMap5, tc).rgba;
 
-    psOut.color += float4(s, 0.0f);
+    psOut.color += float4(s, 0.0);
 }
 
 void vsMain(in VS_INPUT vsIn, out VS_OUTPUT vsOut) {
@@ -164,7 +166,7 @@ void vsMain(in VS_INPUT vsIn, out VS_OUTPUT vsOut) {
     vsOut.screenPos = mul(viewPos, Proj);
     vsOut.worldPos  = worldPos.xyz;
     vsOut.texCoord  = vsIn.texCoord;
-    vsOut.norm      = normalize(mul(float4(vsIn.norm.xyz, 0.0f), Model).xyz);
+    vsOut.norm      = normalize(mul(float4(vsIn.norm.xyz, 0.0), Model).xyz);
 }
 
 technique T1 {
