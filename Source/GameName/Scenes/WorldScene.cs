@@ -47,7 +47,7 @@ namespace GameName.Scenes
             float farplane = 1000f;
 
             int player = AddEntity();
-            AddComponent(player, new CBody() { Radius = 1, Aabb = new BoundingBox(new Vector3(-1, 0, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f, Position = new Vector3(0, 5, 0) } );
+            AddComponent(player, new CBody() { Radius = 1, Aabb = new BoundingBox(new Vector3(-1, 0, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f } );
             AddComponent(player, new CInput());
             AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(.05f) } );
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });

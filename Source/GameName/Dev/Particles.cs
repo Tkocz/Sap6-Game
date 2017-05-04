@@ -99,7 +99,6 @@ public sealed class Particles: Scene {
         AddComponent(ball, new CBody { Aabb     = new BoundingBox(-r*Vector3.One, r*Vector3.One),
                                        Radius   = r,
                                        LinDrag  = 0.1f,
-                                       Position = p,
                                        Velocity = v });
 
         AddComponent(ball, new CTransform { Position = p,

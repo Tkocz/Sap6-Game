@@ -174,17 +174,18 @@ public sealed class DebugOverlay: EcsSystem {
         mAabbEffect.Projection = cam.Projection;
         mAabbEffect.View       = cam.View;
 
-        foreach (var component in Scene.GetComponents<CBody>().Values) {
-            var body = (CBody)component;
+        foreach (var component in Scene.GetComponents<CBody>()) {
+            var body = (CBody)component.Value;
+            var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(component.Key);
 
-            // Figure out the size of the aabb and scale our pre-computed aabb model accordingly.
-            // TODO: This probably only works for models centered on the origin, but ok for now.
-            var x = body.Aabb.Max.X - body.Aabb.Min.X;
+                // Figure out the size of the aabb and scale our pre-computed aabb model accordingly.
+                // TODO: This probably only works for models centered on the origin, but ok for now.
+                var x = body.Aabb.Max.X - body.Aabb.Min.X;
             var y = body.Aabb.Max.Y - body.Aabb.Min.Y;
             var z = body.Aabb.Max.Z - body.Aabb.Min.Z;
 
             mAabbEffect.World = Matrix.CreateScale(x, y, z)
-                              * Matrix.CreateTranslation(body.Position);
+                              * Matrix.CreateTranslation(transform.Position);
 
             // Draw the 12 lines making up the bounding box.
             mAabbEffect.CurrentTechnique.Passes[0].Apply();

@@ -116,15 +116,16 @@ using static System.Math;
         var scene = Game1.Inst.Scene;
         foreach (var e in scene.GetComponents<CBody>()) {
             var body = (CBody)e.Value;
+            var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(e.Key);
 
-            // TODO: Implement 4th order Runge-Kutta for differential equations.
-            // Symplectic Euler is ok for now so compute force before updating position!
-            body.Velocity += dt*(Gravity - body.InvMass*body.LinDrag*body.Velocity);
-            body.Position += dt*body.Velocity;
+                // TODO: Implement 4th order Runge-Kutta for differential equations.
+                // Symplectic Euler is ok for now so compute force before updating position!
+                body.Velocity += dt*(Gravity - body.InvMass*body.LinDrag*body.Velocity);
+            transform.Position += dt*body.Velocity;
 
             // Setup the AABBs and see if they intersect (inner loop). Intersection means we have a
             // *potential* collision. It needs to be verified and resolved by the fine-phase solver.
-            var p1    = body.Position;
+            var p1    = transform.Position;
             var aabb1 = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
 
             //----------------------------
@@ -133,44 +134,44 @@ using static System.Math;
 
             // TODO: Maybe refactor into own function? Looks messy.
             if (aabb1.Min.X < Bounds.Min.X) {
-                body.Position.X = Bounds.Min.X - body.Aabb.Min.X;
+                transform.Position.X = Bounds.Min.X - body.Aabb.Min.X;
                 body.Velocity.X *= -1.0f;
             }
             else if (aabb1.Max.X > Bounds.Max.X) {
-                body.Position.X = Bounds.Max.X - body.Aabb.Max.X;
+                transform.Position.X = Bounds.Max.X - body.Aabb.Max.X;
                 body.Velocity.X *= -1.0f;
             }
 
             if (aabb1.Min.Y < Bounds.Min.Y) {
-                body.Position.Y = Bounds.Min.Y - body.Aabb.Min.Y;
+                transform.Position.Y = Bounds.Min.Y - body.Aabb.Min.Y;
                 body.Velocity.Y *= -1.0f;
             }
             else if (aabb1.Max.Y > Bounds.Max.Y) {
-                body.Position.Y = Bounds.Max.Y - body.Aabb.Max.Y;
+                transform.Position.Y = Bounds.Max.Y - body.Aabb.Max.Y;
                 body.Velocity.Y *= -1.0f;
             }
 
             if (aabb1.Min.Z < Bounds.Min.Z) {
-                body.Position.Z = Bounds.Min.Z - body.Aabb.Min.Z;
+                transform.Position.Z = Bounds.Min.Z - body.Aabb.Min.Z;
                 body.Velocity.Z *= -1.0f;
             }
             else if (aabb1.Max.Z > Bounds.Max.Z) {
-                body.Position.Z = Bounds.Max.Z - body.Aabb.Max.Z;
+                transform.Position.Z = Bounds.Max.Z - body.Aabb.Max.Z;
                 body.Velocity.Z *= -1.0f;
             }
 
             if (MapSystem != null) {
-                var bodyPositionY = body.Position.Y;
-                var mapHeight = MapSystem.HeightPosition(body.Position.X, body.Position.Z);
+                var bodyPositionY = transform.Position.Y;
+                var mapHeight = MapSystem.HeightPosition(transform.Position.X, transform.Position.Z);
 
                 if(aabb1.Min.Y < mapHeight) {
-                    body.Position.Y = mapHeight - body.Aabb.Min.Y;
+                    transform.Position.Y = mapHeight - body.Aabb.Min.Y;
                     body.Velocity.Y *= -0.5f;
                 }
             }
 
             // Not sure what else to do. Need to update transform to match physical body position.
-            ((CTransform)scene.GetComponentFromEntity<CTransform>(e.Key)).Position = body.Position;
+            ((CTransform)scene.GetComponentFromEntity<CTransform>(e.Key)).Position = transform.Position;
 
             //----------------------------
             // Body-body collisions
@@ -178,13 +179,14 @@ using static System.Math;
 
             foreach (var e2 in scene.GetComponents<CBody>()) {
                 var body2 = (CBody)e2.Value;
+                var transform2 = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(e2.Key);
 
                 // Check entity IDs (.Key) to skip double-checking each potential collision.
                 if (e2.Key <= e.Key) {
                     continue;
                 }
 
-                var p2    = body2.Position;
+                var p2    = transform2.Position;
                 var aabb2 = new BoundingBox(p2 + body2.Aabb.Min, p2 + body2.Aabb.Max);
 
                 if (!aabb1.Intersects(aabb2)) {
@@ -214,13 +216,15 @@ using static System.Math;
         // Iterate over the collision pairs and solve actual collisions.
         foreach (var cp in mPotentialColls) {
             var s1 = ((CBody)scene.GetComponentFromEntity<CBody>(cp.First));
+            var t1 = (CTransform)scene.GetComponentFromEntity<CTransform>(cp.First);
             var s2 = ((CBody)scene.GetComponentFromEntity<CBody>(cp.Second));
+            var t2 = (CTransform)scene.GetComponentFromEntity<CTransform>(cp.Second);
 
-            // Any closer than this and the bodies are colliding
-            var minDist = s1.Radius + s2.Radius;
+                // Any closer than this and the bodies are colliding
+                var minDist = s1.Radius + s2.Radius;
 
             // Collision normal
-            var n = s1.Position - s2.Position;
+            var n = t1.Position - t2.Position;
 
             if (n.LengthSquared() >= minDist*minDist) {
                 // Not colliding.
@@ -249,13 +253,13 @@ using static System.Math;
 
             d = (minDist - d)*im; // Mass adjusted penetration distance
 
-            s1.Position += n*d*s1.InvMass;
+            t1.Position += n*d*s1.InvMass;
             s1.Velocity += n*p*s1.InvMass;
 
-            s2.Position -= n*d*s2.InvMass;
+            t2.Position -= n*d*s2.InvMass;
             s2.Velocity -= n*p*s2.InvMass;
 
-            var c = 0.5f*(s1.Position + s2.Position);
+            var c = 0.5f*(t1.Position + t2.Position);
 
             Scene.Raise("collision", new CollisionInfo { Entity1  = cp.First,
                                                          Entity2  = cp.Second,

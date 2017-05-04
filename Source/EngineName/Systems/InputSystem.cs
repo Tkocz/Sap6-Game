@@ -10,6 +10,8 @@ namespace EngineName.Systems {
         private MapSystem _mapSystem;
         private const float CAMERASPEED = 0.1f;
         private Keys[] lastPressedKeys;
+        private Matrix addRot;
+        private float yaw = 0, pitch = 0, roll = 0;
 
         public InputSystem() { }
 
@@ -22,6 +24,7 @@ namespace EngineName.Systems {
         {
             KeyboardState currentState = Keyboard.GetState();
             Keys[] pressedKeys = currentState.GetPressedKeys();
+            yaw = 0;
 
             foreach (var input in Game1.Inst.Scene.GetComponents<CInput>()) {
                 CBody body = null;
@@ -70,21 +73,31 @@ namespace EngineName.Systems {
                     continue;
                 }
                 
-                var movementSpeed = dt*3f;
+                var movementSpeed = dt*30f;
                 
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
-                    body.Velocity.Z -= movementSpeed;
+                    //body.Velocity.Z += movementSpeed;
+                    body.Velocity += movementSpeed * transform.Frame.Forward;
                 if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
-                    body.Velocity.Z += movementSpeed;
+                    //body.Velocity.Z -= movementSpeed;
+                    body.Velocity -= movementSpeed * transform.Frame.Backward;
                 if (currentState.IsKeyDown(inputValue.LeftMovementKey))
-                    body.Velocity.X -= movementSpeed;
+                {
+                    //body.Velocity.X -= movementSpeed;
+                    yaw = dt;
+                }
                 if (currentState.IsKeyDown(inputValue.RightMovementKey))
-                    body.Velocity.X += movementSpeed;
-
+                {
+                    //body.Velocity.X += movementSpeed;
+                    yaw = -dt;
+                }
+                addRot = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
+                
+                transform.Rotation *= addRot;
 
 
                 //save the currently pressed keys so we can compare on the next update
-             
+
 
                 /*
 
