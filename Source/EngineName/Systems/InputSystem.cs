@@ -81,7 +81,7 @@ namespace EngineName.Systems {
                 }
                 
                 var movementSpeed = dt*30f;
-                
+                // TODO: Fix backwards movement
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
                     //body.Velocity.Z += movementSpeed;
                     body.Velocity += movementSpeed * transform.Frame.Forward;
