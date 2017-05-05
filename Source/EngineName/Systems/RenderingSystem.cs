@@ -13,9 +13,11 @@ namespace EngineName.Systems
 {
     public class RenderingSystem : EcsSystem {
         private GraphicsDevice mGraphicsDevice;
-
+        private Texture2D normalMap;
         public override void Init() {
             mGraphicsDevice = Game1.Inst.GraphicsDevice;
+            normalMap = Game1.Inst.Content.Load<Texture2D>("Textures/water_bump");
+
             base.Init();
         }
         public override void Update(float t, float dt) {
@@ -68,12 +70,38 @@ namespace EngineName.Systems
 
                         foreach (ModelMesh shit in model.model.Meshes) {
 
-                            foreach (ModelMeshPart part in mesh.MeshParts) {
-                                part.Effect.Parameters["World"].SetValue(mesh.ParentBone.Transform * transform.Frame);
-                                part.Effect.Parameters["View"].SetValue(camera.View);
+                            foreach (ModelMeshPart part in mesh.MeshParts) {                                Matrix world = mesh.ParentBone.Transform * transform.Frame;
+
+                                part.Effect.Parameters["World"].SetValue(world);
+                                part.Effect.Parameters["View"].SetValue(camera.View);
                                 part.Effect.Parameters["Projection"].SetValue(camera.Projection);
-                                part.Effect.Parameters["Time"].SetValue(t);                                CTransform cameraTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(cameraID);
-                                part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
+                                part.Effect.Parameters["AmbientColor"].SetValue(new Vector4(0f, 0f, 1f, 1f));
+                                part.Effect.Parameters["AmbientIntensity"].SetValue(0.5f);
+                                
+                                part.Effect.Parameters["DiffuseLightDirection"].SetValue(new Vector3(0.5f, -0.5f, 0.5f));
+                                part.Effect.Parameters["DiffuseColor"].SetValue(new Vector4(0f, 0.8f, 0f, 1f));
+                                part.Effect.Parameters["DiffuseIntensity"].SetValue(0.5f);
+
+
+                                //Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * world));
+                                //part.Effect.Parameters["WorldInverseTranspose"].SetValue(world);
+
+                                CTransform cameraTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(cameraID);
+
+                                var viewVector = (camera.Target - cameraTransform.Position);
+                                viewVector.Normalize();
+                                //part.Effect.Parameters["ViewVector"].SetValue(viewVector);
+
+                                part.Effect.Parameters["Shininess"].SetValue(200f);
+                                part.Effect.Parameters["SpecularColor"].SetValue(new Vector4(1, 1, 1, 1));
+                                part.Effect.Parameters["SpecularIntensity"].SetValue(200f);
+
+                                //effect.Parameters["ModelTexture"].SetValue(texture);
+                                part.Effect.Parameters["NormalMap"].SetValue(normalMap);
+                                part.Effect.Parameters["BumpConstant"].SetValue(4 + 3 * (float)Math.Cos(t));
+
+                                part.Effect.Parameters["Time"].SetValue(t);
+                                //part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
                                 foreach (var pass in part.Effect.CurrentTechnique.Passes) {
                                     pass.Apply();
                                 }

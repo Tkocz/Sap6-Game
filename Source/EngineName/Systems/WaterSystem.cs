@@ -15,7 +15,7 @@ namespace EngineName.Systems
     {
         private GraphicsDevice mGraphicsDevice;
         private int[] indices  =null;
-        private VertexPositionNormalColor[] vertices;
+        private VertexPositionNormalTexture[] vertices;
         private CImportedModel CModel;
         private int[] vibirations;
         private Effect bEffect;
@@ -44,11 +44,11 @@ namespace EngineName.Systems
 
                 var terrainHeight = heightmap.Image.Height;
                 var terrainWidth = heightmap.Image.Width;
-                var resolution = 30; // vertices per direction
+                var resolution = 100; // vertices per direction
                 //
                 int counter = 0;
                 indices = new int[(resolution - 1) * (resolution - 1) * 6];
-                vertices = new VertexPositionNormalColor[resolution * resolution];
+                vertices = new VertexPositionNormalTexture[resolution * resolution];
                 // Create vertices
                 for (int x = 0; x < resolution; x++)
                 {
@@ -57,7 +57,7 @@ namespace EngineName.Systems
                         vertices[x + y * resolution].Position = new Vector3((terrainWidth/resolution)*x, heightmap.LowestPoint + 200, (terrainHeight/resolution)*y);
                         var color = Color.Blue;
                         color.A = 100;
-                        vertices[x + y * resolution].Color = color;
+                        vertices[x + y * resolution].TextureCoordinate = new Vector2(x * 0.005f, y * 0.005f);
                     }
                 }
                 for (int y = 0; y < resolution - 1; y++)
@@ -99,7 +99,7 @@ namespace EngineName.Systems
 
 
 
-                var vertexBuffer = new VertexBuffer(mGraphicsDevice, VertexPositionNormalColor.VertexDeclaration,
+                var vertexBuffer = new VertexBuffer(mGraphicsDevice, VertexPositionNormalTexture.VertexDeclaration,
                     vertices.Length, BufferUsage.None);
                 vertexBuffer.SetData(vertices);
                 var indexBuffer = new IndexBuffer(mGraphicsDevice, typeof(int), indices.Length, BufferUsage.None);
