@@ -31,7 +31,7 @@ public static class Game {
         Log.ToFile();
 
         // TODO: Create initial scene.
-	using (var game = new Game1(new Dev.Collisions2())) {
+	using (var game = new Game1(new MainMenu())) {
             game.Run();
         }
 
