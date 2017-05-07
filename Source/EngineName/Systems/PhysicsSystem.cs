@@ -344,7 +344,14 @@ public class PhysicsSystem: EcsSystem {
                                                      Position = c });
     }
 
+    /// <summary>Solves a collision between a body and a (static) oriented bounding box.</summary>
+    /// <param name="cp">The collision to solve.</param>
     private void SolveBodyBox(Pair<int, int> cp) {
+        // So what's really going on here? Well, we're basically transforming the body into the
+        // box's frame-of-reference and solving the collision as if the box was axis-aligned. Then,
+        // we transform the normal back into world-space and apply it as an impulse to the body.
+        // Seems to work nicely! :-D
+
         var scene = Game1.Inst.Scene;
 
         var body = ((CBody)scene.GetComponentFromEntity<CBody>(cp.First));
