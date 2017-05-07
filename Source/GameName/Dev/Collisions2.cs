@@ -108,6 +108,11 @@ public sealed class Collisions2: Scene {
         return ball;
     }
 
+    /// <summary>Creates a static, oriented bounding box.</summary>
+    /// <param name="pos">The position of the box.</param>
+    /// <param name="dim">The box dimensions, or size.</param>
+    /// <param name="rotAxis">The axis of rotation (concerning the box's transformation).</param>
+    /// <param name="rotDeg">The rotation, in degrees (concerning the box's transformation).</param>
     private void CreateBox(Vector3 pos, Vector3 dim, Vector3 rotAxis, float rotDeg) {
         var rotRad = MathHelper.ToRadians(rotDeg);
 
