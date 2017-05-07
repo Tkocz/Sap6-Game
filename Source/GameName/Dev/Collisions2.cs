@@ -23,7 +23,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 /// <summary>Provides a simple test case for collisions. Running it, you should see several spheres
 ///          colliding on the screen in a sane manner.</summary>
-public sealed class Collisions: Scene {
+public sealed class Collisions2: Scene {
     //--------------------------------------
     // NON-PUBLIC FIELDS
     //--------------------------------------
@@ -51,11 +51,23 @@ public sealed class Collisions: Scene {
         InitCam();
 
         // Spawn a few balls.
-        for (var i = 0; i < 10; i++) {
-            var r = 1.0f; // TODO: Random size and mass.
-            CreateBall(new Vector3(0.9f*i - 3.5f, 0.3f*i, 0.0f), // Position
-                       new Vector3(         1.0f, 0.0f  , 0.0f), // Velocity
-                       r);                                       // Radius
+        for (var i = 0; i < 3; i++) {
+            var r = 1.0f;
+            CreateBall(new Vector3(-4.5f + i*0.5f, 6.0f + 2.0f*i, 0.0f), // Position
+                       new Vector3(0.0f          , 0.0f         , 0.0f), // Velocity
+                       r);                                               // Radius
+        }
+
+        var dist = 8.5f;
+        for (var i = 0; i < 2; i++) {
+            var a = i - 1.0f;
+            var b = a + 0.5f;
+            CreateBox(5.0f*Vector3.Right + dist*a*Vector3.Up,
+                      new Vector3(6.0f, 0.5f, 1.0f),
+                      Vector3.Backward, 20.0f);
+            CreateBox(5.0f*Vector3.Left + dist*b*Vector3.Up,
+                      new Vector3(6.0f, 0.5f, 1.0f),
+                      Vector3.Backward, -20.0f);
         }
     }
 
@@ -79,10 +91,11 @@ public sealed class Collisions: Scene {
     private int CreateBall(Vector3 p, Vector3 v, float r=1.0f) {
         var ball = AddEntity();
 
-        AddComponent(ball, new CBody { Aabb     = new BoundingBox(-r*Vector3.One, r*Vector3.One),
-                                       Radius   = r,
-                                       LinDrag  = 0.1f,
-                                       Velocity = v });
+        AddComponent(ball, new CBody { Aabb        = new BoundingBox(-r*Vector3.One, r*Vector3.One),
+                                       Radius      = r,
+                                       LinDrag     = 0.1f,
+                                       Velocity    = v,
+                                       Restitution = 0.3f});
 
         AddComponent(ball, new CTransform { Position = p,
                                             Rotation = Matrix.Identity,
@@ -93,6 +106,25 @@ public sealed class Collisions: Scene {
         });
 
         return ball;
+    }
+
+    private void CreateBox(Vector3 pos, Vector3 dim, Vector3 rotAxis, float rotDeg) {
+        var rotRad = MathHelper.ToRadians(rotDeg);
+
+        var box1 = AddEntity();
+
+        AddComponent<C3DRenderable>(box1, new CImportedModel {
+            model  = Game1.Inst.Content.Load<Model>("Models/DummyBox")
+        });
+
+        var rot = Matrix.CreateFromAxisAngle(rotAxis, rotRad);
+        var invRot = Matrix.Invert(rot);
+
+        AddComponent(box1, new CTransform { Position = pos,
+                                            Rotation = rot,
+                                            Scale    = dim });
+
+        AddComponent(box1, new CBox { Box = new BoundingBox(-dim, dim), InvTransf = invRot });
     }
 
     /// <summary>Sets up the camera.</summary>

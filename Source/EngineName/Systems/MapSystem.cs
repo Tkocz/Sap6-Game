@@ -86,6 +86,7 @@ namespace EngineName.Systems
 			}
 		}
 
+
 		private void CreateIndicesChunk(CHeightmap heightMap, ref Dictionary<int, int[]> indicesdict, int reCurisiveCounter)
 		{
 			int terrainWidthChunk = heightMap.Image.Width / chunksplit;
