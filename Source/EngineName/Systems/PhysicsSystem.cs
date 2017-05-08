@@ -379,7 +379,7 @@ public class PhysicsSystem: EcsSystem {
 
         // Collision normal
         var n = Vector3.Transform(d, boxTransf.Rotation);
-        if (Vector3.Dot(body.Velocity, n) > 0.0f) {
+        if (Vector3.Dot(body.Velocity, n) > 0.001f) {
             // Body is moving away from box already.
             return;
         }

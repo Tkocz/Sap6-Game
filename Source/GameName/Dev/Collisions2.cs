@@ -37,10 +37,15 @@ public sealed class Collisions2: Scene {
 
     /// <summary>Initializes the scene.</summary>
     public override void Init() {
+        PhysicsSystem physics;
+
         AddSystems(new                    LogicSystem(),
-                   new                  PhysicsSystem(),
+                   physics      =   new PhysicsSystem(),
                    new                   CameraSystem(),
                    mRenderer    = new RenderingSystem());
+
+        physics.Bounds = new BoundingBox(-50.0f*Vector3.One, 50.0f*Vector3.One);
+        physics.Gravity *= 10.0f;
 
 #if DEBUG
         AddSystem(new DebugOverlay());
@@ -51,22 +56,22 @@ public sealed class Collisions2: Scene {
         InitCam();
 
         // Spawn a few balls.
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < 100; i++) {
             var r = 1.0f;
-            CreateBall(new Vector3(-4.5f + i*0.5f, 6.0f + 2.0f*i, 0.0f), // Position
+            CreateBall(new Vector3(-4.5f + i*0.05f, 20.0f + 2.0f*i, 0.0f), // Position
                        new Vector3(0.0f          , 0.0f         , 0.0f), // Velocity
                        r);                                               // Radius
         }
 
         var dist = 8.5f;
-        for (var i = 0; i < 2; i++) {
+        for (var i = 0; i < 10; i++) {
             var a = i - 1.0f;
             var b = a + 0.5f;
-            CreateBox(5.0f*Vector3.Right + dist*a*Vector3.Up,
-                      new Vector3(6.0f, 0.5f, 1.0f),
+            CreateBox(13.0f*Vector3.Right + dist*a*Vector3.Up,
+                      new Vector3(15.0f, 0.5f, 1.0f),
                       Vector3.Backward, 20.0f);
-            CreateBox(5.0f*Vector3.Left + dist*b*Vector3.Up,
-                      new Vector3(6.0f, 0.5f, 1.0f),
+            CreateBox(13.0f*Vector3.Left + dist*b*Vector3.Up,
+                      new Vector3(15.0f, 0.5f, 1.0f),
                       Vector3.Backward, -20.0f);
         }
     }
@@ -143,9 +148,10 @@ public sealed class Collisions2: Scene {
         var proj   = Matrix.CreatePerspectiveFieldOfView(fovRad, aspect, zNear, zFar);
 
         AddComponent(cam, new CCamera { ClipProjection = proj,
-                                        Projection     = proj });
+                                        Projection     = proj,
+                                        Target = new Vector3(0.0f, 20.0f, 0.0f) });
 
-        AddComponent(cam, new CTransform { Position = new Vector3(0.0f, 0.0f, 18.0f),
+        AddComponent(cam, new CTransform { Position = new Vector3(0.0f, 20.0f, 38.0f),
                                            Rotation = Matrix.Identity,
                                            Scale    = Vector3.One });
 
