@@ -1,5 +1,4 @@
-﻿namespace EngineName.Systems
-{
+﻿namespace EngineName.Systems {
 
 //--------------------------------------
 // USINGS
@@ -115,12 +114,13 @@ public class PhysicsSystem: EcsSystem {
     /// <param name="dt">The time, in seconds, since the last call to this
     ///                  method.</param>
     public override void Update(float t, float dt) {
+        var scene = Game1.Inst.Scene;
+
         // Basically, use semi-implicit Euler to integrate all positions and then sweep coarsely for
         // AABB collisions. All potential collisions are passed on to the fine-phase solver.
         mColls1.Clear();
         mColls2.Clear();
 
-        var scene = Game1.Inst.Scene;
         foreach (var e in scene.GetComponents<CBody>()) {
             var body   = (CBody)e.Value;
             var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
@@ -291,6 +291,7 @@ public class PhysicsSystem: EcsSystem {
         // Proably something to do with "Moving away from each other" check.
 
         var scene = Game1.Inst.Scene;
+
         var s1 = ((CBody)scene.GetComponentFromEntity<CBody>(cp.First));
         var s2 = ((CBody)scene.GetComponentFromEntity<CBody>(cp.Second));
         var t1 = (CTransform)scene.GetComponentFromEntity<CTransform>(cp.First);
@@ -330,8 +331,7 @@ public class PhysicsSystem: EcsSystem {
         d = (minDist - d)*im; // Mass adjusted penetration distance
 
         t1.Position += n*d*s1.InvMass;
-        s1.Velocity += n*p*s1.InvMass;
-
+        s1.Velocity += n*p*s1.Inv
         t2.Position -= n*d*s2.InvMass;
         s2.Velocity -= n*p*s2.InvMass;
 
@@ -372,6 +372,7 @@ public class PhysicsSystem: EcsSystem {
         var dist2 = d.LengthSquared();
 
         if (dist2 >= minDist2) {
+            // Not colliding.
             return;
         }
 
@@ -379,21 +380,24 @@ public class PhysicsSystem: EcsSystem {
 
         // Collision normal
         var n = Vector3.Transform(d, boxTransf.Rotation);
-        if (Vector3.Dot(body.Velocity, n) > 0.001f) {
+        if (Vector3.Dot(body.Velocity, n) > 0.0f) {
             // Body is moving away from box already.
             return;
         }
 
         if (n.Length() < 0.001f) {
+            // TODO: Don't think this is needed?
             return;
         }
 
         n.Normalize();
+
+        var e = (1.0f + body.Restitution);
         var i = Vector3.Reflect(body.Velocity, n);
 
-        bodyTransf.Position += r*n;
-        body.Velocity += (1.0f + body.Restitution) * n * Vector3.Dot(i, n);
 
+        bodyTransf.Position += r*n;
+        body.Velocity += e*n*Vector3.Dot(i, n);
     }
 }
 
