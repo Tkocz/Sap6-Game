@@ -45,6 +45,9 @@ public sealed class Collisions2: Scene {
                    mRenderer    = new RenderingSystem());
 
         physics.Bounds = new BoundingBox(-50.0f*Vector3.One, 50.0f*Vector3.One);
+
+        // Cheap hack to make balls behave like small marbles. Could also just change the scale of
+        // the world, but doesn't matter for this scene.
         physics.Gravity *= 10.0f;
 
 #if DEBUG
