@@ -29,7 +29,7 @@ namespace GameName.Scenes
                 new CameraSystem(),
                 physicsSys,
                 mapSystem,
-                new InputSystem(mapSystem),
+                new InputSystem(),
                 waterSys,
                 new Rendering2DSystem()
 
