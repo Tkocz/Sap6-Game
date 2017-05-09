@@ -47,10 +47,9 @@ public sealed class Collisions2: Scene {
     public override void Init() {
         PhysicsSystem physics;
 
-        AddSystems(new                    LogicSystem(),
-                   physics      =   new PhysicsSystem(),
-                   new                   CameraSystem(),
-                                  new RenderingSystem());
+        AddSystems(physics = new PhysicsSystem(),
+                              new CameraSystem(),
+                           new RenderingSystem());
 
         physics.Bounds = new BoundingBox(-50.0f*Vector3.One, 50.0f*Vector3.One);
 
@@ -73,11 +72,11 @@ public sealed class Collisions2: Scene {
             new Vector3(1.0f, 1.0f, 1.0f),
             new Vector3(1.0f, 0.8f, 0.9f),
             new Vector3(1.0f, 0.4f, 0.5f),
-            new Vector3(1.0f, 0.2f, 0.8f),
+            new Vector3(1.0f, 0.3f, 0.7f),
         };
 
         // Spawn a few balls.
-        for (var i = 0; i < 200; i++) {
+        for (var i = 0; i < 300; i++) {
             var r = 0.6f + (float)rnd.NextDouble()*1.0f;
             CreateBall(new Vector3(-4.5f + i*0.05f, 20.0f + 2.0f*i, (float)Math.Cos(i)), // Position
                        new Vector3(0.0f           , 0.0f          , 0.0f              ), // Velocity
