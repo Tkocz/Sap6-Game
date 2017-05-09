@@ -128,6 +128,7 @@
 #begin Fonts\sector034.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts\sector034.spritefont
 
@@ -158,6 +159,7 @@
 #begin Fonts/DroidSans.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts/DroidSans.spritefont
 
@@ -271,4 +273,10 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=DxtCompressed
 /build:Models/DummyBox.fbx
+
+#begin Effects/AdsMaterial.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/AdsMaterial.fx
 

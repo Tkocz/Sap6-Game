@@ -13,13 +13,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 /// <summary>Represents a material shader used to render objects in the world.</summary>
 public class MaterialShader {
-
     //--------------------------------------
     // NON-PUBLIC FIELDS
     //--------------------------------------
 
     /// <summary>The effect used to render the material in the GPU.</summary>
     internal readonly Effect mEffect;
+
+    /// <summary>The camera position.</summary>
+    private Vector3 mCamPos;
+
+    /// <summary>The camera position shader parameter.</summary>
+    private EffectParameter mCamPosParam;
 
     /// <summary>The model matrix.</summary>
     private Matrix mModel;
@@ -42,6 +47,21 @@ public class MaterialShader {
     //--------------------------------------
     // PUBLIC PROPERTIES
     //--------------------------------------
+
+    /// <summary>Gets or sets the camera position.</summary>
+    public Vector3 CamPos {
+        get {
+            return mCamPos;
+        }
+
+        set {
+            mCamPos = value;
+
+            if (mCamPosParam != null) {
+                mCamPosParam.SetValue(value);
+            }
+        }
+    }
 
     /// <summary>Gets or sets the model matrix.</summary>
     public Matrix Model {
@@ -88,14 +108,14 @@ public class MaterialShader {
     public MaterialShader(Effect effect) {
         mEffect = effect;
 
-        mModelParam = effect.Parameters["Model"];
-        mProjParam  = effect.Parameters["Proj"];
-        mViewParam  = effect.Parameters["View"];
+        mCamPosParam = effect.Parameters["CamPos"];
+        mModelParam  = effect.Parameters["Model"];
+        mProjParam   = effect.Parameters["Proj"];
+        mViewParam   = effect.Parameters["View"];
     }
 
     /// <summary>Called just before the material is rendered.</summary>
     public virtual void Prerender() {
-
     }
 }
 

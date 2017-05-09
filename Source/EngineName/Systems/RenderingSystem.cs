@@ -27,14 +27,15 @@ namespace EngineName.Systems
             Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
 
-            foreach (CCamera camera in Game1.Inst.Scene.GetComponents<CCamera>().Values) {
-                DrawScene(camera);
+            foreach (var camera in Game1.Inst.Scene.GetComponents<CCamera>()) {
+                var camPos = ((CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(camera.Key)).Position;
+                DrawScene((CCamera)(camera.Value), -1, camPos);
             }
             // debugging for software culling
             //Console.WriteLine(string.Format("{0} meshes drawn", counter));
         }
 
-        public void DrawScene(CCamera camera, int excludeEid=-1) {
+        public void DrawScene(CCamera camera, int excludeEid=-1, Vector3? camPos=null) {
             // TODO: Clean code below up, hard to read.
 
             foreach (CTransform transformComponent in Game1.Inst.Scene.GetComponents<CTransform>().Values)
@@ -65,6 +66,9 @@ namespace EngineName.Systems
 
                     // TODO: This might bug out with multiple mesh parts.
                     if (model.material != null) {
+                        if (camPos.HasValue) {
+                            model.material.CamPos = camPos.Value;
+                        }
                         model.material.Model = mesh.ParentBone.Transform * transform.Frame;
                         model.material.View  = camera.View;
                         model.material.Proj  = camera.Projection;

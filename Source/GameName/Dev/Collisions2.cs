@@ -33,7 +33,7 @@ public sealed class Collisions2: Scene {
     private int mCamID;
 
     /// <summary>Whether slow motion is enabled.</summary>
-    private bool mSlowMo;
+    private bool mSlowMo = true;
 
     /// <summary>Whether the user can toggle slow motion - used to prevent accidental
     ///          spamming.</summary>
@@ -68,36 +68,46 @@ public sealed class Collisions2: Scene {
 
         var rnd = new System.Random();
 
+        // Colors to pick from when spawning balls.
+        var cols = new [] {
+            new Vector3(1.0f, 1.0f, 1.0f),
+            new Vector3(1.0f, 0.8f, 0.9f),
+            new Vector3(1.0f, 0.4f, 0.5f),
+            new Vector3(1.0f, 0.2f, 0.8f),
+        };
+
         // Spawn a few balls.
         for (var i = 0; i < 200; i++) {
             var r = 0.6f + (float)rnd.NextDouble()*1.0f;
             CreateBall(new Vector3(-4.5f + i*0.05f, 20.0f + 2.0f*i, (float)Math.Cos(i)), // Position
                        new Vector3(0.0f           , 0.0f          , 0.0f              ), // Velocity
-                       r);                                                               // Radius
+                       r,                                                                // Radius
+                       cols[rnd.Next(cols.Length)]);                                     // Color
         }
 
         var dist = 25.0f;
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 2; i++) {
             var a = i - 1.0f;
             var b = a + 0.25f;
             var c = b + 0.25f;
             var d = c + 0.25f;
 
-            var size = new Vector3(25.0f, 0.5f, 25.0f);
+            var size = new Vector3(20.0f, 0.5f, 20.0f);
+            var rot  = 25.0f;
 
             CreateBox(13.0f*Vector3.Right + dist*a*Vector3.Up + 10.0f*Vector3.Forward,
                       size,
-                      Vector3.Backward + Vector3.Right, 15.0f);
+                      Vector3.Backward + Vector3.Right, rot);
             CreateBox(13.0f*Vector3.Left + dist*c*Vector3.Up + 10.0f*Vector3.Forward,
                       size,
-                      Vector3.Backward - Vector3.Right, -15.0f);
+                      Vector3.Backward - Vector3.Right, -rot);
 
             CreateBox(13.0f*Vector3.Right + dist*b*Vector3.Up + 10.0f*Vector3.Backward,
                       size,
-                      Vector3.Backward - Vector3.Right, 15.0f);
+                      Vector3.Backward - Vector3.Right, rot);
             CreateBox(13.0f*Vector3.Left + dist*d*Vector3.Up + 10.0f*Vector3.Backward,
                       size,
-                      Vector3.Backward + Vector3.Right, -15.0f);
+                      Vector3.Backward + Vector3.Right, -rot);
         }
     }
 
@@ -236,21 +246,26 @@ public sealed class Collisions2: Scene {
     /// <param name="p">The ball position, in world-space.</param>
     /// <param name="v">The initial velocity to give to the ball.</param>
     /// <param name="r">The ball radius.</param>
-    private int CreateBall(Vector3 p, Vector3 v, float r=1.0f) {
+    /// <param name="col">The ball color.</param>
+    private int CreateBall(Vector3 p, Vector3 v, float r, Vector3 col) {
         var ball = AddEntity();
 
         AddComponent(ball, new CBody { Aabb        = new BoundingBox(-r*Vector3.One, r*Vector3.One),
                                        Radius      = r,
                                        LinDrag     = 0.2f,
                                        Velocity    = v,
-                                       Restitution = 0.3f});
+                                       Restitution = 0.7f});
 
         AddComponent(ball, new CTransform { Position = p,
                                             Rotation = Matrix.Identity,
                                             Scale    = r*Vector3.One });
 
         AddComponent<C3DRenderable>(ball, new CImportedModel {
-            model  = Game1.Inst.Content.Load<Model>("Models/DummySphere")
+            model  = Game1.Inst.Content.Load<Model>("Models/DummySphere"),
+            material = new AdsMaterial(0.2f*col,
+                                            col,
+                                            new Vector3(1.0f, 1.0f, 1.0f),
+                                            50.0f)
         });
 
         return ball;
@@ -267,7 +282,11 @@ public sealed class Collisions2: Scene {
         var box1 = AddEntity();
 
         AddComponent<C3DRenderable>(box1, new CImportedModel {
-            model  = Game1.Inst.Content.Load<Model>("Models/DummyBox")
+            model  = Game1.Inst.Content.Load<Model>("Models/DummyBox"),
+            material = new AdsMaterial(0.2f*new Vector3(0.2f, 0.4f, 1.0f),
+                                            new Vector3(0.2f, 0.4f, 1.0f),
+                                            new Vector3(1.0f, 1.0f, 1.0f),
+                                            30.0f)
         });
 
         var rot = Matrix.CreateFromAxisAngle(rotAxis, rotRad);
