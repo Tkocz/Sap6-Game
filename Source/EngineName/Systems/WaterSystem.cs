@@ -15,7 +15,7 @@ namespace EngineName.Systems
     {
         private GraphicsDevice mGraphicsDevice;
         private int[] indices  =null;
-        private VertexPositionNormalColor[] vertices;
+        private VertexPositionNormalTexture[] vertices;
         private CImportedModel CModel;
         private int[] vibirations;
         private Effect bEffect;
@@ -24,7 +24,8 @@ namespace EngineName.Systems
         {
             mGraphicsDevice = Game1.Inst.GraphicsDevice;
             base.Init();
-            bEffect = new BasicEffect(mGraphicsDevice) { VertexColorEnabled = true };
+            bEffect = Game1.Inst.Content.Load<Effect>("Effects/Water");
+            bEffect.CurrentTechnique = bEffect.Techniques["BasicColorDrawing"];
         }
 
         public void Load()
@@ -41,36 +42,32 @@ namespace EngineName.Systems
                 Random rnd = new Random(1990);
 
 
-                var terrainHeight = 1081;
-                var terrainWidth = 1081;
+                var terrainHeight = heightmap.Image.Height;
+                var terrainWidth = heightmap.Image.Width;
+                var resolution = 30; // vertices per direction
                 //
                 int counter = 0;
-                indices = new int[(terrainWidth - 1) * (terrainHeight - 1) * 6];
-                vertices = new VertexPositionNormalColor[terrainWidth * terrainHeight];
-                vibirations = new int[terrainWidth * terrainHeight];
+                indices = new int[(resolution - 1) * (resolution - 1) * 6];
+                vertices = new VertexPositionNormalTexture[resolution * resolution];
                 // Create vertices
-                for (int x = 0; x < terrainWidth; x++)
+                for (int x = 0; x < resolution; x++)
                 {
-                    for (int y = 0; y < terrainHeight; y++)
+                    for (int y = 0; y < resolution; y++)
                     {
-
-                        vertices[x + y * terrainWidth].Position = new Vector3(x, heightmap.LowestPoint+10, y);
+                        vertices[x + y * resolution].Position = new Vector3((terrainWidth/resolution)*x, heightmap.LowestPoint + 200, (terrainHeight/resolution)*y);
                         var color = Color.Blue;
                         color.A = 100;
-                        vertices[x + y * terrainWidth].Color = color;
-
-                        // Randomly set the direction of the vertex up or down
-                        vibirations[x + y * terrainWidth] = rnd.Next(0, 100) > 50 ? -1 : 1;
+                        vertices[x + y * resolution].TextureCoordinate = new Vector2(x * 0.005f, y * 0.005f);
                     }
                 }
-                for (int y = 0; y < terrainHeight - 1; y++)
+                for (int y = 0; y < resolution - 1; y++)
                 {
-                    for (int x = 0; x < terrainWidth - 1; x++)
+                    for (int x = 0; x < resolution - 1; x++)
                     {
-                        int topLeft = x + y * terrainWidth;
-                        int topRight = (x + 1) + y * terrainWidth;
-                        int lowerLeft = x + (y + 1) * terrainWidth;
-                        int lowerRight = (x + 1) + (y + 1) * terrainWidth;
+                        int topLeft = x + y * resolution;
+                        int topRight = (x + 1) + y * resolution;
+                        int lowerLeft = x + (y + 1) * resolution;
+                        int lowerRight = (x + 1) + (y + 1) * resolution;
 
                         indices[counter++] = (int)topLeft;
                         indices[counter++] = (int)lowerRight;
@@ -102,7 +99,7 @@ namespace EngineName.Systems
 
 
 
-                var vertexBuffer = new VertexBuffer(mGraphicsDevice, VertexPositionNormalColor.VertexDeclaration,
+                var vertexBuffer = new VertexBuffer(mGraphicsDevice, VertexPositionNormalTexture.VertexDeclaration,
                     vertices.Length, BufferUsage.None);
                 vertexBuffer.SetData(vertices);
                 var indexBuffer = new IndexBuffer(mGraphicsDevice, typeof(int), indices.Length, BufferUsage.None);
@@ -121,11 +118,12 @@ namespace EngineName.Systems
 
                 ModelMesh mesh = new ModelMesh(mGraphicsDevice, parts);
                 meshPart.Effect = bEffect;
+                
 
                 mesh.Name = "water";
                 mesh.BoundingSphere = BoundingSphere.CreateFromBoundingBox(new BoundingBox(new Vector3(0, heightmap.LowestPoint, 0), new Vector3(1081, heightmap.HeighestPoint, 1081)));
                 ModelBone bone = new ModelBone();
-                bone.Name = "Water";
+                bone.Name = "water";
                 bone.AddMesh(mesh);
                 bone.Transform = Matrix.Identity;
                 mesh.ParentBone = bone;
@@ -133,7 +131,7 @@ namespace EngineName.Systems
                 bones.Add(bone);
                 meshes.Add(mesh);
                 model = new Model(Game1.Inst.GraphicsDevice,bones,meshes);
- 
+                model.Tag = "water";
 
             }
             int id = Game1.Inst.Scene.AddEntity();
