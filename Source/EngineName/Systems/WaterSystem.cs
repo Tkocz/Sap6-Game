@@ -123,6 +123,7 @@ namespace EngineName.Systems
                 meshPart.Effect = bEffect;
 
                 mesh.Name = "water";
+                mesh.BoundingSphere = BoundingSphere.CreateFromBoundingBox(new BoundingBox(new Vector3(0, heightmap.LowestPoint, 0), new Vector3(1081, heightmap.HeighestPoint, 1081)));
                 ModelBone bone = new ModelBone();
                 bone.Name = "Water";
                 bone.AddMesh(mesh);
@@ -137,7 +138,7 @@ namespace EngineName.Systems
             }
             int id = Game1.Inst.Scene.AddEntity();
            
-            Game1.Inst.Scene.AddComponent(id, new CTransform() { Position = new Vector3(-590, -900, -590) * 0.01f, Rotation = Matrix.Identity, Scale = new Vector3(0.01f) });
+            Game1.Inst.Scene.AddComponent(id, new CTransform() { Position = new Vector3(-590, -275, -590), Rotation = Matrix.Identity, Scale = new Vector3(1f) });
             CModel = new CImportedModel() { model = model };
             Game1.Inst.Scene.AddComponent<C3DRenderable>(id, CModel);
         }

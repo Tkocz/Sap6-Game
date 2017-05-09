@@ -20,6 +20,9 @@ namespace EngineName {
 
     /// <summary>Represents a game scene.</summary>
     public abstract class Scene {
+        public int NumEntities {
+            get { return m_Entities.Count; }
+        }
         /*--------------------------------------
          * NESTED TYPES
          *------------------------------------*/
@@ -55,6 +58,10 @@ namespace EngineName {
          * NON-PUBLIC FIELDS
          *------------------------------------*/
 
+        /// <summary>The event callbacks registered in the scene.</summary>
+        private readonly Dictionary<string, List<Action<object>>> mEventCBs =
+            new Dictionary<string, List<Action<object>>>();
+
         private List<int> m_Entities = new List<int>();
 
         /// <summary>The systems in use by the scene.</summary>
@@ -68,6 +75,39 @@ namespace EngineName {
          * PUBLIC METHODS
          *------------------------------------*/
 
+        /// <summary>Raises the specified event in the scene.</summary>
+        /// <param name="name">The name of the event to raise.</param>
+        /// <param name="data">The event data.</param>
+        public void Raise(string name, object data) {
+            // Event name is case insensitive.
+            name = name.ToLower();
+
+            List<Action<object>> cbs;
+            if (!mEventCBs.TryGetValue(name, out cbs)) {
+                // No events registered for this event name.
+                return;
+            }
+
+            foreach (var cb in cbs) {
+                cb(data);
+            }
+        }
+
+        /// <summary>Registers a callback for a specific event.</summary>
+        /// <param name="name">The name of the event.</param>
+        /// <param name="cb">The callback to invoke after the event is raised.</param>
+        public void OnEvent(string name, Action<object> cb) {
+            // Event name is case insensitive.
+            name = name.ToLower();
+
+            List<Action<object>> cbs;
+            if (!mEventCBs.TryGetValue(name, out cbs)) {
+                mEventCBs[name] = cbs = new List<Action<object>>();
+            }
+
+            cbs.Add(cb);
+        }
+
         /// <summary>Adds the specified entity to the scene.</summary>
         /// <param name="entity">The entity to add to the scene.</param>
         public int AddEntity() {
@@ -78,8 +118,20 @@ namespace EngineName {
             return EntityCounter;
         }
 
+        public void RemoveEntity(int eid) {
+            foreach (var e in Components) {
+                e.Value.Remove(eid);
+            }
+
+            m_Entities.Remove(eid);
+        }
+
+        public void AddComponent(int id, EcsComponent component, Type type) {
+            Components[type].Add(id, component);
+        }
+
         public void AddComponent<T>(int id, T component) where T : EcsComponent {
-            Components[typeof(T)].Add(id, component);
+            AddComponent(id, component, typeof (T));
         }
         public Dictionary<int, EcsComponent> GetComponents<T>() where T : EcsComponent {
             Dictionary<int, EcsComponent> r;
@@ -101,6 +153,7 @@ namespace EngineName {
     /// <param name="system">The system to add.</param>
     public void AddSystem(EcsSystem system) {
         m_Systems.Add(system);
+        system.Scene = this;
     }
 
     /// <summary>Add the specified systems to the scene.</summary>
@@ -123,10 +176,8 @@ namespace EngineName {
     /// <summary>Draws the scene by invoking the <see cref="EcsSystem.Draw"/>
     ///          method on all systems in the scene.</summary>
     /// <param name="t">The total game time, in seconds.</param>
-    /// <param name="dt">The game time, in seconds, since the last call to this
-    ///                  method.</param>
+    /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public virtual void Draw(float t, float dt) {
-        Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
         foreach (var system in m_Systems) {
             system.Draw(t, dt);
         }
@@ -150,9 +201,12 @@ namespace EngineName {
         Components.Add(typeof(C2DRenderable), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CCamera), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CBody), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CParticle), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CLogic), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CBox), new Dictionary<int, EcsComponent>());
 
 #if DEBUG
-        AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));
+            AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));
 #endif
 
         foreach (var system in m_Systems) {
@@ -202,8 +256,7 @@ namespace EngineName {
      *------------------------------------*/
 
     /// <summary>Updates the component cache for the entity.</summary>
-    /// <param name="entity">The entitiy to update the component cache
-    ///                      for.</param>
+    /// <param name="entity">The entitiy to update the component cache for.</param>
     internal void NotifyComponentsChanged(EcsEntity entity) {
             /*
         lock (m_EntitiesPending) {

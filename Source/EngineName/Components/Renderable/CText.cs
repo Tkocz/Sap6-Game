@@ -12,6 +12,5 @@ namespace EngineName.Components.Renderable
     {
         public SpriteFont font;
         public string format;
-        public Vector2 origin;
     }
 }

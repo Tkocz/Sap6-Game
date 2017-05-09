@@ -5,8 +5,10 @@ namespace GameName.Scenes {
 //--------------------------------------
 
 using System;
+using System.Reflection;
 
 using EngineName;
+using EngineName.Utils;
 
 //--------------------------------------
 // CLASSES
@@ -26,7 +28,7 @@ public sealed class MainMenu: MenuScene {
         base.Init();
 
         // Ugly, but useful during development.
-        foreach (var type in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()) {
+        foreach (var type in Assembly.GetExecutingAssembly().GetTypes()) {
             if (!type.IsSubclassOf(typeof (Scene)) || type == GetType()) {
                 continue;
             }
@@ -39,6 +41,10 @@ public sealed class MainMenu: MenuScene {
         CreateLabel("Quit", () => {
             Game1.Inst.Exit();
         });
+
+        SfxUtil.PlayMusic("Sounds/Music/MainMenu");
+
+        OnEvent("selchanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
     }
 
 }

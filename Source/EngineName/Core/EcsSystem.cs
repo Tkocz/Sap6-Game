@@ -7,6 +7,13 @@ namespace EngineName.Core {
 /// <summary>Represents an entity component system.</summary>
 public abstract class EcsSystem {
     /*--------------------------------------
+     * PUBLIC PROPERTIES
+     *------------------------------------*/
+
+    /// <summary>Gets the scene that the system is in.</summary>
+    public Scene Scene { get; internal set; }
+
+    /*--------------------------------------
      * PUBLIC METHODS
      *------------------------------------*/
 
