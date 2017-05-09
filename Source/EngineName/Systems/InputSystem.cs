@@ -7,23 +7,15 @@ using EngineName.Components;
 
 namespace EngineName.Systems {
     public class InputSystem : EcsSystem {
-        private MapSystem _mapSystem;
         private const float CAMERASPEED = 0.1f;
         private Keys[] lastPressedKeys;
         private Matrix addRot;
         private float yaw = 0, pitch = 0, roll = 0;
         private bool isInAir = false;
-        public InputSystem() { }
-
-        public InputSystem(MapSystem mapSystem)
-        {
-            _mapSystem = mapSystem;
-        }
 
         public override void Init()
         {
             Game1.Inst.Scene.OnEvent("collisionwithground", data => isInAir = false);
-            
             base.Init();
         }
 
@@ -32,7 +24,6 @@ namespace EngineName.Systems {
             KeyboardState currentState = Keyboard.GetState();
             Keys[] pressedKeys = currentState.GetPressedKeys();
             yaw = 0;
-
             foreach (var input in Game1.Inst.Scene.GetComponents<CInput>()) {
                 CBody body = null;
                 if (Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
@@ -137,6 +128,10 @@ namespace EngineName.Systems {
 
             */
 
+            }
+            if (currentState.IsKeyDown(Keys.Escape))
+            {
+                Environment.Exit(0);
             }
         }
     }
