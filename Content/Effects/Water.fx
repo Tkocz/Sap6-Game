@@ -57,12 +57,13 @@ struct VertexShaderOutput {
 
 float CalculateHeight(float4 Position) {
     int phase = (Position.x + Position.z % 2) * 2;
-    float amplitude = 0.4;
+    float amplitude = 0.6;
     float frequency = 2;
     float bias = 0.5;
     float newHeight = (amplitude * sin(frequency * Time + phase) + bias);
      
-    return newHeight * 10; 
+    return newHeight * 10;
+ 
 }
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input) {

@@ -44,7 +44,7 @@ namespace EngineName.Systems
 
                 var terrainHeight = heightmap.Image.Height;
                 var terrainWidth = heightmap.Image.Width;
-                var resolution = 30; // vertices per direction
+                var resolution = 40; // vertices per direction
                 //
                 int counter = 0;
                 indices = new int[(resolution - 1) * (resolution - 1) * 6];

@@ -82,7 +82,7 @@ namespace EngineName.Systems {
                 if (currentState.IsKeyDown(Keys.Escape))
                     Game1.Inst.Exit();
 
-                var movementSpeed = dt * 30f;
+                var movementSpeed = dt * 30f * body.SpeedMultiplier;
 
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
                     //body.Velocity.Z += movementSpeed;
@@ -93,12 +93,12 @@ namespace EngineName.Systems {
                 if (currentState.IsKeyDown(inputValue.LeftMovementKey))
                 {
                     //body.Velocity.X -= movementSpeed;
-                    yaw = dt;
+                    yaw = -movementSpeed * 0.5f;
                 }
                 if (currentState.IsKeyDown(inputValue.RightMovementKey))
                 {
                     //body.Velocity.X += movementSpeed;
-                    yaw = -dt;
+                    yaw = movementSpeed * 0.5f;
                 }
                 if (currentState.IsKeyDown(Keys.Space) && !isInAir)
                 {

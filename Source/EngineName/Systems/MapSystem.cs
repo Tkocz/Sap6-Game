@@ -257,6 +257,8 @@ namespace EngineName.Systems
 					var vert = vertices[j];
 					var ind = indices[j];
 					CalculateNormals(ref vert, ref ind);
+                    for(int i = 0; i < vertices[j].Length; i++)
+                        vertices[j][i].Color = Color.ForestGreen;
 					vertices[j] = vert;
 					indices[j] = ind;
 
