@@ -16,6 +16,7 @@ using EngineName.Utils;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 //--------------------------------------
 // CLASSES
@@ -28,8 +29,15 @@ public sealed class Collisions2: Scene {
     // NON-PUBLIC FIELDS
     //--------------------------------------
 
-    /// <summary>Used to create environment maps.</summary>
-    private RenderingSystem mRenderer;
+    /// <summary>Camera entity ID.</summary>
+    private int mCamID;
+
+    /// <summary>Whether slow motion is enabled.</summary>
+    private bool mSlowMo;
+
+    /// <summary>Whether the user can toggle slow motion - used to prevent accidental
+    ///          spamming.</summary>
+    private bool mCanToggleSlowMo;
 
     //--------------------------------------
     // PUBLIC METHODS
@@ -42,7 +50,7 @@ public sealed class Collisions2: Scene {
         AddSystems(new                    LogicSystem(),
                    physics      =   new PhysicsSystem(),
                    new                   CameraSystem(),
-                   mRenderer    = new RenderingSystem());
+                                  new RenderingSystem());
 
         physics.Bounds = new BoundingBox(-50.0f*Vector3.One, 50.0f*Vector3.One);
 
@@ -56,27 +64,53 @@ public sealed class Collisions2: Scene {
 
         base.Init();
 
-        InitCam();
+        mCamID = InitCam();
+
+        var rnd = new System.Random();
 
         // Spawn a few balls.
-        for (var i = 0; i < 100; i++) {
-            var r = 1.0f;
-            CreateBall(new Vector3(-4.5f + i*0.05f, 20.0f + 2.0f*i, 0.0f), // Position
-                       new Vector3(0.0f          , 0.0f         , 0.0f), // Velocity
-                       r);                                               // Radius
+        for (var i = 0; i < 200; i++) {
+            var r = 0.7f + (float)rnd.NextDouble()*0.8f;
+            CreateBall(new Vector3(-4.5f + i*0.05f, 20.0f + 2.0f*i, (float)Math.Cos(i)), // Position
+                       new Vector3(0.0f           , 0.0f          , 0.0f              ), // Velocity
+                       r);                                                               // Radius
         }
 
-        var dist = 8.5f;
+        var dist = 25.0f;
         for (var i = 0; i < 10; i++) {
             var a = i - 1.0f;
-            var b = a + 0.5f;
-            CreateBox(13.0f*Vector3.Right + dist*a*Vector3.Up,
-                      new Vector3(15.0f, 0.5f, 1.0f),
-                      Vector3.Backward, 20.0f);
-            CreateBox(13.0f*Vector3.Left + dist*b*Vector3.Up,
-                      new Vector3(15.0f, 0.5f, 1.0f),
-                      Vector3.Backward, -20.0f);
+            var b = a + 0.25f;
+            var c = b + 0.25f;
+            var d = c + 0.25f;
+
+            var size = new Vector3(25.0f, 0.5f, 25.0f);
+
+            CreateBox(13.0f*Vector3.Right + dist*a*Vector3.Up + 10.0f*Vector3.Forward,
+                      size,
+                      Vector3.Backward + 0.5f*Vector3.Right, 15.0f);
+            CreateBox(13.0f*Vector3.Left + dist*c*Vector3.Up + 10.0f*Vector3.Forward,
+                      size,
+                      Vector3.Backward - 0.5f*Vector3.Right, -15.0f);
+
+            CreateBox(13.0f*Vector3.Right + dist*b*Vector3.Up + 10.0f*Vector3.Backward,
+                      size,
+                      Vector3.Backward - 0.5f*Vector3.Right, 15.0f);
+            CreateBox(13.0f*Vector3.Left + dist*d*Vector3.Up + 10.0f*Vector3.Backward,
+                      size,
+                      Vector3.Backward + 0.5f*Vector3.Right, -15.0f);
         }
+    }
+
+    /// <summary>Performs update logic specific to the system.</summary>
+    /// <param name="t">The total game time, in seconds.</param>
+    /// <param name="dt">The time, in seconds, since the last call to this method.</param>
+    public override void Update(float t, float dt) {
+        if (mSlowMo) {
+            t  *= 0.1f;
+            dt *= 0.1f;
+        }
+
+        base.Update(t, dt);
     }
 
     /// <summary>Draws the scene by invoking the <see cref="EcsSystem.Draw"/>
@@ -85,7 +119,113 @@ public sealed class Collisions2: Scene {
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
         Game1.Inst.GraphicsDevice.Clear(Color.White);
+
         base.Draw(t, dt);
+
+        const float CAM_SPEED = 25.0f;
+
+        var kb = Keyboard.GetState();
+
+        if (kb.IsKeyDown(Keys.Space)) {
+            if (mCanToggleSlowMo) {
+                mSlowMo = !mSlowMo;
+
+                mCanToggleSlowMo = false;
+            }
+        }
+        else {
+            mCanToggleSlowMo = true;
+        }
+
+        if (kb.IsKeyDown(Keys.W)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+            var camTransf = ((CTransform)GetComponentFromEntity<CTransform>(mCamID));
+
+            var d = (cam.Target - camTransf.Position);
+            d.Normalize();
+            cam.Target += CAM_SPEED*dt*d;
+            camTransf.Position += CAM_SPEED*dt*d;
+        }
+
+        if (kb.IsKeyDown(Keys.S)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+            var camTransf = ((CTransform)GetComponentFromEntity<CTransform>(mCamID));
+
+            var d = (cam.Target - camTransf.Position);
+            d.Normalize();
+            cam.Target -= CAM_SPEED*dt*d;
+            camTransf.Position -= CAM_SPEED*dt*d;
+        }
+
+        if (kb.IsKeyDown(Keys.A)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+            var camTransf = ((CTransform)GetComponentFromEntity<CTransform>(mCamID));
+
+            var d = (cam.Target - camTransf.Position);
+            d = new Vector3(d.Z, 0.0f, -d.X);
+            d.Normalize();
+            cam.Target += CAM_SPEED*dt*d;
+            camTransf.Position += CAM_SPEED*dt*d;
+        }
+
+        if (kb.IsKeyDown(Keys.D)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+            var camTransf = ((CTransform)GetComponentFromEntity<CTransform>(mCamID));
+
+            var d = (cam.Target - camTransf.Position);
+            d = new Vector3(d.Z, 0.0f, -d.X);
+            d.Normalize();
+            cam.Target -= CAM_SPEED*dt*d;
+            camTransf.Position -= CAM_SPEED*dt*d;
+        }
+
+        if (kb.IsKeyDown(Keys.Q)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+            var camTransf = ((CTransform)GetComponentFromEntity<CTransform>(mCamID));
+
+            cam.Target += CAM_SPEED*dt*Vector3.Up;
+            camTransf.Position += CAM_SPEED*dt*Vector3.Up;
+        }
+
+        if (kb.IsKeyDown(Keys.Z)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+            var camTransf = ((CTransform)GetComponentFromEntity<CTransform>(mCamID));
+
+            cam.Target -= CAM_SPEED*dt*Vector3.Up;
+            camTransf.Position -= CAM_SPEED*dt*Vector3.Up;
+        }
+
+        if (kb.IsKeyDown(Keys.Up)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+
+            cam.Target += CAM_SPEED*dt*Vector3.Up;
+        }
+
+        if (kb.IsKeyDown(Keys.Down)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+
+            cam.Target -= CAM_SPEED*dt*Vector3.Up;
+        }
+
+        if (kb.IsKeyDown(Keys.Left)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+            var camTransf = ((CTransform)GetComponentFromEntity<CTransform>(mCamID));
+
+            var d = (cam.Target - camTransf.Position);
+            d = new Vector3(d.Z, 0.0f, -d.X);
+            d.Normalize();
+            cam.Target += CAM_SPEED*dt*d;
+        }
+
+        if (kb.IsKeyDown(Keys.Right)) {
+            var cam = ((CCamera)GetComponentFromEntity<CCamera>(mCamID));
+            var camTransf = ((CTransform)GetComponentFromEntity<CTransform>(mCamID));
+
+            var d = (cam.Target - camTransf.Position);
+            d = new Vector3(d.Z, 0.0f, -d.X);
+            d.Normalize();
+            cam.Target -= CAM_SPEED*dt*d;
+        }
     }
 
     //--------------------------------------
@@ -101,7 +241,7 @@ public sealed class Collisions2: Scene {
 
         AddComponent(ball, new CBody { Aabb        = new BoundingBox(-r*Vector3.One, r*Vector3.One),
                                        Radius      = r,
-                                       LinDrag     = 0.1f,
+                                       LinDrag     = 0.2f,
                                        Velocity    = v,
                                        Restitution = 0.3f});
 
