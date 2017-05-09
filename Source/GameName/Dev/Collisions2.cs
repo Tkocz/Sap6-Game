@@ -70,7 +70,7 @@ public sealed class Collisions2: Scene {
 
         // Spawn a few balls.
         for (var i = 0; i < 200; i++) {
-            var r = 0.7f + (float)rnd.NextDouble()*0.8f;
+            var r = 0.6f + (float)rnd.NextDouble()*1.0f;
             CreateBall(new Vector3(-4.5f + i*0.05f, 20.0f + 2.0f*i, (float)Math.Cos(i)), // Position
                        new Vector3(0.0f           , 0.0f          , 0.0f              ), // Velocity
                        r);                                                               // Radius
@@ -87,17 +87,17 @@ public sealed class Collisions2: Scene {
 
             CreateBox(13.0f*Vector3.Right + dist*a*Vector3.Up + 10.0f*Vector3.Forward,
                       size,
-                      Vector3.Backward + 0.5f*Vector3.Right, 15.0f);
+                      Vector3.Backward + Vector3.Right, 15.0f);
             CreateBox(13.0f*Vector3.Left + dist*c*Vector3.Up + 10.0f*Vector3.Forward,
                       size,
-                      Vector3.Backward - 0.5f*Vector3.Right, -15.0f);
+                      Vector3.Backward - Vector3.Right, -15.0f);
 
             CreateBox(13.0f*Vector3.Right + dist*b*Vector3.Up + 10.0f*Vector3.Backward,
                       size,
-                      Vector3.Backward - 0.5f*Vector3.Right, 15.0f);
+                      Vector3.Backward - Vector3.Right, 15.0f);
             CreateBox(13.0f*Vector3.Left + dist*d*Vector3.Up + 10.0f*Vector3.Backward,
                       size,
-                      Vector3.Backward + 0.5f*Vector3.Right, -15.0f);
+                      Vector3.Backward + Vector3.Right, -15.0f);
         }
     }
 
