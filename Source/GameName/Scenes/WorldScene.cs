@@ -49,8 +49,8 @@ namespace GameName.Scenes
             int player = AddEntity();
             AddComponent(player, new CBody() { Radius = 1, Aabb = new BoundingBox(new Vector3(-1, 0, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f } );
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(.05f) } );
-            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) } );
+            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/dummysphere") });
             /*
             int ball = AddEntity();
             AddComponent(ball, new CBody() { Position = new Vector3(10f, 0, 10f), Radius = 1, Aabb = new BoundingBox(-1 * Vector3.One, 1 * Vector3.One) } );

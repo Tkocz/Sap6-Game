@@ -79,15 +79,18 @@ namespace EngineName.Systems {
                 if (!Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
                     continue;
                 }
-                
-                var movementSpeed = dt*30f;
+                if (currentState.IsKeyDown(Keys.Escape))
+                    Game1.Inst.Exit();
+
+                var movementSpeed = dt * 30f;
+
                 // TODO: Fix backwards movement
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
                     //body.Velocity.Z += movementSpeed;
                     body.Velocity += movementSpeed * transform.Frame.Forward;
                 if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
                     //body.Velocity.Z -= movementSpeed;
-                    body.Velocity -= movementSpeed * transform.Frame.Backward;
+                    body.Velocity += movementSpeed * transform.Frame.Backward;
                 if (currentState.IsKeyDown(inputValue.LeftMovementKey))
                 {
                     //body.Velocity.X -= movementSpeed;
