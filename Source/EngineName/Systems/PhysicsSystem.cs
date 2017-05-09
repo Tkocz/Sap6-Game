@@ -331,7 +331,7 @@ public class PhysicsSystem: EcsSystem {
         d = (minDist - d)*im; // Mass adjusted penetration distance
 
         t1.Position += n*d*s1.InvMass;
-        s1.Velocity += n*p*s1.Inv
+        s1.Velocity += n*p*s1.InvMass;
         t2.Position -= n*d*s2.InvMass;
         s2.Velocity -= n*p*s2.InvMass;
 
