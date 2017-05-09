@@ -39,6 +39,9 @@ public sealed class Collisions2: Scene {
     ///          spamming.</summary>
     private bool mCanToggleSlowMo;
 
+    private float mDrawT;
+    private float mUpdT;
+
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
@@ -47,10 +50,9 @@ public sealed class Collisions2: Scene {
     public override void Init() {
         PhysicsSystem physics;
 
-        AddSystems(new                    LogicSystem(),
-                   physics      =   new PhysicsSystem(),
-                   new                   CameraSystem(),
-                                  new RenderingSystem());
+        AddSystems(physics = new PhysicsSystem(),
+                              new CameraSystem(),
+                           new RenderingSystem());
 
         physics.Bounds = new BoundingBox(-50.0f*Vector3.One, 50.0f*Vector3.One);
 
@@ -70,14 +72,15 @@ public sealed class Collisions2: Scene {
 
         // Colors to pick from when spawning balls.
         var cols = new [] {
-            new Vector3(1.0f, 1.0f, 1.0f),
-            new Vector3(1.0f, 0.8f, 0.9f),
-            new Vector3(1.0f, 0.4f, 0.5f),
-            new Vector3(1.0f, 0.2f, 0.8f),
+            new Vector3(1.0f, 1.0f, 0.0f),
+            new Vector3(1.0f, 0.5f, 0.0f),
+            new Vector3(1.0f, 0.8f, 0.0f),
+            new Vector3(1.0f, 1.0f, 0.5f),
+            new Vector3(0.01f, 0.01f, 0.01f),
         };
 
         // Spawn a few balls.
-        for (var i = 0; i < 200; i++) {
+        for (var i = 0; i < 300; i++) {
             var r = 0.6f + (float)rnd.NextDouble()*1.0f;
             CreateBall(new Vector3(-4.5f + i*0.05f, 20.0f + 2.0f*i, (float)Math.Cos(i)), // Position
                        new Vector3(0.0f           , 0.0f          , 0.0f              ), // Velocity
@@ -113,17 +116,17 @@ public sealed class Collisions2: Scene {
         CreateBox(new Vector3(0.0f, -49.0f, 0.0f),
                   new Vector3(50.0f, 1.0f, 50.0f),
                   Vector3.Right, 0.0f,
-                  new Vector3(0.4f, 0.4f, 0.4f));
+                  new Vector3(0.02f, 0.02f, 0.02f));
 
         CreateBox(new Vector3(-49.0f, 0.0f, 0.0f),
                   new Vector3(1.0f, 50.0f, 50.0f),
                   Vector3.Right, 0.0f,
-                  new Vector3(0.4f, 0.4f, 0.4f));
+                  new Vector3(0.02f, 0.02f, 0.02f));
 
         CreateBox(new Vector3(0.0f, 0.0f, -49.0f),
                   new Vector3(50.0f, 50.0f, 1.0f),
                   Vector3.Right, 0.0f,
-                  new Vector3(0.4f, 0.4f, 0.4f));
+                  new Vector3(0.02f, 0.02f, 0.02f));
     }
 
     /// <summary>Performs update logic specific to the system.</summary>
@@ -131,11 +134,12 @@ public sealed class Collisions2: Scene {
     /// <param name="dt">The time, in seconds, since the last call to this method.</param>
     public override void Update(float t, float dt) {
         if (mSlowMo) {
-            t  *= 0.1f;
             dt *= 0.1f;
         }
 
-        base.Update(t, dt);
+        mUpdT += dt;
+
+        base.Update(mUpdT, dt);
     }
 
     /// <summary>Draws the scene by invoking the <see cref="EcsSystem.Draw"/>
@@ -143,11 +147,20 @@ public sealed class Collisions2: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
+        if (mSlowMo) {
+            dt *= 0.1f;
+        }
+
+        mDrawT += dt;
+
         Game1.Inst.GraphicsDevice.Clear(Color.White);
 
-        base.Draw(t, dt);
+        base.Draw(mDrawT, dt);
 
-        const float CAM_SPEED = 25.0f;
+        float CAM_SPEED = 25.0f;
+        if (mSlowMo) {
+            CAM_SPEED *= 10.0f;
+        }
 
         var kb = Keyboard.GetState();
 

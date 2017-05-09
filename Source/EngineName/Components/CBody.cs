@@ -26,6 +26,10 @@ public sealed class CBody: EcsComponent {
     /// <summary>The restitution coefficient.</summary>
     public float Restitution = 1.0f;
 
+    /// <summary>The speed multiplier.</summary>
+
+    public float SpeedMultiplier = 1.0f;
+         
     /// <summary>The velocity, in meters per second.</summary>
     public Vector3 Velocity;
 }

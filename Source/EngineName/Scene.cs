@@ -195,6 +195,7 @@ namespace EngineName {
 
     /// <summary>Performs initialization logic for the scene.</summary>
     public virtual void Init() {
+
         // init all component dictionaries
         Components.Add(typeof(CTransform), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CInput), new Dictionary<int, EcsComponent>());
@@ -247,7 +248,8 @@ namespace EngineName {
     public virtual void Update(float t, float dt) {
         HandlePendingEntities();
 
-        foreach (var system in m_Systems) {
+         var systems = m_Systems.ToArray();
+        foreach (var system in systems) {
             system.Update(t, dt);
         }
     }
