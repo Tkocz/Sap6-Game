@@ -9,6 +9,6 @@ namespace EngineName.Components
 {
     public class CSyncObject : EcsComponent
     {
-
+        public bool Owner = true;
     }
 }

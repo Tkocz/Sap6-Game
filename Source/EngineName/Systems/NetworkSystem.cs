@@ -308,15 +308,19 @@ namespace EngineName.Systems
 
         private void syncObjects()
         {
-            foreach (var key in Game1.Inst.Scene.GetComponents<CSyncObject>().Keys)
+            foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
             {
-                var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(key);
-                var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
-                var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(key);
-                SendCObject(ctransform, cbody, key, model.fileName);
+                var sync = (CSyncObject) pair.Value;
+                if (sync.Owner) { 
+                    var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(pair.Key);
+                    var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(pair.Key);
+                    var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(pair.Key);
+                    SendCObject(ctransform, cbody, pair.Key, model.fileName);
+                }
             }
         }
 
+        private Vector3 oldLocation;
         private void addOrUpdatCObjects(int id, CBody cbody, CTransform ctransform,string modelname)
         {
             //Add entity 
@@ -331,14 +335,20 @@ namespace EngineName.Systems
                     model = Game1.Inst.Content.Load<Model>(modelname),
                     fileName = modelname
                 });
+                Game1.Inst.Scene.AddComponent(id, new CSyncObject{ Owner = false}) ;
+                oldLocation = ctransform.Position;
             }
             else
             {
                 //Update postition
                 var oldctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(id);
+                var oldcbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(id);
+
+                oldcbody.Velocity = cbody.Velocity;
                 oldctransform.Frame = ctransform.Frame;
                 oldctransform.Rotation = ctransform.Rotation;
                 oldctransform.Position = ctransform.Position;
+                //Vector3.SmoothStep(ref oldctransform.Position, ref ctransform.Position, 0.2f, out oldctransform.Position);
                 oldctransform.Scale = ctransform.Scale;
             }   
         }
@@ -348,7 +358,7 @@ namespace EngineName.Systems
             _peer.Shutdown("Shutting Down");
             base.Cleanup();
         }
-        private const float updateInterval  = 0.1f;
+        private const float updateInterval  = 0.15f;
         private float reamaingTime = 0;
         public override void Update(float t, float dt)
         {
@@ -358,7 +368,15 @@ namespace EngineName.Systems
                 syncObjects();
                 reamaingTime = 0;
             }
-          
+            /*foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
+            {
+                var sync = (CSyncObject)pair.Value;
+                if (!sync.Owner)
+                {
+                    var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(pair.Key);
+                }
+            }*/
+
             MessageLoop();
             base.Update(t, dt);
         }
