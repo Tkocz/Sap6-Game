@@ -1,3 +1,5 @@
+using GameName.Dev;
+
 namespace GameName {
 
 /*--------------------------------------
@@ -31,7 +33,7 @@ public static class Game {
         Log.ToFile();
 
         // TODO: Create initial scene.
-	using (var game = new Game1(new MainMenu())) {
+	using (var game = new Game1(new SyncObjects(args))) {
             game.Run();
         }
 

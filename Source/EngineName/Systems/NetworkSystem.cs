@@ -4,10 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using EngineName.Components;
+using EngineName.Components.Renderable;
 using EngineName.Core;
 using EngineName.Utils;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
 namespace EngineName.Systems
 {
     public class NetworkSystem : EcsSystem
@@ -20,6 +23,13 @@ namespace EngineName.Systems
         private NetIncomingMessage _msg;
         private bool _bot = false;
         private Thread _scanThread;
+        public NetworkSystem()
+        {
+        }
+        public NetworkSystem(int port)
+        {
+            _localport = port;
+        }
         /// <summary>Inits networkssystems configures settings for lidgrens networks framework.</summary>
         public override void Init()
         {
@@ -40,6 +50,7 @@ namespace EngineName.Systems
             if (!_bot) { 
                 Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data , "metadata"));
                 Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
+                 Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
             }
 
             _scanThread = new Thread(ScanForNewPeers);
@@ -68,11 +79,11 @@ namespace EngineName.Systems
                 counter++;
                 Thread.Sleep(1000);
                 MessageLoop();
-                if (counter % 5 == 0 && counter != 0)
+                if (counter % 2 == 0 && counter != 0)
                 {
                     counter++;
-                    SendObject(new CTransform() {Position = new Vector3(2,4,5)},"Player 1 Transform");
-                    SendObject(counter + "hej from bot","chatmessage");
+                    
+                    //SendObject(counter + "hej from bot","chatmessage");
                 }
             }
         }
@@ -100,6 +111,19 @@ namespace EngineName.Systems
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
+        public void SendCObject(CTransform cTransform, CBody cBody, int id,string modelfilename)
+        {
+            if (!havePeers())
+            {
+                Debug.WriteLine("No connections to send to.");
+                return;
+            }
+
+            NetOutgoingMessage msg = _peer.CreateMessage();
+            msg.Write((byte)Enums.MessageType.Entity);
+            msg.WriteEntity(id, cBody,cTransform, modelfilename);            
+        }
+
         /// <summary>Send simple string to all peers </summary>
         public void SendObject(object datatosend, string metadata)
         {
@@ -117,6 +141,12 @@ namespace EngineName.Systems
             NetOutgoingMessage msg = _peer.CreateMessage();
             switch (type)
             {
+                case Enums.MessageType.CBody:
+                    var dataCbody = (CBody)datatosend;
+                    msg.Write((byte)type);
+                    msg.Write(metadata);
+                    msg.WriteCBody(dataCbody);
+                    break;
                 case Enums.MessageType.CTransform:
                     var dataTransform = (CTransform)datatosend;
                     msg.Write((byte)type);
@@ -210,23 +240,57 @@ namespace EngineName.Systems
                                 }
                             }
                         }
+                        else if (mType == Enums.MessageType.Entity)
+                        {
+                            var cbody = new CBody();
+                            var ctransform = new CTransform();
+                            string modelname = "";
+                            var metadata = _msg.ReadString();
+                            var id  =_msg.ReadEntity(ref cbody,  ref ctransform,  ref modelname);
+                            if (!string.IsNullOrEmpty(modelname))
+                            {
+                                //Add entity 
+                                if (!Game1.Inst.Scene.EntityHasComponent<CTransform>(id))
+                                {
+                                    var ball = Game1.Inst.Scene.AddEntity();
+
+                                    Game1.Inst.Scene.AddComponent(ball, cbody);
+                                    Game1.Inst.Scene.AddComponent(ball, ctransform);
+                                    Game1.Inst.Scene.AddComponent<C3DRenderable>(ball, new CImportedModel
+                                    {
+                                        model = Game1.Inst.Content.Load<Model>(modelname),
+                                        fileName = modelname
+                                    });
+                                }
+                                else
+                                {
+                                    //Update postition
+                                    var oldctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(id);
+                                    oldctransform.Frame = ctransform.Frame;
+                                    oldctransform.Rotation = ctransform.Rotation;
+                                    oldctransform.Position = ctransform.Position;
+                                    oldctransform.Scale = ctransform.Scale;
+                                }
+                            }
+                            //Game1.Inst.Scene.Raise("network_data", data);
+                        }
                         else if (mType == Enums.MessageType.CTransform)
                         {
                             var metadata = _msg.ReadString();
                             var data = _msg.ReadCTransform();
-                            Game1.Inst.Scene.Raise("network_data", data);
+                            //Game1.Inst.Scene.Raise("network_data", data);
                         }
                         else if (mType == Enums.MessageType.Vector3)
                         {
                             var metadata = _msg.ReadString();
                             var data = _msg.ReadCTransform();
-                            Game1.Inst.Scene.Raise("network_data", data);
+                            //Game1.Inst.Scene.Raise("network_data", data);
                         }
                         else if (mType == Enums.MessageType.Int)
                         {
                             var metadata = _msg.ReadString();
                             var data = _msg.ReadInt32();
-                            Game1.Inst.Scene.Raise("network_data", data);
+                            //Game1.Inst.Scene.Raise("network_data", data);
                         }
                         //Console.WriteLine("END ReceivePeersData Data");
                         break;
@@ -265,15 +329,34 @@ namespace EngineName.Systems
             }
         }
 
+        private void syncObjects()
+        {
+            foreach (var key in Game1.Inst.Scene.GetComponents<CSyncObject>().Keys)
+            {
+                var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(key);
+                var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+                var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(key);
+                SendCObject(ctransform, cbody, key, model.fileName);
+            }
+        }
+
         public override void Cleanup()
         {
             _scanThread.Abort();
             _peer.Shutdown("Shutting Down");
             base.Cleanup();
         }
-
+        private const float updateInterval  = 2;
+        private float reamaingTime = 0;
         public override void Update(float t, float dt)
         {
+            reamaingTime += dt;
+            if (reamaingTime> updateInterval)
+            {
+                syncObjects();
+                reamaingTime = 0;
+            }
+          
             MessageLoop();
             base.Update(t, dt);
         }
