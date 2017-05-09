@@ -132,13 +132,13 @@ public class EnvMapMaterial: MaterialShader {
         for (var i = 0; i < 6; i++) {
             cams[i].Projection = Matrix.CreatePerspectiveFieldOfView(fovRad, aspect, zNear, zFar);
             GfxUtil.SetRT(mEnvRTs[i]);
-            Game1.Inst.GraphicsDevice.Clear(Color.Black);
+            Game1.Inst.GraphicsDevice.Clear(Color.White);
 
             if (mSkybox != null) {
                 mSkybox.DrawSkybox(cams[i]);
             }
 
-            //mRenderer.DrawScene(cams[i], mEid);
+            mRenderer.DrawScene(cams[i], mEid, mTransf);
         }
 
         GfxUtil.SetRT(null);

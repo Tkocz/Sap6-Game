@@ -14,6 +14,8 @@ namespace EngineName.Systems
     public class RenderingSystem : EcsSystem {
         private GraphicsDevice mGraphicsDevice;
         private Texture2D normalMap;
+        private float mT;
+        private float mDT;
         public override void Init() {
             mGraphicsDevice = Game1.Inst.GraphicsDevice;
             normalMap = Game1.Inst.Content.Load<Texture2D>("Textures/water_bump");
@@ -24,21 +26,26 @@ namespace EngineName.Systems
             base.Update(t, dt);
         }
         public override void Draw(float t, float dt) {
+            mT = t;
+            mDT = dt;
+
             base.Draw(t, dt);
 
             Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
 
-            foreach (var camera in Game1.Inst.Scene.GetComponents<CCamera>().Keys) {
-                DrawScene(camera, t, dt);
+            foreach (var camera in Game1.Inst.Scene.GetComponents<CCamera>()) {
+                var camPos = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(camera.Key);
+                DrawScene((CCamera)(camera.Value), -1, camPos);
+                break;
             }
             // debugging for software culling
             //Console.WriteLine(string.Format("{0} meshes drawn", counter));
         }
 
-        public void DrawScene(int cameraID, float t, float dt, int excludeEid=-1) {
+        public void DrawScene(CCamera camera, int excludeEid=-1, CTransform camPos=null) {
             // TODO: Clean code below up, hard to read.
-            CCamera camera = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(cameraID);
+
             foreach (CTransform transformComponent in Game1.Inst.Scene.GetComponents<CTransform>().Values)
             {
                 transformComponent.Frame = Matrix.CreateScale(transformComponent.Scale) *
@@ -86,7 +93,7 @@ namespace EngineName.Systems
                                 //Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * world));
                                 //part.Effect.Parameters["WorldInverseTranspose"].SetValue(world);
 
-                                CTransform cameraTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(cameraID);
+                                CTransform cameraTransform = camPos;
 
                                 var viewVector = (camera.Target - cameraTransform.Position);
                                 viewVector.Normalize();
@@ -100,9 +107,9 @@ namespace EngineName.Systems
 
                                 //effect.Parameters["ModelTexture"].SetValue(texture);
                                 part.Effect.Parameters["NormalMap"].SetValue(normalMap);
-                                part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(t));
+                                part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(mT));
 
-                                part.Effect.Parameters["Time"].SetValue(t);
+                                part.Effect.Parameters["Time"].SetValue(mT);
                                 //part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
                                 foreach (var pass in part.Effect.CurrentTechnique.Passes) {
                                     pass.Apply();
@@ -112,6 +119,7 @@ namespace EngineName.Systems
                         }
                     }
                     else if (model.material != null) {
+                        model.material.CamPos = camPos.Position;
                         model.material.Model = mesh.ParentBone.Transform * transform.Frame;
                         model.material.View  = camera.View;
                         model.material.Proj  = camera.Projection;
