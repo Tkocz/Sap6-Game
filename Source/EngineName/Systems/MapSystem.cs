@@ -15,7 +15,7 @@ namespace EngineName.Systems
 	public class MapSystem : EcsSystem
 	{
 		private GraphicsDevice mGraphicsDevice;
-		private int chunksplit = 20;
+		private int chunksplit = 1;
 		private BasicEffect basicEffect;
         private float[,] mHeightData;
 
