@@ -16,6 +16,8 @@ using Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+using static System.Math;
+
 //--------------------------------------
 // CLASSES
 //--------------------------------------
@@ -174,8 +176,9 @@ public sealed class DebugOverlay: EcsSystem {
         mAabbEffect.Projection = cam.Projection;
         mAabbEffect.View       = cam.View;
 
-        foreach (var component in Scene.GetComponents<CBody>().Values) {
-            var body = (CBody)component;
+        foreach (var component in Scene.GetComponents<CBody>()) {
+            var body   = (CBody)component.Value;
+            var transf = (CTransform)Scene.GetComponentFromEntity<CTransform>(component.Key);
 
             // Figure out the size of the aabb and scale our pre-computed aabb model accordingly.
             // TODO: This probably only works for models centered on the origin, but ok for now.
@@ -184,7 +187,49 @@ public sealed class DebugOverlay: EcsSystem {
             var z = body.Aabb.Max.Z - body.Aabb.Min.Z;
 
             mAabbEffect.World = Matrix.CreateScale(x, y, z)
-                              * Matrix.CreateTranslation(body.Position);
+                              * Matrix.CreateTranslation(transf.Position);
+
+            // Draw the 12 lines making up the bounding box.
+            mAabbEffect.CurrentTechnique.Passes[0].Apply();
+            Game1.Inst.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, mAabb, 0, 12);
+        }
+
+        var p = new Vector3[8];
+        foreach (var component in Scene.GetComponents<CBox>()) {
+            var box    = (CBox)component.Value;
+            var transf = (CTransform)Scene.GetComponentFromEntity<CTransform>(component.Key);
+
+            p[0] = new Vector3(box.Box.Min.X, box.Box.Min.Y, box.Box.Min.Z);
+            p[1] = new Vector3(box.Box.Min.X, box.Box.Min.Y, box.Box.Max.Z);
+            p[2] = new Vector3(box.Box.Min.X, box.Box.Max.Y, box.Box.Min.Z);
+            p[3] = new Vector3(box.Box.Min.X, box.Box.Max.Y, box.Box.Max.Z);
+            p[4] = new Vector3(box.Box.Max.X, box.Box.Min.Y, box.Box.Min.Z);
+            p[5] = new Vector3(box.Box.Max.X, box.Box.Min.Y, box.Box.Max.Z);
+            p[6] = new Vector3(box.Box.Max.X, box.Box.Max.Y, box.Box.Min.Z);
+            p[7] = new Vector3(box.Box.Max.X, box.Box.Max.Y, box.Box.Max.Z);
+
+            var pMin = Vector3.One * Single.PositiveInfinity;
+            var pMax = Vector3.One * Single.NegativeInfinity;
+            for (var i = 0; i < 8; i++) {
+                var q = Vector3.Transform(p[i], transf.Rotation);
+                pMin.X = Min(pMin.X, q.X);
+                pMin.Y = Min(pMin.Y, q.Y);
+                pMin.Z = Min(pMin.Z, q.Z);
+                pMax.X = Max(pMax.X, q.X);
+                pMax.Y = Max(pMax.Y, q.Y);
+                pMax.Z = Max(pMax.Z, q.Z);
+            }
+
+            var aabb = new BoundingBox(transf.Position + pMin, transf.Position + pMax);
+
+            // Figure out the size of the aabb and scale our pre-computed aabb model accordingly.
+            // TODO: This probably only works for models centered on the origin, but ok for now.
+            var x = aabb.Max.X - aabb.Min.X;
+            var y = aabb.Max.Y - aabb.Min.Y;
+            var z = aabb.Max.Z - aabb.Min.Z;
+
+            mAabbEffect.World = Matrix.CreateScale(x, y, z)
+                              * Matrix.CreateTranslation(transf.Position);
 
             // Draw the 12 lines making up the bounding box.
             mAabbEffect.CurrentTechnique.Passes[0].Apply();

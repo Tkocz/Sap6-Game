@@ -203,9 +203,10 @@ namespace EngineName {
         Components.Add(typeof(CBody), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CParticle), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CLogic), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CBox), new Dictionary<int, EcsComponent>());
 
 #if DEBUG
-        AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));
+            AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));
 #endif
 
         foreach (var system in m_Systems) {

@@ -23,10 +23,6 @@ public sealed class CBody: EcsComponent {
     /// <summary>The linear drag to apply to the body.</summary>
     public float LinDrag = 0.0f;
 
-    /// <summary>The position in world-space as a displacement from the origin, in
-    ///          meters.</summary>
-    public Vector3 Position;
-
     /// <summary>The restitution coefficient.</summary>
     public float Restitution = 1.0f;
 

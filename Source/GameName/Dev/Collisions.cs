@@ -55,7 +55,7 @@ public sealed class Collisions: Scene {
             var r = 1.0f; // TODO: Random size and mass.
             CreateBall(new Vector3(0.9f*i - 3.5f, 0.3f*i, 0.0f), // Position
                        new Vector3(         1.0f, 0.0f  , 0.0f), // Velocity
-                       r);                                       // Reflective
+                       r);                                       // Radius
         }
     }
 
@@ -82,16 +82,15 @@ public sealed class Collisions: Scene {
         AddComponent(ball, new CBody { Aabb     = new BoundingBox(-r*Vector3.One, r*Vector3.One),
                                        Radius   = r,
                                        LinDrag  = 0.1f,
-                                       Position = p,
                                        Velocity = v });
 
         AddComponent(ball, new CTransform { Position = p,
                                             Rotation = Matrix.Identity,
                                             Scale    = r*Vector3.One });
+
         AddComponent<C3DRenderable>(ball, new CImportedModel {
             model  = Game1.Inst.Content.Load<Model>("Models/DummySphere")
         });
-
 
         return ball;
     }

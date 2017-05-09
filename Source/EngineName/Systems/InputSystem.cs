@@ -1,32 +1,37 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using EngineName.Components.Renderable;
 using EngineName.Core;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EngineName.Utils;
 using EngineName.Components;
 
 namespace EngineName.Systems {
     public class InputSystem : EcsSystem {
         private MapSystem _mapSystem;
         private const float CAMERASPEED = 0.1f;
-
+        private Keys[] lastPressedKeys;
+        private Matrix addRot;
+        private float yaw = 0, pitch = 0, roll = 0;
+        private bool isInAir = false;
         public InputSystem() { }
 
-        public InputSystem(MapSystem mapSystem) {
+        public InputSystem(MapSystem mapSystem)
+        {
             _mapSystem = mapSystem;
         }
 
-        public override void Update(float t, float dt){
+        public override void Init()
+        {
+            Game1.Inst.Scene.OnEvent("collisionwithground", data => isInAir = false);
+            
+            base.Init();
+        }
+
+        public override void Update(float t, float dt)
+        {
             KeyboardState currentState = Keyboard.GetState();
-            if(currentState.IsKeyDown(Keys.Escape))
-                Game1.Inst.Exit();
+            Keys[] pressedKeys = currentState.GetPressedKeys();
+            yaw = 0;
 
             foreach (var input in Game1.Inst.Scene.GetComponents<CInput>()) {
                 CBody body = null;
@@ -60,20 +65,50 @@ namespace EngineName.Systems {
                         transform.Position = Vector3.Subtract(cameraComponent.Target, new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), cameraComponent.Height, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f))));
                     }
                 }
+
+                //For Network Chat           
+                foreach (Keys key in pressedKeys)
+                {
+                    if (!lastPressedKeys.Contains(key))
+                    {
+                        Game1.Inst.RaiseInScene("key_to_write", key);
+
+                    }
+                }
+                lastPressedKeys = pressedKeys;
                 if (!Game1.Inst.Scene.EntityHasComponent<CBody>(input.Key)) {
                     continue;
                 }
                 
-                var movementSpeed = dt*3f;
-                
+                var movementSpeed = dt*30f;
+                // TODO: Fix backwards movement
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
-                    body.Velocity.Z -= movementSpeed;
+                    //body.Velocity.Z += movementSpeed;
+                    body.Velocity += movementSpeed * transform.Frame.Forward;
                 if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
-                    body.Velocity.Z += movementSpeed;
+                    //body.Velocity.Z -= movementSpeed;
+                    body.Velocity -= movementSpeed * transform.Frame.Backward;
                 if (currentState.IsKeyDown(inputValue.LeftMovementKey))
-                    body.Velocity.X -= movementSpeed;
+                {
+                    //body.Velocity.X -= movementSpeed;
+                    yaw = dt;
+                }
                 if (currentState.IsKeyDown(inputValue.RightMovementKey))
-                    body.Velocity.X += movementSpeed;
+                {
+                    //body.Velocity.X += movementSpeed;
+                    yaw = -dt;
+                }
+                if (currentState.IsKeyDown(Keys.Space) && !isInAir)
+                {
+                    body.Velocity.Y += 15f;
+                    isInAir = true;
+                }
+                addRot = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
+                
+                transform.Rotation *= addRot;
+
+
+                //save the currently pressed keys so we can compare on the next update
 
 
                 /*
