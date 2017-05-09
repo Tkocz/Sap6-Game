@@ -51,6 +51,7 @@ public sealed class SyncObjects: Scene {
                    new                  PhysicsSystem(),
                    new                   CameraSystem(),
                    mRenderer    = new RenderingSystem(),
+                   new InputSystem(),
                    new NetworkSystem(port));
 
 #if DEBUG

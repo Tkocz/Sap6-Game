@@ -63,7 +63,7 @@ namespace EngineName.Systems
             while (true)
             {
                 _peer.DiscoverLocalPeers(_searchport);
-                Thread.Sleep(30000);
+                Thread.Sleep(1000);
             }   
         }
 
@@ -90,14 +90,18 @@ namespace EngineName.Systems
         /// <summary>Checks if have peers, so its possible to send stuff</summary>
         private bool havePeers()
         {
-            return _peer.Connections != null && _peer.Connections.Count > 0;
+            if(_peer.Connections != null && _peer.Connections.Count > 0)
+                return true;
+
+            _peer.DiscoverLocalPeers(_searchport);
+            return false;
         }
         /// <summary>Send information about newly connected peer to all other peers for faster discovery </summary>
         public void SendPeerInfo(IPAddress ip, int port)
         {
             if (!havePeers())
             {
-                Debug.WriteLine("No connections to send to.");
+                //Debug.WriteLine("No connections to send to.");
                 return;
             }
             Debug.WriteLine(string.Format("Broadcasting {0}:{1} to all (count: {2})", ip.ToString(),
@@ -115,13 +119,13 @@ namespace EngineName.Systems
         {
             if (!havePeers())
             {
-                Debug.WriteLine("No connections to send to.");
+                //Debug.WriteLine("No connections to send to.");
                 return;
             }
-
             NetOutgoingMessage msg = _peer.CreateMessage();
             msg.Write((byte)Enums.MessageType.Entity);
-            msg.WriteEntity(id, cBody,cTransform, modelfilename);            
+            msg.WriteEntity(id, cBody,cTransform, modelfilename);
+            _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
         }
 
         /// <summary>Send simple string to all peers </summary>
@@ -176,8 +180,6 @@ namespace EngineName.Systems
                     break;
 
             }
-            
-        
             //ability to send diffrent types of data with ease
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
         }
@@ -245,33 +247,8 @@ namespace EngineName.Systems
                             var cbody = new CBody();
                             var ctransform = new CTransform();
                             string modelname = "";
-                            var metadata = _msg.ReadString();
                             var id  =_msg.ReadEntity(ref cbody,  ref ctransform,  ref modelname);
-                            if (!string.IsNullOrEmpty(modelname))
-                            {
-                                //Add entity 
-                                if (!Game1.Inst.Scene.EntityHasComponent<CTransform>(id))
-                                {
-                                    var ball = Game1.Inst.Scene.AddEntity();
-
-                                    Game1.Inst.Scene.AddComponent(ball, cbody);
-                                    Game1.Inst.Scene.AddComponent(ball, ctransform);
-                                    Game1.Inst.Scene.AddComponent<C3DRenderable>(ball, new CImportedModel
-                                    {
-                                        model = Game1.Inst.Content.Load<Model>(modelname),
-                                        fileName = modelname
-                                    });
-                                }
-                                else
-                                {
-                                    //Update postition
-                                    var oldctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(id);
-                                    oldctransform.Frame = ctransform.Frame;
-                                    oldctransform.Rotation = ctransform.Rotation;
-                                    oldctransform.Position = ctransform.Position;
-                                    oldctransform.Scale = ctransform.Scale;
-                                }
-                            }
+                            addOrUpdatCObjects(id, cbody, ctransform, modelname);
                             //Game1.Inst.Scene.Raise("network_data", data);
                         }
                         else if (mType == Enums.MessageType.CTransform)
@@ -340,13 +317,38 @@ namespace EngineName.Systems
             }
         }
 
+        private void addOrUpdatCObjects(int id, CBody cbody, CTransform ctransform,string modelname)
+        {
+            //Add entity 
+            if (!Game1.Inst.Scene.EntityHasComponent<CTransform>(id))
+            {
+                //calculate BoundindBox since we have the data do this
+                cbody.Aabb = new BoundingBox(-cbody.Radius * Vector3.One, cbody.Radius * Vector3.One);
+                Game1.Inst.Scene.AddComponent(id, cbody);
+                Game1.Inst.Scene.AddComponent(id, ctransform);
+                Game1.Inst.Scene.AddComponent<C3DRenderable>(id, new CImportedModel
+                {
+                    model = Game1.Inst.Content.Load<Model>(modelname),
+                    fileName = modelname
+                });
+            }
+            else
+            {
+                //Update postition
+                var oldctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(id);
+                oldctransform.Frame = ctransform.Frame;
+                oldctransform.Rotation = ctransform.Rotation;
+                oldctransform.Position = ctransform.Position;
+                oldctransform.Scale = ctransform.Scale;
+            }   
+        }
         public override void Cleanup()
         {
             _scanThread.Abort();
             _peer.Shutdown("Shutting Down");
             base.Cleanup();
         }
-        private const float updateInterval  = 2;
+        private const float updateInterval  = 0.1f;
         private float reamaingTime = 0;
         public override void Update(float t, float dt)
         {
