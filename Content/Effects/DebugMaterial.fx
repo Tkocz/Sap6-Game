@@ -1,3 +1,11 @@
+#if OPENGL
+	#define SV_POSITION POSITION
+	#define VS_SHADERMODEL vs_3_0
+	#define PS_SHADERMODEL ps_3_0
+#else
+	#define VS_SHADERMODEL vs_4_0_level_9_1
+	#define PS_SHADERMODEL ps_4_0_level_9_1
+#endif
 /*-------------------------------------
  * UNIFORMS
  *-----------------------------------*/
@@ -41,7 +49,7 @@ void vsMain(in VS_INPUT vsIn, out VS_OUTPUT vsOut) {
 
 technique T1 {
   pass P0 {
-    PixelShader = compile ps_3_0 psMain();
-    VertexShader = compile vs_3_0 vsMain();
+    PixelShader = compile PS_SHADERMODEL psMain();
+    VertexShader = compile VS_SHADERMODEL vsMain();
   }
 }

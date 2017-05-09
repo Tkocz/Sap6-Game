@@ -109,6 +109,21 @@ public sealed class Collisions2: Scene {
                       size,
                       Vector3.Backward + Vector3.Right, -rot);
         }
+
+        CreateBox(new Vector3(0.0f, -49.0f, 0.0f),
+                  new Vector3(50.0f, 1.0f, 50.0f),
+                  Vector3.Right, 0.0f,
+                  new Vector3(0.4f, 0.4f, 0.4f));
+
+        CreateBox(new Vector3(-49.0f, 0.0f, 0.0f),
+                  new Vector3(1.0f, 50.0f, 50.0f),
+                  Vector3.Right, 0.0f,
+                  new Vector3(0.4f, 0.4f, 0.4f));
+
+        CreateBox(new Vector3(0.0f, 0.0f, -49.0f),
+                  new Vector3(50.0f, 50.0f, 1.0f),
+                  Vector3.Right, 0.0f,
+                  new Vector3(0.4f, 0.4f, 0.4f));
     }
 
     /// <summary>Performs update logic specific to the system.</summary>
@@ -276,15 +291,25 @@ public sealed class Collisions2: Scene {
     /// <param name="dim">The box dimensions, or size.</param>
     /// <param name="rotAxis">The axis of rotation (concerning the box's transformation).</param>
     /// <param name="rotDeg">The rotation, in degrees (concerning the box's transformation).</param>
-    private void CreateBox(Vector3 pos, Vector3 dim, Vector3 rotAxis, float rotDeg) {
+    /// <param name="col">The color (optional).</param>
+    private void CreateBox(Vector3  pos,
+                           Vector3  dim,
+                           Vector3  rotAxis,
+                           float    rotDeg,
+                           Vector3? col=null)
+    {
         var rotRad = MathHelper.ToRadians(rotDeg);
 
         var box1 = AddEntity();
 
+        if (col == null) {
+            col = new Vector3(0.2f, 0.4f, 1.0f);
+        }
+
         AddComponent<C3DRenderable>(box1, new CImportedModel {
             model  = Game1.Inst.Content.Load<Model>("Models/DummyBox"),
-            material = new AdsMaterial(0.2f*new Vector3(0.2f, 0.4f, 1.0f),
-                                            new Vector3(0.2f, 0.4f, 1.0f),
+            material = new AdsMaterial(0.2f*col.Value,
+                                            col.Value,
                                             new Vector3(1.0f, 1.0f, 1.0f),
                                             30.0f)
         });
