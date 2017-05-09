@@ -57,7 +57,7 @@ struct VertexShaderOutput {
 
 float CalculateHeight(float4 Position) {
     int phase = (Position.x + Position.z % 2) * 2;
-    float amplitude = 0.2;
+    float amplitude = 0.4;
     float frequency = 2;
     float bias = 0.5;
     float newHeight = (amplitude * sin(frequency * Time + phase) + bias);
@@ -73,38 +73,35 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input) {
     output.Position = mul(viewPosition, Projection);
 
     output.Position.y += CalculateHeight(input.Position);
-    float4 worldNormal = mul(input.Normal, World);
-    output.Normal = normalize(mul(View, worldNormal));
+    
+    float4 worldNormal = mul(float4(input.Normal.xyz, 0), World);
+    float4 viewNormal = mul(float4(worldNormal.xyz, 0), View);
+    output.Normal = normalize(viewNormal);
     output.Color = input.Color + (DiffuseIntensity * DiffuseColor);
     output.TextureCoordinate = input.TextureCoordinate;
-    output.WorldPos = viewPosition;
+    output.WorldPos = worldPosition;
     return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0 {
-    // Calculate the normal, including the information in the bump map
-    float3 bump = BumpConstant * (tex2D(bumpSampler, input.TextureCoordinate * 5) - (0.5, 0.5, 0.5));
+    float3 bump = BumpConstant * ((tex2D(bumpSampler, input.TextureCoordinate * 10 + float2(cos(Time * 0.02), sin(Time * 0.02))) - (0.5, 0.5, 0.5)));
     float3 bumpNormal = input.Normal + bump;
     bumpNormal = normalize(bumpNormal);
 
-    // Calculate the diffuse light component with the bump map normal
     float3 light = normalize(DiffuseLightDirection);
     float diffuseIntensity = dot(light, bumpNormal);
     if (diffuseIntensity < 0)
         diffuseIntensity = 0;
 
-    // Calculate the specular light component with the bump map normal
     float3 r = normalize(reflect(light, bumpNormal));
     float3 v = normalize(CameraPosition - input.WorldPos);
     float dotProduct = dot(r, v);
 
     float4 specular = SpecularIntensity * SpecularColor * max(pow(dotProduct, Shininess), 0) * diffuseIntensity;
 
-    // Calculate the texture color
     //float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
     //textureColor.a = 1;
 
-    // Combine all of these values into one (including the ambient light)
     return float4 (saturate(input.Color.xyz * (diffuseIntensity) + AmbientColor.xyz * AmbientIntensity + specular.xyz), 0.5);
 }
 technique BasicColorDrawing {

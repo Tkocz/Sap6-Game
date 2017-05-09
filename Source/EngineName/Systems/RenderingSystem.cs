@@ -78,7 +78,7 @@ namespace EngineName.Systems
                                 part.Effect.Parameters["AmbientColor"].SetValue(new Vector4(0f, 0f, 1f, 1f));
                                 part.Effect.Parameters["AmbientIntensity"].SetValue(0.5f);
                                 
-                                part.Effect.Parameters["DiffuseLightDirection"].SetValue(new Vector3(0.5f, -0.5f, 0.5f));
+                                part.Effect.Parameters["DiffuseLightDirection"].SetValue(new Vector3(0f, -1f, 2f));
                                 part.Effect.Parameters["DiffuseColor"].SetValue(new Vector4(0f, 0.8f, 0f, 1f));
                                 part.Effect.Parameters["DiffuseIntensity"].SetValue(0.5f);
 
@@ -91,6 +91,8 @@ namespace EngineName.Systems
                                 var viewVector = (camera.Target - cameraTransform.Position);
                                 viewVector.Normalize();
                                 //part.Effect.Parameters["ViewVector"].SetValue(viewVector);
+                                part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
+
 
                                 part.Effect.Parameters["Shininess"].SetValue(200f);
                                 part.Effect.Parameters["SpecularColor"].SetValue(new Vector4(1, 1, 1, 1));
@@ -98,7 +100,7 @@ namespace EngineName.Systems
 
                                 //effect.Parameters["ModelTexture"].SetValue(texture);
                                 part.Effect.Parameters["NormalMap"].SetValue(normalMap);
-                                part.Effect.Parameters["BumpConstant"].SetValue(4 + 3 * (float)Math.Cos(t));
+                                part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(t));
 
                                 part.Effect.Parameters["Time"].SetValue(t);
                                 //part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
