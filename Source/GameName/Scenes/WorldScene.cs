@@ -73,7 +73,7 @@ namespace GameName.Scenes
             AddComponent(player, new CInput());
             AddComponent(player,new CSyncObject());
             AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) } );
-            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking"), fileName = "Models/DummySphere" });
+            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking"), fileName = "Models/viking" });
             /*
             int ball = AddEntity();
             AddComponent(ball, new CBody() { Position = new Vector3(10f, 0, 10f), Radius = 1, Aabb = new BoundingBox(-1 * Vector3.One, 1 * Vector3.One) } );
@@ -156,8 +156,8 @@ namespace GameName.Scenes
                 int id = AddEntity();
                 CImportedModel modelComponent = new CImportedModel();
                 double random = rnd.NextDouble();
-                modelComponent.fileName = "flossy";
-                modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName);
+                modelComponent.fileName = "Models/flossy";
+                modelComponent.model = Game1.Inst.Content.Load<Model>(modelComponent.fileName);
                 AddComponent<C3DRenderable>(id, modelComponent);
 
                 int x = (int)(rnd.NextDouble() * worldSize);
