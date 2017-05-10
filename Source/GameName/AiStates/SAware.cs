@@ -47,7 +47,7 @@ namespace GameName.AiStates
             }
             var enemyTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(closestEnemyId);
             Vector3 dest = Vector3.Normalize(enemyTransform.Position - npcTransform.Position);
-            var source = Vector3.Left;
+            var source = Vector3.Forward;
             var goalQuat = AISystem.GetRotation(source, dest, Vector3.Up);
             var startQuat = npcTransform.Rotation.Rotation;
             var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);

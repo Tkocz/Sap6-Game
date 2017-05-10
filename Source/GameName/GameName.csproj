@@ -50,7 +50,6 @@
     <Compile Include="Scenes\EndGameScene.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
     <Compile Include="Dev\Collisions.cs" />
-    <Compile Include="Dev\Collisions2.cs" />
     <Compile Include="Dev\Materials.cs" />
     <Compile Include="Dev\Particles.cs" />
     <Compile Include="Dev\PostFx.cs" />

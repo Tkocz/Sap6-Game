@@ -43,10 +43,18 @@ namespace GameName.Dev
             base.Init();
             
             int player = AddEntity();
-            AddComponent(player, new CBody() { Radius = 1, Aabb = new BoundingBox(new Vector3(-1, 0, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f, InvMass = 1 });
+            AddComponent(player, new CBody() {
+                Radius = 1,
+                Aabb = new BoundingBox(new Vector3(-1, 0, -1), new Vector3(1, 2, 1)),
+                LinDrag = 0.8f,
+                InvMass = 1,
+                SpeedMultiplier = 1f,
+                RotationMultiplier = 1f,
+                MaxVelocity = 5
+            });
             AddComponent(player, new CInput());
             AddComponent(player, new CTransform() { Position = new Vector3(100, 10, -100), Scale = new Vector3(1f) });
-            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
+            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
 
             // Camera entity
             int camera = AddEntity();
@@ -89,7 +97,7 @@ namespace GameName.Dev
                 //transformComponent.Position += new Vector3(-590, -50, -590);
                 transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
                     (float)(Math.PI * (rn.NextDouble() * 4)));
-                float scale = (float)(rn.NextDouble() * 0.0f) + 0.15f;
+                float scale = 1;
                 transformComponent.Scale = new Vector3(scale, scale, scale);
                 AddComponent(id, transformComponent);
                 AddComponent(id, new CBody {
@@ -98,6 +106,8 @@ namespace GameName.Dev
                     LinDrag = 0.9f,
                     Velocity = Vector3.Zero,
                     Radius = 1f,
+                    SpeedMultiplier = 0.5f,
+                    MaxVelocity = 5
                 });
                 AddComponent(id, new CAI());
             }

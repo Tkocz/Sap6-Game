@@ -23,7 +23,7 @@ namespace GameName.AiStates
 
         public override void Handle(float t, float dt)
         {
-            var rotationSpeed = Math.Min(0.65f * dt, 1);
+            var rotationSpeed = Math.Min(1.8f * dt, 1);
             var movementSpeed = dt * 30f;
             var npcTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(entityId);
             var npcBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(entityId);
@@ -47,7 +47,7 @@ namespace GameName.AiStates
             }
             var enemyTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(closestEnemyId);
             Vector3 dest = Vector3.Normalize(enemyTransform.Position - npcTransform.Position);
-            var source = Vector3.Left;
+            var source = Vector3.Backward;
             var goalQuat = AISystem.GetRotation(source, dest, Vector3.Up);
             var startQuat = npcTransform.Rotation.Rotation;
             var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);

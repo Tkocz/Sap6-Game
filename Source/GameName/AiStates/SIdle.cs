@@ -23,23 +23,13 @@ namespace GameName.AiStates
         }
         public override void Handle(float t, float dt)
         {
-            var rotationSpeed = Math.Min(0.65f * dt, 1);
-            var movementSpeed = dt*15f;
+            var rotationSpeed = 1.0f * dt;
+            var movementSpeed = dt*300f;
             var npcTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(entityId);
             var npcBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(entityId);
             
-            
-            npcTransform.Rotation *= Matrix.CreateFromYawPitchRoll(MathHelper.PiOver4*rotationSpeed, 0, 0);
-            npcBody.Velocity += movementSpeed * npcTransform.Frame.Backward;
-
-            /*
-            var enemyTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(closestEnemyId);
-            Vector3 dest = Vector3.Normalize(enemyTransform.Position - npcTransform.Position);
-            var source = Vector3.Left;
-            var goalQuat = GetRotation(source, dest, Vector3.Up);
-            var startQuat = npcTransform.Rotation.Rotation;
-            var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);
-            npcTransform.Rotation = Matrix.CreateFromQuaternion(dQuat);*/
+            npcTransform.Rotation *= Matrix.CreateFromYawPitchRoll(rotationSpeed, 0, 0);
+            npcBody.Velocity = movementSpeed * npcTransform.Rotation.Forward;
         }
     }
 }
