@@ -46,7 +46,7 @@ namespace GameName.Dev
             AddComponent(player, new CBody() {
                 Radius = 1,
                 Aabb = new BoundingBox(new Vector3(-1, 0, -1), new Vector3(1, 2, 1)),
-                LinDrag = 0.8f,
+                LinDrag = 5f,
                 InvMass = 1,
                 SpeedMultiplier = 1f,
                 RotationMultiplier = 1f,
@@ -85,7 +85,7 @@ namespace GameName.Dev
                 int id = AddEntity();
                 CImportedModel modelComponent = new CImportedModel();
                 double random = rn.NextDouble();
-                modelComponent.fileName = "hen";
+                modelComponent.fileName = "flossy";
                 modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName);
                 AddComponent<C3DRenderable>(id, modelComponent);
 
@@ -94,16 +94,15 @@ namespace GameName.Dev
                 float y = 0;
                 CTransform transformComponent = new CTransform();
                 transformComponent.Position = new Vector3(x, y, z);
-                //transformComponent.Position += new Vector3(-590, -50, -590);
                 transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
-                    (float)(Math.PI * (rn.NextDouble() * 4)));
+                    (float)(Math.PI * (rn.NextDouble() * 2)));
                 float scale = 1;
                 transformComponent.Scale = new Vector3(scale, scale, scale);
                 AddComponent(id, transformComponent);
                 AddComponent(id, new CBody {
                     InvMass = 1,
                     Aabb = new BoundingBox(new Vector3(0,0,0), new Vector3(1,1,1)),
-                    LinDrag = 0.9f,
+                    LinDrag = 5f,
                     Velocity = Vector3.Zero,
                     Radius = 1f,
                     SpeedMultiplier = 0.5f,
