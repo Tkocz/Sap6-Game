@@ -30,6 +30,9 @@ public class AdsMaterial: MaterialShader {
     /// <summary>The shininess constant.</summary>
     private float mK;
 
+    /// <summary>The diffuse texture.</summary>
+    private Texture2D mDifTex;
+
     //--------------------------------------
     // PUBLIC CONSTRUCTORS
     //--------------------------------------
@@ -39,13 +42,15 @@ public class AdsMaterial: MaterialShader {
     /// <param name="dif">The diffuse color.</param>
     /// <param name="spe">The specular color.</param>
     /// <param name="k">The shininess constant.</param>
-    public AdsMaterial(Vector3 amb, Vector3 dif, Vector3 spe, float k)
+    /// <param name="difTex">The diffuse texture.</param>
+    public AdsMaterial(Vector3 amb, Vector3 dif, Vector3 spe, float k, Texture2D difTex=null)
         : base(Game1.Inst.Content.Load<Effect>("Effects/AdsMaterial"))
     {
-        mAmb = amb;
-        mDif = dif;
-        mSpe = spe;
-        mK   = k;
+        mAmb    = amb;
+        mDif    = dif;
+        mSpe    = spe;
+        mK      = k;
+        mDifTex = difTex;
     }
 
     //--------------------------------------
@@ -58,6 +63,15 @@ public class AdsMaterial: MaterialShader {
         mEffect.Parameters["Dif"].SetValue(mDif);
         mEffect.Parameters["Spe"].SetValue(mSpe);
         mEffect.Parameters["K"  ].SetValue(mK);
+
+        if (mDifTex != null) {
+            mEffect.Parameters["UseDifTex"].SetValue(true);
+            mEffect.Parameters["DifTex"].SetValue(mDifTex);
+        }
+        else {
+            mEffect.Parameters["UseDifTex"].SetValue(false);
+            mEffect.Parameters["DifTex"].SetValue((Texture2D)null);
+        }
     }
 }
 
