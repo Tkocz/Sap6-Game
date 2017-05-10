@@ -34,7 +34,7 @@ using GameName.Scenes;
         Log.ToFile();
 
         // TODO: Create initial scene.
-	using (var game = new Game1(new LoobyScene(args))) {
+	using (var game = new Game1(new LobbyScene(args))) {
             game.Run();
         }
 
