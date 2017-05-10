@@ -7,13 +7,17 @@ extern uniform float3 Dif;
 extern uniform float3 Spe;
 extern uniform float K;
 
-static const int NUM_LIGHTS = 4;
+static const int NUM_LIGHTS = 8;
 
 static const float4 Lights[NUM_LIGHTS] = {
-    float4(30.0, 65.0, -30.0,  0.1),
-    float4(-35.0, 25.0, 0.0,  0.1),
-    float4( 0.0, 2.0, 25.0,  0.1),
-    float4( 40.0, 2.0, 25.0,  0.1),
+    float4(-1.0, 5.5, -1.0,  0.7),
+    float4( 1.0, 5.5, -1.0,  0.7),
+    float4( 1.0, 5.5,  1.0,  0.7),
+    float4(-1.0, 5.5,  1.0,  0.7),
+    float4(-2.5, -3.0, -2.0,  0.6),
+    float4( 3.0, -2.5, -1.5,  0.6),
+    float4( 3.5, -2.0,  2.5,  0.6),
+    float4(-1.0, -1.5,  3.5,  0.6),
 };
 
 struct PSOutput {
@@ -45,7 +49,7 @@ void ps_main(in VSOutput x, out PSOutput r) {
         float3 v = normalize(CamPos - x.worldPos);
         float3 vl = length(CamPos - x.worldPos);
         float  d = length(Lights[i].xyz - x.worldPos);
-        float  j = Lights[i].w;
+        float  j = Lights[i].w/(d*d);
         float  dif = max(0.0, dot(l, n));
         float  spe = pow(max(0.0, dot(rn, v)), K);
 

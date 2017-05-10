@@ -15,13 +15,14 @@ using EngineName.Components.Renderable;
 using EngineName.Systems;
 
 using GameName.Scenes;
+    using GameName.Dev;
 
-/*--------------------------------------
- * CLASSES
- *------------------------------------*/
+    /*--------------------------------------
+     * CLASSES
+     *------------------------------------*/
 
-/// <summary>Provides a program entry point.</summary>
-public static class Game {
+    /// <summary>Provides a program entry point.</summary>
+    public static class Game {
     /*--------------------------------------
      * NON-PUBLIC METHODS
      *------------------------------------*/

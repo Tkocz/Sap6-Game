@@ -66,17 +66,15 @@ namespace EngineName.Systems
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
                 CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
 
+                Matrix[] bones = new Matrix[model.model.Bones.Count];
+                model.model.CopyAbsoluteBoneTransformsTo(bones);
                 foreach (var mesh in model.model.Meshes)
                 {
 
                     if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
                         continue;
-
                     // TODO: This might bug out with multiple mesh parts.
-                    if (model.model.Tag == "water") {
-
-                        foreach (ModelMesh shit in model.model.Meshes) {
-
+                    if (model.model.Tag == "water") {
                             foreach (ModelMeshPart part in mesh.MeshParts) {                                Matrix world = mesh.ParentBone.Transform * transform.Frame;
 
                                 part.Effect.Parameters["World"].SetValue(world);
@@ -113,9 +111,8 @@ namespace EngineName.Systems
                                 //part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
                                 foreach (var pass in part.Effect.CurrentTechnique.Passes) {
                                     pass.Apply();
-                                }
-                            }
-                            shit.Draw();
+                                }                                
+                            mesh.Draw();
                         }
                     }
                     else if (model.material != null) {
@@ -146,7 +143,9 @@ namespace EngineName.Systems
                         }
                     }
                     else {
-                        foreach (BasicEffect effect in mesh.Effects) {
+                        for(int i = 0; i < mesh.MeshParts.Count; i++) {
+                            var meshPart = mesh.MeshParts[i];
+                            var effect = (BasicEffect)meshPart.Effect;
                             effect.EnableDefaultLighting();
                             effect.PreferPerPixelLighting = true;
 

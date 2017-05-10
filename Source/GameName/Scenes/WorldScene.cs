@@ -1,12 +1,14 @@
 ﻿using EngineName;
 using EngineName.Components;
 using EngineName.Components.Renderable;
+using EngineName.Core;
 using EngineName.Logging;
 using EngineName.Systems;
 using EngineName.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 
 namespace GameName.Scenes
 {
@@ -14,12 +16,10 @@ namespace GameName.Scenes
     {
         private float passedTime = 0.0f;
         private bool shouldLeave = false;
-        private NetworkSystem _networkSystem;
-        public WorldScene(NetworkSystem networkSystem)
-        {
-            _networkSystem = networkSystem;
-        }
-        
+        private Random rnd = new Random();
+        private int worldSize = 300;
+        private int player;
+
         public override void Draw(float t, float dt) {
             Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
             if (shouldLeave) {
@@ -33,8 +33,7 @@ namespace GameName.Scenes
             var mapSystem = new MapSystem();
             var waterSys = new WaterSystem();
             var physicsSys = new PhysicsSystem();
-            
-            physicsSys.Bounds = new BoundingBox(-200.0f*Vector3.One, 200.0f*Vector3.One);
+            physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
             AddSystems(
                 new FpsCounterSystem(updatesPerSec: 10),
                 new SkyBoxSystem(),
@@ -42,9 +41,10 @@ namespace GameName.Scenes
                 new CameraSystem(),
                 physicsSys,
                 mapSystem,
-                new InputSystem(),
+                new InputSystem(mapSystem),
                 waterSys,
-                new Rendering2DSystem()
+                new Rendering2DSystem(),
+                new AISystem()
             );
 
 #if DEBUG
@@ -52,24 +52,17 @@ namespace GameName.Scenes
 #endif
 
             base.Init();
-            //add  network after init since its allready up and runnning
-            if (_networkSystem != null)
-            {
-                AddSystems(_networkSystem);
-                _networkSystem.InitLight();
-            }
             // Camera entity
             int camera = AddEntity();
             float fieldofview = MathHelper.PiOver2;
             float nearplane = 0.1f;
             float farplane = 1000f;
 
-            int player = AddEntity();
-            AddComponent(player, new CBody() { SpeedMultiplier = 100f, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f } );
+            player = AddEntity();
+            AddComponent(player, new CBody() { MaxVelocity = 1f, InvMass = 0.1f, SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 5f } );
             AddComponent(player, new CInput());
-            AddComponent(player, new CSyncObject());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(0.01f) });
-            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking"), fileName = "Models/viking" });
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) } );
+            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
             /*
             int ball = AddEntity();
             AddComponent(ball, new CBody() { Position = new Vector3(10f, 0, 10f), Radius = 1, Aabb = new BoundingBox(-1 * Vector3.One, 1 * Vector3.One) } );
@@ -78,10 +71,12 @@ namespace GameName.Scenes
             */
 
             AddComponent(camera, new CCamera(-50, 50) {
+                Height = 20,
+                Distance = 20,
                 Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio,nearplane,farplane)
                 ,ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview*1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane*0.5f, farplane*1.2f)
             });
-            AddComponent(camera, new CInput());
+            //AddComponent(camera, new CInput());
             AddComponent(camera, new CTransform() { Position = new Vector3(-50, 50, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
             /*
             int eid = AddEntity();
@@ -108,49 +103,88 @@ namespace GameName.Scenes
 
 
             // Heightmap entity
-            int id = AddEntity();
-            AddComponent<C3DRenderable>(id, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/HeightMap") });
-            AddComponent(id, new CTransform() { Position = new Vector3(-590, -50, -590), Rotation = Matrix.Identity, Scale = new Vector3(1) });
+            int heightMap = AddEntity();
+            AddComponent<C3DRenderable>(heightMap, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/HeightMap") });
+            AddComponent(heightMap, new CTransform() { Position = new Vector3(-590, -50, -590), Rotation = Matrix.Identity, Scale = new Vector3(1) });
             // manually start loading all heightmap components, should be moved/automated
             mapSystem.Load();
             waterSys.Load();
             physicsSys.MapSystem = mapSystem;
-
-            if ((_networkSystem!= null &&_networkSystem._isMaster) || _networkSystem == null) { 
-                var rnd = new Random();
-                for (var i = 0; i < 200; i++) {
-                    var r = 0.6f + (float)rnd.NextDouble() * 1.0f;
-                    CreateBall(new Vector3(-4.5f + i * 0.05f + 100, 20.0f + 2.0f * i, (float)Math.Cos(i) + 100), // Position
-                               new Vector3(0.0f, 0.0f, 0.0f), // Velocity
-                               r);                                                               // Radius
-                }
-            }
-
+                       
+            
             // Add tree as sprint goal
 
             int sprintGoal = AddEntity();
-            AddComponent(sprintGoal, new CBody() { Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f });
-            AddComponent(sprintGoal, new CTransform() { Position = new Vector3(100, -0, 100), Scale = new Vector3(0.05f) });
+            //AddComponent(sprintGoal, new CTrigger());
+            AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
+            AddComponent(sprintGoal, new CTransform() { Position = new Vector3(100, -0, 100), Scale = new Vector3(1f) });
             AddComponent<C3DRenderable>(sprintGoal, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
-
 
             OnEvent("collision", data => {
                 if ((((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
                      ((PhysicsSystem.CollisionInfo)data).Entity2 == sprintGoal)
-                    || 
+                       ||
                     (((PhysicsSystem.CollisionInfo)data).Entity2 == player &&
                      ((PhysicsSystem.CollisionInfo)data).Entity1 == sprintGoal)) {
-                    shouldLeave = true;
-                                       
+                        shouldLeave = true; // We reached the goal and wants to leave the scene-
                 }
             });
 
+            CreateTriggerEvents(player);
+            CreateAnimals();
 
             Log.Get().Debug("TestScene initialized.");
         }
 
+        private void CreateAnimals() {
+            for(int i = 0; i < 50; i++) {
+
+                int id = AddEntity();
+                CImportedModel modelComponent = new CImportedModel();
+                double random = rnd.NextDouble();
+                modelComponent.fileName = "flossy";
+                modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName);
+                AddComponent<C3DRenderable>(id, modelComponent);
+
+                int x = (int)(rnd.NextDouble() * worldSize);
+                int z = (int)(rnd.NextDouble() * worldSize);
+                float y = 0;
+                CTransform transformComponent = new CTransform();
+                
+                transformComponent.Position = new Vector3(x, y, z);
+                //transformComponent.Position += new Vector3(-590, -50, -590);
+                transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
+                    (float)(Math.PI * (rnd.NextDouble() * 2)));
+                float scale = 1;
+                transformComponent.Scale = new Vector3(scale, scale, scale);
+                AddComponent(id, transformComponent);
+                AddComponent(id, new CBody {
+                    InvMass = 0.05f,
+                    Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+                    LinDrag = 0.8f,
+                    Velocity = Vector3.Zero,
+                    Radius = 1f,
+                    SpeedMultiplier = 0.5f,
+                    MaxVelocity = 5
+                });
+                AddComponent(id, new CAI());
+            }
+        }
+
         public override void Update(float t, float dt) {
             passedTime += dt;
+
+            Dictionary<int, EcsComponent> cameras = GetComponents<CCamera>();
+
+            foreach(var camera in cameras) {
+                CTransform cameraPos = (CTransform)GetComponentFromEntity<CTransform>(camera.Key);
+                CTransform playerPos = (CTransform)GetComponentFromEntity<CTransform>(player);
+                cameraPos.Position.X = playerPos.Position.X + ((CCamera)camera.Value).Distance;
+                cameraPos.Position.Y = playerPos.Position.Y + ((CCamera)camera.Value).Height;
+                cameraPos.Position.Z = playerPos.Position.Z + ((CCamera)camera.Value).Distance;
+                ((CCamera)camera.Value).Target = playerPos.Position;
+            } 
+
             base.Update(t, dt);
         }
 
@@ -164,8 +198,7 @@ namespace GameName.Scenes
                 Velocity = v,
                 Restitution = 0.3f
             });
-                    
-            AddComponent(ball ,new CSyncObject());
+
             AddComponent(ball, new CTransform {
                 Position = p,
                 Rotation = Matrix.Identity,
@@ -173,11 +206,53 @@ namespace GameName.Scenes
             });
 
             AddComponent<C3DRenderable>(ball, new CImportedModel {
-                model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),
-                fileName = "Models/DummySphere"
+                model = Game1.Inst.Content.Load<Model>("Models/DummySphere")
             });
 
             return ball;
+        }
+
+        private void CreateTriggerEvents(int playerID) {
+            for (int i = 0; i < 40; i++) {
+                int id = AddEntity();
+                AddComponent(id, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
+                AddComponent(id, new CTransform() { Position = new Vector3(rnd.Next(-worldSize, worldSize), -0, rnd.Next(-worldSize, worldSize)), Scale = new Vector3(0.05f) });
+                if (rnd.NextDouble() > 0.5) {
+                    // Falling balls event
+                    OnEvent("collision", data => {
+                        if ((((PhysicsSystem.CollisionInfo)data).Entity1 == playerID &&
+                             ((PhysicsSystem.CollisionInfo)data).Entity2 == id)
+                               ||
+                            (((PhysicsSystem.CollisionInfo)data).Entity2 == id &&
+                             ((PhysicsSystem.CollisionInfo)data).Entity1 == playerID)) {
+                            CTransform playerPosition = (CTransform)GetComponentFromEntity<CTransform>(playerID);
+                            for (var j = 0; j < 6; j++) {
+                                var r = 0.6f + (float)rnd.NextDouble() * 2.0f;
+                                CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, 10f + 2.0f * j, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
+                                           new Vector3(0.0f, -50.0f, 0.0f), // Velocity
+                                           r);                              // Radius
+                            }
+                        }
+                    });
+                } else {
+                    // Balls spawns around the player
+                    OnEvent("collision", data => {
+                        if ((((PhysicsSystem.CollisionInfo)data).Entity1 == playerID &&
+                             ((PhysicsSystem.CollisionInfo)data).Entity2 == id)
+                               ||
+                            (((PhysicsSystem.CollisionInfo)data).Entity2 == id &&
+                             ((PhysicsSystem.CollisionInfo)data).Entity1 == playerID)) {
+                            CTransform playerPosition = (CTransform)GetComponentFromEntity<CTransform>(playerID);
+                            for (var j = 0; j < 6; j++) {
+                                var r = 0.6f + (float)rnd.NextDouble() * 2.0f;
+                                CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 2f, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
+                                           new Vector3(0.0f, 0.0f, 0.0f), // Velocity
+                                           r);                            // Radius
+                            }
+                        }
+                    });
+                }
+            }
         }
     }
 }
