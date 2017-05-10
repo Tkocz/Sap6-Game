@@ -48,6 +48,18 @@ public sealed class Collisions: Scene {
     /// <summary>Slow motion factor.</summary>
     private float mSlowMoFactor = 1.0f;
 
+    /// <summary>Pseudo-random number generator.</summary>
+    private Random mRnd = new Random();
+
+    /// <summary>Delay between spawns.</summary>
+    private float mSpawnInterval = 0.05f;
+
+    /// <summary>Spawn timer.</summary>
+    private float mSpawnTimer;
+
+    /// <summary>The ball restitution.</summary>
+    private float mRestitution = 0.7f;
+
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
@@ -56,7 +68,8 @@ public sealed class Collisions: Scene {
     public override void Init() {
         PhysicsSystem physics;
 
-        AddSystems(physics = new PhysicsSystem(),
+        AddSystems(            new LogicSystem(),
+                   physics = new PhysicsSystem(),
                               new CameraSystem(),
                            new RenderingSystem());
 
@@ -70,21 +83,11 @@ public sealed class Collisions: Scene {
 
         mCamID = InitCam();
 
-        var rnd = new System.Random();
-
-        // Colors to pick from when spawning balls.
-        var cols = new [] {
-            new Vector3(1.0f, 0.8f, 0.0f),
-            new Vector3(0.2f, 0.8f, 0.1f),
-        };
+        mRnd = new System.Random();
 
         // Spawn a few balls.
-        for (var i = 0; i < 300; i++) {
-            var r = 0.06f + (float)rnd.NextDouble()*0.1f;
-            CreateBall(new Vector3(-0.4f + i*0.005f, 2.0f + 0.2f*i, 0.1f*(float)Math.Cos(i)),
-                       new Vector3(0.0f           , 0.0f          , 0.0f                   ),
-                       r,
-                       cols[rnd.Next(cols.Length)]);
+        for (var i = 0; i < 100; i++) {
+            SpawnBall();
         }
 
         var dist = 2.2f;
@@ -155,6 +158,12 @@ public sealed class Collisions: Scene {
 
         mUpdT += dt;
 
+        mSpawnTimer -= dt;
+        if (mSpawnTimer < 0.0f) {
+            mSpawnTimer = mSpawnInterval;
+            SpawnBall();
+        }
+
         base.Update(mUpdT, dt);
     }
 
@@ -163,22 +172,34 @@ public sealed class Collisions: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
-        if (mSlowMo) {
-            dt *= 0.1f;
+        var kb = Keyboard.GetState();
+
+        if (kb.IsKeyDown(Keys.R)) {
+            mRestitution += dt;
+            if (mRestitution > 1.0f) {
+                mRestitution = 1.0f;
+            }
         }
 
-        mDrawT += dt;
+        if (kb.IsKeyDown(Keys.V)) {
+            mRestitution -= dt;
+            if (mRestitution < 0.0f) {
+                mRestitution = 0.0f;
+            }
+        }
 
-        Game1.Inst.GraphicsDevice.Clear(Color.White);
+        if (kb.IsKeyDown(Keys.E)) {
+            mSpawnInterval += dt;
+        }
 
-        base.Draw(mDrawT, dt);
+        if (kb.IsKeyDown(Keys.C)) {
+            mSpawnInterval -= dt;
+            if (mSpawnInterval < 0.01f) {
+                mSpawnInterval = 0.01f;
+            }
+        }
 
         float CAM_SPEED = 5.0f;
-        if (mSlowMo) {
-            CAM_SPEED *= 10.0f;
-        }
-
-        var kb = Keyboard.GetState();
 
         if (kb.IsKeyDown(Keys.Escape)) {
             Game1.Inst.LeaveScene();
@@ -285,11 +306,36 @@ public sealed class Collisions: Scene {
             d.Normalize();
             cam.Target -= CAM_SPEED*dt*d;
         }
+
+        if (mSlowMo) {
+            dt *= 0.1f;
+        }
+
+        mDrawT += dt;
+
+        Game1.Inst.GraphicsDevice.Clear(Color.White);
+
+        base.Draw(mDrawT, dt);
     }
 
     //--------------------------------------
     // NON-PUBLIC METHODS
     //--------------------------------------
+
+    /// <summary>Spawns a ball!</summary>
+    private void SpawnBall() {
+        // Colors to pick from when spawning balls.
+        var cols = new [] {
+            new Vector3(0.9f, 0.1f, 0.1f),
+            new Vector3(0.9f, 0.9f, 0.9f),
+        };
+
+        var theta = 2.0f*MathHelper.Pi*(float)mRnd.NextDouble();
+        CreateBall(new Vector3(1.0f*(float)Math.Cos(theta), 5.0f, 1.0f*(float)Math.Sin(theta)),
+                   (float)mRnd.NextDouble()*Vector3.Up,
+                   0.06f + (float)mRnd.NextDouble()*0.1f,
+                   cols[mRnd.Next(cols.Length)]);
+    }
 
     /// <summary>Creates a new ball in the scene with the given position and velocity.</summary>
     /// <param name="p">The ball position, in world-space.</param>
@@ -299,11 +345,19 @@ public sealed class Collisions: Scene {
     private int CreateBall(Vector3 p, Vector3 v, float r, Vector3 col) {
         var ball = AddEntity();
 
+        var ttl = 8.0f;
+        AddComponent(ball, new CLogic { Fn = (t, dt) => {
+            ttl -= dt;
+            if (ttl <= 0.0f) {
+                Game1.Inst.Scene.RemoveEntity(ball);
+            }
+        }});
+
         AddComponent(ball, new CBody { Aabb        = new BoundingBox(-r*Vector3.One, r*Vector3.One),
                                        Radius      = r,
                                        LinDrag     = 0.2f,
                                        Velocity    = v,
-                                       Restitution = 0.7f,
+                                       Restitution = mRestitution,
                                        EnableRot = true });
 
         AddComponent(ball, new CTransform { Position = p,

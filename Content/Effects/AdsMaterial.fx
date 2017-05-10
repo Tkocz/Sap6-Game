@@ -21,8 +21,8 @@ static const float4 Lights[NUM_LIGHTS] = {
     float4(-1.0, 5.5,  1.0,  0.7),
     float4(-2.5, -3.0, -2.0,  0.6),
     float4( 3.0, -2.5, -1.5,  0.6),
-    float4( 3.5, -2.0,  2.5,  0.6),
-    float4(-1.0, -1.5,  3.5,  0.6),
+    float4( 3.5, 2.0,  2.5,  0.6),
+    float4(-1.0, 1.5,  3.5,  0.6),
 };
 
 struct PSOutput {
@@ -46,6 +46,10 @@ struct VSOutput {
 
 void ps_main(in VSOutput x, out PSOutput r) {
     r.color = float4(Amb, 1.0);
+
+    if (UseDifTex == true) {
+        r.color *= float4(tex2D(difTex, x.texCoord).rgb, 1.0f);
+    }
 
     for (int i = 0; i < NUM_LIGHTS; i++) {
         float3 l = normalize(Lights[i].xyz - x.worldPos);
