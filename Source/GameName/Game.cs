@@ -13,13 +13,14 @@ using EngineName.Components.Renderable;
 using EngineName.Systems;
 
 using GameName.Scenes;
+    using GameName.Dev;
 
-/*--------------------------------------
- * CLASSES
- *------------------------------------*/
+    /*--------------------------------------
+     * CLASSES
+     *------------------------------------*/
 
-/// <summary>Provides a program entry point.</summary>
-public static class Game {
+    /// <summary>Provides a program entry point.</summary>
+    public static class Game {
     /*--------------------------------------
      * NON-PUBLIC METHODS
      *------------------------------------*/
@@ -31,7 +32,7 @@ public static class Game {
         Log.ToFile();
 
         // TODO: Create initial scene.
-	using (var game = new Game1(new MainMenu())) {
+	using (var game = new Game1(new AiScene())) {
             game.Run();
         }
 

@@ -27,11 +27,15 @@ public sealed class CBody: EcsComponent {
     public float Restitution = 1.0f;
 
     /// <summary>The speed multiplier.</summary>
-
     public float SpeedMultiplier = 1.0f;
+
+    /// <summary>The rotation multiplier.</summary>
+    public float RotationMultiplier = 1.0f;
          
     /// <summary>The velocity, in meters per second.</summary>
     public Vector3 Velocity;
-}
+
+    public float MaxVelocity = 1.0f;
+    }
 
 }

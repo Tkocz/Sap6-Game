@@ -83,25 +83,29 @@ namespace EngineName.Systems {
                     Game1.Inst.Exit();
 
                 var movementSpeed = dt * 30f * body.SpeedMultiplier;
+                var rotationSpeed = dt * 3f * body.RotationMultiplier;
+
+                Vector3 acceleration = Vector3.Zero;
 
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
-                    //body.Velocity.Z += movementSpeed;
-                    body.Velocity += movementSpeed * transform.Frame.Forward;
+                    acceleration += movementSpeed * transform.Frame.Forward;
                 if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
-                    //body.Velocity.Z -= movementSpeed;
-                    body.Velocity += movementSpeed * transform.Frame.Backward;
-                if (currentState.IsKeyDown(inputValue.LeftMovementKey))
-                {
-                    //body.Velocity.X -= movementSpeed;
-                    yaw = -movementSpeed * 0.5f;
+                    acceleration += movementSpeed * transform.Frame.Backward;
+
+                if (acceleration.X + body.Velocity.X < body.MaxVelocity || acceleration.X + body.Velocity.X > -body.MaxVelocity)
+                    body.Velocity.X += acceleration.X;
+                if (acceleration.Y + body.Velocity.Y < body.MaxVelocity || acceleration.Y + body.Velocity.Y > -body.MaxVelocity)
+                    body.Velocity.Y += acceleration.Y;
+                if (acceleration.Z + body.Velocity.Z < body.MaxVelocity || acceleration.Z + body.Velocity.Z > -body.MaxVelocity)
+                    body.Velocity.Z += acceleration.Z;
+
+                if (currentState.IsKeyDown(inputValue.LeftMovementKey)) {
+                    yaw = rotationSpeed;
                 }
-                if (currentState.IsKeyDown(inputValue.RightMovementKey))
-                {
-                    //body.Velocity.X += movementSpeed;
-                    yaw = movementSpeed * 0.5f;
+                if (currentState.IsKeyDown(inputValue.RightMovementKey)) {
+                    yaw = -rotationSpeed;
                 }
-                if (currentState.IsKeyDown(Keys.Space) && !isInAir)
-                {
+                if (currentState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 15f;
                     isInAir = true;
                 }

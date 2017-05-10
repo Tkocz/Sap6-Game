@@ -42,6 +42,10 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AiStates\SAware.cs" />
+    <Compile Include="AiStates\SEvade.cs" />
+    <Compile Include="AiStates\SIdle.cs" />
+    <Compile Include="Dev\AiScene.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Scenes\EndGameScene.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
@@ -51,6 +55,7 @@
     <Compile Include="Dev\PostFx.cs" />
     <Compile Include="Dev\ChatScene.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
+    <Compile Include="Systems\AISystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
