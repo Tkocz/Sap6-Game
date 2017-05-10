@@ -1,12 +1,14 @@
 ﻿using EngineName;
 using EngineName.Components;
 using EngineName.Components.Renderable;
+using EngineName.Core;
 using EngineName.Logging;
 using EngineName.Systems;
 using EngineName.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 
 namespace GameName.Scenes
 {
@@ -16,6 +18,7 @@ namespace GameName.Scenes
         private bool shouldLeave = false;
         private Random rnd = new Random();
         private int worldSize = 300;
+        private int player;
 
         public override void Draw(float t, float dt) {
             Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
@@ -55,10 +58,10 @@ namespace GameName.Scenes
             float nearplane = 0.1f;
             float farplane = 1000f;
 
-            int player = AddEntity();
-            AddComponent(player, new CBody() { SpeedMultiplier = 100f, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f } );
+            player = AddEntity();
+            AddComponent(player, new CBody() { SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f } );
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(0.01f) } );
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) } );
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
             /*
             int ball = AddEntity();
@@ -68,10 +71,12 @@ namespace GameName.Scenes
             */
 
             AddComponent(camera, new CCamera(-50, 50) {
+                Height = 20,
+                Distance = 20,
                 Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio,nearplane,farplane)
                 ,ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview*1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane*0.5f, farplane*1.2f)
             });
-            AddComponent(camera, new CInput());
+            //AddComponent(camera, new CInput());
             AddComponent(camera, new CTransform() { Position = new Vector3(-50, 50, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
             /*
             int eid = AddEntity();
@@ -132,6 +137,18 @@ namespace GameName.Scenes
 
         public override void Update(float t, float dt) {
             passedTime += dt;
+
+            Dictionary<int, EcsComponent> cameras = GetComponents<CCamera>();
+
+            foreach(var camera in cameras) {
+                CTransform cameraPos = (CTransform)GetComponentFromEntity<CTransform>(camera.Key);
+                CTransform playerPos = (CTransform)GetComponentFromEntity<CTransform>(player);
+                cameraPos.Position.X = playerPos.Position.X + ((CCamera)camera.Value).Distance;
+                cameraPos.Position.Y = playerPos.Position.Y + ((CCamera)camera.Value).Height;
+                cameraPos.Position.Z = playerPos.Position.Z + ((CCamera)camera.Value).Distance;
+                ((CCamera)camera.Value).Target = playerPos.Position;
+            } 
+
             base.Update(t, dt);
         }
 
