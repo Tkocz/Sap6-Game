@@ -30,6 +30,7 @@ namespace GameName.AiStates
 
             var closestEnemyDistance = float.MaxValue;
             var closestEnemyId = -1;
+            CTransform closestEnemyTransform = null;
 
             foreach (var player in Game1.Inst.Scene.GetComponents<CInput>())
             {
@@ -43,10 +44,12 @@ namespace GameName.AiStates
                 if (closestEnemyDistance > distance) {
                     closestEnemyDistance = distance;
                     closestEnemyId = player.Key;
+                    closestEnemyTransform = playerTransform;
                 }
             }
-            var enemyTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(closestEnemyId);
-            Vector3 dest = Vector3.Normalize(enemyTransform.Position - npcTransform.Position);
+            if (closestEnemyId == -1)
+                return;
+            Vector3 dest = Vector3.Normalize(closestEnemyTransform.Position - npcTransform.Position);
             var source = Vector3.Backward;
             var goalQuat = AISystem.GetRotation(source, dest, Vector3.Up);
             var startQuat = npcTransform.Rotation.Rotation;

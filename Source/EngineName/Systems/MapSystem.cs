@@ -73,6 +73,17 @@ namespace EngineName.Systems
 
 		private Color materialPick(int decimalCode)
 		{
+            var sand = Color.FromNonPremultiplied(194, 178, 128, 255);
+            var grass = Color.ForestGreen;
+            float sandStop = 225;
+            float grassStart = 235;
+            if (decimalCode < sandStop)
+                return sand;
+            if(decimalCode < grassStart) {
+                var progress = (decimalCode - sandStop) / (grassStart - sandStop);
+                return Color.Lerp(sand, grass, progress);
+            }
+            return grass;
 			switch (decimalCode)
 			{
 				case 255:
@@ -161,10 +172,11 @@ namespace EngineName.Systems
 
 			compHeight.HeightData = new Color[terrainWidth, terrainHeight];
             mHeightData = new float[terrainWidth, terrainHeight];
+            Random rn = new Random();
             for (int x = 0; x < terrainWidth; x++) {
                 for (int y = 0; y < terrainHeight; y++) {
                     compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
-                    mHeightData[x, y] = colorMap[x + y * terrainWidth].R + transformComponent.Position.Y;
+                    mHeightData[x, y] = colorMap[x + y * terrainWidth].R + transformComponent.Position.Y + (0.5f-(float)(rn.NextDouble() * 1f));
                 }
             }
 
@@ -207,7 +219,7 @@ namespace EngineName.Systems
 						yOffset = yOffset - reCurisiveCounter % chunksplit;
 					globalx = x + xOffset;
 					globaly = y + yOffset;
-					int height = (int)cheightmap.HeightData[globalx, globaly].R;
+					float height = mHeightData[globalx, globaly];
 					vertices[x + y * terrainWidth].Position = new Vector3(globalx, height, globaly);
 					vertices[x + y * terrainWidth].Color = materialPick(cheightmap.HeightData[globalx, globaly].G);
 
@@ -251,14 +263,19 @@ namespace EngineName.Systems
 				CreateIndicesChunk(heightmap, ref indices, 0);
 				CalculateHeightData(heightmap, key);
 				CreateVerticesChunks(heightmap, ref vertices, 0, 0);
-				basicEffect.Texture = heightmap.Image;
-				for (int j = 0; j < vertices.Values.Count; j++)
+                //basicEffect.Texture = heightmap.Image;
+                basicEffect.DiffuseColor = new Vector3(1, 1, 1);
+                basicEffect.SpecularPower = 20f;
+                basicEffect.SpecularColor = new Vector3(0.25f);
+                for (int j = 0; j < vertices.Values.Count; j++)
 				{
 					var vert = vertices[j];
 					var ind = indices[j];
 					CalculateNormals(ref vert, ref ind);
+                    /*
                     for(int i = 0; i < vertices[j].Length; i++)
                         vertices[j][i].Color = Color.ForestGreen;
+                    */
 					vertices[j] = vert;
 					indices[j] = ind;
 

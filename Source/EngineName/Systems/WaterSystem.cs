@@ -54,7 +54,7 @@ namespace EngineName.Systems
                 {
                     for (int y = 0; y < resolution; y++)
                     {
-                        vertices[x + y * resolution].Position = new Vector3((terrainWidth/resolution)*x, heightmap.LowestPoint + 200, (terrainHeight/resolution)*y);
+                        vertices[x + y * resolution].Position = new Vector3((terrainWidth/resolution)*x, heightmap.LowestPoint + 375, (terrainHeight/resolution)*y);
                         var color = Color.Blue;
                         color.A = 100;
                         vertices[x + y * resolution].TextureCoordinate = new Vector2(x * 0.005f, y * 0.005f);
