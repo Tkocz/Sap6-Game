@@ -7,23 +7,24 @@ using EngineName.Components;
 
 namespace EngineName.Systems {
     public class InputSystem : EcsSystem {
-        private MapSystem _mapSystem;
         private const float CAMERASPEED = 0.1f;
         private Keys[] lastPressedKeys;
         private Matrix addRot;
         private float yaw = 0, pitch = 0, roll = 0;
         private bool isInAir = false;
+        private Vector3 playerPosition = Vector3.Zero;
         public InputSystem() { }
 
         public InputSystem(MapSystem mapSystem)
         {
-            _mapSystem = mapSystem;
         }
 
         public override void Init()
         {
             Game1.Inst.Scene.OnEvent("collisionwithground", data => isInAir = false);
-            
+            #if DEBUG
+                DebugOverlay.Inst.DbgStr((t, dt) => $"Player position: {playerPosition}");
+            #endif
             base.Init();
         }
 
@@ -40,8 +41,9 @@ namespace EngineName.Systems {
                 }
                 var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(input.Key);
                 var inputValue = (CInput)input.Value;
-                if (Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key))
-                {
+                if(body != null)
+                    playerPosition = transform.Position;
+                if (Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key)) {
                     CCamera cameraComponent = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(input.Key);
 
                     if (currentState.IsKeyDown(inputValue.CameraMovementForward))
@@ -87,7 +89,7 @@ namespace EngineName.Systems {
                     body.Velocity += movementSpeed * transform.Frame.Forward;
                 if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
                     //body.Velocity.Z -= movementSpeed;
-                    body.Velocity -= movementSpeed * transform.Frame.Backward;
+                    body.Velocity -= movementSpeed * transform.Frame.Forward;
                 if (currentState.IsKeyDown(inputValue.LeftMovementKey))
                 {
                     //body.Velocity.X -= movementSpeed;
