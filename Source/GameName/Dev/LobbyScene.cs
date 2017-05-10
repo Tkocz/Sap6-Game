@@ -22,6 +22,11 @@ namespace GameName.Scenes
             }
 
         }
+
+        public LobbyScene()
+        {
+        }
+
         public override void Draw(float t, float dt)
         {
             Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
