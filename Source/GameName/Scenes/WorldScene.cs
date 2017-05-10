@@ -14,6 +14,12 @@ namespace GameName.Scenes
     {
         private float passedTime = 0.0f;
         private bool shouldLeave = false;
+        private NetworkSystem _networkSystem;
+        public WorldScene(NetworkSystem networkSystem)
+        {
+            _networkSystem = networkSystem;
+        }
+        
         public override void Draw(float t, float dt) {
             Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
             if (shouldLeave) {
@@ -27,6 +33,7 @@ namespace GameName.Scenes
             var mapSystem = new MapSystem();
             var waterSys = new WaterSystem();
             var physicsSys = new PhysicsSystem();
+            
             physicsSys.Bounds = new BoundingBox(-200.0f*Vector3.One, 200.0f*Vector3.One);
             AddSystems(
                 new FpsCounterSystem(updatesPerSec: 10),
@@ -38,7 +45,6 @@ namespace GameName.Scenes
                 new InputSystem(),
                 waterSys,
                 new Rendering2DSystem()
-
             );
 
 #if DEBUG
@@ -46,6 +52,11 @@ namespace GameName.Scenes
 #endif
 
             base.Init();
+            //add  network after init since its allready up and runnning
+            if (_networkSystem != null)
+            {
+                AddSystems(_networkSystem);
+            }
             // Camera entity
             int camera = AddEntity();
             float fieldofview = MathHelper.PiOver2;
@@ -55,8 +66,9 @@ namespace GameName.Scenes
             int player = AddEntity();
             AddComponent(player, new CBody() { SpeedMultiplier = 100f, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f } );
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(0.01f) } );
-            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
+            AddComponent(player, new CSyncObject());
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(0.01f) });
+            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking"), fileName = "Models/viking" });
             /*
             int ball = AddEntity();
             AddComponent(ball, new CBody() { Position = new Vector3(10f, 0, 10f), Radius = 1, Aabb = new BoundingBox(-1 * Vector3.One, 1 * Vector3.One) } );
@@ -103,12 +115,14 @@ namespace GameName.Scenes
             waterSys.Load();
             physicsSys.MapSystem = mapSystem;
 
-            var rnd = new Random();
-            for (var i = 0; i < 200; i++) {
-                var r = 0.6f + (float)rnd.NextDouble() * 1.0f;
-                CreateBall(new Vector3(-4.5f + i * 0.05f + 100, 20.0f + 2.0f * i, (float)Math.Cos(i) + 100), // Position
-                           new Vector3(0.0f, 0.0f, 0.0f), // Velocity
-                           r);                                                               // Radius
+            if (_networkSystem._isMaster) { 
+                var rnd = new Random();
+                for (var i = 0; i < 200; i++) {
+                    var r = 0.6f + (float)rnd.NextDouble() * 1.0f;
+                    CreateBall(new Vector3(-4.5f + i * 0.05f + 100, 20.0f + 2.0f * i, (float)Math.Cos(i) + 100), // Position
+                               new Vector3(0.0f, 0.0f, 0.0f), // Velocity
+                               r);                                                               // Radius
+                }
             }
 
             // Add tree as sprint goal
@@ -149,7 +163,8 @@ namespace GameName.Scenes
                 Velocity = v,
                 Restitution = 0.3f
             });
-
+                    
+            AddComponent(ball ,new CSyncObject());
             AddComponent(ball, new CTransform {
                 Position = p,
                 Rotation = Matrix.Identity,
@@ -157,7 +172,8 @@ namespace GameName.Scenes
             });
 
             AddComponent<C3DRenderable>(ball, new CImportedModel {
-                model = Game1.Inst.Content.Load<Model>("Models/DummySphere")
+                model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),
+                fileName = "Models/DummySphere"
             });
 
             return ball;

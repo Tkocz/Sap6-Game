@@ -60,7 +60,7 @@ namespace EngineName.Systems {
                 //For Network Chat           
                 foreach (Keys key in pressedKeys)
                 {
-                    if (!lastPressedKeys.Contains(key))
+                    if (lastPressedKeys != null && lastPressedKeys.Contains(key))
                     {
                         Game1.Inst.RaiseInScene("key_to_write", key);
 

@@ -1,3 +1,5 @@
+using Lidgren.Network;
+
 namespace EngineName {
 
     /*--------------------------------------
@@ -70,7 +72,7 @@ namespace EngineName {
 
         Dictionary<Type, Dictionary<int, EcsComponent>> Components = new Dictionary<Type, Dictionary<int, EcsComponent>>();
         private int EntityCounter = -1;
-        private Random rnd = new Random();
+        private CryptoRandom rnd = new CryptoRandom();
         /*--------------------------------------
          * PUBLIC METHODS
          *------------------------------------*/
@@ -114,7 +116,8 @@ namespace EngineName {
             /*
         DebugUtil.Assert(AtomicUtil.CAS(ref entity.m_Scene, this, null),
                          "entity.m_Scene is not null!");*/
-            EntityCounter = rnd.Next(0, 10000000);
+           
+            EntityCounter = rnd.Next(0, int.MaxValue);
             m_Entities.Add(EntityCounter);
             return EntityCounter;
         }

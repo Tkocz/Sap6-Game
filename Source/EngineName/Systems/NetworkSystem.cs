@@ -23,6 +23,9 @@ namespace EngineName.Systems
         private NetIncomingMessage _msg;
         private bool _bot = false;
         private Thread _scanThread;
+        private bool _scanForPeers = true;
+        public bool _isMaster =false;
+        public string masterIp;
         public NetworkSystem()
         {
         }
@@ -42,16 +45,24 @@ namespace EngineName.Systems
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
             _config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
-
+           
             _peer = new NetPeer(_config);
             _peer.Start();
+            
             _peer.DiscoverLocalPeers(_searchport);
 
-            if (!_bot) { 
-                Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data , "metadata"));
-                Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
-                 Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
-            }
+
+            Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data , "metadata"));
+            Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
+            Game1.Inst.Scene.OnEvent("startgame",
+                data =>
+                {
+                    this.SendObject(_peer.Configuration.BroadcastAddress.ToString(), "StartEvent");
+                    _isMaster = true;
+                    Game1.Inst.Scene.Raise("startgamerequest", null);
+                    _scanThread.Abort();
+                });
+     
 
             _scanThread = new Thread(ScanForNewPeers);
             _scanThread.Start();
@@ -64,6 +75,8 @@ namespace EngineName.Systems
             {
                 _peer.DiscoverLocalPeers(_searchport);
                 Thread.Sleep(1000);
+                if(!_scanForPeers)
+                    return;
             }   
         }
 
@@ -198,7 +211,11 @@ namespace EngineName.Systems
                     case NetIncomingMessageType.DiscoveryResponse:
                         // just connect to first server discovered
                         //Debug.WriteLine("ReceivePeersData DiscoveryResponse CONNECT");
-                        _peer.Connect(_msg.SenderEndPoint);
+                        if (_peer.Connections.Any(x => x.RemoteEndPoint.Address == _msg.SenderEndPoint.Address))
+                            Debug.WriteLine("allreadyConnected");
+                        else { 
+                             _peer.Connect(_msg.SenderEndPoint);
+                        }
                         Game1.Inst.Scene.Raise("peer_data", _peer.Connections.Select(x => x.RemoteEndPoint.Address.ToString()).ToList());
                         break;
                     case NetIncomingMessageType.ConnectionApproval:
@@ -217,7 +234,19 @@ namespace EngineName.Systems
                             if (!_bot)
                             {
                                 var metadata = _msg.ReadString();
-                                Game1.Inst.Scene.Raise("network_data_text", _msg.ReadString());                               
+                                if (metadata == "StartEvent")
+                                {
+                                    var ip = _msg.ReadString();
+                                    masterIp = ip;
+                                    _isMaster = false;
+                                    Game1.Inst.Scene.Raise("startgamerequest", _msg.ReadString());
+                                    _scanThread.Abort();
+                                }
+                                else if(metadata == "metadata")
+                                {
+                                    Game1.Inst.Scene.Raise("network_data_text", _msg.ReadString());
+                                }
+                                                            
                             }
                         }
                         else if (mType == Enums.MessageType.PeerInformation)
@@ -275,16 +304,16 @@ namespace EngineName.Systems
                         Debug.WriteLine("UnconnectedData: " + _msg.ReadString());
                         break;
                     case NetIncomingMessageType.VerboseDebugMessage:
-                        Debug.WriteLine(_msg.ReadString());
+                        Debug.WriteLine(NetIncomingMessageType.VerboseDebugMessage +" " + _msg.ReadString());
                         break;
                     case NetIncomingMessageType.DebugMessage:
-                        Debug.WriteLine(_msg.ReadString());
+                        Debug.WriteLine(NetIncomingMessageType.DebugMessage + " "+ _msg.ReadString());
                         break;
                     case NetIncomingMessageType.WarningMessage:
-                        Debug.WriteLine(_msg.ReadString());
+                        Debug.WriteLine(NetIncomingMessageType.WarningMessage + " " + _msg.ReadString());
                         break;
                     case NetIncomingMessageType.ErrorMessage:
-                        Debug.WriteLine(_msg.ReadString());
+                        Debug.WriteLine(NetIncomingMessageType.ErrorMessage + " "  + _msg.ReadString());
                         break;
                     default:
                         Debug.WriteLine("ReceivePeersData Unknown type: " + _msg.MessageType.ToString());
@@ -340,6 +369,9 @@ namespace EngineName.Systems
             }
             else
             {
+                if (string.IsNullOrEmpty(modelname))
+                    return;
+                
                 //Update postition
                 var oldctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(id);
                 var oldcbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(id);

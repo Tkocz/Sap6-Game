@@ -10,8 +10,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameName.Scenes
 {
-    public class ChatScene : Scene
+    public class LoobyScene : Scene
     {
+        private NetworkSystem _network;
+        private int port = 50001;
+        public LoobyScene(string[] args)
+        {
+            if (args.Length > 0 && args[0] == "player2")
+            {
+                port = 50002;
+            }
+
+        }
         public override void Draw(float t, float dt)
         {
             Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
@@ -20,10 +30,10 @@ namespace GameName.Scenes
 
         public override void Init()
         {
-
+            var _network = new NetworkSystem(port);
             AddSystems(
                 new FpsCounterSystem(updatesPerSec: 10),
-                new NetworkSystem(),
+                _network,
                 new Rendering2DSystem(),
                 new InputSystem(),
                 new ChatSystem()
@@ -32,12 +42,12 @@ namespace GameName.Scenes
 #if DEBUG
             AddSystem(new DebugOverlay());
 #endif
-
+           
             base.Init();
 
             int player = AddEntity();
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -40, 0), Scale = new Vector3(1f) });
+            AddComponent(player, new CTransform() {Position = new Vector3(0, -40, 0), Scale = new Vector3(1f)});
             AddComponent<C2DRenderable>(player, new CText()
             {
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
@@ -47,7 +57,8 @@ namespace GameName.Scenes
                 origin = Vector2.Zero
             });
 
-            AddComponent<C2DRenderable>(AddEntity(), new CText()
+            var statusbar = AddEntity();
+            AddComponent<C2DRenderable>(statusbar, new CText()
             {
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
                 format = "0 peers",
@@ -55,26 +66,12 @@ namespace GameName.Scenes
                 position = new Vector2(300, 20),
                 origin = Vector2.Zero
             });
-
-            int eid = AddEntity();
-      
-            AddComponent<C2DRenderable>(eid, new CSprite
+            Game1.Inst.Scene.OnEvent("startgamerequest", data =>
             {
-                texture = Game1.Inst.Content.Load<Texture2D>("Textures/clubbing"),
-                position = new Vector2(300, 300),
-                color = Color.White
+                Game1.Inst.EnterScene(new WorldScene(_network));
             });
-
-
-
             //new Thread(NewThread).Start();
-            Log.Get().Debug("TestScene initialized.");
-        }
-       
-        static void NewThread()
-        {
-            var test = new NetworkSystem();
-            test.Bot();
+
         }
     }
 }

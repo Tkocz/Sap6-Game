@@ -45,7 +45,6 @@
     <Compile Include="Game.cs" />
     <Compile Include="Scenes\EndGameScene.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
-    <Compile Include="Dev\SyncObjects.cs" />
     <Compile Include="Dev\Collisions.cs" />
     <Compile Include="Dev\Collisions2.cs" />
     <Compile Include="Dev\Materials.cs" />

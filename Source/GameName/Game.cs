@@ -33,7 +33,7 @@ public static class Game {
         Log.ToFile();
 
         // TODO: Create initial scene.
-	using (var game = new Game1(new SyncObjects(args))) {
+	using (var game = new Game1(new LoobyScene(args))) {
             game.Run();
         }
 
