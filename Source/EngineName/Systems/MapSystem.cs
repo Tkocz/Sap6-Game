@@ -18,6 +18,7 @@ namespace EngineName.Systems
 		private int chunksplit = 1;
 		private BasicEffect basicEffect;
         private float[,] mHeightData;
+        private Random rn = new Random();
 
         public override void Init()
 		{
@@ -74,7 +75,13 @@ namespace EngineName.Systems
 		private Color materialPick(int decimalCode)
 		{
             var sand = Color.FromNonPremultiplied(194, 178, 128, 255);
+            sand.R += (byte)(rn.Next(10) - 5);
+            sand.G += (byte)(rn.Next(10) - 5);
+            sand.B += (byte)(rn.Next(10) - 5);
             var grass = Color.ForestGreen;
+            grass.R += (byte)(rn.Next(10) - 10);
+            grass.G += (byte)(rn.Next(10) - 10);
+            grass.B += (byte)(rn.Next(10) - 10);
             float sandStop = 225;
             float grassStart = 235;
             if (decimalCode < sandStop)
