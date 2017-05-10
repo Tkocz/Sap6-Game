@@ -25,6 +25,7 @@ namespace GameName.Scenes
         {
             _networkSystem = _network;
         }
+        public WorldScene(){ }
 
         public override void Draw(float t, float dt) {
             Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
@@ -60,8 +61,11 @@ namespace GameName.Scenes
             base.Init();
 
             //add network after init
-            AddSystem(_networkSystem);
-            _networkSystem.InitLight();
+            if (_networkSystem != null)
+            {
+                AddSystem(_networkSystem);
+                _networkSystem.InitLight();
+            }
 
             // Camera entity
             int camera = AddEntity();
