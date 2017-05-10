@@ -61,7 +61,8 @@ namespace GameName.Scenes
 
             //add network after init
             AddSystem(_networkSystem);
-            
+            _networkSystem.InitLight();
+
             // Camera entity
             int camera = AddEntity();
             float fieldofview = MathHelper.PiOver2;
@@ -72,7 +73,7 @@ namespace GameName.Scenes
             AddComponent(player, new CBody() { MaxVelocity = 1f, InvMass = 0.1f, SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 5f } );
             AddComponent(player, new CInput());
             AddComponent(player,new CSyncObject());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) } );
+            AddComponent(player, new CTransform() { Position = new Vector3(rnd.Next(0,50), -0, rnd.Next(0, 50)), Scale = new Vector3(1f) } );
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking"), fileName = "Models/viking" });
             /*
             int ball = AddEntity();
