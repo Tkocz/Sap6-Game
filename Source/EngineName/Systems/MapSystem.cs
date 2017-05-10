@@ -84,17 +84,6 @@ namespace EngineName.Systems
                 return Color.Lerp(sand, grass, progress);
             }
             return grass;
-			switch (decimalCode)
-			{
-				case 255:
-					return Color.Brown;
-				case 250:
-					return Color.Pink;
-				case 240:
-					return Color.Yellow;
-				default:
-					return Color.Pink;
-			}
 		}
 
 
@@ -176,7 +165,7 @@ namespace EngineName.Systems
             for (int x = 0; x < terrainWidth; x++) {
                 for (int y = 0; y < terrainHeight; y++) {
                     compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
-                    mHeightData[x, y] = colorMap[x + y * terrainWidth].R + transformComponent.Position.Y + (0.5f-(float)(rn.NextDouble() * 1f));
+                    mHeightData[x, y] = colorMap[x + y * terrainWidth].R + transformComponent.Position.Y;
                 }
             }
 
@@ -197,7 +186,7 @@ namespace EngineName.Systems
 		private void CreateVerticesChunks(CHeightmap cheightmap,
 			ref Dictionary<int, VertexPositionNormalColor[]> vertexdict, int reCurisiveCounter, int xOffset)
 		{
-
+            Random rn = new Random();
 
 			int terrainWidth = cheightmap.Image.Width / chunksplit;
 			int terrainHeight = cheightmap.Image.Height / chunksplit;
@@ -210,6 +199,7 @@ namespace EngineName.Systems
 				xOffset--;
 			}
 			var vertices = new VertexPositionNormalColor[terrainWidth * terrainHeight];
+            var vertRandomOffset = 0.45f;
 			for (int x = 0; x < terrainWidth; x++)
 			{
 				for (int y = 0; y < terrainHeight; y++)
@@ -219,7 +209,7 @@ namespace EngineName.Systems
 						yOffset = yOffset - reCurisiveCounter % chunksplit;
 					globalx = x + xOffset;
 					globaly = y + yOffset;
-					float height = mHeightData[globalx, globaly];
+					float height = cheightmap.HeightData[globalx, globaly].R + vertRandomOffset - (float)(rn.NextDouble() * vertRandomOffset*2);
 					vertices[x + y * terrainWidth].Position = new Vector3(globalx, height, globaly);
 					vertices[x + y * terrainWidth].Color = materialPick(cheightmap.HeightData[globalx, globaly].G);
 

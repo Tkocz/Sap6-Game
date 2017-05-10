@@ -32,7 +32,7 @@ using GameName.Scenes;
         Log.ToFile();
 
         // TODO: Create initial scene.
-	using (var game = new Game1(new MainMenu())) {
+	using (var game = new Game1(new WorldScene())) {
             game.Run();
         }
 
