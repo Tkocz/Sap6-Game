@@ -29,7 +29,7 @@ public class PhysicsSystem: EcsSystem {
         /// <summary>The id of first entity involved in the collision.</summary>
         public int Entity1;
         /// <summary>The id of the second entity involved in the collision, or negative one if the
-        //           collision happened with a world bounary.</summary>
+        ///           collision happened with a world bounary.</summary>
         public int Entity2;
 
         /// <summary>The collision force (unspecified unit).</summary>
@@ -320,7 +320,6 @@ public class PhysicsSystem: EcsSystem {
             return;
         }
 
-        // TODO: Restitution is missing here.
         // TODO: There is probably some way around this double-inversion of the masses, but I'm
         //       too lazy to figure it out until it becomes a problem!
         var m1 = ((float)Abs(s1.InvMass) > 0.0001f) ? 1.0f/s1.InvMass : 0.0f;
@@ -331,9 +330,9 @@ public class PhysicsSystem: EcsSystem {
         d = (minDist - d)*im; // Mass adjusted penetration distance
 
         t1.Position += n*d*s1.InvMass;
-        s1.Velocity += n*p*s1.InvMass;
+        s1.Velocity += n*p*s1.InvMass*s1.Restitution;
         t2.Position -= n*d*s2.InvMass;
-        s2.Velocity -= n*p*s2.InvMass;
+        s2.Velocity -= n*p*s2.InvMass*s2.Restitution;
 
         var c = 0.5f*(t1.Position + t2.Position);
 
@@ -394,7 +393,6 @@ public class PhysicsSystem: EcsSystem {
 
         var e = (1.0f + body.Restitution);
         var i = Vector3.Reflect(body.Velocity, n);
-
 
         bodyTransf.Position += r*n;
         body.Velocity += e*n*Vector3.Dot(i, n);

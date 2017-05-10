@@ -17,4 +17,6 @@
 1493641542:2.0:Implemented particle system.
 1493664210:2.0:Added support for environment mapping
 1493700845:1.0:Debugged and tweaked environment maps
+1493719557:2.0:Added bump/normal mapping to env maps
 1494182163:3.0:Implemented collisions between sphersd and (static) oriented bounding boxes.
+1494321857:2.0:Added Phong materials (AdsMaterial.fx)

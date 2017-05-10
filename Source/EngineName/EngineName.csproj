@@ -70,6 +70,7 @@
     <Compile Include="Logging\Log.cs" />
     <Compile Include="MenuScene.cs" />
     <Compile Include="Scene.cs" />
+    <Compile Include="Shaders\AdsMaterial.cs" />
     <Compile Include="Shaders\EnvMapMaterial.cs" />
     <Compile Include="Shaders\MaterialShader.cs" />
     <Compile Include="Systems\AsyncMultiSystem.cs" />
