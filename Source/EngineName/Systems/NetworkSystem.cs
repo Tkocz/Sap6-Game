@@ -364,7 +364,7 @@ namespace EngineName.Systems
                 Game1.Inst.Scene.AddComponent(id, ctransform);
                 Game1.Inst.Scene.AddComponent<C3DRenderable>(id, new CImportedModel
                 {
-                    model = Game1.Inst.Content.Load<Model>(modelname),
+                    model = Game1.Inst.Content.Load<Model>("Models/" + modelname),
                     fileName = modelname
                 });
                 Game1.Inst.Scene.AddComponent(id, new CSyncObject{ Owner = false}) ;
