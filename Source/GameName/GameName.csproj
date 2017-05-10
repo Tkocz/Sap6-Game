@@ -47,6 +47,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="PhilGame.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
+    <Compile Include="Scenes\MainMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

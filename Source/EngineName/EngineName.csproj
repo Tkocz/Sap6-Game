@@ -82,6 +82,7 @@
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
     <Compile Include="Utils\GraphicsUtil.cs" />
+    <Compile Include="MenuScene.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

@@ -16,14 +16,7 @@
 
 #begin Textures/HeightMap.png
 /importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
+/processor:TerrainProcessor
 /build:Textures/HeightMap.png
 
 #begin Models/chest.fbx
