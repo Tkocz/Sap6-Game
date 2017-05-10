@@ -1,5 +1,3 @@
-using Lidgren.Network;
-
 namespace EngineName {
 
     /*--------------------------------------
@@ -9,7 +7,7 @@ namespace EngineName {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-
+    using Lidgren.Network;
     using Core;
     using Utils;
 
@@ -74,7 +72,8 @@ namespace EngineName {
 
         Dictionary<Type, Dictionary<int, EcsComponent>> Components = new Dictionary<Type, Dictionary<int, EcsComponent>>();
         private int EntityCounter = -1;
-        private CryptoRandom rnd = new CryptoRandom();
+        //wanted a more unique id... couldnt use standard random class in C# ...when started two instances of the game... same tick equals same id.. ;) probaly change!
+        private CryptoRandom rnd = new CryptoRandom(); 
         /*--------------------------------------
          * PUBLIC METHODS
          *------------------------------------*/
