@@ -29,7 +29,21 @@ public abstract class MenuScene: Scene {
     //--------------------------------------
 
     /// <summary>Gets or sets the font used to render menu text.</summary>
-    public SpriteFont Font { get; set; }
+    public SpriteFont Font {
+        get { return mFont; }
+        set {
+            if (value ==  mFont) {
+                return;
+            }
+
+            // Update all current items to use the new font.
+            foreach (var item in mItems) {
+                item.Text.font = value;
+            }
+
+            mFont = value;
+        }
+    }
 
     /// <summary>Gets or sets the key used to move up amongst the menu items.</summary>
     public Keys MoveUpKey { get; set; } = Keys.Up;
@@ -61,6 +75,9 @@ public abstract class MenuScene: Scene {
     ///          selection spamming.</summary>
     private bool mCanInteract = true;
 
+    /// <summary>The font used to render text in the menu.</summary>
+    private SpriteFont mFont;
+
     /// <summary>The item that have been added to the menu.</summary>
     private readonly List<MenuItem> mItems = new List<MenuItem>();
 
@@ -81,18 +98,15 @@ public abstract class MenuScene: Scene {
 
         base.Init();
 
-        Font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans");
+        mFont = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans");
 
         AddComponent<C2DRenderable>(AddEntity(), mSelHighlight = new CText {
             color    = Color.Black,
-            font     = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
+            font     = mFont,
             format   = "--->",
             origin   = Vector2.Zero,
             position = new Vector2(150, 0)
         });
-
-        // TODO: Renndering2DSystem refuses to draw text without this hack.
-        AddComponent(AddEntity(), new CCamera {});
     }
 
     /// <summary>Performs draw logic (and, in the case of the <see cref="MenuScene"/> class, some
@@ -103,6 +117,7 @@ public abstract class MenuScene: Scene {
         // Position the selection highlight before delegating drawing.
         mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
 
+        Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
 
         var keyboard = Keyboard.GetState();
@@ -114,6 +129,8 @@ public abstract class MenuScene: Scene {
                 if (mSelIndex < 0) {
                     mSelIndex = mItems.Count - 1;
                 }
+
+                Raise("selchanged", mSelIndex);
             }
 
             canMove = false;
@@ -125,6 +142,8 @@ public abstract class MenuScene: Scene {
                 if (mSelIndex >= mItems.Count) {
                     mSelIndex = 0;
                 }
+
+                Raise("selchanged", mSelIndex);
             }
 
             canMove = false;
@@ -165,9 +184,9 @@ public abstract class MenuScene: Scene {
 
         var label = new MenuItem {
             Select = cb,
-            Text       = new CText {
+            Text   = new CText {
                 color    = color ?? Color.Black,
-                font     = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
+                font     = mFont,
                 format   = text,
                 origin   = Vector2.Zero,
                 position = new Vector2(x, y)

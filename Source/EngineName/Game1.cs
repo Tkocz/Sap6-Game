@@ -47,6 +47,25 @@ public class Game1: Game {
      * CONSTRUCTORS
      *------------------------------------*/
 
+    /// <summary>Raises the specified event in all scenes in the stack.</summary>
+    /// <param name="name">The name of the event to raise.</param>
+    /// <param name="data">The event data.</param>
+    public void RaiseGlobal(string name, object data) {
+        foreach (var scene in mScenes) {
+            scene.Raise(name, data);
+        }
+    }
+
+    /// <summary>Raises the specified event in th current scene.</summary>
+    /// <param name="name">The name of the event to raise.</param>
+    /// <param name="data">The event data.</param>
+    public void RaiseInScene(string name, object data) {
+        var scene = Scene;
+        if (scene != null) {
+            scene.Raise(name, data);
+        }
+    }
+
     /// <summary>Initializes the game singleton instance.</summary>
     /// <param name="scene">The scene to display initially.</param>
     public Game1(Scene scene) {
@@ -74,8 +93,8 @@ public class Game1: Game {
     /// <summary>Enters the specified scene.</summary>
     /// <param name="scene">The scene to display.</param>
     public void EnterScene(Scene scene) {
-        scene.Init();
         mScenes.Push(scene);
+        scene.Init();
 
         Log.Get().Info($"Entered scene: {scene.GetType().Name}");
     }

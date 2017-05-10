@@ -24,7 +24,7 @@ namespace EngineName.Systems
                 CTransform transformComponent = (CTransform) Game1.Inst.Scene.GetComponentFromEntity<CTransform>(camera.Key);
 
                 Vector3 cameraPosition = transformComponent.Position;
-                
+
                 cameraComponent.View = Matrix.CreateLookAt(cameraPosition, cameraComponent.Target, Vector3.Up);
             }
             base.Update(t, dt);
