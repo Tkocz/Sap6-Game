@@ -25,7 +25,7 @@ namespace GameName.Scenes {
             base.Init();
             AddComponent<C2DRenderable>(text, new CText() {
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
-                format = "Din tid blev: " + gameTime.ToString() + " s",
+                format = "Din tid blev: " + gameTime.ToString("0.00") + " s",
                 color = Color.Black,
                 position = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.5f, Game1.Inst.GraphicsDevice.Viewport.Height * 0.5f),
                 origin = Vector2.Zero
