@@ -309,5 +309,39 @@ namespace EngineName.Utils
             message.WriteMatrix(transform.Rotation);
             message.WriteMatrix(transform.Frame);
         }
+        public static CBody ReadCBody(this NetBuffer message)
+        {
+            CBody retval = new CBody();
+            retval.InvMass =message.ReadFloat();
+            retval.LinDrag = message.ReadFloat();
+            retval.Radius = message.ReadFloat();
+            retval.Restitution = message.ReadFloat();
+            retval.Velocity = message.ReadVector3();
+            return retval;
+        }
+        public static void WriteCBody(this NetBuffer message, CBody cbody)
+        {
+            message.Write(cbody.InvMass);
+            message.Write(cbody.LinDrag);
+            message.Write(cbody.Radius);
+            message.Write(cbody.Restitution);
+            message.Write(cbody.Velocity);
+        }
+        public static int ReadEntity(this NetBuffer message, ref CBody cBody, ref CTransform ctransform, ref string modelname)
+        {
+            int id = message.ReadInt32();
+            cBody = ReadCBody(message);
+            ctransform = ReadCTransform(message);
+            modelname = message.ReadString();
+            return id;
+        }
+        public static void WriteEntity(this NetBuffer message, int id, CBody cbody, CTransform ctransform, string modelname)
+        {
+            message.Write(id);
+            message.WriteCBody(cbody);
+            message.WriteCTransform(ctransform);
+            message.Write(modelname);
+
+        }
     }
 }

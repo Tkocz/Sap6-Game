@@ -15,6 +15,7 @@ namespace EngineName.Systems
     public class ChatSystem : EcsSystem
     {
         private int textheight = 100;
+        private CText _textinput = null;
         public override void Init()
         {
             Game1.Inst.Scene.OnEvent("key_to_write", data => handleKey((Keys)data));
@@ -37,53 +38,75 @@ namespace EngineName.Systems
 
         private void updatePeerStatus(List<string> peerdata)
         {
-            var peer = (CText)Game1.Inst.Scene.GetComponentFromEntity<C2DRenderable>(1);
-            peer.format = "Connected to ";
-            peer.format =+ peerdata.Count + " peers ";
-            peerdata.ForEach(x => peer.format += " " + x);
+            foreach (var keyval in Game1.Inst.Scene.GetComponents<C2DRenderable>())
+            {
+                var peertext = Game1.Inst.Scene.GetComponentFromEntity<C2DRenderable>(keyval.Key) as CText;
+                if (peertext != null && peertext.position == new Vector2(300, 20))
+                {
+                    peertext.format = "Connected to ";
+                    peertext.format = +peerdata.Count + " peers ";
+                    peerdata.ForEach(x => peertext.format += " " + x);
+                }
+            }
 
         }
         private void handleKey(Keys key)
         {
-           var text = (CText)Game1.Inst.Scene.GetComponentFromEntity<C2DRenderable>(0);
+            //dumbass search
+            if (_textinput == null) { 
+                foreach (var keyval in Game1.Inst.Scene.GetComponents<C2DRenderable>())
+                {
+                    if (_textinput != null)
+                        continue;
+                    _textinput = Game1.Inst.Scene.GetComponentFromEntity<C2DRenderable>(keyval.Key) as CText;
+                    if (_textinput == null || _textinput.position != new Vector2(300, 750))
+                        return;
+                }
+                if(_textinput == null)
+                    return;
+            }
 
             if (key == Keys.Back)
             {
-                if (text.format.Length > 0)
-                    text.format = text.format.Remove(text.format.Length - 1);
+                if (_textinput.format.Length > 0)
+                    _textinput.format = _textinput.format.Remove(_textinput.format.Length - 1);
             }
             else if (key == Keys.Enter)
             {
-                Game1.Inst.Scene.Raise("send_to_peer",text.format);
-                writeToChat(text.format);
-                text.format = "";
+                Game1.Inst.Scene.Raise("send_to_peer", _textinput.format);
+                writeToChat(_textinput.format);
+                _textinput.format = "";
             }
             else if (key == Keys.LeftControl)
             {
                 Game1.Inst.Scene.Raise("search_for_peers", null);
             }
+            else if (key == Keys.RightControl)
+            {
+                Game1.Inst.Scene.Raise("startgame", null);
+            }
             else
             {
                 if (key == Keys.Space)
                 {
-                    text.format += " ";
+                    _textinput.format += " ";
                 }
                 else if (key == Keys.OemSemicolon)
                 {
-                    text.format += "O";
+                    _textinput.format += "O";
                 }
                 else if (key == Keys.OemOpenBrackets)
                 {
-                    text.format += "A";
+                    _textinput.format += "A";
                 }
                 else if (key == Keys.OemQuotes)
                 {
-                    text.format += "A";
+                    _textinput.format += "A";
                 }
                 else
-                    text.format += key.ToString();
+                    _textinput.format += key.ToString();
             }
-            text.format =  text.format.ToLower();
+            _textinput.format = _textinput.format.ToLower();
 
         }
         public override void Update(float t, float dt)

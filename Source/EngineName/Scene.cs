@@ -1,3 +1,5 @@
+using Lidgren.Network;
+
 namespace EngineName {
 
     /*--------------------------------------
@@ -72,6 +74,7 @@ namespace EngineName {
 
         Dictionary<Type, Dictionary<int, EcsComponent>> Components = new Dictionary<Type, Dictionary<int, EcsComponent>>();
         private int EntityCounter = -1;
+        private CryptoRandom rnd = new CryptoRandom();
         /*--------------------------------------
          * PUBLIC METHODS
          *------------------------------------*/
@@ -115,7 +118,9 @@ namespace EngineName {
             /*
         DebugUtil.Assert(AtomicUtil.CAS(ref entity.m_Scene, this, null),
                          "entity.m_Scene is not null!");*/
-            m_Entities.Add(++EntityCounter);
+           
+            EntityCounter = rnd.Next(0, int.MaxValue);
+            m_Entities.Add(EntityCounter);
             return EntityCounter;
         }
 
@@ -212,7 +217,8 @@ namespace EngineName {
         Components.Add(typeof(CParticle), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CLogic), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CBox), new Dictionary<int, EcsComponent>());
-        Components.Add(typeof(CAI), new Dictionary<int, EcsComponent>());
+		Components.Add(typeof(CAI), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CSyncObject),new Dictionary<int, EcsComponent>());
 
 #if DEBUG
             AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));

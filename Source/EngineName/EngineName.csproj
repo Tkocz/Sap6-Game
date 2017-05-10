@@ -52,7 +52,8 @@
     <Compile Include="Components\CInput.cs" />
     <Compile Include="Components\CLogic.cs" />
     <Compile Include="Components\CParticle.cs" />
-    <Compile Include="Core\AiState.cs" />
+    <Compile Include="Components\CSyncObject.cs" />
+ 	<Compile Include="Core\AiState.cs" />
     <Compile Include="Core\Enums.cs" />
     <Compile Include="Components\Renderable\C2DRenderable.cs" />
     <Compile Include="Components\Renderable\CHeightmap.cs" />

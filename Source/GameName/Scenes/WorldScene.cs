@@ -19,6 +19,13 @@ namespace GameName.Scenes
         private Random rnd = new Random();
         private int worldSize = 300;
         private int player;
+        private NetworkSystem _networkSystem;
+
+        public WorldScene(NetworkSystem _network)
+        {
+            _networkSystem = _network;
+        }
+        public WorldScene(){ }
 
         public override void Draw(float t, float dt) {
             Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
@@ -41,7 +48,7 @@ namespace GameName.Scenes
                 new CameraSystem(),
                 physicsSys,
                 mapSystem,
-                new InputSystem(mapSystem),
+                new InputSystem(),
                 waterSys,
                 new Rendering2DSystem(),
                 new AISystem()
@@ -52,6 +59,14 @@ namespace GameName.Scenes
 #endif
 
             base.Init();
+
+            //add network after init
+            if (_networkSystem != null)
+            {
+                AddSystem(_networkSystem);
+                _networkSystem.InitLight();
+            }
+
             // Camera entity
             int camera = AddEntity();
             float fieldofview = MathHelper.PiOver2;
@@ -62,8 +77,9 @@ namespace GameName.Scenes
             AddComponent(player, new CBody() { MaxVelocity = 1f, InvMass = 0.1f, SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 5f } );
             AddComponent(player, new CInput());
             AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) } );
-            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
-
+            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") ,fileName  = "viking" });
+			AddComponent(player,new CSyncObject());
+			 
             AddComponent(camera, new CCamera(-50, 50) {
                 Height = 20,
                 Distance = 20,
@@ -103,7 +119,10 @@ namespace GameName.Scenes
             });
 
             CreateTriggerEvents(player);
-            CreateAnimals();
+            if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
+            {
+                CreateAnimals();
+            }
 
             Log.Get().Debug("TestScene initialized.");
         }
@@ -148,6 +167,7 @@ namespace GameName.Scenes
                         MaxVelocity = 5
                     });
                     AddComponent(id, new CAI());
+                    AddComponent(id, new CSyncObject());
 
                     flock.Members.Add(id);
                 }
@@ -187,9 +207,9 @@ namespace GameName.Scenes
                 Rotation = Matrix.Identity,
                 Scale = r * Vector3.One
             });
-
+            //AddComponent(ball, new CSyncObject());
             AddComponent<C3DRenderable>(ball, new CImportedModel {
-                model = Game1.Inst.Content.Load<Model>("Models/DummySphere")
+                model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),fileName = "DummySphere" 
             });
 
             return ball;

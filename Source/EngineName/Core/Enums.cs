@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EngineName.Components
+namespace EngineName.Core
 {
     public static class Enums
     {
@@ -13,6 +13,8 @@ namespace EngineName.Components
             String,
             PeerInformation,
             CTransform,
+            CBody,
+            Entity,
             Vector3,
             Int,
             Unknown,
