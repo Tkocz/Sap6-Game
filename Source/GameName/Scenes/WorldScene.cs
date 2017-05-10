@@ -43,8 +43,8 @@ namespace GameName.Scenes
                 mapSystem,
                 new InputSystem(mapSystem),
                 waterSys,
-                new Rendering2DSystem()
-
+                new Rendering2DSystem(),
+                new AISystem()
             );
 
 #if DEBUG
@@ -59,7 +59,7 @@ namespace GameName.Scenes
             float farplane = 1000f;
 
             player = AddEntity();
-            AddComponent(player, new CBody() { SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f } );
+            AddComponent(player, new CBody() { MaxVelocity = 1f, InvMass = 0.1f, SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 5f } );
             AddComponent(player, new CInput());
             AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) } );
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
@@ -117,7 +117,7 @@ namespace GameName.Scenes
             int sprintGoal = AddEntity();
             //AddComponent(sprintGoal, new CTrigger());
             AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
-            AddComponent(sprintGoal, new CTransform() { Position = new Vector3(100, -0, 100), Scale = new Vector3(0.05f) });
+            AddComponent(sprintGoal, new CTransform() { Position = new Vector3(100, -0, 100), Scale = new Vector3(1f) });
             AddComponent<C3DRenderable>(sprintGoal, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
 
             OnEvent("collision", data => {
@@ -131,8 +131,44 @@ namespace GameName.Scenes
             });
 
             CreateTriggerEvents(player);
+            CreateAnimals();
 
             Log.Get().Debug("TestScene initialized.");
+        }
+
+        private void CreateAnimals() {
+            for(int i = 0; i < 50; i++) {
+
+                int id = AddEntity();
+                CImportedModel modelComponent = new CImportedModel();
+                double random = rnd.NextDouble();
+                modelComponent.fileName = "flossy";
+                modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName);
+                AddComponent<C3DRenderable>(id, modelComponent);
+
+                int x = (int)(rnd.NextDouble() * worldSize);
+                int z = (int)(rnd.NextDouble() * worldSize);
+                float y = 0;
+                CTransform transformComponent = new CTransform();
+                
+                transformComponent.Position = new Vector3(x, y, z);
+                //transformComponent.Position += new Vector3(-590, -50, -590);
+                transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
+                    (float)(Math.PI * (rnd.NextDouble() * 2)));
+                float scale = 1;
+                transformComponent.Scale = new Vector3(scale, scale, scale);
+                AddComponent(id, transformComponent);
+                AddComponent(id, new CBody {
+                    InvMass = 0.05f,
+                    Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+                    LinDrag = 0.8f,
+                    Velocity = Vector3.Zero,
+                    Radius = 1f,
+                    SpeedMultiplier = 0.5f,
+                    MaxVelocity = 5
+                });
+                AddComponent(id, new CAI());
+            }
         }
 
         public override void Update(float t, float dt) {

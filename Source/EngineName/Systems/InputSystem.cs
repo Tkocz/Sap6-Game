@@ -69,7 +69,7 @@ namespace EngineName.Systems {
                 //For Network Chat           
                 foreach (Keys key in pressedKeys)
                 {
-                    if (!lastPressedKeys.Contains(key))
+                    if (lastPressedKeys != null && !lastPressedKeys.Contains(key))
                     {
                         Game1.Inst.RaiseInScene("key_to_write", key);
 
@@ -106,7 +106,7 @@ namespace EngineName.Systems {
                     yaw = -rotationSpeed;
                 }
                 if (currentState.IsKeyDown(Keys.Space) && !isInAir) {
-                    body.Velocity.Y += 15f;
+                    body.Velocity.Y += 3f;
                     isInAir = true;
                 }
                 addRot = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);

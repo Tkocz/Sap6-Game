@@ -38,7 +38,7 @@ namespace GameName.AiStates
                 var playerTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(player.Key);
 
                 var positionDiff = playerTransform.Position - npcTransform.Position;
-                float distance = (float)Math.Sqrt(Math.Pow(positionDiff.X, 2) + Math.Pow(positionDiff.Y, 2) + Math.Pow(positionDiff.Z, 2));
+                float distance = (float)Math.Sqrt(Math.Pow(positionDiff.X, 2) + 0 + Math.Pow(positionDiff.Z, 2));
 
                 if (closestEnemyDistance > distance) {
                     closestEnemyDistance = distance;
