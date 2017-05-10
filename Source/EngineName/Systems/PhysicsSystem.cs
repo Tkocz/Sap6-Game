@@ -29,7 +29,7 @@ public class PhysicsSystem: EcsSystem {
         /// <summary>The id of first entity involved in the collision.</summary>
         public int Entity1;
         /// <summary>The id of the second entity involved in the collision, or negative one if the
-        //           collision happened with a world bounary.</summary>
+        ///           collision happened with a world bounary.</summary>
         public int Entity2;
 
         /// <summary>The collision force (unspecified unit).</summary>
