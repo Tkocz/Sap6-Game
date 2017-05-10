@@ -29,7 +29,8 @@ namespace GameName.AiStates
             var npcBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(entityId);
             
             npcTransform.Rotation *= Matrix.CreateFromYawPitchRoll(rotationSpeed, 0, 0);
-            npcBody.Velocity = movementSpeed * npcTransform.Rotation.Forward;
+            npcBody.Velocity.X = (movementSpeed * npcTransform.Rotation.Forward).X;
+            npcBody.Velocity.Z = (movementSpeed * npcTransform.Rotation.Forward).Z;
         }
     }
 }
