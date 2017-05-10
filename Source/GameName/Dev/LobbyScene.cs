@@ -10,11 +10,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameName.Scenes
 {
-    public class LoobyScene : Scene
+    public class LobbyScene : Scene
     {
         private NetworkSystem _network;
         private int port = 50001;
-        public LoobyScene(string[] args)
+        public LobbyScene(string[] args)
         {
             if (args.Length > 0 && args[0] == "player2")
             {
@@ -30,7 +30,7 @@ namespace GameName.Scenes
 
         public override void Init()
         {
-            var _network = new NetworkSystem(port);
+            _network = new NetworkSystem(port);
             AddSystems(
                 new FpsCounterSystem(updatesPerSec: 10),
                 _network,
@@ -61,7 +61,7 @@ namespace GameName.Scenes
             AddComponent<C2DRenderable>(statusbar, new CText()
             {
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
-                format = "0 peers",
+                format = "Waiting for players to join",
                 color = Color.White,
                 position = new Vector2(300, 20),
                 origin = Vector2.Zero

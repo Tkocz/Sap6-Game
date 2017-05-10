@@ -56,6 +56,7 @@ namespace GameName.Scenes
             if (_networkSystem != null)
             {
                 AddSystems(_networkSystem);
+                _networkSystem.InitLight();
             }
             // Camera entity
             int camera = AddEntity();
@@ -115,7 +116,7 @@ namespace GameName.Scenes
             waterSys.Load();
             physicsSys.MapSystem = mapSystem;
 
-            if (_networkSystem._isMaster) { 
+            if ((_networkSystem!= null &&_networkSystem._isMaster) || _networkSystem == null) { 
                 var rnd = new Random();
                 for (var i = 0; i < 200; i++) {
                     var r = 0.6f + (float)rnd.NextDouble() * 1.0f;

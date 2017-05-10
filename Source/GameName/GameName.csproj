@@ -50,7 +50,7 @@
     <Compile Include="Dev\Materials.cs" />
     <Compile Include="Dev\Particles.cs" />
     <Compile Include="Dev\PostFx.cs" />
-    <Compile Include="Dev\ChatScene.cs" />
+    <Compile Include="Dev\LobbyScene.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
   </ItemGroup>
   <ItemGroup>

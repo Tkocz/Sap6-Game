@@ -41,6 +41,7 @@ namespace EngineName.Systems
                 Port = _localport,
                 AcceptIncomingConnections = true
             };
+
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -66,7 +67,14 @@ namespace EngineName.Systems
 
             _scanThread = new Thread(ScanForNewPeers);
             _scanThread.Start();
-            base.Init();
+
+            InitLight();
+        }
+
+        public void InitLight()
+        {
+            DebugOverlay.Inst.DbgStr((a, b) => $" Cons: {_peer.Connections.Count} IsMaster: {_isMaster} "
+               );
         }
         /// <summary>Periodically scan for new peers</summary>
         private void ScanForNewPeers()
@@ -211,12 +219,11 @@ namespace EngineName.Systems
                     case NetIncomingMessageType.DiscoveryResponse:
                         // just connect to first server discovered
                         //Debug.WriteLine("ReceivePeersData DiscoveryResponse CONNECT");
-                        if (_peer.Connections.Any(x => x.RemoteEndPoint.Address == _msg.SenderEndPoint.Address))
+                        if (_peer.Connections.Any(x => x.RemoteEndPoint.Address.Equals(_msg.SenderEndPoint.Address)))
                             Debug.WriteLine("allreadyConnected");
                         else { 
                              _peer.Connect(_msg.SenderEndPoint);
                         }
-                        Game1.Inst.Scene.Raise("peer_data", _peer.Connections.Select(x => x.RemoteEndPoint.Address.ToString()).ToList());
                         break;
                     case NetIncomingMessageType.ConnectionApproval:
                         Debug.WriteLine("ReceivePeersData ConnectionApproval");
@@ -231,22 +238,18 @@ namespace EngineName.Systems
            
                         if (mType == Enums.MessageType.String)
                         {
-                            if (!_bot)
+                            var metadata = _msg.ReadString();
+                            if (metadata == "StartEvent")
                             {
-                                var metadata = _msg.ReadString();
-                                if (metadata == "StartEvent")
-                                {
-                                    var ip = _msg.ReadString();
-                                    masterIp = ip;
-                                    _isMaster = false;
-                                    Game1.Inst.Scene.Raise("startgamerequest", _msg.ReadString());
-                                    _scanThread.Abort();
-                                }
-                                else if(metadata == "metadata")
-                                {
-                                    Game1.Inst.Scene.Raise("network_data_text", _msg.ReadString());
-                                }
-                                                            
+                                var ip = _msg.ReadString();
+                                masterIp = ip;
+                                _isMaster = false;
+                                Game1.Inst.Scene.Raise("startgamerequest", _msg.ReadString());
+                                _scanThread.Abort();
+                            }
+                            else if(metadata == "metadata")
+                            {
+                                Game1.Inst.Scene.Raise("network_data_text", _msg.ReadString());
                             }
                         }
                         else if (mType == Enums.MessageType.PeerInformation)
@@ -391,15 +394,17 @@ namespace EngineName.Systems
             base.Cleanup();
         }
         private const float updateInterval  = 0.15f;
-        private float reamaingTime = 0;
+        private float remaingTime = 0;
         public override void Update(float t, float dt)
         {
-            reamaingTime += dt;
-            if (reamaingTime> updateInterval)
+            remaingTime += dt;
+            if (remaingTime> updateInterval)
             {
                 syncObjects();
-                reamaingTime = 0;
+                remaingTime = 0;
             }
+            
+            //Todo Impliment Prediction for player movement  
             /*foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
             {
                 var sync = (CSyncObject)pair.Value;
