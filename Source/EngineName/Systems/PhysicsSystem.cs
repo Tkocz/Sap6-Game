@@ -130,6 +130,11 @@ public class PhysicsSystem: EcsSystem {
             body.Velocity   += dt*(Gravity - body.InvMass*body.LinDrag*body.Velocity);
             transf.Position += dt*body.Velocity;
 
+            if (body.EnableRot) {
+                body.Rot = Quaternion.CreateFromAxisAngle(body.RotAx, body.RotVel*dt)*body.Rot;
+                transf.Rotation = Matrix.CreateFromQuaternion(body.Rot);
+            }
+
             // Setup the AABBs and see if they intersect (inner loop). Intersection means we have a
             // *potential* collision. It needs to be verified and resolved by the fine-phase solver.
             var p1    = transf.Position;
@@ -396,6 +401,14 @@ public class PhysicsSystem: EcsSystem {
 
         bodyTransf.Position += r*n;
         body.Velocity += e*n*Vector3.Dot(i, n);
+
+        // Impulse along surface (tangent vector).
+        var f = body.Velocity - n*Vector3.Dot(body.Velocity, n);
+
+        body.RotVel = f.Length()/body.Radius;
+        body.RotAx  = Vector3.Cross(n, f);
+
+        body.RotAx.Normalize();
     }
 }
 

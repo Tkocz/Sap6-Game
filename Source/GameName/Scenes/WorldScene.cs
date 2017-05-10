@@ -72,16 +72,10 @@ namespace GameName.Scenes
             player = AddEntity();
             AddComponent(player, new CBody() { MaxVelocity = 1f, InvMass = 0.1f, SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 5f } );
             AddComponent(player, new CInput());
-            AddComponent(player,new CSyncObject());
-            AddComponent(player, new CTransform() { Position = new Vector3(rnd.Next(0,50), -0, rnd.Next(0, 50)), Scale = new Vector3(1f) } );
-            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking"), fileName = "Models/viking" });
-            /*
-            int ball = AddEntity();
-            AddComponent(ball, new CBody() { Position = new Vector3(10f, 0, 10f), Radius = 1, Aabb = new BoundingBox(-1 * Vector3.One, 1 * Vector3.One) } );
-            AddComponent(ball, new CTransform() { Scale = new Vector3(1) } );
-            AddComponent<C3DRenderable>(ball, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/DummySphere") });
-            */
-
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) } );
+            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
+			AddComponent(player,new CSyncObject());
+			 
             AddComponent(camera, new CCamera(-50, 50) {
                 Height = 20,
                 Distance = 20,
@@ -90,33 +84,11 @@ namespace GameName.Scenes
             });
             //AddComponent(camera, new CInput());
             AddComponent(camera, new CTransform() { Position = new Vector3(-50, 50, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
-            /*
-            int eid = AddEntity();
-            AddComponent<C2DRenderable>(eid, new CFPS
-            {
-                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034"),
-                format = "Sap my Low-Poly Game",
-                color = Color.White,
-                position = new Vector2(300, 20),
-                origin = Vector2.Zero// Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034").MeasureString("Sap my Low-Poly Game") / 2
-        });
-            eid = AddEntity();
-            AddComponent<C2DRenderable>(eid, new CSprite
-            {
-                texture = Game1.Inst.Content.Load<Texture2D>("Textures/clubbing"),
-                position = new Vector2(300, 300),
-                color = Color.White
-            });
-            */
-            // Tree model entity
-            /*int id = AddEntity();
-            AddComponent<C3DRenderable>(id, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
-            AddComponent(id, new CTransform() { Position = new Vector3(0, 0, 0), Rotation = Matrix.Identity, Scale = Vector3.One });*/
 
 
             // Heightmap entity
             int heightMap = AddEntity();
-            AddComponent<C3DRenderable>(heightMap, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/HeightMap") });
+            AddComponent<C3DRenderable>(heightMap, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/Square_island_4x4") });
             AddComponent(heightMap, new CTransform() { Position = new Vector3(-590, -50, -590), Rotation = Matrix.Identity, Scale = new Vector3(1) });
             // manually start loading all heightmap components, should be moved/automated
             mapSystem.Load();
@@ -152,38 +124,49 @@ namespace GameName.Scenes
         }
 
         private void CreateAnimals() {
-            for(int i = 0; i < 50; i++) {
+            var flockRadius = 10;
+            for (int f = 0; f < 5; f++) {
+                int flockId = AddEntity();
+                CFlock flock = new CFlock();
+                double animal = rnd.NextDouble();
+                string flockAnimal = animal > 0.66 ? "flossy" : animal > 0.33 ? "goose" : "hen";
+                int flockX = (int)(rnd.NextDouble() * worldSize);
+                int flockZ = (int)(rnd.NextDouble() * worldSize);
+                CTransform flockTransform = new CTransform { Position = new Vector3(flockX, 0, flockZ) };
+                flockTransform.Position += new Vector3(-worldSize / 2, -50, -worldSize / 2);
+                for (int i = 0; i < 10; i++) {
+                    int id = AddEntity();
+                    CImportedModel modelComponent = new CImportedModel();
+                    modelComponent.fileName = flockAnimal;
+                    modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName);
+                    AddComponent<C3DRenderable>(id, modelComponent);
 
-                int id = AddEntity();
-                CImportedModel modelComponent = new CImportedModel();
-                double random = rnd.NextDouble();
-                modelComponent.fileName = "Models/flossy";
-                modelComponent.model = Game1.Inst.Content.Load<Model>(modelComponent.fileName);
-                AddComponent<C3DRenderable>(id, modelComponent);
+                    float memberX = flockTransform.Position.X + (float)rnd.NextDouble() * flockRadius*2 - flockRadius;
+                    float memberZ = flockTransform.Position.Z + (float)rnd.NextDouble() * flockRadius*2 - flockRadius;
+                    float y = flockTransform.Position.Y;
+                    CTransform transformComponent = new CTransform();
 
-                int x = (int)(rnd.NextDouble() * worldSize);
-                int z = (int)(rnd.NextDouble() * worldSize);
-                float y = 0;
-                CTransform transformComponent = new CTransform();
-                
-                transformComponent.Position = new Vector3(x, y, z);
-                //transformComponent.Position += new Vector3(-590, -50, -590);
-                transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
-                    (float)(Math.PI * (rnd.NextDouble() * 2)));
-                float scale = 1;
-                transformComponent.Scale = new Vector3(scale, scale, scale);
-                AddComponent(id, transformComponent);
-                AddComponent(id, new CBody {
-                    InvMass = 0.05f,
-                    Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
-                    LinDrag = 0.8f,
-                    Velocity = Vector3.Zero,
-                    Radius = 1f,
-                    SpeedMultiplier = 0.5f,
-                    MaxVelocity = 5
-                });
-                AddComponent(id, new CAI());
-                AddComponent(id, new CSyncObject());
+                    transformComponent.Position = new Vector3(memberX, y, memberZ);
+                    //transformComponent.Position += new Vector3(-590, -50, -590);
+                    transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
+                        (float)(Math.PI * (rnd.NextDouble() * 2)));
+                    float scale = 1;
+                    transformComponent.Scale = new Vector3(scale, scale, scale);
+                    AddComponent(id, transformComponent);
+                    AddComponent(id, new CBody {
+                        InvMass = 0.05f,
+                        Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+                        LinDrag = 0.8f,
+                        Velocity = Vector3.Zero,
+                        Radius = 1f,
+                        SpeedMultiplier = 0.5f,
+                        MaxVelocity = 5
+                    });
+                    AddComponent(id, new CAI());
+                    AddComponent(id, new CSyncObject());
+
+                    flock.Members.Add(id);
+                }
             }
         }
 
@@ -222,7 +205,7 @@ namespace GameName.Scenes
             });
             //AddComponent(ball, new CSyncObject());
             AddComponent<C3DRenderable>(ball, new CImportedModel {
-                model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),fileName = "Models/DummySphere" 
+                model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),fileName = "DummySphere" 
             });
 
             return ball;

@@ -60,6 +60,8 @@ namespace EngineName {
          * NON-PUBLIC FIELDS
          *------------------------------------*/
 
+        private readonly List<int> mEntsToRemove = new List<int>();
+
         /// <summary>The event callbacks registered in the scene.</summary>
         private readonly Dictionary<string, List<Action<object>>> mEventCBs =
             new Dictionary<string, List<Action<object>>>();
@@ -123,11 +125,7 @@ namespace EngineName {
         }
 
         public void RemoveEntity(int eid) {
-            foreach (var e in Components) {
-                e.Value.Remove(eid);
-            }
-
-            m_Entities.Remove(eid);
+            mEntsToRemove.Add(eid);
         }
 
         public void AddComponent(int id, EcsComponent component, Type type) {
@@ -185,6 +183,16 @@ namespace EngineName {
         foreach (var system in m_Systems) {
             system.Draw(t, dt);
         }
+
+        foreach (var eid in mEntsToRemove) {
+            foreach (var e in Components) {
+                e.Value.Remove(eid);
+            }
+
+            m_Entities.Remove(eid);
+        }
+
+        mEntsToRemove.Clear();
     }
 
     /// <summary>Retrieves all entities containing a component of the specified

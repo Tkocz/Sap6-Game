@@ -18,6 +18,7 @@ namespace EngineName.Systems
 		private int chunksplit = 1;
 		private BasicEffect basicEffect;
         private float[,] mHeightData;
+        private Random rn = new Random();
 
         public override void Init()
 		{
@@ -73,17 +74,23 @@ namespace EngineName.Systems
 
 		private Color materialPick(int decimalCode)
 		{
-			switch (decimalCode)
-			{
-				case 255:
-					return Color.Brown;
-				case 250:
-					return Color.Pink;
-				case 240:
-					return Color.Yellow;
-				default:
-					return Color.Pink;
-			}
+            var sand = Color.FromNonPremultiplied(194, 178, 128, 255);
+            sand.R += (byte)(rn.Next(10) - 5);
+            sand.G += (byte)(rn.Next(10) - 5);
+            sand.B += (byte)(rn.Next(10) - 5);
+            var grass = Color.ForestGreen;
+            grass.R += (byte)(rn.Next(10) - 10);
+            grass.G += (byte)(rn.Next(10) - 10);
+            grass.B += (byte)(rn.Next(10) - 10);
+            float sandStop = 225;
+            float grassStart = 235;
+            if (decimalCode < sandStop)
+                return sand;
+            if(decimalCode < grassStart) {
+                var progress = (decimalCode - sandStop) / (grassStart - sandStop);
+                return Color.Lerp(sand, grass, progress);
+            }
+            return grass;
 		}
 
 
@@ -161,6 +168,7 @@ namespace EngineName.Systems
 
 			compHeight.HeightData = new Color[terrainWidth, terrainHeight];
             mHeightData = new float[terrainWidth, terrainHeight];
+            Random rn = new Random();
             for (int x = 0; x < terrainWidth; x++) {
                 for (int y = 0; y < terrainHeight; y++) {
                     compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
@@ -185,7 +193,7 @@ namespace EngineName.Systems
 		private void CreateVerticesChunks(CHeightmap cheightmap,
 			ref Dictionary<int, VertexPositionNormalColor[]> vertexdict, int reCurisiveCounter, int xOffset)
 		{
-
+            Random rn = new Random();
 
 			int terrainWidth = cheightmap.Image.Width / chunksplit;
 			int terrainHeight = cheightmap.Image.Height / chunksplit;
@@ -198,6 +206,7 @@ namespace EngineName.Systems
 				xOffset--;
 			}
 			var vertices = new VertexPositionNormalColor[terrainWidth * terrainHeight];
+            var vertRandomOffset = 0.45f;
 			for (int x = 0; x < terrainWidth; x++)
 			{
 				for (int y = 0; y < terrainHeight; y++)
@@ -207,7 +216,7 @@ namespace EngineName.Systems
 						yOffset = yOffset - reCurisiveCounter % chunksplit;
 					globalx = x + xOffset;
 					globaly = y + yOffset;
-					int height = (int)cheightmap.HeightData[globalx, globaly].R;
+					float height = cheightmap.HeightData[globalx, globaly].R + vertRandomOffset - (float)(rn.NextDouble() * vertRandomOffset*2);
 					vertices[x + y * terrainWidth].Position = new Vector3(globalx, height, globaly);
 					vertices[x + y * terrainWidth].Color = materialPick(cheightmap.HeightData[globalx, globaly].G);
 
@@ -251,14 +260,19 @@ namespace EngineName.Systems
 				CreateIndicesChunk(heightmap, ref indices, 0);
 				CalculateHeightData(heightmap, key);
 				CreateVerticesChunks(heightmap, ref vertices, 0, 0);
-				basicEffect.Texture = heightmap.Image;
-				for (int j = 0; j < vertices.Values.Count; j++)
+                //basicEffect.Texture = heightmap.Image;
+                basicEffect.DiffuseColor = new Vector3(1, 1, 1);
+                basicEffect.SpecularPower = 20f;
+                basicEffect.SpecularColor = new Vector3(0.25f);
+                for (int j = 0; j < vertices.Values.Count; j++)
 				{
 					var vert = vertices[j];
 					var ind = indices[j];
 					CalculateNormals(ref vert, ref ind);
+                    /*
                     for(int i = 0; i < vertices[j].Length; i++)
                         vertices[j][i].Color = Color.ForestGreen;
+                    */
 					vertices[j] = vert;
 					indices[j] = ind;
 

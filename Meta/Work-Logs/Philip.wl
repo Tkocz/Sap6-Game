@@ -20,3 +20,4 @@
 1493719557:2.0:Added bump/normal mapping to env maps
 1494182163:3.0:Implemented collisions between sphersd and (static) oriented bounding boxes.
 1494321857:2.0:Added Phong materials (AdsMaterial.fx)
+1494434971:2.0:Added computations for rotational mechanics
