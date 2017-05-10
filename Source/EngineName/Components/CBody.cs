@@ -1,9 +1,16 @@
-namespace EngineName.Components
-{
+namespace EngineName.Components {
+
+//--------------------------------------
+// USINGS
+//--------------------------------------
 
 using Core;
 
 using Microsoft.Xna.Framework;
+
+//--------------------------------------
+// CLASSES
+//--------------------------------------
 
 /// <summary>Provides a physical representation-component for simulating physical effects on
 /// entities in the game world.</summary>
@@ -31,11 +38,23 @@ public sealed class CBody: EcsComponent {
 
     /// <summary>The rotation multiplier.</summary>
     public float RotationMultiplier = 1.0f;
-         
+
     /// <summary>The velocity, in meters per second.</summary>
     public Vector3 Velocity;
 
     public float MaxVelocity = 1.0f;
-    }
+
+    /// <summary>Whether to enable rotational computations.</summary>
+    public bool EnableRot;
+
+    /// <summary>The body rotation.</summary>
+    public Quaternion Rot = Quaternion.Identity;
+
+    /// <summary>The rotational velocity axis.</summary>
+    public Vector3 RotAx;
+
+    /// <summary>The rotational velocity.</summary>
+    public float RotVel;
+}
 
 }

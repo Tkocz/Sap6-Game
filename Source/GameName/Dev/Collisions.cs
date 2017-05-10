@@ -74,10 +74,8 @@ public sealed class Collisions: Scene {
 
         // Colors to pick from when spawning balls.
         var cols = new [] {
-            new Vector3(1.0f, 1.0f, 0.0f),
-            new Vector3(1.0f, 0.3f, 0.0f),
             new Vector3(1.0f, 0.8f, 0.0f),
-            new Vector3(1.0f, 1.0f, 0.5f),
+            new Vector3(0.2f, 0.8f, 0.1f),
         };
 
         // Spawn a few balls.
@@ -305,7 +303,8 @@ public sealed class Collisions: Scene {
                                        Radius      = r,
                                        LinDrag     = 0.2f,
                                        Velocity    = v,
-                                       Restitution = 0.7f});
+                                       Restitution = 0.7f,
+                                       EnableRot = true });
 
         AddComponent(ball, new CTransform { Position = p,
                                             Rotation = Matrix.Identity,
@@ -313,10 +312,11 @@ public sealed class Collisions: Scene {
 
         AddComponent<C3DRenderable>(ball, new CImportedModel {
             model  = Game1.Inst.Content.Load<Model>("Models/DummySphere"),
-            material = new AdsMaterial(0.2f*col,
-                                            col,
-                                            new Vector3(1.0f, 1.0f, 1.0f),
-                                            50.0f)
+            material = new AdsMaterial(0.15f*col,
+                                             col,
+                                             Vector3.One,
+                                             50.0f,
+                                             Game1.Inst.Content.Load<Texture2D>("Textures/Checker"))
         });
 
         return ball;
