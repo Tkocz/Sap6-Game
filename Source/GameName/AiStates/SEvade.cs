@@ -10,20 +10,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameName.AiStates
-{
-    public class SEvade : AiState
-    {
-        public SEvade(int id) : base(id)
-        {
-        }
-        public override string ToString()
-        {
+namespace GameName.AiStates {
+    public class SEvade : AiState {
+        public SEvade(int id) : base(id) {}
+        public override string ToString() {
             return "Evade";
         }
-
-        public override void Handle(float t, float dt)
-        {
+        public override void Handle(float t, float dt) {
             var rotationSpeed = Math.Min(1.8f * dt, 1);
             var movementSpeed = dt * 30f;
             var npcTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(entityId);
@@ -33,8 +26,7 @@ namespace GameName.AiStates
             var closestEnemyId = -1;
             CTransform closestEnemyTransform = null;
 
-            foreach (var player in Game1.Inst.Scene.GetComponents<CInput>())
-            {
+            foreach (var player in Game1.Inst.Scene.GetComponents<CInput>()) {
                 if (!Game1.Inst.Scene.EntityHasComponent<CBody>(player.Key))
                     continue;
                 var playerTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(player.Key);

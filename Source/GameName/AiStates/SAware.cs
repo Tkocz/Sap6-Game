@@ -14,24 +14,21 @@ namespace GameName.AiStates
 {
     public class SAware : AiState
     {
-        public SAware(int id) : base(id)
-        {
+        public SAware(int id) : base(id) {
         }
-        public override string ToString()
-        {
+        public override string ToString() {
             return "Aware";
         }
 
-        public override void Handle(float t, float dt)
-        {
+        public override void Handle(float t, float dt) {
             var rotationSpeed = Math.Min(0.65f * dt, 1);
             var npcTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(entityId);
+            var npcBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(entityId);
 
             var closestEnemyDistance = float.MaxValue;
             var closestEnemyId = -1;
 
-            foreach (var player in Game1.Inst.Scene.GetComponents<CInput>())
-            {
+            foreach (var player in Game1.Inst.Scene.GetComponents<CInput>()) {
                 if (!Game1.Inst.Scene.EntityHasComponent<CBody>(player.Key))
                     continue;
                 var playerBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(player.Key);
@@ -54,6 +51,8 @@ namespace GameName.AiStates
             dQuat.X = 0;
             dQuat.Z = 0;
             npcTransform.Rotation = Matrix.CreateFromQuaternion(dQuat);
+            var stopSpeed = 0.8f;
+            npcBody.Velocity *= stopSpeed;
         }
     }
 }

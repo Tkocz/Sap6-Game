@@ -166,7 +166,9 @@ namespace GameName.Scenes
         private void CreateAnimals()
         {
             var flockRadius = 10;
-            for (int f = 0; f < 5; f++)
+            var flockCount = 1;
+            var membersPerFlock = 5;
+            for (int f = 0; f < flockCount; f++)
             {
                 int flockId = AddEntity();
                 CFlock flock = new CFlock { Radius = 20 };
@@ -176,7 +178,7 @@ namespace GameName.Scenes
                 int flockZ = (int)(rnd.NextDouble() * worldSize);
                 CTransform flockTransform = new CTransform { Position = new Vector3(flockX, 0, flockZ) };
                 flockTransform.Position += new Vector3(-worldSize / 2, -50, -worldSize / 2);
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < membersPerFlock; i++)
                 {
                     int id = AddEntity();
                     CImportedModel modelComponent = new CImportedModel();

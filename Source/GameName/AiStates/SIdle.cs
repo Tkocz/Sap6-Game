@@ -41,38 +41,40 @@ namespace GameName.AiStates
             var cohFactor = 1.0f;
 
             var sep = Separation(npcTransform.Position, flock);
-            sep.Normalize();
+            //sep.Normalize();
             // Alignment
             // For every nearby boid in the system, calculate the average velocity
             var ali = flock.AvgVelocity;
-            ali.Normalize();
+            //ali.Normalize();
             // Cohesion
             // For the average position (i.e. center) of all nearby boids, calculate steering vector towards that position
             var coh = Vector3.Normalize(flock.Centroid - npcTransform.Position);
-
+            /*
             sep *= sepFactor;
             ali *= aliFactor;
             coh *= cohFactor;
+            */
+            /*
             if (centroidDistance > flock.Radius)
-                ali = Vector3.Zero;
+                ali = Vector3.Zero;*/
 
-            var rot = sep + ali + coh;
-            //var goalQuat = AISystem.GetRotation(Vector3.Forward, rot, Vector3.Up);
-            //var goalRot = Quaternion.CreateFromYawPitchRoll(rot.Y, 0, 0);
+            var rot = sep+coh+ali;// + ali + coh;
+            rot.Normalize();
+            var source = Vector3.Forward;
+            var goalQuat = AISystem.GetRotation(source, rot, Vector3.Up);
             
+            var startQuat = npcTransform.Rotation.Rotation;
 
-            //var startQuat = npcTransform.Rotation.Rotation;
-
-            //var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);
-            //npcTransform.Rotation = Matrix.CreateFromQuaternion(dQuat);
-            
+            var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);
+            dQuat.Normalize();
+            npcTransform.Rotation = Matrix.CreateFromQuaternion(dQuat);
+            /*
             // if too far from flock, steer towards flock
             if (centroidDistance > flock.Radius) {
                 Vector3 dest = Vector3.Normalize(flock.Centroid - npcTransform.Position);
-                var source = Vector3.Forward;
-                var goalQuat = AISystem.GetRotation(source, dest, Vector3.Up);
-                var startQuat = npcTransform.Rotation.Rotation;
-                var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);
+                //var goalQuat = AISystem.GetRotation(source, dest, Vector3.Up);
+                dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);
+                dQuat.Normalize();
                 dQuat.X = 0;
                 dQuat.Z = 0;
                 npcTransform.Rotation = Matrix.CreateFromQuaternion(dQuat);
@@ -80,7 +82,8 @@ namespace GameName.AiStates
             // else wander around
             else {
                 npcTransform.Rotation *= Matrix.CreateFromYawPitchRoll(rotationSpeed, 0, 0);
-            }
+            }*/
+            // move forward in current direction
             npcBody.Velocity.X = (movementSpeed * npcTransform.Rotation.Forward).X;
             npcBody.Velocity.Z = (movementSpeed * npcTransform.Rotation.Forward).Z;
         }
@@ -121,6 +124,9 @@ namespace GameName.AiStates
                 steer.sub(velocity);
                 steer.limit(maxforce);
             }*/
+            //steer.Normalize();
+            steer = Vector3.Negate(steer);
+
             return steer;
         }
     }

@@ -12,6 +12,6 @@ namespace EngineName.Components {
 
         public Vector3 Centroid { get; set; }
         public Vector3 AvgVelocity { get; set; }
-        public float Radius;
+        public float Radius { get; set; }
     }
 }
