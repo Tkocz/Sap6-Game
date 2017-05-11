@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -10,6 +11,7 @@ using EngineName.Utils;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace EngineName.Systems
 {
@@ -36,12 +38,12 @@ namespace EngineName.Systems
         /// <summary>Inits networkssystems configures settings for lidgrens networks framework.</summary>
         public override void Init()
         {
+            
             _config = new NetPeerConfiguration("Sap6_Networking")
             {
                 Port = _localport,
                 AcceptIncomingConnections = true
             };
-
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -51,7 +53,7 @@ namespace EngineName.Systems
             _peer.Start();
             
             _peer.DiscoverLocalPeers(_searchport);
-
+            _config.SimulatedLoss = 0.1f;
 
             Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data , "metadata"));
             Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
@@ -352,7 +354,6 @@ namespace EngineName.Systems
             }
         }
 
-        private Vector3 oldLocation;
         private void addOrUpdatCObjects(int id, CBody cbody, CTransform ctransform,string modelname)
         {
             //Add entity 
@@ -368,32 +369,31 @@ namespace EngineName.Systems
                     fileName = modelname
                 });
                 Game1.Inst.Scene.AddComponent(id, new CSyncObject{ Owner = false}) ;
-                oldLocation = ctransform.Position;
+                newCBody.Add(id,cbody);              
+                newpositions.Add(id, ctransform); 
             }
             else
             {
                 if (string.IsNullOrEmpty(modelname))
                     return;
-                
-                //Update postition
-                var oldctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(id);
-                var oldcbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(id);
-
-                oldcbody.Velocity = cbody.Velocity;
-                oldctransform.Frame = ctransform.Frame;
-                oldctransform.Rotation = ctransform.Rotation;
-                oldctransform.Position = ctransform.Position;
-                //Vector3.SmoothStep(ref oldctransform.Position, ref ctransform.Position, 0.2f, out oldctransform.Position);
-                oldctransform.Scale = ctransform.Scale;
+                prevCBody[id] = newCBody[id];
+                prevpositions[id] = prevpositions[id];
+                newpositions[id] = ctransform;
+                newCBody[id] = cbody;
             }   
         }
+        private Dictionary<int, CBody> prevCBody = new Dictionary<int, CBody>();
+        private Dictionary<int,CTransform> prevpositions = new Dictionary<int, CTransform>();
+        private Dictionary<int, CBody> newCBody = new Dictionary<int, CBody>();
+        private Dictionary<int, CTransform> newpositions = new Dictionary<int, CTransform>();
         public override void Cleanup()
         {
             _scanThread.Abort();
             _peer.Shutdown("Shutting Down");
             base.Cleanup();
         }
-        private const float updateInterval  = 0.15f;
+
+        private const float updateInterval = (float)1 / 20;
         private float remaingTime = 0;
         public override void Update(float t, float dt)
         {
@@ -403,19 +403,42 @@ namespace EngineName.Systems
                 syncObjects();
                 remaingTime = 0;
             }
-            
+
             //Todo Impliment Prediction for player movement  
             /*foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
             {
                 var sync = (CSyncObject)pair.Value;
                 if (!sync.Owner)
                 {
-                    var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(pair.Key);
+                 
+                    
                 }
             }*/
+            foreach (var key in newCBody.Keys)
+            {
 
+                var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(key);
+                var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+                var newtransform = newpositions[key];
+                var newcbody = newCBody[key];
+
+
+                //Smooth
+               
+                if(transform.Position.Y - newtransform.Position.Y  > 0.02 && transform.Position.X - newtransform.Position.X > 0.02 && transform.Position.Z - newtransform.Position.Z > 0.02)
+                {
+                    cbody.Velocity = Vector3.Lerp(cbody.Velocity, newcbody.Velocity, 0.1f);
+                    transform.Position = Vector3.Lerp(transform.Position, newtransform.Position, 0.1f);
+                    transform.Scale = Vector3.Lerp(transform.Scale, newtransform.Scale, 0.1f);
+                    transform.Frame = newtransform.Frame;
+                }
+                var rotation = Quaternion.Lerp(Quaternion.CreateFromRotationMatrix(transform.Rotation),
+                    Quaternion.CreateFromRotationMatrix(newtransform.Rotation), 0.1f);
+                transform.Rotation = Matrix.CreateFromQuaternion(rotation);
+                
+            }
+           
             MessageLoop();
-            base.Update(t, dt);
         }
     }
 }

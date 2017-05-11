@@ -312,20 +312,34 @@ namespace EngineName.Utils
         public static CBody ReadCBody(this NetBuffer message)
         {
             CBody retval = new CBody();
+            retval.Radius = message.ReadFloat();
             retval.InvMass =message.ReadFloat();
             retval.LinDrag = message.ReadFloat();
-            retval.Radius = message.ReadFloat();
             retval.Restitution = message.ReadFloat();
+            retval.SpeedMultiplier = message.ReadFloat();
+            retval.RotationMultiplier = message.ReadFloat();
             retval.Velocity = message.ReadVector3();
+            retval.MaxVelocity = message.ReadFloat();
+            retval.EnableRot = message.ReadBoolean();
+            retval.Rot = message.ReadRotation(8);
+            retval.RotAx = message.ReadVector3();
+            retval.RotVel = message.ReadFloat();
             return retval;
         }
         public static void WriteCBody(this NetBuffer message, CBody cbody)
         {
+            message.Write(cbody.Radius);
             message.Write(cbody.InvMass);
             message.Write(cbody.LinDrag);
-            message.Write(cbody.Radius);
             message.Write(cbody.Restitution);
+            message.Write(cbody.SpeedMultiplier);
+            message.Write(cbody.RotationMultiplier);
             message.Write(cbody.Velocity);
+            message.Write(cbody.MaxVelocity);
+            message.Write(cbody.EnableRot);
+            message.WriteRotation(cbody.Rot,8);
+            message.Write(cbody.RotAx);
+            message.Write(cbody.RotVel);
         }
         public static int ReadEntity(this NetBuffer message, ref CBody cBody, ref CTransform ctransform, ref string modelname)
         {
