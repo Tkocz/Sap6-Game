@@ -116,27 +116,42 @@ public class PhysicsSystem: EcsSystem {
     public override void Update(float t, float dt) {
         var scene = Game1.Inst.Scene;
 
+        // TODO: Shouldn't even alloc this every frame. :-(
+        var p = new Vector3[8]; // Used to compute AABBs for OBBs.
+
         // Basically, use semi-implicit Euler to integrate all positions and then sweep coarsely for
         // AABB collisions. All potential collisions are passed on to the fine-phase solver.
         mColls1.Clear();
         mColls2.Clear();
-        
+
+        // -------------------------------------------------
+        // TODO: I'm commenting this out because:
+        //       1) The physics system is in the engine project - not all games want an inventory
+        //          (which is a very game-specific concept) so it should not be in the engine, but
+        //          rather in the game project.
+        //       2) It's harmful to the performance of the physics system (which lags heavily in the
+        //          Dev.Collisions scene with this check enabled).
+        //
+        //       My suggestion is to re-implement this functionality as a separate system in the
+        //       game project.
         // Skip entities that are in an inventory, since it aint't possible to collide with them
         // while they're inside an inventory.
-        Dictionary<int, EcsComponent> inventoryComps = Game1.Inst.Scene.GetComponents<CInventory>();
-        List<int> itemsInInventory = new List<int>();
-        foreach (var inv in inventoryComps)
-        {
-            var temp = (CInventory)inv.Value;
-            itemsInInventory.AddRange(temp.inventory);
-        }
+        //     -- Philip Arvidsson <philip@philiparvidsson.com>
+        //
+        // Dictionary<int, EcsComponent> inventoryComps = Game1.Inst.Scene.GetComponents<CInventory>();
+        // List<int> itemsInInventory = new List<int>();
+        // foreach (var inv in inventoryComps)
+        // {
+        //     var temp = (CInventory)inv.Value;
+        //     itemsInInventory.AddRange(temp.inventory);
+        // }
+        // -------------------------------------------------
 
-            foreach (var e in scene.GetComponents<CBody>()) {
+        foreach (var e in scene.GetComponents<CBody>()) {
             var body   = (CBody)e.Value;
             var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
             var key = e.Key;
-            if (itemsInInventory.Contains(key))
-                continue;
+
             // TODO: Implement 4th order Runge-Kutta for differential equations.
             // Symplectic Euler is ok for now so compute force before updating position!
             body.Velocity   += dt*(Gravity - body.InvMass*body.LinDrag*body.Velocity);
@@ -157,7 +172,7 @@ public class PhysicsSystem: EcsSystem {
             //----------------------------
 
             // May 7th, 2017: Refactored into own function in response to feedback from other group.
-            CheckBodyWorld(body, transf, aabb1, e.Key);
+            CheckBodyWorld(e.Key, body, transf, aabb1);
 
             //----------------------------
             // Body-body collisions
@@ -167,7 +182,7 @@ public class PhysicsSystem: EcsSystem {
             // store them for later (fine-phase) processing.
             foreach (var e2 in scene.GetComponents<CBody>()) {
                 // Check entity IDs (.Key) to skip double-checking each potential collision.
-                if (e2.Key <= e.Key || itemsInInventory.Contains(e2.Key)) {
+                if (e2.Key <= e.Key) {
                     continue;
                 }
 
@@ -188,9 +203,6 @@ public class PhysicsSystem: EcsSystem {
             // Body-box collisions
             //----------------------------
 
-            // TODO: Shouldn't even alloc this every frame. :-(
-            var p = new Vector3[8];
-
             // Find collisions against boxes (oriented bounding boxes, really). Boxes are static to
             // avoid a rigid body dynamic implementation.
             foreach (var e2 in scene.GetComponents<CBox>()) {
@@ -199,6 +211,7 @@ public class PhysicsSystem: EcsSystem {
                 var p2      = transf2.Position;
 
                 // Transform into an AABB covering the entire OBB and check for collisions.
+                // TODO: We could precompute this since the OBBs are static.
 
                 p[0] = new Vector3(box.Box.Min.X, box.Box.Min.Y, box.Box.Min.Z);
                 p[1] = new Vector3(box.Box.Min.X, box.Box.Min.Y, box.Box.Max.Z);
@@ -242,7 +255,11 @@ public class PhysicsSystem: EcsSystem {
     //--------------------------------------
 
     /// <summary>Checks for and solves collisions against the world bounds.</summary>
-    private void CheckBodyWorld(CBody body, CTransform transf, BoundingBox aabb, int id) {
+    /// <param name="eid">The ID of the entity to check.</param>
+    /// <param name="body">The body component of the entity to check.</param>
+    /// <param name="transf">The transform component of the entity to check.</param>
+    /// <param name="aabb">The axis-aligned bounding box component of the entity to check.</param>
+    private void CheckBodyWorld(int eid, CBody body, CTransform transf, BoundingBox aabb) {
         // This function is pretty trivial, so we can solve the collision immediately - no need to
         // store it for solving during the fine-solver phase. Basically, just check the bounding box
         // against the world bounds and bounce against them with full restitution. In practice, this
@@ -282,11 +299,10 @@ public class PhysicsSystem: EcsSystem {
             var mapHeight = MapSystem.HeightPosition(transf.Position.X, transf.Position.Z);
 
             if (aabb.Min.Y < mapHeight) {
-                Scene.Raise("collisionwithground", new CollisionInfo {
-                                                   Entity1 = id
-                                                });
-                    transf.Position.Y = mapHeight - body.Aabb.Min.Y;
-                body.Velocity.Y *= -0.5f;
+                transf.Position.Y = mapHeight - body.Aabb.Min.Y;
+                body.Velocity.Y *= -body.Restitution;
+
+                Scene.Raise("collisionwithground", new CollisionInfo { Entity1 = eid });
             }
         }
     }
@@ -294,6 +310,7 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>Finds and solves sphere-sphere collisions using an a posteriori approach.</summary>
     private void SolveCollisions() {
         // Iterate over the collision pairs and solve actual collisions.
+
         foreach (var cp in mColls1) {
             SolveBodyBody(cp);
         }
