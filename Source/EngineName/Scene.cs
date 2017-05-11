@@ -218,7 +218,8 @@ namespace EngineName {
         Components.Add(typeof(CBox), new Dictionary<int, EcsComponent>());
 		Components.Add(typeof(CAI), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CSyncObject),new Dictionary<int, EcsComponent>());
-        Components.Add(typeof(CInventory), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CFlock),new Dictionary<int, EcsComponent>());
+		Components.Add(typeof(CInventory), new Dictionary<int, EcsComponent>());
 
 #if DEBUG
             AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));

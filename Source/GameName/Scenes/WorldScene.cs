@@ -169,7 +169,7 @@ namespace GameName.Scenes
             for (int f = 0; f < 5; f++)
             {
                 int flockId = AddEntity();
-                CFlock flock = new CFlock();
+                CFlock flock = new CFlock { Radius = 20 };
                 double animal = rnd.NextDouble();
                 string flockAnimal = animal > 0.66 ? "flossy" : animal > 0.33 ? "goose" : "hen";
                 int flockX = (int)(rnd.NextDouble() * worldSize);
@@ -206,11 +206,13 @@ namespace GameName.Scenes
                         SpeedMultiplier = 0.5f,
                         MaxVelocity = 5
                     });
-                    AddComponent(id, new CAI());
+                    AddComponent(id, new CAI { Flock = flockId });
                     AddComponent(id, new CSyncObject());
 
                     flock.Members.Add(id);
                 }
+                AddComponent(flockId, flock);
+                AddComponent(flockId, flockTransform);
             }
         }
 
