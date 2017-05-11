@@ -55,6 +55,8 @@ namespace GameName.AiStates
             var goalQuat = AISystem.GetRotation(source, dest, Vector3.Up);
             var startQuat = npcTransform.Rotation.Rotation;
             var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);
+            dQuat.X = 0;
+            dQuat.Z = 0;
             npcTransform.Rotation = Matrix.CreateFromQuaternion(dQuat);
 
             npcBody.Velocity += movementSpeed * npcTransform.Rotation.Forward;

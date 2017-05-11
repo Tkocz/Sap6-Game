@@ -40,8 +40,7 @@ namespace GameName.AiStates
                 var positionDiff = playerTransform.Position - npcTransform.Position;
                 float distance = (float)Math.Sqrt(Math.Pow(positionDiff.X, 2) + 0 + Math.Pow(positionDiff.Z, 2));
 
-                if (closestEnemyDistance > distance)
-                {
+                if (closestEnemyDistance > distance) {
                     closestEnemyDistance = distance;
                     closestEnemyId = player.Key;
                 }
@@ -52,6 +51,8 @@ namespace GameName.AiStates
             var goalQuat = AISystem.GetRotation(source, dest, Vector3.Up);
             var startQuat = npcTransform.Rotation.Rotation;
             var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);
+            dQuat.X = 0;
+            dQuat.Z = 0;
             npcTransform.Rotation = Matrix.CreateFromQuaternion(dQuat);
         }
     }

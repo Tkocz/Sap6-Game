@@ -95,6 +95,7 @@
     <Compile Include="Utils\DebugUtil.cs" />
     <Compile Include="Utils\GfxUtil.cs" />
     <Compile Include="Utils\GraphicsUtil.cs" />
+    <Compile Include="Utils\PositionalUtil.cs" />
     <Compile Include="Utils\SfxUtil.cs" />
     <Compile Include="Utils\XNAExtensions.cs" />
   </ItemGroup>

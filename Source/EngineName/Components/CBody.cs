@@ -17,7 +17,10 @@ using Microsoft.Xna.Framework;
 public sealed class CBody: EcsComponent {
     /// <summary>The axis-aligned bounding box, used for coarse-phase collision detection.</summary>
     public BoundingBox Aabb;
-
+    /// <summary>
+    /// The area in which the entity can reach items residing in the game world.
+    /// </summary>
+    public BoundingBox ReachableArea;
     /// <summary>The body sphere radius. Currently, the physics system only supports sphere-sphere
     ///          collisions detection and resolution. During fine-phase collision detection, the
     ///          radius is used to solve the collision between two bodies as if they were

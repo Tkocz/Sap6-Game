@@ -9,5 +9,6 @@ namespace EngineName.Components
 {
     public class CAI : EcsComponent {
         public AiState State;
+        public int Flock = -1;
     }
 }
