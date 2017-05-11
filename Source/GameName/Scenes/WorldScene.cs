@@ -5,6 +5,7 @@ using EngineName.Core;
 using EngineName.Logging;
 using EngineName.Systems;
 using EngineName.Utils;
+using GameName.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -55,14 +56,14 @@ namespace GameName.Scenes
             );
 
 #if DEBUG
-        AddSystem(new DebugOverlay());
+            AddSystem(new DebugOverlay());
 #endif
 
             base.Init();
 
             //add network after init
-            if (_networkSystem != null)
-            {
+
+            if (_networkSystem != null){
                 AddSystem(_networkSystem);
                 _networkSystem.InitLight();
             }
@@ -74,21 +75,22 @@ namespace GameName.Scenes
             float farplane = 1000f;
 
             player = AddEntity();
-            AddComponent(player, new CBody() { MaxVelocity = 1f, InvMass = 0.1f, SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 5f } );
+            AddComponent(player, new CBody() { MaxVelocity = 5f, InvMass = 0.01f, SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f });
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) } );
-            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") ,fileName  = "viking" });
-			AddComponent(player,new CSyncObject());
-			 
+            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) });
+            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
+            AddComponent(player, new CSyncObject());
+
             AddComponent(camera, new CCamera(-50, 50) {
                 Height = 20,
                 Distance = 20,
-                Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio,nearplane,farplane)
-                ,ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview*1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane*0.5f, farplane*1.2f)
+                Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane, farplane)
+                ,
+                ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview * 1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane * 0.5f, farplane * 1.2f)
             });
             //AddComponent(camera, new CInput());
             AddComponent(camera, new CTransform() { Position = new Vector3(-50, 50, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
-
+            
 
             // Heightmap entity
             int heightMap = AddEntity();
@@ -98,8 +100,8 @@ namespace GameName.Scenes
             mapSystem.Load();
             waterSys.Load();
             physicsSys.MapSystem = mapSystem;
-                       
-            
+
+
             // Add tree as sprint goal
 
             int sprintGoal = AddEntity();
@@ -114,20 +116,21 @@ namespace GameName.Scenes
                        ||
                     (((PhysicsSystem.CollisionInfo)data).Entity2 == player &&
                      ((PhysicsSystem.CollisionInfo)data).Entity1 == sprintGoal)) {
-                        shouldLeave = true; // We reached the goal and wants to leave the scene-
+                    shouldLeave = true; // We reached the goal and wants to leave the scene-
                 }
             });
 
             CreateTriggerEvents(player);
-            if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
-            {
+
+            if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null) {
                 CreateAnimals();
             }
 
             Log.Get().Debug("TestScene initialized.");
         }
 
-        private void CreateAnimals() {
+
+    private void CreateAnimals() {
             var flockRadius = 10;
             for (int f = 0; f < 5; f++) {
                 int flockId = AddEntity();
@@ -145,8 +148,8 @@ namespace GameName.Scenes
                     modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName);
                     AddComponent<C3DRenderable>(id, modelComponent);
 
-                    float memberX = flockTransform.Position.X + (float)rnd.NextDouble() * flockRadius*2 - flockRadius;
-                    float memberZ = flockTransform.Position.Z + (float)rnd.NextDouble() * flockRadius*2 - flockRadius;
+                    float memberX = flockTransform.Position.X + (float)rnd.NextDouble() * flockRadius * 2 - flockRadius;
+                    float memberZ = flockTransform.Position.Z + (float)rnd.NextDouble() * flockRadius * 2 - flockRadius;
                     float y = flockTransform.Position.Y;
                     CTransform transformComponent = new CTransform();
 
@@ -179,14 +182,14 @@ namespace GameName.Scenes
 
             Dictionary<int, EcsComponent> cameras = GetComponents<CCamera>();
 
-            foreach(var camera in cameras) {
+            foreach (var camera in cameras) {
                 CTransform cameraPos = (CTransform)GetComponentFromEntity<CTransform>(camera.Key);
                 CTransform playerPos = (CTransform)GetComponentFromEntity<CTransform>(player);
                 cameraPos.Position.X = playerPos.Position.X + ((CCamera)camera.Value).Distance;
                 cameraPos.Position.Y = playerPos.Position.Y + ((CCamera)camera.Value).Height;
                 cameraPos.Position.Z = playerPos.Position.Z + ((CCamera)camera.Value).Distance;
                 ((CCamera)camera.Value).Target = playerPos.Position;
-            } 
+            }
 
             base.Update(t, dt);
         }
@@ -209,7 +212,8 @@ namespace GameName.Scenes
             });
             //AddComponent(ball, new CSyncObject());
             AddComponent<C3DRenderable>(ball, new CImportedModel {
-                model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),fileName = "DummySphere" 
+                model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),
+                fileName = "DummySphere"
             });
 
             return ball;
@@ -231,7 +235,7 @@ namespace GameName.Scenes
                             CTransform playerPosition = (CTransform)GetComponentFromEntity<CTransform>(playerID);
                             for (var j = 0; j < 6; j++) {
                                 var r = 0.6f + (float)rnd.NextDouble() * 2.0f;
-                                CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, 10f + 2.0f * j, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
+                                CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 10f + 2.0f * j, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
                                            new Vector3(0.0f, -50.0f, 0.0f), // Velocity
                                            r);                              // Radius
                             }
@@ -256,6 +260,12 @@ namespace GameName.Scenes
                     });
                 }
             }
+        }
+
+        public int GetPlayerEntityID() {
+
+            return player;
+
         }
     }
 }

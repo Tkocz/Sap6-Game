@@ -145,7 +145,7 @@ public class PhysicsSystem: EcsSystem {
             //----------------------------
 
             // May 7th, 2017: Refactored into own function in response to feedback from other group.
-            CheckBodyWorld(body, transf, aabb1);
+            CheckBodyWorld(body, transf, aabb1, e.Key);
 
             //----------------------------
             // Body-body collisions
@@ -230,7 +230,7 @@ public class PhysicsSystem: EcsSystem {
     //--------------------------------------
 
     /// <summary>Checks for and solves collisions against the world bounds.</summary>
-    private void CheckBodyWorld(CBody body, CTransform transf, BoundingBox aabb) {
+    private void CheckBodyWorld(CBody body, CTransform transf, BoundingBox aabb, int id) {
         // This function is pretty trivial, so we can solve the collision immediately - no need to
         // store it for solving during the fine-solver phase. Basically, just check the bounding box
         // against the world bounds and bounce against them with full restitution. In practice, this
@@ -270,8 +270,10 @@ public class PhysicsSystem: EcsSystem {
             var mapHeight = MapSystem.HeightPosition(transf.Position.X, transf.Position.Z);
 
             if (aabb.Min.Y < mapHeight) {
-                Scene.Raise("collisionwithground", null);
-                transf.Position.Y = mapHeight - body.Aabb.Min.Y;
+                Scene.Raise("collisionwithground", new CollisionInfo {
+                                                   Entity1 = id
+                                                });
+                    transf.Position.Y = mapHeight - body.Aabb.Min.Y;
                 body.Velocity.Y *= -0.5f;
             }
         }

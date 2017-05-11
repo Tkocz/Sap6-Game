@@ -53,7 +53,7 @@
     <Compile Include="Components\CLogic.cs" />
     <Compile Include="Components\CParticle.cs" />
     <Compile Include="Components\CSyncObject.cs" />
- 	<Compile Include="Core\AiState.cs" />
+    <Compile Include="Core\AiState.cs" />
     <Compile Include="Core\Enums.cs" />
     <Compile Include="Components\Renderable\C2DRenderable.cs" />
     <Compile Include="Components\Renderable\CHeightmap.cs" />
@@ -80,7 +80,6 @@
     <Compile Include="Systems\ChatSystem.cs" />
     <Compile Include="Systems\DebugOverlay.cs" />
     <Compile Include="Systems\FpsCounterSystem.cs" />
-    <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\LogicSystem.cs" />
     <Compile Include="Systems\MapSystem.cs" />
     <Compile Include="Systems\NetworkSystem.cs" />
