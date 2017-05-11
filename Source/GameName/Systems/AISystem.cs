@@ -1,4 +1,5 @@
-﻿using EngineName.Components;
+﻿using EngineName;
+using EngineName.Components;
 using EngineName.Core;
 using GameName.AiStates;
 using Microsoft.Xna.Framework;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EngineName.Systems
+namespace GameName.Systems
 {
     public class AISystem : EcsSystem
     {

@@ -120,11 +120,23 @@ public class PhysicsSystem: EcsSystem {
         // AABB collisions. All potential collisions are passed on to the fine-phase solver.
         mColls1.Clear();
         mColls2.Clear();
+        
+        // Skip entities that are in an inventory, since it aint't possible to collide with them
+        // while they're inside an inventory.
+        Dictionary<int, EcsComponent> inventoryComps = Game1.Inst.Scene.GetComponents<CInventory>();
+        List<int> itemsInInventory = new List<int>();
+        foreach (var inv in inventoryComps)
+        {
+            var temp = (CInventory)inv.Value;
+            itemsInInventory.AddRange(temp.inventory);
+        }
 
-        foreach (var e in scene.GetComponents<CBody>()) {
+            foreach (var e in scene.GetComponents<CBody>()) {
             var body   = (CBody)e.Value;
             var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
-
+            var key = e.Key;
+            if (itemsInInventory.Contains(key))
+                continue;
             // TODO: Implement 4th order Runge-Kutta for differential equations.
             // Symplectic Euler is ok for now so compute force before updating position!
             body.Velocity   += dt*(Gravity - body.InvMass*body.LinDrag*body.Velocity);
@@ -145,7 +157,7 @@ public class PhysicsSystem: EcsSystem {
             //----------------------------
 
             // May 7th, 2017: Refactored into own function in response to feedback from other group.
-            CheckBodyWorld(body, transf, aabb1);
+            CheckBodyWorld(body, transf, aabb1, e.Key);
 
             //----------------------------
             // Body-body collisions
@@ -155,7 +167,7 @@ public class PhysicsSystem: EcsSystem {
             // store them for later (fine-phase) processing.
             foreach (var e2 in scene.GetComponents<CBody>()) {
                 // Check entity IDs (.Key) to skip double-checking each potential collision.
-                if (e2.Key <= e.Key) {
+                if (e2.Key <= e.Key || itemsInInventory.Contains(e2.Key)) {
                     continue;
                 }
 
@@ -230,7 +242,7 @@ public class PhysicsSystem: EcsSystem {
     //--------------------------------------
 
     /// <summary>Checks for and solves collisions against the world bounds.</summary>
-    private void CheckBodyWorld(CBody body, CTransform transf, BoundingBox aabb) {
+    private void CheckBodyWorld(CBody body, CTransform transf, BoundingBox aabb, int id) {
         // This function is pretty trivial, so we can solve the collision immediately - no need to
         // store it for solving during the fine-solver phase. Basically, just check the bounding box
         // against the world bounds and bounce against them with full restitution. In practice, this
@@ -270,8 +282,10 @@ public class PhysicsSystem: EcsSystem {
             var mapHeight = MapSystem.HeightPosition(transf.Position.X, transf.Position.Z);
 
             if (aabb.Min.Y < mapHeight) {
-                Scene.Raise("collisionwithground", null);
-                transf.Position.Y = mapHeight - body.Aabb.Min.Y;
+                Scene.Raise("collisionwithground", new CollisionInfo {
+                                                   Entity1 = id
+                                                });
+                    transf.Position.Y = mapHeight - body.Aabb.Min.Y;
                 body.Velocity.Y *= -0.5f;
             }
         }
