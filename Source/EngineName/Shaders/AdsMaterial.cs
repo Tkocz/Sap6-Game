@@ -33,6 +33,12 @@ public class AdsMaterial: MaterialShader {
     /// <summary>The diffuse texture.</summary>
     private Texture2D mDifTex;
 
+    /// <summary>The normal texture.</summary>
+    private Texture2D mNormTex;
+
+    /// <summary>The normal coefficient.</summary>
+    private float mNormCoeff;
+
     //--------------------------------------
     // PUBLIC CONSTRUCTORS
     //--------------------------------------
@@ -43,14 +49,22 @@ public class AdsMaterial: MaterialShader {
     /// <param name="spe">The specular color.</param>
     /// <param name="k">The shininess constant.</param>
     /// <param name="difTex">The diffuse texture.</param>
-    public AdsMaterial(Vector3 amb, Vector3 dif, Vector3 spe, float k, Texture2D difTex=null)
+    public AdsMaterial(Vector3   amb,
+                       Vector3   dif,
+                       Vector3   spe,
+                       float     k,
+                       Texture2D difTex    = null,
+                       Texture2D normTex   = null,
+                       float     normCoeff = 1.0f)
         : base(Game1.Inst.Content.Load<Effect>("Effects/AdsMaterial"))
     {
-        mAmb    = amb;
-        mDif    = dif;
-        mSpe    = spe;
-        mK      = k;
-        mDifTex = difTex;
+        mAmb       = amb;
+        mDif       = dif;
+        mSpe       = spe;
+        mK         = k;
+        mDifTex    = difTex;
+        mNormTex   = normTex;
+        mNormCoeff = normCoeff;
     }
 
     //--------------------------------------
@@ -71,6 +85,16 @@ public class AdsMaterial: MaterialShader {
         else {
             mEffect.Parameters["UseDifTex"].SetValue(false);
             mEffect.Parameters["DifTex"].SetValue((Texture2D)null);
+        }
+
+        if (mNormTex != null) {
+            mEffect.Parameters["UseNormTex"].SetValue(true);
+            mEffect.Parameters["NormTex"].SetValue(mNormTex);
+            mEffect.Parameters["NormCoeff"].SetValue(mNormCoeff);
+        }
+        else {
+            mEffect.Parameters["UseNormTex"].SetValue(false);
+            mEffect.Parameters["NormTex"].SetValue((Texture2D)null);
         }
     }
 }

@@ -375,7 +375,9 @@ public sealed class Collisions: Scene {
                                              col,
                                              Vector3.One,
                                              50.0f,
-                                             Game1.Inst.Content.Load<Texture2D>("Textures/Checker"))
+                                             Game1.Inst.Content.Load<Texture2D>("Textures/Ball"),
+                                             Game1.Inst.Content.Load<Texture2D>("Textures/Grain"),
+                                             0.1f)
         });
 
         return ball;
