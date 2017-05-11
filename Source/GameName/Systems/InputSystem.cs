@@ -119,7 +119,25 @@ namespace GameName.Systems {
                     body.Velocity.Y += 10f;
                     isInAir = true;
                 }
-
+                if(currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
+                {
+                    if(Game1.Inst.Scene.GetType() == typeof(WorldScene))
+                    {
+                        var scene = (WorldScene)Game1.Inst.Scene;
+                        var inv = (CInventory)Game1.Inst.Scene.GetComponentFromEntity<CInventory>(input.Key);
+                        foreach (int ball in scene.getBalls())
+                        {
+                            var ballBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(ball);
+                            if (body.ReachableArea.Intersects(ballBody.Aabb) && !inv.isFull && !inv.inventory.Contains(ball))
+                            {
+                                inv.inventory.Add(ball);
+                                prevState = currentState;
+                                // Return so only one item will be picked up.
+                                return;
+                            }
+                        }
+                    }
+                }
                 if (currentState.IsKeyDown(Keys.LeftControl) && !prevState.IsKeyDown(Keys.LeftControl))
                 {
                     if (Game1.Inst.Scene.EntityHasComponent<CInventory>(input.Key))
@@ -128,13 +146,14 @@ namespace GameName.Systems {
                         if (inv.inventory.Count > 0)
                         {
                             int itemId = inv.inventory.ElementAt(inv.inventory.Count - 1);
-                            inv.inventory.Remove(itemId);
+                            inv.itemsToRemove.Add(itemId);
+                            //inv.inventory.Remove(itemId);
                             var itemBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(itemId);
                             var itemTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(itemId);
                             itemTransform.Position = transform.Position;
-                            itemTransform.Frame.Forward = transform.Frame.Forward + new Vector3(itemBody.Aabb.Max.X * 2 + .5f, 0f, itemBody.Aabb.Max.X * 2 + .5f);
                             var throwSpeed = dt * 100f * itemBody.SpeedMultiplier;
-                            itemBody.Velocity += throwSpeed * itemTransform.Frame.Forward;
+                            itemBody.Velocity += transform.Rotation.Forward
+                                              * new Vector3(itemBody.Aabb.Max.X * 2 + .5f, 0f, itemBody.Aabb.Max.Z * 2 + .5f) * throwSpeed;
                         }
                     }
                 }

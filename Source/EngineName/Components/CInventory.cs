@@ -30,5 +30,16 @@ namespace EngineName.Components
         /// The items contained in an inventory
         /// </summary>
         public List<int> inventory = new List<int>(MAXSIZE);
+        /// <summary>
+        /// Items that are to be removed from the inventory.
+        /// </summary>
+        public List<int> itemsToRemove = new List<int>(MAXSIZE);
+
+        public void removeItems()
+        {
+            foreach (var item in itemsToRemove)
+                inventory.Remove(item);
+            itemsToRemove.Clear();
+        }
     }
 }
