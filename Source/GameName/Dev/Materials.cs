@@ -28,6 +28,9 @@ public sealed class Materials: Scene {
     // NON-PUBLIC FIELDS
     //--------------------------------------
 
+    /// <summary>Camera entity ID.</summary>
+    private int mCamID;
+
     /// <summary>Used to create environment maps.</summary>
     private RenderingSystem mRenderer;
 
@@ -42,7 +45,6 @@ public sealed class Materials: Scene {
     public override void Init() {
         AddSystems(new                    LogicSystem(),
                    new                  PhysicsSystem() { Gravity = Vector3.Zero },
-                   new                   CameraSystem(),
                    mSkybox         = new SkyBoxSystem(),
                    mRenderer    = new RenderingSystem());
 
@@ -52,7 +54,7 @@ public sealed class Materials: Scene {
 
         base.Init();
 
-        InitCam();
+        mCamID = InitCam();
 
         // Spawn a few balls.
         for (var i = 0; i < 10; i++) {
@@ -69,6 +71,12 @@ public sealed class Materials: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
+        { // TODO: CameraSystem no longer supports anything but chase cam, so manual setup below.
+            var cam = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(mCamID);
+            var camTransf = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(mCamID);
+            cam.View = Matrix.CreateLookAt(camTransf.Position, cam.Target, Vector3.Up);
+        }
+
         Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
     }

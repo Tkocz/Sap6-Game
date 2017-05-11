@@ -28,6 +28,9 @@ public sealed class Particles: Scene {
     // NON-PUBLIC FIELDS
     //--------------------------------------
 
+    /// <summary>Camera entity ID.</summary>
+    private int mCamID;
+
     /// <summary>We store a refernece to the particle system so we can spawn particles
     ///          easily.</summary>
     private ParticleSystem mParticleSys;
@@ -40,7 +43,6 @@ public sealed class Particles: Scene {
     public override void Init() {
         AddSystems(mParticleSys = new  ParticleSystem(),
                    new                  PhysicsSystem(),
-                   new                   CameraSystem(),
                    new                RenderingSystem());
 
 #if DEBUG
@@ -49,7 +51,7 @@ public sealed class Particles: Scene {
 
         base.Init();
 
-        InitCam();
+        mCamID = InitCam();
 
         // Spawn a few balls.
         for (var i = 0; i < 20; i++) {
@@ -81,6 +83,12 @@ public sealed class Particles: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
+        { // TODO: CameraSystem no longer supports anything but chase cam, so manual setup below.
+            var cam = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(mCamID);
+            var camTransf = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(mCamID);
+            cam.View = Matrix.CreateLookAt(camTransf.Position, cam.Target, Vector3.Up);
+        }
+
         Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
     }

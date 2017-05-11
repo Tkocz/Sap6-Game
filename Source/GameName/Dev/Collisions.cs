@@ -70,7 +70,6 @@ public sealed class Collisions: Scene {
 
         AddSystems(            new LogicSystem(),
                    physics = new PhysicsSystem(),
-                              new CameraSystem(),
                            new RenderingSystem());
 
         physics.Bounds = new BoundingBox(-5.0f*Vector3.One, 5.0f*Vector3.One);
@@ -312,6 +311,12 @@ public sealed class Collisions: Scene {
         }
 
         mDrawT += dt;
+
+        { // TODO: CameraSystem no longer supports anything but chase cam, so manual setup below.
+            var cam = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(mCamID);
+            var camTransf = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(mCamID);
+            cam.View = Matrix.CreateLookAt(camTransf.Position, cam.Target, Vector3.Up);
+        }
 
         Game1.Inst.GraphicsDevice.Clear(Color.White);
 

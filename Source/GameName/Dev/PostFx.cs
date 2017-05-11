@@ -28,6 +28,9 @@ public sealed class PostFx: Scene {
     // NON-PUBLIC FIELDS
     //--------------------------------------
 
+    /// <summary>Camera entity ID.</summary>
+    private int mCamID;
+
     /// <summary>The distortion pixel shader.</summary>
     private Effect mDistortFX;
 
@@ -48,7 +51,6 @@ public sealed class PostFx: Scene {
     public override void Init() {
         AddSystems(new                    LogicSystem(),
                    new                  PhysicsSystem(),
-                   new                   CameraSystem(),
                    mSkybox      = new SkyBoxSystem(),
                    mRenderer    = new RenderingSystem());
 
@@ -58,7 +60,7 @@ public sealed class PostFx: Scene {
 
         base.Init();
 
-        InitCam();
+        mCamID = InitCam();
 
         // Spawn a few balls.
         for (var i = 0; i < 10; i++) {
@@ -78,6 +80,12 @@ public sealed class PostFx: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt)  {
+        { // TODO: CameraSystem no longer supports anything but chase cam, so manual setup below.
+            var cam = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(mCamID);
+            var camTransf = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(mCamID);
+            cam.View = Matrix.CreateLookAt(camTransf.Position, cam.Target, Vector3.Up);
+        }
+
         GfxUtil.SetRT(mRT);
         Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
