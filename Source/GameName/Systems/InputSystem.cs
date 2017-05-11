@@ -50,7 +50,7 @@ namespace GameName.Systems {
                 }
                 var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(input.Key);
                 var inputValue = (CInput)input.Value;
-                if (Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key))
+                /*if (Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key))
                 {
                     CCamera cameraComponent = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(input.Key);
 
@@ -74,7 +74,7 @@ namespace GameName.Systems {
                         cameraComponent.Heading += 0.05f;
                         transform.Position = Vector3.Subtract(cameraComponent.Target, new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), cameraComponent.Height, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f))));
                     }
-                }
+                }*/
 
                 //For Network Chat           
                 foreach (Keys key in pressedKeys)
@@ -141,7 +141,7 @@ namespace GameName.Systems {
                 prevState = currentState;
 
                 addRot = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
-                
+                transform.Heading += yaw;
                 transform.Rotation *= addRot;
 
 

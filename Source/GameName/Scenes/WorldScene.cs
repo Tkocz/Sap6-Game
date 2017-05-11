@@ -79,12 +79,12 @@ namespace GameName.Scenes
             player = AddEntity();
             AddComponent(player, new CBody() { MaxVelocity = 5f, InvMass = 0.01f, SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f });
             AddComponent(player, new CInput());
-            AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) });
+            AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) });
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
             AddComponent(player, new CSyncObject());
             AddComponent(player, new CInventory());
 
-            AddComponent(camera, new CCamera(-50, 50) {
+            AddComponent(player, new CCamera(-50, 50) {
                 Height = 20,
                 Distance = 20,
                 Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane, farplane)
@@ -92,7 +92,7 @@ namespace GameName.Scenes
                 ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview * 1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane * 0.5f, farplane * 1.2f)
             });
             //AddComponent(camera, new CInput());
-            AddComponent(camera, new CTransform() { Position = new Vector3(-50, 50, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
+            //AddComponent(camera, new CTransform() { Position = new Vector3(-50, 50, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
             
 
             // Heightmap entity
@@ -208,14 +208,16 @@ namespace GameName.Scenes
 
             Dictionary<int, EcsComponent> cameras = GetComponents<CCamera>();
 
-            foreach (var camera in cameras) {
+            /*foreach (var camera in cameras) {
                 CTransform cameraPos = (CTransform)GetComponentFromEntity<CTransform>(camera.Key);
                 CTransform playerPos = (CTransform)GetComponentFromEntity<CTransform>(player);
                 cameraPos.Position.X = playerPos.Position.X + ((CCamera)camera.Value).Distance;
                 cameraPos.Position.Y = playerPos.Position.Y + ((CCamera)camera.Value).Height;
                 cameraPos.Position.Z = playerPos.Position.Z + ((CCamera)camera.Value).Distance;
-                ((CCamera)camera.Value).Target = playerPos.Position;
-            }
+                //((CCamera)camera.Value).Target = playerPos.Position;
+                //((CCamera)camera.Value).Heading += 0.1f;
+
+            }*/
 
             base.Update(t, dt);
         }

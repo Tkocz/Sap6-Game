@@ -14,5 +14,6 @@ namespace EngineName.Components
         public Vector3 Scale = Vector3.One;
         public Matrix Rotation = Matrix.Identity;
         public Matrix Frame = Matrix.Identity;
+        public float Heading = 0.0f;
     }
 }
