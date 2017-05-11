@@ -15,6 +15,8 @@ namespace GameName.Systems {
         private Matrix addRot;
         private float yaw = 0, pitch = 0, roll = 0;
         private bool isInAir = false;
+        private KeyboardState prevState = new KeyboardState();
+        public InputSystem() { }
 
         public override void Init()
         {
@@ -117,6 +119,27 @@ namespace GameName.Systems {
                     body.Velocity.Y += 10f;
                     isInAir = true;
                 }
+
+                if (currentState.IsKeyDown(Keys.LeftControl) && !prevState.IsKeyDown(Keys.LeftControl))
+                {
+                    if (Game1.Inst.Scene.EntityHasComponent<CInventory>(input.Key))
+                    {
+                        var inv = (CInventory)Game1.Inst.Scene.GetComponentFromEntity<CInventory>(input.Key);
+                        if (inv.inventory.Count > 0)
+                        {
+                            int itemId = inv.inventory.ElementAt(inv.inventory.Count - 1);
+                            inv.inventory.Remove(itemId);
+                            var itemBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(itemId);
+                            var itemTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(itemId);
+                            itemTransform.Position = transform.Position;
+                            itemTransform.Frame.Forward = transform.Frame.Forward + new Vector3(itemBody.Aabb.Max.X * 2 + .5f, 0f, itemBody.Aabb.Max.X * 2 + .5f);
+                            var throwSpeed = dt * 100f * itemBody.SpeedMultiplier;
+                            itemBody.Velocity += throwSpeed * itemTransform.Frame.Forward;
+                        }
+                    }
+                }
+                prevState = currentState;
+
                 addRot = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
                 
                 transform.Rotation *= addRot;

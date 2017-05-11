@@ -120,11 +120,23 @@ public class PhysicsSystem: EcsSystem {
         // AABB collisions. All potential collisions are passed on to the fine-phase solver.
         mColls1.Clear();
         mColls2.Clear();
+        
+        // Skip entities that are in an inventory, since it aint't possible to collide with them
+        // while they're inside an inventory.
+        Dictionary<int, EcsComponent> inventoryComps = Game1.Inst.Scene.GetComponents<CInventory>();
+        List<int> itemsInInventory = new List<int>();
+        foreach (var inv in inventoryComps)
+        {
+            var temp = (CInventory)inv.Value;
+            itemsInInventory.AddRange(temp.inventory);
+        }
 
-        foreach (var e in scene.GetComponents<CBody>()) {
+            foreach (var e in scene.GetComponents<CBody>()) {
             var body   = (CBody)e.Value;
             var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
-
+            var key = e.Key;
+            if (itemsInInventory.Contains(key))
+                continue;
             // TODO: Implement 4th order Runge-Kutta for differential equations.
             // Symplectic Euler is ok for now so compute force before updating position!
             body.Velocity   += dt*(Gravity - body.InvMass*body.LinDrag*body.Velocity);
@@ -155,7 +167,7 @@ public class PhysicsSystem: EcsSystem {
             // store them for later (fine-phase) processing.
             foreach (var e2 in scene.GetComponents<CBody>()) {
                 // Check entity IDs (.Key) to skip double-checking each potential collision.
-                if (e2.Key <= e.Key) {
+                if (e2.Key <= e.Key || itemsInInventory.Contains(e2.Key)) {
                     continue;
                 }
 

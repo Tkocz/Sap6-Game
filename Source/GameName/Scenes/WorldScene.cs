@@ -20,6 +20,8 @@ namespace GameName.Scenes
         private Random rnd = new Random();
         private int worldSize = 300;
         private int player;
+        private int pickUpCount = 0;
+        private List<int> balls = new List<int>();
         private NetworkSystem _networkSystem;
 
         public WorldScene(NetworkSystem _network)
@@ -32,7 +34,7 @@ namespace GameName.Scenes
             Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
             if (shouldLeave) {
                 Game1.Inst.LeaveScene();
-                Game1.Inst.EnterScene(new EndGameScene(passedTime));
+                Game1.Inst.EnterScene(new EndGameScene(passedTime, pickUpCount));
             }
             base.Draw(t, dt);
         }
@@ -80,6 +82,7 @@ namespace GameName.Scenes
             AddComponent(player, new CTransform() { Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) });
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") });
             AddComponent(player, new CSyncObject());
+            AddComponent(player, new CInventory());
 
             AddComponent(camera, new CCamera(-50, 50) {
                 Height = 20,
@@ -117,6 +120,29 @@ namespace GameName.Scenes
                     (((PhysicsSystem.CollisionInfo)data).Entity2 == player &&
                      ((PhysicsSystem.CollisionInfo)data).Entity1 == sprintGoal)) {
                     shouldLeave = true; // We reached the goal and wants to leave the scene-
+                }
+            });
+
+            OnEvent("collision", data => {
+                if (((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
+                    balls.Contains(((PhysicsSystem.CollisionInfo)data).Entity2))
+                {
+                    var inventory = (CInventory)GetComponentFromEntity<CInventory>(player);
+                    if (!inventory.isFull && !inventory.inventory.Contains(((PhysicsSystem.CollisionInfo)data).Entity2))
+                    {
+                        inventory.inventory.Add(((PhysicsSystem.CollisionInfo)data).Entity2);
+                        pickUpCount++;
+                    }
+                }
+                else if (balls.Contains(((PhysicsSystem.CollisionInfo)data).Entity1) &&
+                        ((PhysicsSystem.CollisionInfo)data).Entity2 == player)
+                {
+                    var inventory = (CInventory)GetComponentFromEntity<CInventory>(player);
+                    if (!inventory.isFull && !inventory.inventory.Contains(((PhysicsSystem.CollisionInfo)data).Entity1))
+                    {
+                        inventory.inventory.Add(((PhysicsSystem.CollisionInfo)data).Entity1);
+                        pickUpCount++;
+                    }
                 }
             });
 
@@ -235,9 +261,10 @@ namespace GameName.Scenes
                             CTransform playerPosition = (CTransform)GetComponentFromEntity<CTransform>(playerID);
                             for (var j = 0; j < 6; j++) {
                                 var r = 0.6f + (float)rnd.NextDouble() * 2.0f;
-                                CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 10f + 2.0f * j, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
+                                var ballId = CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 10f + 2.0f * j, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
                                            new Vector3(0.0f, -50.0f, 0.0f), // Velocity
                                            r);                              // Radius
+                                balls.Add(ballId);
                             }
                         }
                     });
@@ -252,9 +279,10 @@ namespace GameName.Scenes
                             CTransform playerPosition = (CTransform)GetComponentFromEntity<CTransform>(playerID);
                             for (var j = 0; j < 6; j++) {
                                 var r = 0.6f + (float)rnd.NextDouble() * 2.0f;
-                                CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 2f, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
+                                var ballId = CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 2f, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
                                            new Vector3(0.0f, 0.0f, 0.0f), // Velocity
                                            r);                            // Radius
+                                balls.Add(ballId);
                             }
                         }
                     });
