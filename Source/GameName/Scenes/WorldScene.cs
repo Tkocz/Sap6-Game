@@ -146,7 +146,7 @@ namespace GameName.Scenes
                 }
             });
 
-            CreateTriggerEvents(player);
+            CreateTriggerEvents();
 
             if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null) {
                 CreateAnimals();
@@ -245,20 +245,20 @@ namespace GameName.Scenes
             return ball;
         }
 
-        private void CreateTriggerEvents(int playerID) {
+        private void CreateTriggerEvents() {
             for (int i = 0; i < 40; i++) {
                 int id = AddEntity();
                 AddComponent(id, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
-                AddComponent(id, new CTransform() { Position = new Vector3(rnd.Next(-worldSize, worldSize), -0, rnd.Next(-worldSize, worldSize)), Scale = new Vector3(0.05f) });
+                AddComponent(id, new CTransform() { Position = new Vector3(rnd.Next(-worldSize, worldSize), -0, rnd.Next(-worldSize, worldSize)), Scale = new Vector3(1f) });
                 if (rnd.NextDouble() > 0.5) {
                     // Falling balls event
                     OnEvent("collision", data => {
-                        if ((((PhysicsSystem.CollisionInfo)data).Entity1 == playerID &&
+                        if ((((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
                              ((PhysicsSystem.CollisionInfo)data).Entity2 == id)
                                ||
-                            (((PhysicsSystem.CollisionInfo)data).Entity2 == id &&
-                             ((PhysicsSystem.CollisionInfo)data).Entity1 == playerID)) {
-                            CTransform playerPosition = (CTransform)GetComponentFromEntity<CTransform>(playerID);
+                            (((PhysicsSystem.CollisionInfo)data).Entity1 == id &&
+                             ((PhysicsSystem.CollisionInfo)data).Entity2 == player)) {
+                            CTransform playerPosition = (CTransform)GetComponentFromEntity<CTransform>(player);
                             for (var j = 0; j < 6; j++) {
                                 var r = 0.6f + (float)rnd.NextDouble() * 2.0f;
                                 var ballId = CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 10f + 2.0f * j, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
@@ -271,12 +271,12 @@ namespace GameName.Scenes
                 } else {
                     // Balls spawns around the player
                     OnEvent("collision", data => {
-                        if ((((PhysicsSystem.CollisionInfo)data).Entity1 == playerID &&
+                        if ((((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
                              ((PhysicsSystem.CollisionInfo)data).Entity2 == id)
                                ||
-                            (((PhysicsSystem.CollisionInfo)data).Entity2 == id &&
-                             ((PhysicsSystem.CollisionInfo)data).Entity1 == playerID)) {
-                            CTransform playerPosition = (CTransform)GetComponentFromEntity<CTransform>(playerID);
+                            (((PhysicsSystem.CollisionInfo)data).Entity1 == id &&
+                             ((PhysicsSystem.CollisionInfo)data).Entity2 == player)) {
+                            CTransform playerPosition = (CTransform)GetComponentFromEntity<CTransform>(player);
                             for (var j = 0; j < 6; j++) {
                                 var r = 0.6f + (float)rnd.NextDouble() * 2.0f;
                                 var ballId = CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 2f, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
