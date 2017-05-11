@@ -45,15 +45,14 @@ namespace EngineName.Systems
                 AcceptIncomingConnections = true
             };
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
-            _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
             _config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
-           
+            //_config.SimulatedLoss = 0.05f;
+            
             _peer = new NetPeer(_config);
             _peer.Start();
             
             _peer.DiscoverLocalPeers(_searchport);
-            _config.SimulatedLoss = 0.1f;
 
             Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data , "metadata"));
             Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
@@ -370,7 +369,9 @@ namespace EngineName.Systems
                 });
                 Game1.Inst.Scene.AddComponent(id, new CSyncObject{ Owner = false}) ;
                 newCBody.Add(id,cbody);              
-                newpositions.Add(id, ctransform); 
+                newpositions.Add(id, ctransform);
+                prevCBody.Add(id, cbody);
+                prevpositions.Add(id, ctransform);
             }
             else
             {
@@ -425,13 +426,11 @@ namespace EngineName.Systems
 
                 //Smooth
                
-                if(transform.Position.Y - newtransform.Position.Y  > 0.02 && transform.Position.X - newtransform.Position.X > 0.02 && transform.Position.Z - newtransform.Position.Z > 0.02)
-                {
-                    cbody.Velocity = Vector3.Lerp(cbody.Velocity, newcbody.Velocity, 0.1f);
-                    transform.Position = Vector3.Lerp(transform.Position, newtransform.Position, 0.1f);
-                    transform.Scale = Vector3.Lerp(transform.Scale, newtransform.Scale, 0.1f);
-                    transform.Frame = newtransform.Frame;
-                }
+              
+                cbody.Velocity = Vector3.Lerp(cbody.Velocity, newcbody.Velocity, 0.1f);
+                transform.Position = Vector3.Lerp(transform.Position, newtransform.Position, 0.1f);
+                transform.Scale = Vector3.Lerp(transform.Scale, newtransform.Scale, 0.1f);
+                transform.Frame = newtransform.Frame;
                 var rotation = Quaternion.Lerp(Quaternion.CreateFromRotationMatrix(transform.Rotation),
                     Quaternion.CreateFromRotationMatrix(newtransform.Rotation), 0.1f);
                 transform.Rotation = Matrix.CreateFromQuaternion(rotation);
