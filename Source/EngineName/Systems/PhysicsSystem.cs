@@ -258,7 +258,7 @@ public class PhysicsSystem: EcsSystem {
         var b = (ushort)(y + 32767);
         var c = (ushort)(z + 32767);
 
-        Int64 hash = (c << 32) | (b << 16) | a;
+        Int64 hash = ((c & 0xffff) << 32) | ((b & 0xffff) << 16) | (a & 0xffff);
         return hash;
     }
 
@@ -273,14 +273,14 @@ public class PhysicsSystem: EcsSystem {
         int minX = (int)min.X;
         int minY = (int)min.Y;
         int minZ = (int)min.Z;
-        int maxX = (int)max.X + 1;
-        int maxY = (int)max.Y + 1;
-        int maxZ = (int)max.Z + 1;
+        int maxX = (int)max.X;
+        int maxY = (int)max.Y;
+        int maxZ = (int)max.Z;
 
         var sp = mSpatPart;
-        for (var x = minX; x <= minX; x++) {
-        for (var y = minY; y <= minY; y++) {
-        for (var z = minZ; z <= minZ; z++) {
+        for (var x = minX; x <= maxX; x++) {
+        for (var y = minY; y <= maxY; y++) {
+        for (var z = minZ; z <= maxZ; z++) {
             var hash = SpatPartHash(x, y, z);
 
             List<KeyValuePair<int, EcsComponent>> l;
@@ -308,14 +308,14 @@ public class PhysicsSystem: EcsSystem {
         int minX = (int)min.X;
         int minY = (int)min.Y;
         int minZ = (int)min.Z;
-        int maxX = (int)max.X + 1;
-        int maxY = (int)max.Y + 1;
-        int maxZ = (int)max.Z + 1;
+        int maxX = (int)max.X;
+        int maxY = (int)max.Y;
+        int maxZ = (int)max.Z;
 
         var sp = mSpatPart;
-        for (var x = minX; x <= minX; x++) {
-        for (var y = minY; y <= minY; y++) {
-        for (var z = minZ; z <= minZ; z++) {
+        for (var x = minX; x <= maxX; x++) {
+        for (var y = minY; y <= maxY; y++) {
+        for (var z = minZ; z <= maxZ; z++) {
             var hash = SpatPartHash(x, y, z);
 
             List<KeyValuePair<int, EcsComponent>> l2;
@@ -434,7 +434,7 @@ public class PhysicsSystem: EcsSystem {
         SpatPartRetrieve(aabb1.Min, aabb1.Max, l);
         foreach (var e2 in l) {
             // Check entity IDs (.Key) to skip double-checking each potential collision.
-            if (e2.Key <= e.Key) {
+            if (e2.Key == e.Key) {
                 continue;
             }
 
