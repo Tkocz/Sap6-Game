@@ -21,3 +21,4 @@
 1494182163:3.0:Implemented collisions between sphersd and (static) oriented bounding boxes.
 1494321857:2.0:Added Phong materials (AdsMaterial.fx)
 1494434971:2.0:Added computations for rotational mechanics
+1494626653:3.0:Optimized physics (parallelization + spatial partitioning).
