@@ -14,6 +14,7 @@ using EngineName.Core;
 using Microsoft.Xna.Framework;
 
 using static System.Math;
+
 using static EngineName.Logging.Log;
 
 //--------------------------------------
