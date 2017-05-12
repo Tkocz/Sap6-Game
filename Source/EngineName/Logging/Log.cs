@@ -45,17 +45,17 @@ public class Log {
     /// <summary>Gets a log with the specified name.</summary>
     /// <param name="name">The name of the log.</param>
     /// <returns>A log.</returns>
-    public static Log Get(string name) {
+    public static Log GetLog(string name) {
         return new Log(name);
     }
 
     /// <summary>Gets a log for the calling method.</summary>
     /// <returns>A log.</returns>
-    public static Log Get([CallerFilePath  ] string callerFilePath   = "",
-                          [CallerMemberName] string callerMemberName = "",
-                          [CallerLineNumber] int    callerLineNumber = 0)
+    public static Log GetLog([CallerFilePath  ] string callerFilePath   = "",
+                             [CallerMemberName] string callerMemberName = "",
+                             [CallerLineNumber] int    callerLineNumber = 0)
     {
-        return Get($"{Path.GetFileName(callerFilePath)}:{callerLineNumber}");
+        return GetLog($"{Path.GetFileName(callerFilePath)}:{callerLineNumber}");
     }
 
     /// <summary>Writes a debug message to the log.</summary>

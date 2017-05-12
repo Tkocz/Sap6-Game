@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using EngineName.Components;
 using EngineName.Core;
@@ -13,6 +14,7 @@ using EngineName.Core;
 using Microsoft.Xna.Framework;
 
 using static System.Math;
+using static EngineName.Logging.Log;
 
 //--------------------------------------
 // CLASSES
@@ -70,6 +72,34 @@ public class PhysicsSystem: EcsSystem {
             Second = second;
         }
     }
+    //--------------------------------------
+    // NON-PUBLIC FIELDS
+    //--------------------------------------
+
+    // Private field to avoid reallocs.
+    /// <summary>Contains a list of potential body-body collisions each frame.</summary>
+    private List<Pair<int, int>> mColls1 = new List<Pair<int, int>>();
+
+    // Private field to avoid reallocs.
+    /// <summary>Contains a list of potential body-box collisions each frame.</summary>
+    private List<Pair<int, int>> mColls2 = new List<Pair<int, int>>();
+
+    /// <summary>Collision detection threads.</summary>
+    private Thread[] mCollThreads;
+
+    /// <summary>The event that is set during collision detection parallelization phase.</summary>
+    private readonly ManualResetEvent mCollDetStart = new ManualResetEvent(false);
+
+    /// <summary>The event that signals that all collision detection is done.</summary>
+    private readonly AutoResetEvent mCollDetEnd = new AutoResetEvent(false);
+
+    /// <summary>The entity collision detection queue.</summary>
+    private readonly Queue<KeyValuePair<int, EcsComponent>> mCollEntityQueue =
+        new Queue<KeyValuePair<int, EcsComponent>>();
+
+    /// <summary>The number of collisions to check (used to signal completion of collision detection
+    ///          phase).</summary>
+    private int mNumCollEntities;
 
     //--------------------------------------
     // PUBLIC PROPERTIES
@@ -87,26 +117,37 @@ public class PhysicsSystem: EcsSystem {
     public MapSystem MapSystem { get; set; }
 
     //--------------------------------------
-    // NON-PUBLIC FIELDS
-    //--------------------------------------
-
-    // Private field to avoid reallocs.
-    /// <summary>Contains a list of potential body-body collisions each frame.</summary>
-    private List<Pair<int, int>> mColls1 = new List<Pair<int, int>>();
-
-    // Private field to avoid reallocs.
-    /// <summary>Contains a list of potential body-box collisions each frame.</summary>
-    private List<Pair<int, int>> mColls2 = new List<Pair<int, int>>();
-
-    //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
 
     /// <summary>Initializes the physics system.</summary>
     public override void Init() {
+        base.Init();
+
+        mCollThreads = new Thread[Environment.ProcessorCount];
+
+        for (var i = 0; i < mCollThreads.Length; i++) {
+            mCollThreads[i] = new Thread(CollDetThread);
+            mCollThreads[i].Priority = ThreadPriority.BelowNormal;
+            mCollThreads[i].IsBackground = true;
+            mCollThreads[i].Start();
+        }
+
+        GetLog().Info($"Created {mCollThreads.Length} collision detection threads.");
+
 #if DEBUG
         DebugOverlay.Inst.DbgStr((t, dt) => $"Coll checks: {mColls1.Count + mColls2.Count}");
 #endif
+    }
+
+    /// <summary>Cleans up the physics system.</summary>
+    public override void Cleanup() {
+        base.Cleanup();
+
+        // It's ok to just kill off the threads here.
+        foreach (var thread in mCollThreads) {
+            thread.Abort();
+        }
     }
 
     /// <summary>Updates all physical bodies (<see cref="CBody"/>) and solves collisions.</summary>
@@ -115,9 +156,6 @@ public class PhysicsSystem: EcsSystem {
     ///                  method.</param>
     public override void Update(float t, float dt) {
         var scene = Game1.Inst.Scene;
-
-        // TODO: Shouldn't even alloc this every frame. :-(
-        var p = new Vector3[8]; // Used to compute AABBs for OBBs.
 
         // Basically, use semi-implicit Euler to integrate all positions and then sweep coarsely for
         // AABB collisions. All potential collisions are passed on to the fine-phase solver.
@@ -150,7 +188,6 @@ public class PhysicsSystem: EcsSystem {
         foreach (var e in scene.GetComponents<CBody>()) {
             var body   = (CBody)e.Value;
             var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
-            var key = e.Key;
 
             // TODO: Implement 4th order Runge-Kutta for differential equations.
             // Symplectic Euler is ok for now so compute force before updating position!
@@ -173,77 +210,17 @@ public class PhysicsSystem: EcsSystem {
 
             // May 7th, 2017: Refactored into own function in response to feedback from other group.
             CheckBodyWorld(e.Key, body, transf, aabb1);
-
-            //----------------------------
-            // Body-body collisions
-            //----------------------------
-
-            // No collisions are solved in the loops below - we just find potential collisions and
-            // store them for later (fine-phase) processing.
-            foreach (var e2 in scene.GetComponents<CBody>()) {
-                // Check entity IDs (.Key) to skip double-checking each potential collision.
-                if (e2.Key <= e.Key) {
-                    continue;
-                }
-
-                var body2   = (CBody)e2.Value;
-                var transf2 = (CTransform)scene.GetComponentFromEntity<CTransform>(e2.Key);
-                var p2      = transf2.Position;
-                var aabb2   = new BoundingBox(p2 + body2.Aabb.Min, p2 + body2.Aabb.Max);
-
-                if (!aabb1.Intersects(aabb2)) {
-                    // No potential collision.
-                    continue;
-                }
-
-                mColls1.Add(new Pair<int, int>(e.Key, e2.Key));
-            }
-
-            //----------------------------
-            // Body-box collisions
-            //----------------------------
-
-            // Find collisions against boxes (oriented bounding boxes, really). Boxes are static to
-            // avoid a rigid body dynamic implementation.
-            foreach (var e2 in scene.GetComponents<CBox>()) {
-                var box     = (CBox)e2.Value;
-                var transf2 = (CTransform)scene.GetComponentFromEntity<CTransform>(e2.Key);
-                var p2      = transf2.Position;
-
-                // Transform into an AABB covering the entire OBB and check for collisions.
-                // TODO: We could precompute this since the OBBs are static.
-
-                p[0] = new Vector3(box.Box.Min.X, box.Box.Min.Y, box.Box.Min.Z);
-                p[1] = new Vector3(box.Box.Min.X, box.Box.Min.Y, box.Box.Max.Z);
-                p[2] = new Vector3(box.Box.Min.X, box.Box.Max.Y, box.Box.Min.Z);
-                p[3] = new Vector3(box.Box.Min.X, box.Box.Max.Y, box.Box.Max.Z);
-                p[4] = new Vector3(box.Box.Max.X, box.Box.Min.Y, box.Box.Min.Z);
-                p[5] = new Vector3(box.Box.Max.X, box.Box.Min.Y, box.Box.Max.Z);
-                p[6] = new Vector3(box.Box.Max.X, box.Box.Max.Y, box.Box.Min.Z);
-                p[7] = new Vector3(box.Box.Max.X, box.Box.Max.Y, box.Box.Max.Z);
-
-                var pMin = Vector3.One * Single.PositiveInfinity;
-                var pMax = Vector3.One * Single.NegativeInfinity;
-                for (var i = 0; i < 8; i++) {
-                    var q = Vector3.Transform(p[i], transf2.Rotation);
-                    pMin.X = Min(pMin.X, q.X);
-                    pMin.Y = Min(pMin.Y, q.Y);
-                    pMin.Z = Min(pMin.Z, q.Z);
-                    pMax.X = Max(pMax.X, q.X);
-                    pMax.Y = Max(pMax.Y, q.Y);
-                    pMax.Z = Max(pMax.Z, q.Z);
-                }
-
-                var aabb2 = new BoundingBox(transf2.Position + pMin, transf2.Position + pMax);
-
-                if (!aabb1.Intersects(aabb2)) {
-                    // No potential collision.
-                    continue;
-                }
-
-                mColls2.Add(new Pair<int, int>(e.Key, e2.Key));
-            }
         }
+
+        mCollEntityQueue.Clear();
+        foreach (var e in scene.GetComponents<CBody>()) {
+            mCollEntityQueue.Enqueue(e);
+        }
+
+        mNumCollEntities = mCollEntityQueue.Count;
+        mCollDetStart.Set();   // 1. Let collision threads spin!
+        mCollDetEnd.WaitOne(); // 2. Wait for them to exhaust queue.
+        mCollDetStart.Reset(); // 3. Tell them to sleep.
 
         SolveCollisions();
 
@@ -253,6 +230,42 @@ public class PhysicsSystem: EcsSystem {
     //--------------------------------------
     // NON-PUBLIC METHODS
     //--------------------------------------
+
+    /// <summary>Implements a continuous collision detection thread loop.</summary>
+    private void CollDetThread() {
+        // So basically, what this thread does is sleep until someone tells it to start looking for
+        // potential collision.
+
+        while (true) {
+            var scene = Game1.Inst.Scene;
+
+            mCollDetStart.WaitOne();
+
+            KeyValuePair<int, EcsComponent> e;
+            lock (mCollEntityQueue) {
+                if (mCollEntityQueue.Count == 0) {
+                    continue;
+                }
+
+                e = mCollEntityQueue.Dequeue();
+            }
+
+            var body   = (CBody)e.Value;
+            var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
+            var p1     = transf.Position;
+            var aabb1  = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
+
+            // TODO: Would possibly be beneficial to do these two in parallel. Unsure.
+            FindBodyBodyColls(e, aabb1);
+            FindBodyBoxColls (e, aabb1);
+
+            if (Interlocked.Decrement(ref mNumCollEntities) == 0) {
+                // We're the last one to decrement mNumcollentities, so we know all threads are done
+                // here.
+                mCollDetEnd.Set();
+            }
+        }
+    }
 
     /// <summary>Checks for and solves collisions against the world bounds.</summary>
     /// <param name="eid">The ID of the entity to check.</param>
@@ -304,6 +317,152 @@ public class PhysicsSystem: EcsSystem {
 
                 Scene.Raise("collisionwithground", new CollisionInfo { Entity1 = eid });
             }
+        }
+    }
+
+    /// <summary>Asynchronously finds all body-body collisions</summary>
+    /// <param name="e">The entity to check against other bodies.</param>
+    /// <param name="aabb1">The axis-aligned bounding box of the entity.</param>
+    private void FindBodyBodyColls(KeyValuePair<int, EcsComponent> e, BoundingBox aabb1) {
+        var scene = Game1.Inst.Scene;
+        var colls = new List<Pair<int, int>>();
+
+        // No collisions are solved in the loops below - we just find potential collisions and
+        // store them for later (fine-phase) processing.
+        foreach (var e2 in scene.GetComponents<CBody>()) {
+            // Check entity IDs (.Key) to skip double-checking each potential collision.
+            if (e2.Key <= e.Key) {
+                continue;
+            }
+
+            var body2   = (CBody)e2.Value;
+            var transf2 = (CTransform)scene.GetComponentFromEntity<CTransform>(e2.Key);
+            var p2      = transf2.Position;
+            var aabb2   = new BoundingBox(p2 + body2.Aabb.Min, p2 + body2.Aabb.Max);
+
+            if (!aabb1.Intersects(aabb2)) {
+                // No potential collision.
+                continue;
+            }
+
+            colls.Add(new Pair<int, int>(e.Key, e2.Key));
+        }
+
+        lock (mColls1) {
+            mColls1.AddRange(colls);
+        }
+    }
+
+    /// <summary>Asynchronously finds all body-box collisions</summary>
+    /// <param name="e">The entity to check against oriented bounding boxes.</param>
+    /// <param name="aabb1">The axis-aligned bounding box of the entity.</param>
+    private void FindBodyBoxColls(KeyValuePair<int, EcsComponent> e, BoundingBox aabb1) {
+        var scene = Game1.Inst.Scene;
+        var colls = new List<Pair<int, int>>();
+
+        // Find collisions against boxes (oriented bounding boxes, really). Boxes are static to
+        // avoid a rigid body dynamic implementation.
+        foreach (var e2 in scene.GetComponents<CBox>()) {
+            var box     = (CBox)e2.Value;
+            var transf2 = (CTransform)scene.GetComponentFromEntity<CTransform>(e2.Key);
+
+            // Transform into an AABB covering the entire OBB and check for collisions.
+            // TODO: We could precompute this since the OBBs are static.
+
+            var b = box.Box;
+            var r = transf2.Rotation;
+
+            // Below: Compute AABBs for OBBs.
+            // TODO: This is a hack to force stackallocs. (blame this file to see previous impl.)
+            var p0 = Vector3.Transform(new Vector3(b.Min.X, b.Min.Y, b.Min.Z), r);
+            var p1 = Vector3.Transform(new Vector3(b.Min.X, b.Min.Y, b.Max.Z), r);
+            var p2 = Vector3.Transform(new Vector3(b.Min.X, b.Max.Y, b.Min.Z), r);
+            var p3 = Vector3.Transform(new Vector3(b.Min.X, b.Max.Y, b.Max.Z), r);
+            var p4 = Vector3.Transform(new Vector3(b.Max.X, b.Min.Y, b.Min.Z), r);
+            var p5 = Vector3.Transform(new Vector3(b.Max.X, b.Min.Y, b.Max.Z), r);
+            var p6 = Vector3.Transform(new Vector3(b.Max.X, b.Max.Y, b.Min.Z), r);
+            var p7 = Vector3.Transform(new Vector3(b.Max.X, b.Max.Y, b.Max.Z), r);
+
+            var pMin = Vector3.One * Single.PositiveInfinity;
+            var pMax = Vector3.One * Single.NegativeInfinity;
+
+            pMax.X = Max(pMax.X, p0.X);
+            pMax.X = Max(pMax.X, p1.X);
+            pMax.X = Max(pMax.X, p1.X);
+            pMax.X = Max(pMax.X, p2.X);
+            pMax.X = Max(pMax.X, p3.X);
+            pMax.X = Max(pMax.X, p4.X);
+            pMax.X = Max(pMax.X, p4.X);
+            pMax.X = Max(pMax.X, p5.X);
+            pMax.X = Max(pMax.X, p6.X);
+            pMax.X = Max(pMax.X, p7.X);
+            pMax.Y = Max(pMax.Y, p0.Y);
+            pMax.Y = Max(pMax.Y, p1.Y);
+            pMax.Y = Max(pMax.Y, p2.Y);
+            pMax.Y = Max(pMax.Y, p2.Y);
+            pMax.Y = Max(pMax.Y, p3.Y);
+            pMax.Y = Max(pMax.Y, p4.Y);
+            pMax.Y = Max(pMax.Y, p5.Y);
+            pMax.Y = Max(pMax.Y, p5.Y);
+            pMax.Y = Max(pMax.Y, p6.Y);
+            pMax.Y = Max(pMax.Y, p6.Y);
+            pMax.Y = Max(pMax.Y, p7.Y);
+            pMax.Y = Max(pMax.Y, p7.Y);
+            pMax.Z = Max(pMax.Z, p0.Z);
+            pMax.Z = Max(pMax.Z, p1.Z);
+            pMax.Z = Max(pMax.Z, p2.Z);
+            pMax.Z = Max(pMax.Z, p2.Z);
+            pMax.Z = Max(pMax.Z, p3.Z);
+            pMax.Z = Max(pMax.Z, p4.Z);
+            pMax.Z = Max(pMax.Z, p5.Z);
+            pMax.Z = Max(pMax.Z, p5.Z);
+            pMax.Z = Max(pMax.Z, p6.Z);
+            pMax.Z = Max(pMax.Z, p6.Z);
+            pMax.Z = Max(pMax.Z, p7.Z);
+            pMax.Z = Max(pMax.Z, p7.Z);
+            pMin.X = Min(pMin.X, p0.X);
+            pMin.X = Min(pMin.X, p0.X);
+            pMin.X = Min(pMin.X, p1.X);
+            pMin.X = Min(pMin.X, p2.X);
+            pMin.X = Min(pMin.X, p3.X);
+            pMin.X = Min(pMin.X, p3.X);
+            pMin.X = Min(pMin.X, p4.X);
+            pMin.X = Min(pMin.X, p5.X);
+            pMin.X = Min(pMin.X, p6.X);
+            pMin.X = Min(pMin.X, p7.X);
+            pMin.Y = Min(pMin.Y, p0.Y);
+            pMin.Y = Min(pMin.Y, p0.Y);
+            pMin.Y = Min(pMin.Y, p1.Y);
+            pMin.Y = Min(pMin.Y, p2.Y);
+            pMin.Y = Min(pMin.Y, p3.Y);
+            pMin.Y = Min(pMin.Y, p3.Y);
+            pMin.Y = Min(pMin.Y, p4.Y);
+            pMin.Y = Min(pMin.Y, p5.Y);
+            pMin.Y = Min(pMin.Y, p6.Y);
+            pMin.Y = Min(pMin.Y, p7.Y);
+            pMin.Z = Min(pMin.Z, p0.Z);
+            pMin.Z = Min(pMin.Z, p1.Z);
+            pMin.Z = Min(pMin.Z, p1.Z);
+            pMin.Z = Min(pMin.Z, p2.Z);
+            pMin.Z = Min(pMin.Z, p3.Z);
+            pMin.Z = Min(pMin.Z, p4.Z);
+            pMin.Z = Min(pMin.Z, p4.Z);
+            pMin.Z = Min(pMin.Z, p5.Z);
+            pMin.Z = Min(pMin.Z, p6.Z);
+            pMin.Z = Min(pMin.Z, p7.Z);
+
+            var aabb2 = new BoundingBox(transf2.Position + pMin, transf2.Position + pMax);
+
+            if (!aabb1.Intersects(aabb2)) {
+                // No potential collision.
+                continue;
+            }
+
+            colls.Add(new Pair<int, int>(e.Key, e2.Key));
+        }
+
+        lock (mColls2) {
+            mColls2.AddRange(colls);
         }
     }
 

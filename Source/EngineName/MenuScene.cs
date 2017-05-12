@@ -152,7 +152,7 @@ public abstract class MenuScene: Scene {
         if (keyboard.IsKeyDown(SelectKey)) {
             if (mCanInteract) {
                 var s = mItems[mSelIndex].Text.format;
-                Log.Get().Debug($"Selecting menu item: {s}");
+                Log.GetLog().Debug($"Selecting menu item: {s}");
                 mItems[mSelIndex].Select();
             }
 

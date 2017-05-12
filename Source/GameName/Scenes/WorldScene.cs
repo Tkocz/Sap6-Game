@@ -159,7 +159,7 @@ namespace GameName.Scenes
                 CreateAnimals();
             }
 
-            Log.Get().Debug("TestScene initialized.");
+            Log.GetLog().Debug("TestScene initialized.");
         }
 
 

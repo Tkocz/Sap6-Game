@@ -96,20 +96,20 @@ public class Game1: Game {
         mScenes.Push(scene);
         scene.Init();
 
-        Log.Get().Info($"Entered scene: {scene.GetType().Name}");
+        Log.GetLog().Info($"Entered scene: {scene.GetType().Name}");
     }
 
     /// <summary>Leaves the currently displayed scene..</summary>
     public void LeaveScene() {
         if (mScenes.Count == 0) {
-            Log.Get().Warn("No scene to leave.");
+            Log.GetLog().Warn("No scene to leave.");
             return;
         }
 
         var scene = mScenes.Pop();
         scene.Cleanup();
 
-        Log.Get().Info($"Left scene: {scene.GetType().Name}");
+        Log.GetLog().Info($"Left scene: {scene.GetType().Name}");
     }
 
     /*--------------------------------------
@@ -135,16 +135,17 @@ public class Game1: Game {
 
         Graphics.PreferredBackBufferWidth = 1920;
         Graphics.PreferredBackBufferHeight = 1080;
+        Graphics.ApplyChanges();
 
         var profile = Graphics.GraphicsDevice.GraphicsProfile;
         var width   = Graphics.PreferredBackBufferWidth;
         var height  = Graphics.PreferredBackBufferHeight;
         var vsync   = Graphics.SynchronizeWithVerticalRetrace;
 
-        Log.Get().Info( "Graphics device initialized."  )
-                 .Info($"  Profile:    {profile}"       )
-                 .Info($"  Resolution: {width}x{height}")
-                 .Info($"  VSync:      {vsync}"         );
+        Log.GetLog().Info( "Graphics device initialized."  )
+                    .Info($"  Profile:    {profile}"       )
+                    .Info($"  Resolution: {width}x{height}")
+                    .Info($"  VSync:      {vsync}"         );
 
             Content.RootDirectory = "Content";
 
@@ -156,7 +157,7 @@ public class Game1: Game {
     /// <param name="sender">The object that generated the event.</param>
     /// <param name="e">The event arguments.</param>
     protected override void OnExiting(object sender, EventArgs e) {
-        Log.Get().Info("Exiting...");
+        Log.GetLog().Info("Exiting...");
     }
 
     /// <summary>Updates the current scene.</summary>

@@ -35,7 +35,7 @@ public static class DebugUtil {
         var type       = method.DeclaringType;
 
         var logName = string.Format("{0}.{1}", type.Name, method.Name);
-        Log.Get(logName).Err($"Assertion failed: {s}");
+        Log.GetLog(logName).Err($"Assertion failed: {s}");
 
 #if DEBUG
         if (Debugger.IsAttached) Debugger.Launch();

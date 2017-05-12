@@ -73,7 +73,7 @@ namespace EngineName {
         Dictionary<Type, Dictionary<int, EcsComponent>> Components = new Dictionary<Type, Dictionary<int, EcsComponent>>();
         private int EntityCounter = -1;
         //wanted a more unique id... couldnt use standard random class in C# ...when started two instances of the game... same tick equals same id.. ;) probaly change!
-        private CryptoRandom rnd = new CryptoRandom(); 
+        private CryptoRandom rnd = new CryptoRandom();
         /*--------------------------------------
          * PUBLIC METHODS
          *------------------------------------*/
@@ -117,7 +117,7 @@ namespace EngineName {
             /*
         DebugUtil.Assert(AtomicUtil.CAS(ref entity.m_Scene, this, null),
                          "entity.m_Scene is not null!");*/
-           
+
             EntityCounter = rnd.Next(0, int.MaxValue);
             m_Entities.Add(EntityCounter);
             return EntityCounter;
@@ -229,7 +229,7 @@ namespace EngineName {
             system.Init();
         }
 
-        Logging.Log.Get().Info($"Initialized scene: {GetType().Name}");
+        Logging.Log.GetLog().Info($"Initialized scene: {GetType().Name}");
     }
 
     /// <summary>Removes the specified entity from the scene.</summary>
