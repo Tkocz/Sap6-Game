@@ -434,7 +434,7 @@ public class PhysicsSystem: EcsSystem {
         SpatPartRetrieve(aabb1.Min, aabb1.Max, l);
         foreach (var e2 in l) {
             // Check entity IDs (.Key) to skip double-checking each potential collision.
-            if (e2.Key == e.Key) {
+            if (e2.Key <= e.Key) {
                 continue;
             }
 
