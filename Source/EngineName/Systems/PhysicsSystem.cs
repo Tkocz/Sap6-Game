@@ -420,7 +420,10 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>Asynchronously finds all body-body collisions</summary>
     /// <param name="e">The entity to check against other bodies.</param>
     /// <param name="aabb1">The axis-aligned bounding box of the entity.</param>
-    private void FindBodyBodyColls(KeyValuePair<int, EcsComponent> e, BoundingBox aabb1, List<KeyValuePair<int, EcsComponent>> l) {
+    private void FindBodyBodyColls(KeyValuePair<int, EcsComponent> e,
+                                   BoundingBox aabb1,
+                                   List<KeyValuePair<int, EcsComponent>> l)
+    {
         var scene = Game1.Inst.Scene;
         var colls = new List<Pair<int, int>>();
 
