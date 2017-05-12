@@ -78,6 +78,14 @@ public class PhysicsSystem: EcsSystem {
     // NON-PUBLIC FIELDS
     //--------------------------------------
 
+    /// <summary>The spatial grid used to optimize collision detection. Basically a grid of hashed
+    ///          voxels.</summary>
+    private Dictionary<Int64, List<KeyValuePair<int, EcsComponent>>> mSpatPart =
+        new Dictionary<Int64, List<KeyValuePair<int, EcsComponent>>>();
+
+    /// <summary>The inverse of the spatial partitioning voxel size (in meters).</summary>
+    private float mInvSpatPartSize = 5.0f; // 1/meters along each axis
+
     // Private field to avoid reallocs.
     /// <summary>Contains a list of potential body-body collisions each frame.</summary>
     private List<Pair<int, int>> mColls1 = new List<Pair<int, int>>();
@@ -187,6 +195,12 @@ public class PhysicsSystem: EcsSystem {
         // }
         // -------------------------------------------------
 
+        // We don't want to clear sp here, just every single cell. Otherwise it will keep being
+        // reallocated, and we don't want that.
+        foreach (var sp in mSpatPart) {
+            sp.Value.Clear();
+        }
+
         foreach (var e in scene.GetComponents<CBody>()) {
             var body   = (CBody)e.Value;
             var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
@@ -212,6 +226,8 @@ public class PhysicsSystem: EcsSystem {
 
             // May 7th, 2017: Refactored into own function in response to feedback from other group.
             CheckBodyWorld(e.Key, body, transf, aabb1);
+
+            SpatPartInsert(e, aabb1.Min, aabb1.Max);
         }
 
         mCollEntityQueue.Clear();
@@ -233,10 +249,89 @@ public class PhysicsSystem: EcsSystem {
     // NON-PUBLIC METHODS
     //--------------------------------------
 
+    /// <summary>Calculates the hash for a spatial partitioning voxel.</summary>
+    /// <param name="x">The x-coordinate of the voxel position in 3-space (no unit!).</param>
+    /// <param name="y">The y-coordinate of the voxel position in 3-space (no unit!).</param>
+    /// <param name="z">The z-coordinate of the voxel position in 3-space (no unit!).</param>
+    private Int64 SpatPartHash(int x, int y, int z) {
+        var a = (ushort)(x + 32767);
+        var b = (ushort)(y + 32767);
+        var c = (ushort)(z + 32767);
+
+        Int64 hash = (c << 32) | (b << 16) | a;
+        return hash;
+    }
+
+    /// <summary>Inserts an entity into the spatial partitioning data structure.</summary>
+    /// <param name="e">The entity to insert.</param>
+    /// <param name="min">The min point of the entity bounding box.</param>
+    /// <param name="max">The max point of the entity bounding box.</param>
+    private void SpatPartInsert(KeyValuePair<int, EcsComponent> e, Vector3 min, Vector3 max) {
+        min = mInvSpatPartSize * min;
+        max = mInvSpatPartSize * max;
+
+        int minX = (int)min.X;
+        int minY = (int)min.Y;
+        int minZ = (int)min.Z;
+        int maxX = (int)max.X + 1;
+        int maxY = (int)max.Y + 1;
+        int maxZ = (int)max.Z + 1;
+
+        var sp = mSpatPart;
+        for (var x = minX; x <= minX; x++) {
+        for (var y = minY; y <= minY; y++) {
+        for (var z = minZ; z <= minZ; z++) {
+            var hash = SpatPartHash(x, y, z);
+
+            List<KeyValuePair<int, EcsComponent>> l;
+            if (!sp.TryGetValue(hash, out l)) {
+                l = new List<KeyValuePair<int, EcsComponent>>();
+                sp[hash] = l;
+            }
+
+            l.Add(e);
+        }}}
+    }
+
+    /// <summary>Retrieves all entities in the specified region from the spatial partioning data
+    ///          structure.</summary>
+    /// <param name="min">The min point of the region bounding box.</param>
+    /// <param name="max">The max point of the region bounding box.</param>
+    /// <param name="l">The list to store results in (to avoid reallocs).</param>
+    private void SpatPartRetrieve(Vector3 min,
+                                  Vector3 max,
+                                  List<KeyValuePair<int, EcsComponent>> l)
+    {
+        min = mInvSpatPartSize * min;
+        max = mInvSpatPartSize * max;
+
+        int minX = (int)min.X;
+        int minY = (int)min.Y;
+        int minZ = (int)min.Z;
+        int maxX = (int)max.X + 1;
+        int maxY = (int)max.Y + 1;
+        int maxZ = (int)max.Z + 1;
+
+        var sp = mSpatPart;
+        for (var x = minX; x <= minX; x++) {
+        for (var y = minY; y <= minY; y++) {
+        for (var z = minZ; z <= minZ; z++) {
+            var hash = SpatPartHash(x, y, z);
+
+            List<KeyValuePair<int, EcsComponent>> l2;
+            if (sp.TryGetValue(hash, out l2)) {
+                l.AddRange(l2);
+            }
+        }}}
+    }
+
     /// <summary>Implements a continuous collision detection thread loop.</summary>
     private void CollDetThread() {
         // So basically, what this thread does is sleep until someone tells it to start looking for
         // potential collision.
+
+        // Avoiding reallocs!
+        var l = new List<KeyValuePair<int, EcsComponent>>();
 
         while (true) {
             var scene = Game1.Inst.Scene;
@@ -258,7 +353,7 @@ public class PhysicsSystem: EcsSystem {
             var aabb1  = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
 
             // TODO: Would possibly be beneficial to do these two in parallel. Unsure.
-            FindBodyBodyColls(e, aabb1);
+            FindBodyBodyColls(e, aabb1, l);
             FindBodyBoxColls (e, aabb1);
 
             if (Interlocked.Decrement(ref mNumCollEntities) == 0) {
@@ -325,13 +420,16 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>Asynchronously finds all body-body collisions</summary>
     /// <param name="e">The entity to check against other bodies.</param>
     /// <param name="aabb1">The axis-aligned bounding box of the entity.</param>
-    private void FindBodyBodyColls(KeyValuePair<int, EcsComponent> e, BoundingBox aabb1) {
+    private void FindBodyBodyColls(KeyValuePair<int, EcsComponent> e, BoundingBox aabb1, List<KeyValuePair<int, EcsComponent>> l) {
         var scene = Game1.Inst.Scene;
         var colls = new List<Pair<int, int>>();
 
         // No collisions are solved in the loops below - we just find potential collisions and
         // store them for later (fine-phase) processing.
-        foreach (var e2 in scene.GetComponents<CBody>()) {
+        //foreach (var e2 in scene.GetComponents<CBody>()) {
+        l.Clear();
+        SpatPartRetrieve(aabb1.Min, aabb1.Max, l);
+        foreach (var e2 in l) {
             // Check entity IDs (.Key) to skip double-checking each potential collision.
             if (e2.Key <= e.Key) {
                 continue;

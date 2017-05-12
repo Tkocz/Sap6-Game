@@ -10,6 +10,7 @@ using EngineName;
 using EngineName.Components;
 using EngineName.Components.Renderable;
 using EngineName.Core;
+using EngineName.Logging;
 using EngineName.Shaders;
 using EngineName.Systems;
 using EngineName.Utils;
@@ -160,7 +161,7 @@ public sealed class Collisions: Scene {
         mSpawnTimer -= dt;
         if (mSpawnTimer < 0.0f) {
             mSpawnTimer = mSpawnInterval;
-            SpawnBall();
+            SpawnBall();            SpawnBall();            SpawnBall();
         }
 
         base.Update(mUpdT, dt);
@@ -178,6 +179,8 @@ public sealed class Collisions: Scene {
             if (mRestitution > 1.0f) {
                 mRestitution = 1.0f;
             }
+
+            Log.GetLog().Info($"Restitution: {mRestitution}");
         }
 
         if (kb.IsKeyDown(Keys.V)) {
@@ -185,17 +188,23 @@ public sealed class Collisions: Scene {
             if (mRestitution < 0.0f) {
                 mRestitution = 0.0f;
             }
+
+            Log.GetLog().Info($"Restitution: {mRestitution}");
         }
 
         if (kb.IsKeyDown(Keys.E)) {
-            mSpawnInterval += dt;
+            mSpawnInterval += 0.1f*dt;
+
+            Log.GetLog().Info($"Spawn interval: {mSpawnInterval}");
         }
 
         if (kb.IsKeyDown(Keys.C)) {
-            mSpawnInterval -= dt;
-            if (mSpawnInterval < 0.01f) {
-                mSpawnInterval = 0.01f;
+            mSpawnInterval -= 0.1f*dt;
+            if (mSpawnInterval < 0.001f) {
+                mSpawnInterval = 0.001f;
             }
+
+            Log.GetLog().Info($"Spawn interval: {mSpawnInterval}");;
         }
 
         float CAM_SPEED = 5.0f;
