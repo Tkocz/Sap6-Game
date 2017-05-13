@@ -201,6 +201,7 @@ public class PhysicsSystem: EcsSystem {
             sp.Value.Clear();
         }
 
+        mCollEntityQueue.Clear();
         foreach (var e in scene.GetComponents<CBody>()) {
             var body   = (CBody)e.Value;
             var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
@@ -228,10 +229,7 @@ public class PhysicsSystem: EcsSystem {
             CheckBodyWorld(e.Key, body, transf, aabb1);
 
             SpatPartInsert(e, aabb1.Min, aabb1.Max);
-        }
 
-        mCollEntityQueue.Clear();
-        foreach (var e in scene.GetComponents<CBody>()) {
             mCollEntityQueue.Enqueue(e);
         }
 
@@ -254,12 +252,11 @@ public class PhysicsSystem: EcsSystem {
     /// <param name="y">The y-coordinate of the voxel position in 3-space (no unit!).</param>
     /// <param name="z">The z-coordinate of the voxel position in 3-space (no unit!).</param>
     private Int64 SpatPartHash(int x, int y, int z) {
-        var a = (ushort)(x + 32767);
-        var b = (ushort)(y + 32767);
-        var c = (ushort)(z + 32767);
+        var a = (Int64) ((ushort)(x + 32767));
+        var b = (Int64)(((ushort)(y + 32767)) << 16);
+        var c = (Int64)(((ushort)(z + 32767)) << 32);
 
-        Int64 hash = ((c & 0xffff) << 32) | ((b & 0xffff) << 16) | (a & 0xffff);
-        return hash;
+        return a | b | c;
     }
 
     /// <summary>Inserts an entity into the spatial partitioning data structure.</summary>
@@ -331,8 +328,9 @@ public class PhysicsSystem: EcsSystem {
         // potential collision.
 
         // Avoiding reallocs!
-        var q = new List<KeyValuePair<int, EcsComponent>>();
-        var l = new List<KeyValuePair<int, EcsComponent>>();
+        var q  = new List<KeyValuePair<int, EcsComponent>>();
+        var l  = new List<KeyValuePair<int, EcsComponent>>();
+        var l2 = new List<Pair<int, int>>();
 
         while (true) {
             var scene = Game1.Inst.Scene;
@@ -362,7 +360,7 @@ public class PhysicsSystem: EcsSystem {
                 var aabb1  = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
 
                 // TODO: Would possibly be beneficial to do these two in parallel. Unsure.
-                FindBodyBodyColls(e, aabb1, l);
+                FindBodyBodyColls(e, aabb1, l, l2);
                 FindBodyBoxColls (e, aabb1);
 
                 if (Interlocked.Decrement(ref mNumCollEntities) == 0) {
@@ -432,17 +430,20 @@ public class PhysicsSystem: EcsSystem {
     /// <param name="aabb1">The axis-aligned bounding box of the entity.</param>
     private void FindBodyBodyColls(KeyValuePair<int, EcsComponent> e,
                                    BoundingBox aabb1,
-                                   List<KeyValuePair<int, EcsComponent>> l)
+                                   List<KeyValuePair<int, EcsComponent>> l,
+                                   List<Pair<int, int>> colls)
     {
         var scene = Game1.Inst.Scene;
-        var colls = new List<Pair<int, int>>();
 
         // No collisions are solved in the loops below - we just find potential collisions and
         // store them for later (fine-phase) processing.
         //foreach (var e2 in scene.GetComponents<CBody>()) {
+        colls.Clear();
         l.Clear();
         SpatPartRetrieve(aabb1.Min, aabb1.Max, l);
-        foreach (var e2 in l) {
+        var n = l.Count;
+        for (var i = 0; i < n; i++) {
+            var e2 = l[i];
             // Check entity IDs (.Key) to skip double-checking each potential collision.
             if (e2.Key <= e.Key) {
                 continue;
@@ -461,8 +462,10 @@ public class PhysicsSystem: EcsSystem {
             colls.Add(new Pair<int, int>(e.Key, e2.Key));
         }
 
-        lock (mColls1) {
-            mColls1.AddRange(colls);
+        if (colls.Count > 0) {
+            lock (mColls1) {
+                mColls1.AddRange(colls);
+            }
         }
     }
 
@@ -501,7 +504,6 @@ public class PhysicsSystem: EcsSystem {
 
             pMax.X = Max(pMax.X, p0.X);
             pMax.X = Max(pMax.X, p1.X);
-            pMax.X = Max(pMax.X, p1.X);
             pMax.X = Max(pMax.X, p2.X);
             pMax.X = Max(pMax.X, p3.X);
             pMax.X = Max(pMax.X, p4.X);
@@ -512,14 +514,10 @@ public class PhysicsSystem: EcsSystem {
             pMax.Y = Max(pMax.Y, p0.Y);
             pMax.Y = Max(pMax.Y, p1.Y);
             pMax.Y = Max(pMax.Y, p2.Y);
-            pMax.Y = Max(pMax.Y, p2.Y);
             pMax.Y = Max(pMax.Y, p3.Y);
             pMax.Y = Max(pMax.Y, p4.Y);
             pMax.Y = Max(pMax.Y, p5.Y);
-            pMax.Y = Max(pMax.Y, p5.Y);
             pMax.Y = Max(pMax.Y, p6.Y);
-            pMax.Y = Max(pMax.Y, p6.Y);
-            pMax.Y = Max(pMax.Y, p7.Y);
             pMax.Y = Max(pMax.Y, p7.Y);
             pMax.Z = Max(pMax.Z, p0.Z);
             pMax.Z = Max(pMax.Z, p1.Z);
@@ -528,26 +526,19 @@ public class PhysicsSystem: EcsSystem {
             pMax.Z = Max(pMax.Z, p3.Z);
             pMax.Z = Max(pMax.Z, p4.Z);
             pMax.Z = Max(pMax.Z, p5.Z);
-            pMax.Z = Max(pMax.Z, p5.Z);
-            pMax.Z = Max(pMax.Z, p6.Z);
             pMax.Z = Max(pMax.Z, p6.Z);
             pMax.Z = Max(pMax.Z, p7.Z);
-            pMax.Z = Max(pMax.Z, p7.Z);
-            pMin.X = Min(pMin.X, p0.X);
             pMin.X = Min(pMin.X, p0.X);
             pMin.X = Min(pMin.X, p1.X);
             pMin.X = Min(pMin.X, p2.X);
-            pMin.X = Min(pMin.X, p3.X);
             pMin.X = Min(pMin.X, p3.X);
             pMin.X = Min(pMin.X, p4.X);
             pMin.X = Min(pMin.X, p5.X);
             pMin.X = Min(pMin.X, p6.X);
             pMin.X = Min(pMin.X, p7.X);
             pMin.Y = Min(pMin.Y, p0.Y);
-            pMin.Y = Min(pMin.Y, p0.Y);
             pMin.Y = Min(pMin.Y, p1.Y);
             pMin.Y = Min(pMin.Y, p2.Y);
-            pMin.Y = Min(pMin.Y, p3.Y);
             pMin.Y = Min(pMin.Y, p3.Y);
             pMin.Y = Min(pMin.Y, p4.Y);
             pMin.Y = Min(pMin.Y, p5.Y);
@@ -555,10 +546,8 @@ public class PhysicsSystem: EcsSystem {
             pMin.Y = Min(pMin.Y, p7.Y);
             pMin.Z = Min(pMin.Z, p0.Z);
             pMin.Z = Min(pMin.Z, p1.Z);
-            pMin.Z = Min(pMin.Z, p1.Z);
             pMin.Z = Min(pMin.Z, p2.Z);
             pMin.Z = Min(pMin.Z, p3.Z);
-            pMin.Z = Min(pMin.Z, p4.Z);
             pMin.Z = Min(pMin.Z, p4.Z);
             pMin.Z = Min(pMin.Z, p5.Z);
             pMin.Z = Min(pMin.Z, p6.Z);
