@@ -29,6 +29,10 @@ public class PhysicsSystem: EcsSystem {
 
     /// <summary>Contains information about a collision.</summary>
     public struct CollisionInfo {
+        //--------------------------------------
+        // PUBLIC FIELDS
+        //--------------------------------------
+
         /// <summary>The id of first entity involved in the collision.</summary>
         public int Entity1;
         /// <summary>The id of the second entity involved in the collision, or negative one if the
@@ -44,6 +48,15 @@ public class PhysicsSystem: EcsSystem {
 
         /// <summary>The point in world-space where the collision occurred.</summary>
         public Vector3 Position;
+
+        //--------------------------------------
+        // PUBLIC METHODS
+        //--------------------------------------
+
+        public override int GetHashCode() {
+            // Order is unimportant for collision pairs so XORing them is ok!
+            return Entity1 ^ Entity2;
+        }
     }
 
     // TODO: This should be moved somewhere else. I would use the Tuple type but it's a ref type so
@@ -83,9 +96,6 @@ public class PhysicsSystem: EcsSystem {
     private Dictionary<Int64, List<KeyValuePair<int, EcsComponent>>> mSpatPart =
         new Dictionary<Int64, List<KeyValuePair<int, EcsComponent>>>();
 
-    /// <summary>The inverse of the spatial partitioning voxel size (in meters).</summary>
-    private float mInvSpatPartSize = 5.0f; // 1/meters along each axis
-
     // Private field to avoid reallocs.
     /// <summary>Contains a list of potential body-body collisions each frame.</summary>
     private List<Pair<int, int>> mColls1 = new List<Pair<int, int>>();
@@ -114,6 +124,9 @@ public class PhysicsSystem: EcsSystem {
     //--------------------------------------
     // PUBLIC PROPERTIES
     //--------------------------------------
+
+    /// <summary>The inverse of the spatial partitioning voxel size (in meters).</summary>
+    public float InvSpatPartSize { get; set; } = 1.0f; // 1/meters along each axis
 
     /// <summary>Gets or sets the world bounds, as a bounding box with dimensions specified in
     ///          meters.</summary>
@@ -165,6 +178,8 @@ public class PhysicsSystem: EcsSystem {
     /// <param name="dt">The time, in seconds, since the last call to this
     ///                  method.</param>
     public override void Update(float t, float dt) {
+        base.Update(t, dt);
+
         var scene = Game1.Inst.Scene;
 
         // Basically, use semi-implicit Euler to integrate all positions and then sweep coarsely for
@@ -239,8 +254,6 @@ public class PhysicsSystem: EcsSystem {
         mCollDetStart.Reset(); // 3. Tell them to sleep.
 
         SolveCollisions();
-
-        base.Update(t, dt);
     }
 
     //--------------------------------------
@@ -253,10 +266,10 @@ public class PhysicsSystem: EcsSystem {
     /// <param name="z">The z-coordinate of the voxel position in 3-space (no unit!).</param>
     private Int64 SpatPartHash(int x, int y, int z) {
         var a = (Int64) ((ushort)(x + 32767));
-        var b = (Int64)(((ushort)(y + 32767)) << 16);
-        var c = (Int64)(((ushort)(z + 32767)) << 32);
+        var b = (Int64)(((ushort)(y + 32767))) << 16;
+        var c = (Int64)(((ushort)(z + 32767))) << 32;
 
-        return a | b | c;
+        return c | b | a;
     }
 
     /// <summary>Inserts an entity into the spatial partitioning data structure.</summary>
@@ -264,8 +277,8 @@ public class PhysicsSystem: EcsSystem {
     /// <param name="min">The min point of the entity bounding box.</param>
     /// <param name="max">The max point of the entity bounding box.</param>
     private void SpatPartInsert(KeyValuePair<int, EcsComponent> e, Vector3 min, Vector3 max) {
-        min = mInvSpatPartSize * min;
-        max = mInvSpatPartSize * max;
+        min = InvSpatPartSize * min;
+        max = InvSpatPartSize * max;
 
         int minX = (int)min.X;
         int minY = (int)min.Y;
@@ -299,8 +312,8 @@ public class PhysicsSystem: EcsSystem {
                                   Vector3 max,
                                   List<KeyValuePair<int, EcsComponent>> l)
     {
-        min = mInvSpatPartSize * min;
-        max = mInvSpatPartSize * max;
+        min = InvSpatPartSize * min;
+        max = InvSpatPartSize * max;
 
         int minX = (int)min.X;
         int minY = (int)min.Y;
@@ -330,7 +343,7 @@ public class PhysicsSystem: EcsSystem {
         // Avoiding reallocs!
         var q  = new List<KeyValuePair<int, EcsComponent>>();
         var l  = new List<KeyValuePair<int, EcsComponent>>();
-        var l2 = new List<Pair<int, int>>();
+        var l2 = new HashSet<Pair<int, int>>();
 
         while (true) {
             var scene = Game1.Inst.Scene;
@@ -431,7 +444,7 @@ public class PhysicsSystem: EcsSystem {
     private void FindBodyBodyColls(KeyValuePair<int, EcsComponent> e,
                                    BoundingBox aabb1,
                                    List<KeyValuePair<int, EcsComponent>> l,
-                                   List<Pair<int, int>> colls)
+                                   HashSet<Pair<int, int>> colls)
     {
         var scene = Game1.Inst.Scene;
 
@@ -563,8 +576,10 @@ public class PhysicsSystem: EcsSystem {
             colls.Add(new Pair<int, int>(e.Key, e2.Key));
         }
 
-        lock (mColls2) {
-            mColls2.AddRange(colls);
+        if (colls.Count > 0) {
+            lock (mColls2) {
+                mColls2.AddRange(colls);
+            }
         }
     }
 
