@@ -134,7 +134,7 @@ public class PhysicsSystem: EcsSystem {
     public override void Init() {
         base.Init();
 
-        mCollThreads = new Thread[Environment.ProcessorCount];
+        mCollThreads = new Thread[4];
 
         for (var i = 0; i < mCollThreads.Length; i++) {
             mCollThreads[i] = new Thread(CollDetThread);
@@ -331,35 +331,45 @@ public class PhysicsSystem: EcsSystem {
         // potential collision.
 
         // Avoiding reallocs!
+        var q = new List<KeyValuePair<int, EcsComponent>>();
         var l = new List<KeyValuePair<int, EcsComponent>>();
 
         while (true) {
             var scene = Game1.Inst.Scene;
 
+            q.Clear();
+
             mCollDetStart.WaitOne();
 
-            KeyValuePair<int, EcsComponent> e;
             lock (mCollEntityQueue) {
                 if (mCollEntityQueue.Count == 0) {
                     continue;
                 }
 
-                e = mCollEntityQueue.Dequeue();
+                for (var i = 0; i < 10; i++) {
+                    if (mCollEntityQueue.Count == 0) {
+                        break;
+                    }
+
+                    q.Add(mCollEntityQueue.Dequeue());
+                }
             }
 
-            var body   = (CBody)e.Value;
-            var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
-            var p1     = transf.Position;
-            var aabb1  = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
+            foreach (var e in q) {
+                var body   = (CBody)e.Value;
+                var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
+                var p1     = transf.Position;
+                var aabb1  = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
 
-            // TODO: Would possibly be beneficial to do these two in parallel. Unsure.
-            FindBodyBodyColls(e, aabb1, l);
-            FindBodyBoxColls (e, aabb1);
+                // TODO: Would possibly be beneficial to do these two in parallel. Unsure.
+                FindBodyBodyColls(e, aabb1, l);
+                FindBodyBoxColls (e, aabb1);
 
-            if (Interlocked.Decrement(ref mNumCollEntities) == 0) {
-                // We're the last one to decrement mNumcollentities, so we know all threads are done
-                // here.
-                mCollDetEnd.Set();
+                if (Interlocked.Decrement(ref mNumCollEntities) == 0) {
+                    // We're the last one to decrement mNumcollentities, so we know all threads are
+                    // done here.
+                    mCollDetEnd.Set();
+                }
             }
         }
     }
