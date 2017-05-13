@@ -153,7 +153,7 @@ namespace GameName.Scenes
             //});
 
             CreateTriggerEvents();
-
+            CreateCollectables();
             if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
             {
                 CreateAnimals();
@@ -162,6 +162,25 @@ namespace GameName.Scenes
             Log.GetLog().Debug("TestScene initialized.");
         }
 
+        private void CreateCollectables() {
+            int chests = 5, hearts = 5;
+            for(int i = 0; i < chests; i++) {
+                var id = AddEntity();
+                AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "Models/chest", model = Game1.Inst.Content.Load<Model>("Models/chest") });
+                var z = (float)(rnd.NextDouble() * worldSize);
+                var x = (float)(rnd.NextDouble() * worldSize);
+                AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(1f)});
+                AddComponent(id, new CBody() { Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)) });
+            }
+            for(int i = 0; i < hearts; i++) {
+                var id = AddEntity();
+                AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "Models/heart", model = Game1.Inst.Content.Load<Model>("Models/heart") });
+                var z = (float)(rnd.NextDouble() * worldSize);
+                var x = (float)(rnd.NextDouble() * worldSize);
+                AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(1f) });
+                AddComponent(id, new CBody() { Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)) });
+            }
+        }
 
         private void CreateAnimals()
         {
@@ -233,6 +252,17 @@ namespace GameName.Scenes
                 //((CCamera)camera.Value).Target = playerPos.Position;
                 //((CCamera)camera.Value).Heading += 0.1f;
             }*/
+            // TODO: Move to more appropriate location, only trying out heart rotation looks
+            foreach(var comp in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
+                if (comp.Value.GetType() != typeof(CImportedModel))
+                    continue;
+                var modelComponent = (CImportedModel)comp.Value;
+                if (modelComponent.fileName == null || !modelComponent.fileName.Contains("heart"))
+                    continue;
+                var transfComponent = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(comp.Key);
+                transfComponent.Rotation *= Matrix.CreateFromAxisAngle(transfComponent.Frame.Up, dt);
+            }
+
             var invComps = GetComponents<CInventory>();
             foreach(var inv in invComps)
             {

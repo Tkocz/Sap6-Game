@@ -67,6 +67,8 @@ namespace GameName.AiStates
 
             var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);
             dQuat.Normalize();
+            dQuat.X = 0;
+            dQuat.Z = 0;
             npcTransform.Rotation = Matrix.CreateFromQuaternion(dQuat);
             /*
             // if too far from flock, steer towards flock
