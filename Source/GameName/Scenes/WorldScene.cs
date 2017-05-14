@@ -221,7 +221,7 @@ namespace GameName.Scenes
 
                 for (int i = 0; i < membersPerFlock; i++) {
                     int id = AddEntity();
-                    if(flockAnimal == "hen") {
+                    if(flockAnimal.Equals("hen")) {
                         // TODO: Make animals have different animations based on state
                         CAnimation normalAnimation = new CHenNormalAnimation();
                         // Set a random offset to animation so not all animals are synced

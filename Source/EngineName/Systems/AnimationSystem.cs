@@ -8,9 +8,9 @@ namespace EngineName.Systems {
     public class AnimationSystem : EcsSystem {
         public override void Draw(float t, float dt) {
             foreach(var animation in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
-                if (animation.Value.GetType() != typeof(CAnimation))
+                var animationComponent = animation.Value as CAnimation;
+                if (animationComponent == null)
                     continue;
-                var animationComponent = (CAnimation)animation.Value;
                 if (animationComponent.CurrentKeyframe >= animationComponent.Keyframes.Count)
                     animationComponent.CurrentKeyframe = 0;
                 animationComponent.model = animationComponent.Keyframes[animationComponent.CurrentKeyframe++];
