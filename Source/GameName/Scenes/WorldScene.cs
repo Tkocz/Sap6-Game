@@ -5,6 +5,7 @@ using EngineName.Core;
 using EngineName.Logging;
 using EngineName.Systems;
 using EngineName.Utils;
+using GameName.Components;
 using GameName.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -221,33 +222,11 @@ namespace GameName.Scenes
                 for (int i = 0; i < membersPerFlock; i++) {
                     int id = AddEntity();
                     if(flockAnimal == "hen") {
-                        // TODO: Make animals into separate classes or something instead, so creating new animations will be easier. 
                         // TODO: Make animals have different animations based on state
-                        CAnimation idleAnimation = new CAnimation();
-
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_5"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_6"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_7"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_8"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_9"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_10"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_9"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_8"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_7"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_6"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_5"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-
-                        idleAnimation.CurrentKeyframe = rnd.Next(idleAnimation.Keyframes.Count-1);
-
-                        AddComponent<C3DRenderable>(id, idleAnimation);
+                        CAnimation normalAnimation = new CHenNormalAnimation();
+                        // Set a random offset to animation so not all animals are synced
+                        normalAnimation.CurrentKeyframe = rnd.Next(normalAnimation.Keyframes.Count-1);
+                        AddComponent<C3DRenderable>(id, normalAnimation);
                     }
                     else {
                         CImportedModel modelComponent = new CImportedModel();

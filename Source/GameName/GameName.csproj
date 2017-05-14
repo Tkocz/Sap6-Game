@@ -45,7 +45,9 @@
     <Compile Include="AiStates\SAware.cs" />
     <Compile Include="AiStates\SEvade.cs" />
     <Compile Include="AiStates\SIdle.cs" />
+    <Compile Include="Components\CHenNormalAnimation.cs" />
     <Compile Include="Dev\AiScene.cs" />
+    <Compile Include="Entities\EHen.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Scenes\EndGameScene.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
