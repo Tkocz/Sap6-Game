@@ -73,7 +73,8 @@ public sealed class Collisions: Scene {
                    physics = new PhysicsSystem(),
                            new RenderingSystem());
 
-        physics.Bounds = new BoundingBox(-5.0f*Vector3.One, 5.0f*Vector3.One);
+        physics.Bounds = new BoundingBox(-2.5f*Vector3.One, 2.5f*Vector3.One);
+        physics.InvSpatPartSize = 1.0f/0.5f;
 
 #if DEBUG
         AddSystem(new DebugOverlay());
@@ -90,7 +91,7 @@ public sealed class Collisions: Scene {
             SpawnBall();
         }
 
-        var dist = 2.2f;
+        var dist = 1.1f;
         for (var i = 0; i < 3; i++) {
             var a = i - 1.0f;
             var b = a + 0.25f;
@@ -99,36 +100,36 @@ public sealed class Collisions: Scene {
 
             var sf = 0.9f + 0.2f*i;
             var sf2 = sf*0.75f;
-            var size = new Vector3(1.0f, 0.05f, 1.0f)*sf;
+            var size = new Vector3(0.5f, 0.025f, 0.5f)*sf;
             var rot  = 35.0f/(1.0f + 0.4f*i);
 
-            CreateBox(1.3f*sf2*Vector3.Right + dist*a*Vector3.Up + 1.3f*sf2*Vector3.Forward,
+            CreateBox(0.65f*sf2*Vector3.Right + dist*a*Vector3.Up + 0.65f*sf2*Vector3.Forward,
                       size,
                       Vector3.Backward + Vector3.Right, rot);
-            CreateBox(1.3f*sf2*Vector3.Left + dist*b*Vector3.Up + 1.3f*sf2*Vector3.Forward,
+            CreateBox(0.65f*sf2*Vector3.Left + dist*b*Vector3.Up + 0.65f*sf2*Vector3.Forward,
                       size,
                       Vector3.Backward - Vector3.Right, -rot);
 
-            CreateBox(1.3f*sf2*Vector3.Right + dist*c*Vector3.Up + 1.3f*sf2*Vector3.Backward,
+            CreateBox(0.65f*sf2*Vector3.Right + dist*c*Vector3.Up + 0.65f*sf2*Vector3.Backward,
                       size,
                       Vector3.Backward - Vector3.Right, rot);
-            CreateBox(1.3f*sf2*Vector3.Left + dist*d*Vector3.Up + 1.3f*sf2*Vector3.Backward,
+            CreateBox(0.65f*sf2*Vector3.Left + dist*d*Vector3.Up + 0.65f*sf2*Vector3.Backward,
                       size,
                       Vector3.Backward + Vector3.Right, -rot);
         }
 
-        CreateBox(new Vector3(0.0f, -4.9f, 0.0f),
-                  new Vector3(5.0f, 0.1f, 5.0f),
+        CreateBox(new Vector3(0.0f, -2.4f, 0.0f),
+                  new Vector3(2.5f, 0.1f, 2.5f),
                   Vector3.Right, 0.0f,
                   new Vector3(0.02f, 0.02f, 0.02f));
 
-        CreateBox(new Vector3(-4.9f, 0.0f, 0.0f),
-                  new Vector3(0.1f, 5.0f, 5.0f),
+        CreateBox(new Vector3(-2.4f, 0.0f, 0.0f),
+                  new Vector3(0.1f, 2.5f, 2.5f),
                   Vector3.Right, 0.0f,
                   new Vector3(0.02f, 0.02f, 0.02f));
 
-        CreateBox(new Vector3(0.0f, 0.0f, -4.9f),
-                  new Vector3(5.0f, 5.0f, 0.1f),
+        CreateBox(new Vector3(0.0f, 0.0f, -2.4f),
+                  new Vector3(2.5f, 2.5f, 0.1f),
                   Vector3.Right, 0.0f,
                   new Vector3(0.02f, 0.02f, 0.02f));
     }
@@ -138,11 +139,11 @@ public sealed class Collisions: Scene {
     /// <param name="dt">The time, in seconds, since the last call to this method.</param>
     public override void Update(float t, float dt) {
         if (mSlowMo) {
-            if (mSlowMoFactor > 0.02f) {
+            if (mSlowMoFactor > 0.1f) {
                 mSlowMoFactor -= 4.0f*dt;
             }
-            else if (mSlowMoFactor < 0.02f) {
-                mSlowMoFactor = 0.02f;
+            else if (mSlowMoFactor < 0.1f) {
+                mSlowMoFactor = 0.1f;
             }
         }
         else {
@@ -207,7 +208,7 @@ public sealed class Collisions: Scene {
             Log.GetLog().Info($"Spawn interval: {mSpawnInterval}");;
         }
 
-        float CAM_SPEED = 5.0f;
+        float CAM_SPEED = 2.5f;
 
         if (kb.IsKeyDown(Keys.Escape)) {
             Game1.Inst.LeaveScene();
@@ -316,7 +317,7 @@ public sealed class Collisions: Scene {
         }
 
         if (mSlowMo) {
-            dt *= 0.1f;
+            dt *= mSlowMoFactor;
         }
 
         mDrawT += dt;
@@ -345,9 +346,9 @@ public sealed class Collisions: Scene {
         };
 
         var theta = 2.0f*MathHelper.Pi*(float)mRnd.NextDouble();
-        CreateBall(new Vector3(1.0f*(float)Math.Cos(theta), 5.0f, 1.0f*(float)Math.Sin(theta)),
+        CreateBall(new Vector3(0.5f*(float)Math.Cos(theta), 2.4f, 0.5f*(float)Math.Sin(theta)),
                    (float)mRnd.NextDouble()*Vector3.Up,
-                   0.06f + (float)mRnd.NextDouble()*0.1f,
+                   0.03f + (float)mRnd.NextDouble()*0.05f,
                    cols[mRnd.Next(cols.Length)]);
     }
 
@@ -442,9 +443,9 @@ public sealed class Collisions: Scene {
 
         AddComponent(cam, new CCamera { ClipProjection = proj,
                                         Projection     = proj,
-                                        Target = new Vector3(0.0f, 3.0f, 0.0f) });
+                                        Target = new Vector3(0.0f, 1.5f, 0.0f) });
 
-        AddComponent(cam, new CTransform { Position = new Vector3(4.0f, 6.5f, 4.0f),
+        AddComponent(cam, new CTransform { Position = new Vector3(2.0f, 3.2f, 2.0f),
                                            Rotation = Matrix.Identity,
                                            Scale    = Vector3.One });
 

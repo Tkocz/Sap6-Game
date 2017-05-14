@@ -160,6 +160,7 @@ public class PhysicsSystem: EcsSystem {
 
 #if DEBUG
         DebugOverlay.Inst.DbgStr((t, dt) => $"Coll checks: {mColls1.Count + mColls2.Count}");
+        DebugOverlay.Inst.DbgStr((t, dt) => $"Coll cells: {mSpatPart.Count}");
 #endif
     }
 

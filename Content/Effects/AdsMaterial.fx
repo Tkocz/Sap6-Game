@@ -20,14 +20,14 @@ sampler normTex = sampler_state { Texture = <NormTex>; mipfilter = LINEAR; };
 static const int NUM_LIGHTS = 8;
 
 static const float4 Lights[NUM_LIGHTS] = {
-  float4(-1.0, 5.5, -1.0,  0.7),
-  float4( 1.0, 5.5, -1.0,  0.7),
-  float4( 1.0, 5.5,  1.0,  0.7),
-  float4(-1.0, 5.5,  1.0,  0.7),
-  float4(-2.5, -3.0, -2.0,  0.6),
-  float4( 3.0, -2.5, -1.5,  0.6),
-  float4( 3.5, 2.0,  2.5,  0.6),
-  float4(-1.0, 1.5,  3.5,  0.6),
+  float4(-0.7, 2.8, -0.4,  0.2),
+  float4( 0.6, 2.5, -0.5,  0.2),
+  float4( 0.5, 2.6,  0.6,  0.2),
+  float4(-0.4, 2.9,  0.7,  0.2),
+  float4(-1.2, -1.4, -1.0,  0.2),
+  float4( 1.5, -1.6, -0.7,  0.2),
+  float4( 1.7, -0.8,  1.2,  0.2),
+  float4(-0.5, -0.4,  1.7,  0.2),
 };
 
 struct PSOutput {
