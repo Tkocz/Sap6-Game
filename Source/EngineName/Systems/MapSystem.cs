@@ -15,7 +15,7 @@ namespace EngineName.Systems
 	public class MapSystem : EcsSystem
 	{
 		private GraphicsDevice mGraphicsDevice;
-		private int chunksplit = 1;
+		private int chunksplit = 2;
 		private BasicEffect basicEffect;
         private float[,] mHeightData;
         private Random rn = new Random();
@@ -67,13 +67,12 @@ namespace EngineName.Systems
                 // f(a,b,x) = xa + (1-x)b
                 // Pz = f(f(A,B,Px), f(C, D, Px), Py
 
-                return h;
+                return h*transform.Scale.Y;
             }
             return 0;
         }
 
-		private Color materialPick(int decimalCode)
-		{
+		private Color materialPick(int decimalCode) {
             var sand = Color.FromNonPremultiplied(194, 178, 128, 255);
             sand.R += (byte)(rn.Next(10) - 5);
             sand.G += (byte)(rn.Next(10) - 5);
@@ -84,6 +83,10 @@ namespace EngineName.Systems
             grass.B += (byte)(rn.Next(10) - 10);
             float sandStop = 225;
             float grassStart = 235;
+            // TODO: material parameters for dino island, move to better location
+            sandStop = 100;
+            grassStart = 135;
+
             if (decimalCode < sandStop)
                 return sand;
             if(decimalCode < grassStart) {
@@ -395,10 +398,10 @@ namespace EngineName.Systems
 			var vertices = vertexList.ToArray();
 			// indicies
 			var indexLength = (width * 6 * 2) + (depth * 6 * 2);
-			List<short> indexList = new List<short>(indexLength);
-			for (short i = 0; i < indexLength; ++i)
-				indexList.Add(i);
-			var indices = indexList.ToArray();
+			short[] indexList = new short[indexLength];
+			for (int i = 1; i < indexLength; i++)
+				indexList[i] = (short)i;
+            var indices = indexList;
 
 			var vertexBuffer = new VertexBuffer(mGraphicsDevice, VertexPositionNormalColor.VertexDeclaration, vertices.Length, BufferUsage.None);
 			vertexBuffer.SetData(vertices);
@@ -409,15 +412,6 @@ namespace EngineName.Systems
 			var groundMeshPart = new ModelMeshPart { VertexBuffer = vertexBuffer, IndexBuffer = indexBuffer, NumVertices = vertices.Length, PrimitiveCount = vertices.Length / 3 };
 
 			return groundMeshPart;
-		}
-
-		public override void Update(float t, float dt)
-		{
-			base.Update(t, dt);
-		}
-		public override void Draw(float t, float dt)
-		{
-			base.Draw(t, dt);
 		}
 	}
 }

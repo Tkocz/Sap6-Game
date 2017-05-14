@@ -114,8 +114,8 @@ namespace GameName.Scenes
 
             // Heightmap entity
             int heightMap = AddEntity();
-            AddComponent<C3DRenderable>(heightMap, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/Square_island_4x4") });
-            AddComponent(heightMap, new CTransform() { Position = new Vector3(-590, -50, -590), Rotation = Matrix.Identity, Scale = new Vector3(1) });
+            AddComponent<C3DRenderable>(heightMap, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/DinoIsland06") });
+            AddComponent(heightMap, new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) });
             // manually start loading all heightmap components, should be moved/automated
             mapSystem.Load();
             waterSys.Load();

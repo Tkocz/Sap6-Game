@@ -5,8 +5,6 @@ uniform extern matrix Projection;
 uniform extern float4 AmbientColor;
 uniform extern float AmbientIntensity;
 
-uniform extern matrix WorldInverseTranspose;
-
 uniform extern float3 DiffuseLightDirection;
 uniform extern float4 DiffuseColor;
 uniform extern float DiffuseIntensity;
@@ -19,18 +17,13 @@ uniform extern float3 ViewVector;
 uniform extern float3 CameraPosition;
 
 uniform extern float Time;
-/*
-texture ModelTexture;
-sampler2D textureSampler = sampler_state {
-    Texture = (ModelTexture);
-    MinFilter = Linear;
-    MagFilter = Linear;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};*/
+uniform extern float Amplitude; // 0.6
+uniform extern float Frequency; // 2
+uniform extern float Bias; // 0.5
 
 uniform extern float BumpConstant;
 uniform extern texture NormalMap;
+
 sampler2D bumpSampler = sampler_state {
     Texture = (NormalMap);
     MinFilter = Linear;
@@ -57,10 +50,7 @@ struct VertexShaderOutput {
 
 float CalculateHeight(float4 Position) {
     int phase = (Position.x + Position.z % 2) * 2;
-    float amplitude = 0.6;
-    float frequency = 2;
-    float bias = 0.5;
-    float newHeight = (amplitude * sin(frequency * Time + phase) + bias);
+    float newHeight = (Amplitude * sin(Frequency * Time + phase) + Bias);
      
     return newHeight * 10;
  
@@ -99,9 +89,6 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0 {
     float dotProduct = dot(r, v);
 
     float4 specular = SpecularIntensity * SpecularColor * max(pow(dotProduct, Shininess), 0) * diffuseIntensity;
-
-    //float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
-    //textureColor.a = 1;
 
     return float4 (saturate(input.Color.xyz * (diffuseIntensity) + AmbientColor.xyz * AmbientIntensity + specular.xyz), 0.5);
 }
