@@ -47,6 +47,7 @@ namespace GameName.Scenes
             var waterSys = new WaterSystem();
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
+            physicsSys.InvSpatPartSize = 0.1f;
             AddSystems(
                 new FpsCounterSystem(updatesPerSec: 10),
                 new SkyBoxSystem(),
