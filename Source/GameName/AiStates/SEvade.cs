@@ -2,6 +2,7 @@
 using EngineName.Components;
 using EngineName.Core;
 using EngineName.Systems;
+using EngineName.Utils;
 using GameName.Systems;
 using Microsoft.Xna.Framework;
 using System;
@@ -17,10 +18,13 @@ namespace GameName.AiStates {
             return "Evade";
         }
         public override void Handle(float t, float dt) {
-            var rotationSpeed = Math.Min(1.8f * dt, 1);
-            var movementSpeed = dt * 30f;
             var npcTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(entityId);
             var npcBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(entityId);
+            var aiComponent = (CAI)Game1.Inst.Scene.GetComponentFromEntity<CAI>(entityId);
+            var flock = (CFlock)Game1.Inst.Scene.GetComponentFromEntity<CFlock>(aiComponent.Flock);
+
+            var rotationSpeed = Math.Min(1.8f * dt, 1);
+            var movementSpeed = dt * flock.PreferredMovementSpeed*5;
 
             var closestEnemyDistance = float.MaxValue;
             var closestEnemyId = -1;
@@ -44,14 +48,16 @@ namespace GameName.AiStates {
                 return;
             Vector3 dest = Vector3.Normalize(closestEnemyTransform.Position - npcTransform.Position);
             var source = Vector3.Backward;
-            var goalQuat = AISystem.GetRotation(source, dest, Vector3.Up);
+            var goalQuat = PositionalUtil.GetRotation(source, dest, Vector3.Up);
             var startQuat = npcTransform.Rotation.Rotation;
             var dQuat = Quaternion.Lerp(startQuat, goalQuat, rotationSpeed);
             dQuat.X = 0;
             dQuat.Z = 0;
             npcTransform.Rotation = Matrix.CreateFromQuaternion(dQuat);
 
-            npcBody.Velocity += movementSpeed * npcTransform.Rotation.Forward;
+            // move forward in set direction
+            npcBody.Velocity.X = (movementSpeed * npcTransform.Rotation.Forward).X;
+            npcBody.Velocity.Z = (movementSpeed * npcTransform.Rotation.Forward).Z;
         }
     }
 }

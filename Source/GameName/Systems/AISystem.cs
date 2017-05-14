@@ -69,7 +69,7 @@ namespace GameName.Systems
                             npcComponent.State = new SEvade(npcKey);
                     }
                     else if (closestEnemyDistance < 50) {
-                        if (npcComponent.GetType() != typeof(SAware))
+                        if (npcComponent.GetType() != typeof(SAware) && npcComponent.GetType() != typeof(SEvade))
                             npcComponent.State = new SAware(npcKey);
                     }
                     else if (npcComponent.State.GetType() != typeof(SIdle))
@@ -79,27 +79,6 @@ namespace GameName.Systems
                     npcComponent.State.Handle(t, dt);
                 }
             }
-        }
-        public static Quaternion GetRotation(Vector3 source, Vector3 dest, Vector3 up)
-        {
-            var dot = Vector3.Dot(source, dest);
-            /*
-            if (Math.Abs(dot - (-1.0f)) < 0.000001f)
-            {
-                // vector a and b point exactly in the opposite direction, 
-                // so it is a 180 degrees turn around the up-axis
-                return new Quaternion(up, MathHelper.ToRadians(180.0f));
-            }*/
-            if (Math.Abs(dot - (1.0f)) < 0.000001f)
-            {
-                // vector a and b point exactly in the same direction
-                // so we return the identity quaternion
-                return Quaternion.Identity;
-            }
-            float rotAngle = (float)Math.Acos(dot);
-            var rotAxis = Vector3.Cross(source, dest);
-            rotAxis.Normalize();
-            return Quaternion.CreateFromAxisAngle(rotAxis, rotAngle);
         }
     }
 }

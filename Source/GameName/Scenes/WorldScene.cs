@@ -83,7 +83,16 @@ namespace GameName.Scenes
             float farplane = 1000f;
 
             player = AddEntity();
-            AddComponent(player, new CBody() { MaxVelocity = 5f, InvMass = 0.01f, SpeedMultiplier = 1, Radius = 1, Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)), LinDrag = 0.8f, ReachableArea = new BoundingBox(new Vector3(-1.5f, -2, -1.5f), new Vector3(1.5f, 2, 1.5f)) });
+            AddComponent(player, new CBody() {
+                MaxVelocity = 5f,
+                InvMass = 0.01f,
+                SpeedMultiplier = 1,
+                Radius = 1,
+                Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)),
+                LinDrag = 0.8f,
+                ReachableArea = new BoundingBox(new Vector3(-1.5f, -2, -1.5f), new Vector3(1.5f, 2, 1.5f)),
+                Restitution = 0
+            });
             AddComponent(player, new CInput());
             AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) });
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") , fileName = "viking" });
@@ -186,51 +195,66 @@ namespace GameName.Scenes
 
         private void CreateAnimals()
         {
-            var flockRadius = 10;
-            var flockCount = 5;
-            var membersPerFlock = 5;
+            int flockCount = (int)(rnd.NextDouble() * 5) + 3;
+            int membersPerFlock = (int)(rnd.NextDouble()*10) + 10;
+            var flockRadius = membersPerFlock;
             for (int f = 0; f < flockCount; f++)
             {
                 int flockId = AddEntity();
-                CFlock flock = new CFlock { Radius = 20 };
+                CFlock flock = new CFlock {
+                    Radius = 20,
+                    SeparationDistance = 3,
+                    AlignmentFactor = 0.1f,
+                    CohesionFactor = 0.5f,
+                    SeparationFactor = 100.0f,
+                    PreferredMovementSpeed = 150f
+                };
+
                 double animal = rnd.NextDouble();
                 string flockAnimal = animal > 0.66 ? "flossy" : animal > 0.33 ? "goose" : "hen";
+
                 int flockX = (int)(rnd.NextDouble() * worldSize);
                 int flockZ = (int)(rnd.NextDouble() * worldSize);
                 CTransform flockTransform = new CTransform { Position = new Vector3(flockX, 0, flockZ) };
-                flockTransform.Position += new Vector3(-worldSize / 2, -50, -worldSize / 2);
-                for (int i = 0; i < membersPerFlock; i++)
-                {
+                flockTransform.Position += new Vector3(-worldSize / 2, 0, -worldSize / 2);
+
+                for (int i = 0; i < membersPerFlock; i++) {
                     int id = AddEntity();
                     if(flockAnimal == "hen") {
+                        // TODO: Make animals into separate classes or something instead, so creating new animations will be easier. 
+                        // TODO: Make animals have different animations based on state
                         CAnimation idleAnimation = new CAnimation();
 
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_5"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_6"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_7"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_8"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_9"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_10"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_9"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_8"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_7"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_6"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_5"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
-                        idleAnimation.KeyFrames.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_5"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_6"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_7"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_8"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_9"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_10"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_9"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_8"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_7"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_6"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_5"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
+                        idleAnimation.Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
+
+                        idleAnimation.CurrentKeyframe = rnd.Next(idleAnimation.Keyframes.Count-1);
 
                         AddComponent<C3DRenderable>(id, idleAnimation);
                     }
-                    /*CImportedModel modelComponent = new CImportedModel();
-                    modelComponent.fileName = flockAnimal;
-                    modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName + (flockAnimal == "hen" && i%2 == 0 ? "_8" : ""));
-                    AddComponent<C3DRenderable>(id, modelComponent);*/
+                    else {
+                        CImportedModel modelComponent = new CImportedModel();
+                        modelComponent.fileName = flockAnimal;
+                        modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName);
+                        AddComponent<C3DRenderable>(id, modelComponent);
+                    }
 
                     float memberX = flockTransform.Position.X + (float)rnd.NextDouble() * flockRadius * 2 - flockRadius;
                     float memberZ = flockTransform.Position.Z + (float)rnd.NextDouble() * flockRadius * 2 - flockRadius;
@@ -238,7 +262,6 @@ namespace GameName.Scenes
                     CTransform transformComponent = new CTransform();
 
                     transformComponent.Position = new Vector3(memberX, y, memberZ);
-                    //transformComponent.Position += new Vector3(-590, -50, -590);
                     transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
                         (float)(Math.PI * (rnd.NextDouble() * 2)));
                     float scale = 1;
@@ -252,7 +275,8 @@ namespace GameName.Scenes
                         Velocity = Vector3.Zero,
                         Radius = 1f,
                         SpeedMultiplier = 0.5f,
-                        MaxVelocity = 5
+                        MaxVelocity = 5,
+                        Restitution = 0
                     });
                     AddComponent(id, new CAI { Flock = flockId });
                     AddComponent(id, new CSyncObject());
