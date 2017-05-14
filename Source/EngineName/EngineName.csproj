@@ -54,6 +54,7 @@
     <Compile Include="Components\CLogic.cs" />
     <Compile Include="Components\CParticle.cs" />
     <Compile Include="Components\CSyncObject.cs" />
+    <Compile Include="Components\Renderable\CAnimation.cs" />
     <Compile Include="Core\AiState.cs" />
     <Compile Include="Core\Enums.cs" />
     <Compile Include="Components\Renderable\C2DRenderable.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Shaders\AdsMaterial.cs" />
     <Compile Include="Shaders\EnvMapMaterial.cs" />
     <Compile Include="Shaders\MaterialShader.cs" />
+    <Compile Include="Systems\AnimationSystem.cs" />
     <Compile Include="Systems\AsyncMultiSystem.cs" />
     <Compile Include="Systems\CameraSystem.cs" />
     <Compile Include="Systems\ChatSystem.cs" />
