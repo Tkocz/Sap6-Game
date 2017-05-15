@@ -8,6 +8,7 @@ using EngineName.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using GameName.Systems;
+using GameName.Scenes.Utils;
 
 namespace GameName.Scenes
 {
@@ -74,7 +75,7 @@ namespace GameName.Scenes
             });
             Game1.Inst.Scene.OnEvent("startgamerequest", data =>
             {
-                Game1.Inst.EnterScene(new WorldScene(_network));
+                Game1.Inst.EnterScene(new WorldScene(new WorldSceneConfig(5, 5, 5, "DinoIsland06", _network)));
             });
             //new Thread(NewThread).Start();
 

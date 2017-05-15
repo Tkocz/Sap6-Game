@@ -41,13 +41,13 @@ namespace GameName.Scenes.Utils {
             return ball;
         }
 
-        public static void CreateAnimals() {
+        public static void CreateAnimals(int numFlocks) {
             var currentScene = Game1.Inst.Scene;
             
             int flockCount = (int)(rnd.NextDouble() * 5) + 3;
             int membersPerFlock = (int)(rnd.NextDouble() * 10) + 10;
             var flockRadius = membersPerFlock;
-            for (int f = 0; f < flockCount; f++) {
+            for (int f = 0; f < numFlocks; f++) {
                 int flockId = currentScene.AddEntity();
                 CFlock flock = new CFlock {
                     Radius = 20,
@@ -113,11 +113,11 @@ namespace GameName.Scenes.Utils {
             }
         }
 
-        public static void CreateCollectables() {
+        public static void CreateCollectables(int numPowerUps) {
             var currentScene = Game1.Inst.Scene;
             
             // TODO: get the global value of the worldsize
-            int chests = 5, hearts = 5;
+            int chests = numPowerUps, hearts = numPowerUps;
             for (int i = 0; i < chests; i++) {
                 var id = currentScene.AddEntity();
                 currentScene.AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "Models/chest", model = Game1.Inst.Content.Load<Model>("Models/chest") });
@@ -136,12 +136,12 @@ namespace GameName.Scenes.Utils {
             }
         }
         
-        public static void CreateTriggerEvents(int player) {
+        public static void CreateTriggerEvents(int player, int numTriggers) {
             var currentScene = Game1.Inst.Scene;
             Random rnd = new Random();
             
             // TODO: get the global value of the worldsize
-            for (int i = 0; i < 40; i++) {
+            for (int i = 0; i < numTriggers; i++) {
                 int id = currentScene.AddEntity();
                 currentScene.AddComponent(id, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
                 currentScene.AddComponent(id, new CTransform() { Position = new Vector3(rnd.Next(-300, 300), -0, // HERE

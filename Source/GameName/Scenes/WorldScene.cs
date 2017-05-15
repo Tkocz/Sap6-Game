@@ -6,6 +6,7 @@ using EngineName.Logging;
 using EngineName.Systems;
 using EngineName.Utils;
 using GameName.Components;
+using GameName.Scenes.Utils;
 using GameName.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,12 +25,13 @@ namespace GameName.Scenes
         private int pickUpCount = 0;
         private List<int> balls = new List<int>();
         private NetworkSystem _networkSystem;
-
-        public WorldScene(NetworkSystem _network)
-        {
-            _networkSystem = _network;
+        private WorldSceneConfig configs;
+        
+        public WorldScene(WorldSceneConfig configs) {
+            this.configs = configs;
+            if(configs.network != null)
+                _networkSystem = configs.network;
         }
-        public WorldScene() { }
 
         public override void Draw(float t, float dt)
         {
@@ -114,7 +116,7 @@ namespace GameName.Scenes
 
             // Heightmap entity
             int heightMap = AddEntity();
-            AddComponent<C3DRenderable>(heightMap, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/DinoIsland06") });
+            AddComponent<C3DRenderable>(heightMap, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/" + configs.map) });
             AddComponent(heightMap, new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) });
             // manually start loading all heightmap components, should be moved/automated
             mapSystem.Load();
@@ -161,11 +163,11 @@ namespace GameName.Scenes
             //    }
             //});
             
-            Utils.SceneUtils.CreateTriggerEvents(player);
-            Utils.SceneUtils.CreateCollectables();
+            Utils.SceneUtils.CreateTriggerEvents(player, configs.numTriggers);
+            Utils.SceneUtils.CreateCollectables(configs.numPowerUps);
             if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
             {
-                Utils.SceneUtils.CreateAnimals();
+                Utils.SceneUtils.CreateAnimals(configs.numFlocks);
             }
 
             Log.GetLog().Debug("TestScene initialized.");
