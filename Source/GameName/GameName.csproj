@@ -49,6 +49,7 @@
     <Compile Include="Dev\AiScene.cs" />
     <Compile Include="Entities\EHen.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Scenes\ConfigSceneMenu.cs" />
     <Compile Include="Scenes\EndGameScene.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
     <Compile Include="Dev\Collisions.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Dev\Particles.cs" />
     <Compile Include="Dev\PostFx.cs" />
     <Compile Include="Dev\LobbyScene.cs" />
+    <Compile Include="Scenes\Utils\SceneUtils.cs" />
     <Compile Include="Scenes\WorldScene.cs" />
     <Compile Include="Systems\AISystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
