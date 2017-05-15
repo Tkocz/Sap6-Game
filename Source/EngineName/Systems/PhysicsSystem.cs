@@ -117,9 +117,7 @@ public class PhysicsSystem: EcsSystem {
     private readonly Queue<KeyValuePair<int, EcsComponent>> mCollEntityQueue =
         new Queue<KeyValuePair<int, EcsComponent>>();
 
-    /// <summary>The number of collisions to check (used to signal completion of collision detection
-    ///          phase).</summary>
-    private int mNumCollEntities;
+    private int mNumCollChecks;
 
     //--------------------------------------
     // PUBLIC PROPERTIES
@@ -249,10 +247,8 @@ public class PhysicsSystem: EcsSystem {
             mCollEntityQueue.Enqueue(e);
         }
 
-        mNumCollEntities = mCollEntityQueue.Count;
-        mCollDetStart.Set();   // 1. Let collision threads spin!
-        mCollDetEnd.WaitOne(); // 2. Wait for them to exhaust queue.
-        mCollDetStart.Reset(); // 3. Tell them to sleep.
+        Volatile.Write(ref mNumCollChecks, mCollEntityQueue.Count);
+        WaitHandle.SignalAndWait(mCollDetStart, mCollDetEnd);
 
         SolveCollisions();
     }
@@ -347,18 +343,17 @@ public class PhysicsSystem: EcsSystem {
         var l2 = new HashSet<Pair<int, int>>();
 
         while (true) {
-            var scene = Game1.Inst.Scene;
-
             q.Clear();
 
-            mCollDetStart.WaitOne();
-
             lock (mCollEntityQueue) {
+                mCollDetStart.WaitOne();
+
                 if (mCollEntityQueue.Count == 0) {
+                    mCollDetStart.Reset();
                     continue;
                 }
 
-                for (var i = 0; i < 10; i++) {
+                for (var i = 0; i < 50; i++) {
                     if (mCollEntityQueue.Count == 0) {
                         break;
                     }
@@ -366,6 +361,8 @@ public class PhysicsSystem: EcsSystem {
                     q.Add(mCollEntityQueue.Dequeue());
                 }
             }
+
+            var scene = Game1.Inst.Scene;
 
             foreach (var e in q) {
                 var body   = (CBody)e.Value;
@@ -377,9 +374,7 @@ public class PhysicsSystem: EcsSystem {
                 FindBodyBodyColls(e, aabb1, l, l2);
                 FindBodyBoxColls (e, aabb1);
 
-                if (Interlocked.Decrement(ref mNumCollEntities) == 0) {
-                    // We're the last one to decrement mNumcollentities, so we know all threads are
-                    // done here.
+                if (Interlocked.Decrement(ref mNumCollChecks) == 0) {
                     mCollDetEnd.Set();
                 }
             }
