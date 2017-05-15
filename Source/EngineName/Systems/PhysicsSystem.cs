@@ -117,6 +117,7 @@ public class PhysicsSystem: EcsSystem {
     private readonly Queue<KeyValuePair<int, EcsComponent>> mCollEntityQueue =
         new Queue<KeyValuePair<int, EcsComponent>>();
 
+    /// <summary>The number of collision detection checks waiting to be performed.</summary>
     private int mNumCollChecks;
 
     //--------------------------------------
