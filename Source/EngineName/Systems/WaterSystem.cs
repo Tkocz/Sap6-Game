@@ -45,9 +45,6 @@ namespace EngineName.Systems
                 if (renderable.Value.GetType() != typeof(CHeightmap))
                     continue;
                 CHeightmap heightmap = (CHeightmap) renderable.Value;
-
-                // TODO: Remove fixed random seed?
-                Random rnd = new Random(1990);
                 
                 var terrainHeight = heightmap.Image.Height;
                 var terrainWidth = heightmap.Image.Width;

@@ -28,7 +28,7 @@ public sealed class MainMenu: MenuScene {
         base.Init();
 
         // Ugly, but useful during development.
-        foreach (var type in Assembly.GetExecutingAssembly().GetTypes()) {
+        /*foreach (var type in Assembly.GetExecutingAssembly().GetTypes()) {
             if (!type.IsSubclassOf(typeof (Scene)) || type == GetType()) {
                 continue;
             }
@@ -36,9 +36,18 @@ public sealed class MainMenu: MenuScene {
             CreateLabel(type.Name, () => {
                 Game1.Inst.EnterScene((Scene)Activator.CreateInstance(type));
             });
-        }
-
-        CreateLabel("Quit", () => {
+        }*/
+        CreateLabel("Single-Player", () => {
+            Game1.Inst.EnterScene(new ConfigSceneMenu());
+        });
+        CreateLabel("Multi-Player", () => {
+            
+            Game1.Inst.EnterScene(new LobbyScene());
+        });
+        CreateLabel("Collisions", () => {
+            Game1.Inst.EnterScene(new Dev.Collisions());
+        });
+            CreateLabel("Quit", () => {
             Game1.Inst.Exit();
         });
 

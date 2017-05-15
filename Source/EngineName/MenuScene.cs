@@ -196,6 +196,10 @@ public abstract class MenuScene: Scene {
         AddComponent<C2DRenderable>(AddEntity(), label.Text);
         mItems.Add(label);
     }
+
+        protected void UpdateText(string text) {
+            mItems[mSelIndex].Text.format = text;
+        } 
 }
 
 }
