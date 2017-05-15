@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GameName.Components;
 
 namespace GameName.Systems
 {
@@ -49,7 +50,7 @@ namespace GameName.Systems
                     // find closest enemy
                     var closestEnemyDistance = float.MaxValue;
                     var closestEnemyId = -1;
-                    foreach (var player in Game1.Inst.Scene.GetComponents<CInput>()) {
+                    foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>()) {
                         if (!Game1.Inst.Scene.EntityHasComponent<CBody>(player.Key))
                             continue;
                         var playerBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(player.Key);

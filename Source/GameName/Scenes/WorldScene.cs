@@ -42,8 +42,14 @@ namespace GameName.Scenes
             base.Draw(t, dt);
         }
 
+        public void InitGameComponents()
+        {
+            Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
+        }
         public override void Init()
         {
+            InitGameComponents();
+
             var mapSystem = new MapSystem();
             var waterSys = new WaterSystem();
             var physicsSys = new PhysicsSystem();
@@ -61,6 +67,7 @@ namespace GameName.Scenes
                 new Rendering2DSystem(),
                 new AISystem(),
                 new AnimationSystem()
+                
             );
 
 #if DEBUG
@@ -73,12 +80,16 @@ namespace GameName.Scenes
 
             if (_networkSystem != null)
             {
-                AddSystem(_networkSystem);
+
+                var sync = new GameObjectSync();
                 _networkSystem.InitLight();
+                sync.Init();
+                AddSystem(_networkSystem);
+                AddSystem(sync);
+
             }
 
             // Camera entity
-            int camera = AddEntity();
             float fieldofview = MathHelper.PiOver2;
             float nearplane = 0.1f;
             float farplane = 1000f;
@@ -95,9 +106,10 @@ namespace GameName.Scenes
                 Restitution = 0
             });
             AddComponent(player, new CInput());
+            AddComponent(player, new CPlayer());
             AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) });
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") , fileName = "viking" });
-            AddComponent(player, new CSyncObject());
+            AddComponent(player, new CSyncObject { fileName = "chest" });
             AddComponent(player, new CInventory());
 
             AddComponent(player, new CCamera(-50, 50)
@@ -128,8 +140,8 @@ namespace GameName.Scenes
             //AddComponent(sprintGoal, new CTrigger());
             AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
             AddComponent(sprintGoal, new CTransform() { Position = new Vector3(100, -0, 100), Scale = new Vector3(1f) });
-            AddComponent<C3DRenderable>(sprintGoal, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/tree") });
-
+            var treefilename = "tree";
+            AddComponent<C3DRenderable>(sprintGoal, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/"+ treefilename)  ,fileName = treefilename });
             OnEvent("collision", data => {
                 if ((((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
                      ((PhysicsSystem.CollisionInfo)data).Entity2 == sprintGoal)
@@ -164,11 +176,14 @@ namespace GameName.Scenes
             //    }
             //});
 
-            CreateTriggerEvents();
-            CreateCollectables();
-            if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
+          
+            
+            if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null) //Create if Master or playing alone
             {
                 CreateAnimals();
+                CreateTriggerEvents();
+                CreateCollectables();
+                AddComponent(sprintGoal, new CSyncObject {fileName = "sprintGoal"});
             }
 
             Log.GetLog().Debug("TestScene initialized.");
@@ -178,19 +193,21 @@ namespace GameName.Scenes
             int chests = 5, hearts = 5;
             for(int i = 0; i < chests; i++) {
                 var id = AddEntity();
-                AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "Models/chest", model = Game1.Inst.Content.Load<Model>("Models/chest") });
+                AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "chest", model = Game1.Inst.Content.Load<Model>("Models/chest") });
                 var z = (float)(rnd.NextDouble() * worldSize);
                 var x = (float)(rnd.NextDouble() * worldSize);
                 AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(1f)});
                 AddComponent(id, new CBody() { Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)) });
+                AddComponent(id, new CSyncObject { fileName = "chest" });
             }
             for(int i = 0; i < hearts; i++) {
                 var id = AddEntity();
-                AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "Models/heart", model = Game1.Inst.Content.Load<Model>("Models/heart") });
+                AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "heart", model = Game1.Inst.Content.Load<Model>("Models/heart") });
                 var z = (float)(rnd.NextDouble() * worldSize);
                 var x = (float)(rnd.NextDouble() * worldSize);
                 AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(1f) });
                 AddComponent(id, new CBody() { Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)) });
+                AddComponent(id, new CSyncObject{fileName = "heart"});
             }
         }
 
@@ -258,7 +275,8 @@ namespace GameName.Scenes
                         Restitution = 0
                     });
                     AddComponent(id, new CAI { Flock = flockId });
-                    AddComponent(id, new CSyncObject());
+                    //Master Object
+                    AddComponent(id, new CSyncObject { fileName = flockAnimal });
 
                     flock.Members.Add(id);
                 }
@@ -321,7 +339,7 @@ namespace GameName.Scenes
                 Rotation = Matrix.Identity,
                 Scale = r * Vector3.One
             });
-            //AddComponent(ball, new CSyncObject());
+            AddComponent(ball, new CSyncObject() {fileName = "DummySphere" });
             AddComponent<C3DRenderable>(ball, new CImportedModel
             {
                 model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),
@@ -338,6 +356,7 @@ namespace GameName.Scenes
                 int id = AddEntity();
                 AddComponent(id, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
                 AddComponent(id, new CTransform() { Position = new Vector3(rnd.Next(-worldSize, worldSize), -0, rnd.Next(-worldSize, worldSize)), Scale = new Vector3(1f) });
+                //AddComponent(id, new CSyncObject());
                 if (rnd.NextDouble() > 0.5)
                 {
                     // Falling balls event
@@ -356,6 +375,7 @@ namespace GameName.Scenes
                                            new Vector3(0.0f, -50.0f, 0.0f), // Velocity
                                            r);                              // Radius
                                 balls.Add(ballId);
+                                
                             }
                         }
                     });

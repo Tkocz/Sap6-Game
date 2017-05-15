@@ -341,17 +341,19 @@ namespace EngineName.Utils
             message.Write(cbody.RotAx);
             message.Write(cbody.RotVel);
         }
-        public static int ReadEntity(this NetBuffer message, ref CBody cBody, ref CTransform ctransform, ref string modelname)
+        public static int ReadEntity(this NetBuffer message, ref CBody cBody, ref CTransform ctransform, ref string modelname , ref bool isPlayer)
         {
             int id = message.ReadInt32();
+            isPlayer = message.ReadBoolean();
             cBody = ReadCBody(message);
             ctransform = ReadCTransform(message);
             modelname = message.ReadString();
             return id;
         }
-        public static void WriteEntity(this NetBuffer message, int id, CBody cbody, CTransform ctransform, string modelname)
+        public static void WriteEntity(this NetBuffer message, int id, CBody cbody, CTransform ctransform, string modelname, bool isPlayer)
         {
             message.Write(id);
+            message.Write(isPlayer);
             message.WriteCBody(cbody);
             message.WriteCTransform(ctransform);
             message.Write(modelname);

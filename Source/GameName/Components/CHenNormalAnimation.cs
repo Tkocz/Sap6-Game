@@ -15,7 +15,9 @@ namespace GameName.Components {
         /// <summary>
         /// Public constructor. Builds animation keyframe list.
         /// </summary>
-        public CHenNormalAnimation() {
+        public CHenNormalAnimation()
+        {
+            fileName = "hen";
             Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
             Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));
             Keyframes.Add(Game1.Inst.Content.Load<Model>("Models/hen_4"));

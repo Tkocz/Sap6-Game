@@ -64,7 +64,7 @@ namespace EngineName.Systems
                     Game1.Inst.Scene.Raise("startgamerequest", null);
                     _scanThread.Abort();
                 });
-     
+           
 
             _scanThread = new Thread(ScanForNewPeers);
             _scanThread.Start();
@@ -74,8 +74,12 @@ namespace EngineName.Systems
 
         public void InitLight()
         {
-            DebugOverlay.Inst.DbgStr((a, b) => $" Cons: {_peer.Connections.Count} IsMaster: {_isMaster} "
-               );
+            DebugOverlay.Inst.DbgStr((a, b) => $" Cons: {_peer.Connections.Count} IsMaster: {_isMaster}");
+            Game1.Inst.Scene.OnEvent("sendentity", data =>
+            {
+                var sync = (EntitySync)data;
+                SendCObject(sync.CTransform, sync.CBody, sync.ID, sync.ModelFileName,sync.IsPlayer);
+            });
         }
         /// <summary>Periodically scan for new peers</summary>
         private void ScanForNewPeers()
@@ -137,7 +141,7 @@ namespace EngineName.Systems
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
-        public void SendCObject(CTransform cTransform, CBody cBody, int id,string modelfilename)
+        public void SendCObject(CTransform cTransform, CBody cBody, int id,string modelfilename, bool IsPlayer)
         {
             if (!havePeers())
             {
@@ -146,7 +150,7 @@ namespace EngineName.Systems
             }
             NetOutgoingMessage msg = _peer.CreateMessage();
             msg.Write((byte)Enums.MessageType.Entity);
-            msg.WriteEntity(id, cBody,cTransform, modelfilename);
+            msg.WriteEntity(id, cBody,cTransform, modelfilename, IsPlayer);
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
         }
 
@@ -280,9 +284,10 @@ namespace EngineName.Systems
                             var cbody = new CBody();
                             var ctransform = new CTransform();
                             string modelname = "";
-                            var id  =_msg.ReadEntity(ref cbody,  ref ctransform,  ref modelname);
-                            addOrUpdatCObjects(id, cbody, ctransform, modelname);
-                            //Game1.Inst.Scene.Raise("network_data", data);
+                            bool isPlayer = false;
+                            var id  =_msg.ReadEntity(ref cbody,  ref ctransform,  ref modelname, ref isPlayer);                           
+                            Game1.Inst.Scene.Raise("entityupdate", new EntitySync { ID = id,CBody =cbody, CTransform = ctransform, ModelFileName = modelname,IsPlayer = isPlayer });
+
                         }
                         else if (mType == Enums.MessageType.CTransform)
                         {
@@ -339,54 +344,15 @@ namespace EngineName.Systems
             }
         }
 
-        private void syncObjects()
+        public class EntitySync
         {
-            foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
-            {
-                var sync = (CSyncObject) pair.Value;
-                if (sync.Owner) { 
-                    var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(pair.Key);
-                    var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(pair.Key);
-                    var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(pair.Key);
-                    SendCObject(ctransform, cbody, pair.Key, model.fileName);
-                }
-            }
+            public bool IsPlayer { get; set; }
+            public CBody CBody { get; set; }
+            public CTransform CTransform { get; set; }
+            public int ID { get; set; }
+            public string ModelFileName { get; set; }
         }
 
-        private void addOrUpdatCObjects(int id, CBody cbody, CTransform ctransform,string modelname)
-        {
-            //Add entity 
-            if (!Game1.Inst.Scene.EntityHasComponent<CTransform>(id))
-            {
-                //calculate BoundindBox since we have the data do this
-                cbody.Aabb = new BoundingBox(-cbody.Radius * Vector3.One, cbody.Radius * Vector3.One);
-                Game1.Inst.Scene.AddComponent(id, cbody);
-                Game1.Inst.Scene.AddComponent(id, ctransform);
-                Game1.Inst.Scene.AddComponent<C3DRenderable>(id, new CImportedModel
-                {
-                    model = Game1.Inst.Content.Load<Model>("Models/" + modelname),
-                    fileName = modelname
-                });
-                Game1.Inst.Scene.AddComponent(id, new CSyncObject{ Owner = false}) ;
-                newCBody.Add(id,cbody);              
-                newpositions.Add(id, ctransform);
-                prevCBody.Add(id, cbody);
-                prevpositions.Add(id, ctransform);
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(modelname))
-                    return;
-                prevCBody[id] = newCBody[id];
-                prevpositions[id] = prevpositions[id];
-                newpositions[id] = ctransform;
-                newCBody[id] = cbody;
-            }   
-        }
-        private Dictionary<int, CBody> prevCBody = new Dictionary<int, CBody>();
-        private Dictionary<int,CTransform> prevpositions = new Dictionary<int, CTransform>();
-        private Dictionary<int, CBody> newCBody = new Dictionary<int, CBody>();
-        private Dictionary<int, CTransform> newpositions = new Dictionary<int, CTransform>();
         public override void Cleanup()
         {
             _scanThread.Abort();
@@ -394,48 +360,9 @@ namespace EngineName.Systems
             base.Cleanup();
         }
 
-        private const float updateInterval = (float)1 / 20;
-        private float remaingTime = 0;
+
         public override void Update(float t, float dt)
         {
-            remaingTime += dt;
-            if (remaingTime> updateInterval)
-            {
-                syncObjects();
-                remaingTime = 0;
-            }
-
-            //Todo Impliment Prediction for player movement  
-            /*foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
-            {
-                var sync = (CSyncObject)pair.Value;
-                if (!sync.Owner)
-                {
-                 
-                    
-                }
-            }*/
-            foreach (var key in newCBody.Keys)
-            {
-
-                var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(key);
-                var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
-                var newtransform = newpositions[key];
-                var newcbody = newCBody[key];
-
-
-                //Smooth
-               
-              
-                cbody.Velocity = Vector3.Lerp(cbody.Velocity, newcbody.Velocity, 0.1f);
-                transform.Position = Vector3.Lerp(transform.Position, newtransform.Position, 0.1f);
-                transform.Scale = Vector3.Lerp(transform.Scale, newtransform.Scale, 0.1f);
-                transform.Frame = newtransform.Frame;
-                var rotation = Quaternion.Lerp(Quaternion.CreateFromRotationMatrix(transform.Rotation),
-                    Quaternion.CreateFromRotationMatrix(newtransform.Rotation), 0.1f);
-                transform.Rotation = Matrix.CreateFromQuaternion(rotation);
-                
-            }
            
             MessageLoop();
         }

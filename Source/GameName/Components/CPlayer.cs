@@ -5,11 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using EngineName.Core;
 
-namespace EngineName.Components
+namespace GameName.Components
 {
-    public class CSyncObject : EcsComponent
+    public class CPlayer :EcsComponent
     {
-        public bool Owner = true;
-        public string fileName = "";
     }
 }

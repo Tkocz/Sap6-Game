@@ -9,7 +9,7 @@ namespace EngineName.Components.Renderable {
     /// <summary>
     /// Animation component. Stores animation keyframes and inherits a renderable model from C3DRenderable
     /// </summary>
-    public class CAnimation : C3DRenderable {
+    public class CAnimation : CImportedModel {
         /// <summary>
         /// Models used as keyframes in animation
         /// </summary>

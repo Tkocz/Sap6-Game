@@ -427,7 +427,11 @@ public class PhysicsSystem: EcsSystem {
 
         // If we have a map system, check that we don't fall below the ground. This part is part of
         // game mechanics.
-        if (MapSystem != null) {
+        if (MapSystem != null)
+        {
+            //sometimes nan Values??
+            if (double.IsNaN(transf.Position.X))
+                return;
             var mapHeight = MapSystem.HeightPosition(transf.Position.X, transf.Position.Z);
 
             if (aabb.Min.Y < mapHeight) {

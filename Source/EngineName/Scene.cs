@@ -70,7 +70,7 @@ namespace EngineName {
         private readonly List<EcsSystem> m_Systems = new List<EcsSystem>();
 
 
-        Dictionary<Type, Dictionary<int, EcsComponent>> Components = new Dictionary<Type, Dictionary<int, EcsComponent>>();
+        protected Dictionary<Type, Dictionary<int, EcsComponent>> Components = new Dictionary<Type, Dictionary<int, EcsComponent>>();
         private int EntityCounter = -1;
         //wanted a more unique id... couldnt use standard random class in C# ...when started two instances of the game... same tick equals same id.. ;) probaly change!
         private CryptoRandom rnd = new CryptoRandom();

@@ -35,6 +35,7 @@ namespace EngineName.Systems
                     continue;
                 var heightmap = (CHeightmap)renderable.Value;
                 var key = renderable.Key;
+                
                 CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
 
                 x -= transform.Position.X;
