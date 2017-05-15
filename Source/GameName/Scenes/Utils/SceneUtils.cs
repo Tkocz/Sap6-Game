@@ -105,7 +105,6 @@ namespace GameName.Scenes.Utils {
                     });
                     currentScene.AddComponent(id, new CAI { Flock = flockId });
                     currentScene.AddComponent(id, new CSyncObject());
-                    currentScene.AddComponent(id, new CSyncObject());
 
                     flock.Members.Add(id);
                 }
