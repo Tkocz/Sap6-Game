@@ -1,4 +1,4 @@
-using EngineName.Components.Renderable;
+﻿using EngineName.Components.Renderable;
 using EngineName.Core;
 using System;
 using System.Collections.Generic;
@@ -113,6 +113,13 @@ namespace EngineName.Systems
                             effect.EnableDefaultLighting();
                             effect.PreferPerPixelLighting = true;
 
+                            effect.LightingEnabled = true;
+                            effect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor;
+                            effect.DirectionalLight0.Direction = Game1.Inst.Scene.Direction;
+                            effect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.DiffuseColor;
+                            effect.DirectionalLight0.Enabled = true;
+                            effect.SpecularPower = 100;
+
                             effect.Projection = camera.Projection;
                             effect.View = camera.View;
                             effect.World = mesh.ParentBone.Transform * transform.Frame;
@@ -157,7 +164,7 @@ namespace EngineName.Systems
                         part.Effect.Parameters["AmbientColor"].SetValue(new Vector4(0f, 0f, 1f, 1f));
                         part.Effect.Parameters["AmbientIntensity"].SetValue(0.5f);
 
-                        part.Effect.Parameters["DiffuseLightDirection"].SetValue(new Vector3(0f, -1f, 2f));
+                        part.Effect.Parameters["DiffuseLightDirection"].SetValue(Game1.Inst.Scene.Direction);
                         part.Effect.Parameters["DiffuseColor"].SetValue(new Vector4(0f, 0.8f, 0f, 1f));
                         part.Effect.Parameters["DiffuseIntensity"].SetValue(0.5f);
 

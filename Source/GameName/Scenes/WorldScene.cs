@@ -49,9 +49,16 @@ namespace GameName.Scenes
         {
             Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
         }
+        private void InitSceneLightSettings()
+        {
+            DiffuseColor = Color.White.ToVector3();
+            Direction = new Vector3(0.1f, -1, 0);
+            SpecularColor = Color.Gray.ToVector3();
+        }
         public override void Init()
         {
             InitGameComponents();
+            InitSceneLightSettings();
 
             var mapSystem = new MapSystem();
             var waterSys = new WaterSystem();
