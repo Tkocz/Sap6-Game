@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\Source\ContentPipeline\bin\Debug\ContentPipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -93,7 +94,7 @@
 
 #begin Models/rock.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -112,7 +113,7 @@
 
 #begin Models/rock2.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -131,7 +132,7 @@
 
 #begin Models/chest.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -150,7 +151,7 @@
 
 #begin Models/tree.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -248,7 +249,7 @@
 
 #begin Models/DummySphere.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -286,7 +287,7 @@
 
 #begin Models/viking.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -305,7 +306,7 @@
 
 #begin Models/hen.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -336,7 +337,7 @@
 
 #begin Models/flossy.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -367,7 +368,7 @@
 
 #begin Models/goose.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -386,7 +387,7 @@
 
 #begin Models/Hen_Rigged.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -429,7 +430,7 @@
 
 #begin Models/heart.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -448,7 +449,7 @@
 
 #begin Models/hen_8.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -467,7 +468,7 @@
 
 #begin Models/hen_4.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -486,7 +487,7 @@
 
 #begin Models/hen_5.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -505,7 +506,7 @@
 
 #begin Models/hen_6.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -524,7 +525,7 @@
 
 #begin Models/hen_7.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -543,7 +544,7 @@
 
 #begin Models/hen_9.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -562,7 +563,7 @@
 
 #begin Models/hen_10.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
@@ -593,7 +594,7 @@
 
 #begin Models/PalmTree.fbx
 /importer:FbxImporter
-/processor:ModelProcessor
+/processor:ModelBoundingProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
 /processorParam:DefaultEffect=BasicEffect
