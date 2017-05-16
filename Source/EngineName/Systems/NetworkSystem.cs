@@ -142,7 +142,7 @@ namespace EngineName.Systems
             NetOutgoingMessage msg = _peer.CreateMessage();
             if (isLight)
             {
-                msg.Write((byte) Enums.MessageType.Entity);
+                msg.Write((byte) Enums.MessageType.EntityLight);
                 msg.WriteEntityLight(id, cBody, cTransform);
             }
             else

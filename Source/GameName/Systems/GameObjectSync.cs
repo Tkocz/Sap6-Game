@@ -102,7 +102,7 @@ namespace GameName.Systems
                     var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(pair.Key);
                     var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(pair.Key);
                     var isPlayer = Game1.Inst.Scene.EntityHasComponent<CPlayer>(pair.Key);
-                    if (counter < 10 || counter%10000 == 0)
+                    if (counter < 200 || counter%10000 == 0)
                         Game1.Inst.Scene.Raise("sendentity", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
                     else
                         Game1.Inst.Scene.Raise("sendentitylight", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
