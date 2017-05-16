@@ -68,8 +68,8 @@ namespace GameName.Scenes
                 waterSys,
                 new Rendering2DSystem(),
                 new AISystem(),
-                new AnimationSystem()
-                
+                new AnimationSystem(),
+                new InventorySystem()
             );
 
 #if DEBUG
@@ -215,23 +215,9 @@ namespace GameName.Scenes
                 transfComponent.Rotation *= Matrix.CreateFromAxisAngle(transfComponent.Frame.Up, dt);
             }
 
-            var invComps = GetComponents<CInventory>();
-            foreach(var inv in invComps)
-            {
-                var i = (CInventory)inv.Value;
-                i.removeItems();
-            }
             base.Update(t, dt);
         }
 
-        
-
-        
-
-        public List<int> getBalls()
-        {
-            return balls;
-        }
 
         public int GetPlayerEntityID()
         {
