@@ -372,6 +372,8 @@ public class PhysicsSystem: EcsSystem {
                 if(e.Key == 0)
                     continue;
                 var body   = (CBody)e.Value;
+                if (!Game1.Inst.Scene.EntityHasComponent<CTransform>(e.Key))
+                    continue;
                 var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
                 var p1     = transf.Position;
                 var aabb1  = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);

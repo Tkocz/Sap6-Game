@@ -70,7 +70,6 @@
     <Compile Include="Components\Renderable\CText.cs" />
     <Compile Include="Components\CCamera.cs" />
     <Compile Include="Core\EcsComponent.cs" />
-    <Compile Include="Core\EcsEntity.cs" />
     <Compile Include="Core\EcsSystem.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Logging\Log.cs" />
@@ -97,6 +96,7 @@
     <Compile Include="Systems\WaterSystem.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
+    <Compile Include="Utils\FuzzyUtil.cs" />
     <Compile Include="Utils\GfxUtil.cs" />
     <Compile Include="Utils\GraphicsUtil.cs" />
     <Compile Include="Utils\PositionalUtil.cs" />

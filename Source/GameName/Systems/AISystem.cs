@@ -63,9 +63,8 @@ namespace GameName.Systems
                             closestEnemyId = player.Key;
                         }
                     }
-                    
-                    // Decide state
-                    if (closestEnemyDistance < 20) {
+                    var enemyBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(closestEnemyId);
+                    if((CloseToEnemy(closestEnemyDistance) & FastSpeed(enemyBody.Velocity)).IsTrue()) {
                         if (npcComponent.State.GetType() != typeof(SEvade))
                             npcComponent.State = new SEvade(npcKey);
                     }
@@ -80,6 +79,39 @@ namespace GameName.Systems
                     npcComponent.State.Handle(t, dt);
                 }
             }
+        }
+        // Distance to enemy
+        private FuzzyNumber CloseToEnemy(float distance) {
+            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 40));
+        }
+        private FuzzyNumber MediumToEnemy(float distance) {
+            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 80));
+        }
+        private FuzzyNumber FarToEnemy(float distance) {
+            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 100));
+        }
+        // Distance to flock
+        private FuzzyNumber CloseToFlock(float distance) {
+            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 5));
+        }
+        private FuzzyNumber MediumToFlock(float distance) {
+            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 10));
+        }
+        private FuzzyNumber FarToFlock(float distance) {
+            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 20));
+        }
+        // Enemy speed
+        private FuzzyNumber FastSpeed(Vector3 velocity) {
+            double speed = Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Z, 2));
+            return new FuzzyNumber(FuzzyUtil.MagicFunction(speed, 7));
+        }
+        private FuzzyNumber MediumSpeed(Vector3 velocity) {
+            double speed = Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Z, 2));
+            return new FuzzyNumber(FuzzyUtil.MagicFunction(speed, 4));
+        }
+        private FuzzyNumber SlowSpeed(Vector3 velocity) {
+            double speed = Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Z, 2));
+            return new FuzzyNumber(FuzzyUtil.MagicFunction(speed, 2));
         }
     }
 }

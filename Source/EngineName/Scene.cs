@@ -47,9 +47,6 @@ namespace EngineName {
              * PUBLIC FIELDS
              *------------------------------------*/
 
-            /// <summary>The entity to add or remove.</summary>
-            public EcsEntity Entity;
-
             /// <summary>The operation to perform.</summary>
             public int Op;
         }
@@ -122,7 +119,9 @@ namespace EngineName {
             m_Entities.Add(EntityCounter);
             return EntityCounter;
         }
-
+        /// <summary>Removes the specified entity from the scene.</summary>
+        /// <param name="entity">The entity to remove from the scene.</param>
+        /// 
         public void RemoveEntity(int eid) {
             mEntsToRemove.Add(eid);
         }
@@ -242,27 +241,6 @@ namespace EngineName {
         Logging.Log.GetLog().Info($"Initialized scene: {GetType().Name}");
     }
 
-    /// <summary>Removes the specified entity from the scene.</summary>
-    /// <param name="entity">The entity to remove from the scene.</param>
-    /// <returns><see langword="true"/> if the entity existed in the scene and
-    ///          was removed,</returns>
-    public bool RemoveEntity(EcsEntity entity) {
-            /*
-        if (AtomicUtil.CAS(ref entity.m_Scene, null, this)) {
-            // The entity is someone else's responsibility.
-            return false;
-        }*/
-        /*
-        lock (m_EntitiesPending) {
-            m_EntitiesPending.Enqueue(new EntityOp {
-                                          Entity = entity,
-                                          Op     = EntityOp.OP_REMOVE
-                                      });
-        }
-        */
-        return true;
-    }
-
     /// <summary>Updates the scene by invoking the
     ///          <see cref="EcsSystem.Update"/> method on all systems in the
     ///          scene.</summary>
@@ -284,7 +262,7 @@ namespace EngineName {
 
     /// <summary>Updates the component cache for the entity.</summary>
     /// <param name="entity">The entitiy to update the component cache for.</param>
-    internal void NotifyComponentsChanged(EcsEntity entity) {
+    internal void NotifyComponentsChanged(int entity) {
             /*
         lock (m_EntitiesPending) {
             m_EntitiesPending.Enqueue(new EntityOp {
@@ -296,7 +274,7 @@ namespace EngineName {
 
     /// <summary>Adds the specified entity to the scene.</summary>
     /// <param name="entity">The entity to add to the scene.</param>
-    private void AddEntityInternal(EcsEntity entity) {
+    private void AddEntityInternal(int entity) {
             /*
             Debug.Assert(m_Entities.Add(entity));
 
@@ -337,7 +315,7 @@ namespace EngineName {
 
     /// <summary>Removes the specified entity from the scene.</summary>
     /// <param name="entity">The entity to remove from the scene.</param>
-    private void RemoveEntityInternal(EcsEntity entity) {
+    private void RemoveEntityInternal(int entity) {
             /*
         Debug.Assert(m_Entities.Remove(entity));
 
@@ -349,7 +327,7 @@ namespace EngineName {
 
     /// <summary>Updates the component cache for the specified entity.</summary>
     /// <param name="entity">The entity to update.</param>
-    private void UpdateEntityInternal(EcsEntity entity) {
+    private void UpdateEntityInternal(int entity) {
             /*
         if (entity.Scene != this) {
             // Entity is no longer in this scene.
