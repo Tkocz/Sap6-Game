@@ -73,6 +73,10 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ContentPipeline\ContentPipeline.csproj">
+      <Project>{82e732f8-8b84-4a6f-95aa-86e5b21cbe0a}</Project>
+      <Name>ContentPipeline</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EngineName\EngineName.csproj">
       <Project>{297f4502-1d35-453c-95ce-0f449c1b0b3d}</Project>
       <Name>EngineName</Name>
