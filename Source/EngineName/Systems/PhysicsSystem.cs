@@ -674,8 +674,8 @@ public class PhysicsSystem: EcsSystem {
         t1.Position += n*pd*m2;
         t2.Position -= n*pd*m1;
 
-        s1.Velocity += n*p*m2;
-        s2.Velocity -= n*p*m1;
+        s1.Velocity += n*p*m2*s1.Restitution;
+        s2.Velocity -= n*p*m1*s2.Restitution;
 
         var c = 0.5f*(t1.Position + t2.Position);
 
