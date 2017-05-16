@@ -4,13 +4,14 @@ namespace EngineName.Systems {
 // USINGS
 //--------------------------------------
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 using Core;
 
 //--------------------------------------
 // CLASSES
 //--------------------------------------
-
-// TODO: This is not yet async!!!
 
 /// <summary>Provides functinality for running multiple systems spread out over the CPU
 ///          cores.</summary>
@@ -46,7 +47,7 @@ public class AsyncMultiSystem: EcsSystem {
 
     /// <summary>Performs cleanup logic specific to the system.</summary>
     public override void Cleanup() {
-        // TODO: Cleanup doesn't have to be parallelized.
+        // TODO: Init doesn't have to be parallelized.
         foreach (var system in mSystems) {
             system.Cleanup();
         }
@@ -57,8 +58,14 @@ public class AsyncMultiSystem: EcsSystem {
     /// <param name="dt">The time, in seconds, since the last call to this
     ///                  method.</param>
     public override void Draw(float t, float dt) {
+        var tasks = new List<Task>();
+
         foreach (var system in mSystems) {
-            system.Draw(t, dt);
+            tasks.Add(Task.Run(() => system.Draw(t, dt)));
+        }
+
+        foreach (var task in tasks) {
+            task.Wait();
         }
     }
 
@@ -67,8 +74,14 @@ public class AsyncMultiSystem: EcsSystem {
     /// <param name="dt">The time, in seconds, since the last call to this
     ///                  method.</param>
     public override void Update(float t, float dt) {
+        var tasks = new List<Task>();
+
         foreach (var system in mSystems) {
-            system.Update(t, dt);
+            tasks.Add(Task.Run(() => system.Update(t, dt)));
+        }
+
+        foreach (var task in tasks) {
+            task.Wait();
         }
     }
 }

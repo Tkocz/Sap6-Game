@@ -120,6 +120,9 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>The number of collision detection checks waiting to be performed.</summary>
     private int mNumCollChecks;
 
+    /// <summary>Collision detecth reader-writer-lock.</summary>
+    private readonly ReaderWriterLockSlim mCollLock = new ReaderWriterLockSlim();
+
     //--------------------------------------
     // PUBLIC PROPERTIES
     //--------------------------------------
@@ -146,11 +149,14 @@ public class PhysicsSystem: EcsSystem {
     public override void Init() {
         base.Init();
 
+#if MT_PHYS
         mCollThreads = new Thread[Environment.ProcessorCount];
+#else
+        mCollThreads = new Thread[1];
+#endif
 
         for (var i = 0; i < mCollThreads.Length; i++) {
             mCollThreads[i] = new Thread(CollDetThread);
-            mCollThreads[i].Priority = ThreadPriority.BelowNormal;
             mCollThreads[i].IsBackground = true;
             mCollThreads[i].Start();
         }
@@ -181,6 +187,8 @@ public class PhysicsSystem: EcsSystem {
         base.Update(t, dt);
 
         var scene = Game1.Inst.Scene;
+
+        mCollLock.EnterWriteLock();
 
         // Basically, use semi-implicit Euler to integrate all positions and then sweep coarsely for
         // AABB collisions. All potential collisions are passed on to the fine-phase solver.
@@ -249,9 +257,15 @@ public class PhysicsSystem: EcsSystem {
         }
 
         Volatile.Write(ref mNumCollChecks, mCollEntityQueue.Count);
+
         mCollDetStart.Set();
+        mCollLock.ExitWriteLock();
+
         mCollDetEnd.WaitOne();
-        //WaitHandle.SignalAndWait(mCollDetStart, mCollDetEnd);
+
+        // Reacquire lock to make sure all threads get a chance to exit their read locks.
+        mCollLock.EnterWriteLock();
+        mCollLock.ExitWriteLock();
 
         SolveCollisions();
     }
@@ -346,44 +360,52 @@ public class PhysicsSystem: EcsSystem {
         var l2 = new HashSet<Pair<int, int>>();
 
         while (true) {
-            q.Clear();
 
-            lock (mCollEntityQueue) {
-                mCollDetStart.WaitOne();
+            mCollDetStart.WaitOne();
 
-                if (mCollEntityQueue.Count == 0) {
-                    mCollDetStart.Reset();
-                    continue;
-                }
+            mCollLock.EnterReadLock();
+            while (true) {
+                lock (mCollEntityQueue) {
 
-                for (var i = 0; i < 50; i++) {
                     if (mCollEntityQueue.Count == 0) {
+                        mCollDetStart.Reset();
                         break;
                     }
 
-                    q.Add(mCollEntityQueue.Dequeue());
+                    q.Clear();
+
+                    for (var i = 0; i < 50; i++) {
+                        if (mCollEntityQueue.Count == 0) {
+                            break;
+                        }
+
+                        q.Add(mCollEntityQueue.Dequeue());
+                    }
+                }
+
+                var scene = Game1.Inst.Scene;
+
+                foreach (var e in q) {
+                    //quickFix
+                    if(e.Key == 0)
+                        continue;
+                    var body   = (CBody)e.Value;
+                    if (!Game1.Inst.Scene.EntityHasComponent<CTransform>(e.Key))
+                        continue;
+                    var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
+                    var p1     = transf.Position;
+                    var aabb1  = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
+
+                    // TODO: Would possibly be beneficial to do these two in parallel. Unsure.
+                    FindBodyBodyColls(e, aabb1, l, l2);
+                    FindBodyBoxColls (e, aabb1);
+
+                    if (Interlocked.Decrement(ref mNumCollChecks) == 0) {
+                        mCollDetEnd.Set();
+                    }
                 }
             }
-
-            var scene = Game1.Inst.Scene;
-
-            foreach (var e in q) {
-               //quickFix
-                if(e.Key == 0)
-                    continue;
-                var body   = (CBody)e.Value;
-                var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
-                var p1     = transf.Position;
-                var aabb1  = new BoundingBox(p1 + body.Aabb.Min, p1 + body.Aabb.Max);
-
-                // TODO: Would possibly be beneficial to do these two in parallel. Unsure.
-                FindBodyBodyColls(e, aabb1, l, l2);
-                FindBodyBoxColls (e, aabb1);
-
-                if (Interlocked.Decrement(ref mNumCollChecks) == 0) {
-                    mCollDetEnd.Set();
-                }
-            }
+            mCollLock.ExitReadLock();
         }
     }
 
@@ -642,15 +664,18 @@ public class PhysicsSystem: EcsSystem {
         //       too lazy to figure it out until it becomes a problem!
         var m1 = ((float)Abs(s1.InvMass) > 0.0001f) ? 1.0f/s1.InvMass : 0.0f;
         var m2 = ((float)Abs(s2.InvMass) > 0.0001f) ? 1.0f/s2.InvMass : 0.0f;
-        var im = 1.0f/(m1 + m2);
-        var p  = (2.0f*(i2 - i1))*im;
+        var tm = m1 + m2;
+        m1 /= tm;
+        m2 /= tm;
+        var p  = (2.0f*(i2 - i1));
 
-        d = (minDist - d)*im; // Mass adjusted penetration distance
+        var pd = (minDist - d); // Mass adjusted penetration distance
 
-        t1.Position += n*d*s1.InvMass;
-        s1.Velocity += n*p*s1.InvMass*s1.Restitution;
-        t2.Position -= n*d*s2.InvMass;
-        s2.Velocity -= n*p*s2.InvMass*s2.Restitution;
+        t1.Position += n*pd*m2;
+        t2.Position -= n*pd*m1;
+
+        s1.Velocity += n*p*m2*s1.Restitution;
+        s2.Velocity -= n*p*m1*s2.Restitution;
 
         var c = 0.5f*(t1.Position + t2.Position);
 

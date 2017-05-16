@@ -69,8 +69,8 @@ namespace GameName.Scenes
                 waterSys,
                 new Rendering2DSystem(),
                 new AISystem(),
-                new AnimationSystem()
-                
+                new AnimationSystem(),
+                new InventorySystem()
             );
 
 #if DEBUG
@@ -100,19 +100,19 @@ namespace GameName.Scenes
             player = AddEntity();
             AddComponent(player, new CBody() {
                 MaxVelocity = 5f,
-                InvMass = 0.01f,
+                InvMass = 1f,
                 SpeedMultiplier = 1,
                 Radius = 1,
                 Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)),
                 LinDrag = 0.8f,
                 ReachableArea = new BoundingBox(new Vector3(-1.5f, -2, -1.5f), new Vector3(1.5f, 2, 1.5f)),
-                Restitution = 0
+                Restitution = 0.4f
             });
             AddComponent(player, new CInput());
             AddComponent(player, new CPlayer());
             AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) });
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") , fileName = "viking" });
-            AddComponent(player, new CSyncObject { fileName = "chest" });
+            AddComponent(player, new CSyncObject { fileName = "viking" });
             AddComponent(player, new CInventory());
 
             AddComponent(player, new CCamera(-50, 50)
@@ -230,23 +230,9 @@ namespace GameName.Scenes
                 transfComponent.Rotation *= Matrix.CreateFromAxisAngle(transfComponent.Frame.Up, dt);
             }
 
-            var invComps = GetComponents<CInventory>();
-            foreach(var inv in invComps)
-            {
-                var i = (CInventory)inv.Value;
-                i.removeItems();
-            }
             base.Update(t, dt);
         }
 
-        
-
-        
-
-        public List<int> getBalls()
-        {
-            return balls;
-        }
 
         public int GetPlayerEntityID()
         {

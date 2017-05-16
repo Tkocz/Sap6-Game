@@ -51,8 +51,10 @@
     <Compile Include="Components\CFlock.cs" />
     <Compile Include="Components\CInput.cs" />
     <Compile Include="Components\CInventory.cs" />
+    <Compile Include="Components\CInventoryItem.cs" />
     <Compile Include="Components\CLogic.cs" />
     <Compile Include="Components\CParticle.cs" />
+    <Compile Include="Components\CPickUp.cs" />
     <Compile Include="Components\CSyncObject.cs" />
     <Compile Include="Components\Renderable\CAnimation.cs" />
     <Compile Include="Core\AiState.cs" />
@@ -68,7 +70,6 @@
     <Compile Include="Components\Renderable\CText.cs" />
     <Compile Include="Components\CCamera.cs" />
     <Compile Include="Core\EcsComponent.cs" />
-    <Compile Include="Core\EcsEntity.cs" />
     <Compile Include="Core\EcsSystem.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Logging\Log.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Systems\WaterSystem.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
+    <Compile Include="Utils\FuzzyUtil.cs" />
     <Compile Include="Utils\GfxUtil.cs" />
     <Compile Include="Utils\GraphicsUtil.cs" />
     <Compile Include="Utils\PositionalUtil.cs" />
