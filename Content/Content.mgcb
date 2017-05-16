@@ -611,3 +611,15 @@
 /processorParam:TextureFormat=DxtCompressed
 /build:Models/PalmTree.fbx
 
+#begin Fonts/FFFForward.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/FFFForward.spritefont
+
+#begin Fonts/FFFForward_Large.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/FFFForward_Large.spritefont
+
