@@ -22,6 +22,7 @@ namespace GameName.Scenes.Utils {
             currentScene.AddComponent(ball, new CBody {
                 Aabb = new BoundingBox(-r * Vector3.One, r * Vector3.One),
                 Radius = r,
+                InvMass = 0.1f,
                 LinDrag = 0.2f,
                 Velocity = v,
                 Restitution = 0.3f
