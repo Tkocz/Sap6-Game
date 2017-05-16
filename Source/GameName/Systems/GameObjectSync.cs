@@ -65,9 +65,9 @@ namespace GameName.Systems
                     });
 
                 }
-                if(data.IsPlayer)
-                   Game1.Inst.Scene.AddComponent(data.ID,new CPlayer());
-                Game1.Inst.Scene.AddComponent(data.ID, new CSyncObject { Owner = false });
+                if (data.IsPlayer)
+                    Game1.Inst.Scene.AddComponent(data.ID, new CPlayer());
+                Game1.Inst.Scene.AddComponent(data.ID, new CSyncObject {Owner = false});
                 newCBody.Add(data.ID, data.CBody);
                 newTransform.Add(data.ID, data.CTransform);
                 prevCBody.Add(data.ID, data.CBody);
@@ -75,17 +75,19 @@ namespace GameName.Systems
             }
             else
             {
-                if (string.IsNullOrEmpty(data.ModelFileName))
-                    return;
-                /*if (!newCBody.ContainsKey(data.ID))
-                {
-                    newCBody[data.ID] = data.CBody;
-                    newTransform[data.ID] = data.CTransform;
-                }*/
+
                 prevCBody[data.ID] = newCBody[data.ID];
                 prevTransform[data.ID] = newTransform[data.ID];
-                newTransform[data.ID] = data.CTransform;
-                newCBody[data.ID] = data.CBody;
+                if (string.IsNullOrEmpty(data.ModelFileName))
+                {
+                    newCBody[data.ID].Velocity = data.CBody.Velocity;
+                    newTransform[data.ID].Position = data.CTransform.Position;
+                    newTransform[data.ID].Rotation = data.CTransform.Rotation;
+                }
+                else { 
+                    newTransform[data.ID] = data.CTransform;
+                    newCBody[data.ID] = data.CBody;
+                }
             }
         }
         private void syncObjects()
