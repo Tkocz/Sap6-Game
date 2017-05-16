@@ -168,7 +168,7 @@ namespace EngineName {
     /// <summary>Performs cleanup logic for the scene.</summary>
     public virtual void Cleanup() {
         foreach (var system in m_Systems) {
-            system.Init();
+            system.Cleanup();
         }
 
         m_Systems.Clear();
