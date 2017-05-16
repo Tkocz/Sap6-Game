@@ -48,10 +48,9 @@
     <Compile Include="Dev\Particles.cs" />
     <Compile Include="Dev\PostFx.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Scenes\MainMenu.cs" />
     <Compile Include="Dev\ChatScene.cs" />
-    <Compile Include="Scenes\WorldScene.cs" />
     <Compile Include="Scenes\MainMenu.cs" />
+    <Compile Include="Scenes\WorldScene.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

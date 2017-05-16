@@ -55,6 +55,7 @@ namespace EngineName.Systems
 
                 C3DRenderable model = (C3DRenderable)component.Value;
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
+
                 CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
 
                 foreach (var mesh in model.model.Meshes)
