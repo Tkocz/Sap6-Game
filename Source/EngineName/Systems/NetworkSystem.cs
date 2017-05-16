@@ -28,6 +28,7 @@ namespace EngineName.Systems
         private bool _scanForPeers = true;
         public bool _isMaster =false;
         public string masterIp;
+        public NetConnection MasterNetConnection = null;
         public NetworkSystem()
         {
         }
@@ -80,6 +81,11 @@ namespace EngineName.Systems
                 var sync = (EntitySync)data;
                 SendCObject(sync.CTransform, sync.CBody, sync.ID, sync.ModelFileName,sync.IsPlayer);
             });
+            Game1.Inst.Scene.OnEvent("network_game_end",
+            data =>
+            {
+                SendObject(data, "network_game_end");
+            });
         }
         /// <summary>Periodically scan for new peers</summary>
         private void ScanForNewPeers()
@@ -93,26 +99,7 @@ namespace EngineName.Systems
             }   
         }
 
-        ///For testing only
-        public void Bot()
-        {
-            _bot = true;
-            int counter = 0;
-            _localport = 50002;
-            Init();
-            while (true)
-            {
-                counter++;
-                Thread.Sleep(1000);
-                MessageLoop();
-                if (counter % 2 == 0 && counter != 0)
-                {
-                    counter++;
-                    
-                    //SendObject(counter + "hej from bot","chatmessage");
-                }
-            }
-        }
+ 
         /// <summary>Checks if have peers, so its possible to send stuff</summary>
         private bool havePeers()
         {
@@ -138,6 +125,7 @@ namespace EngineName.Systems
             msg.Write(addressBytes.Length);
             msg.Write(addressBytes);
             msg.Write(port);
+
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
@@ -151,7 +139,12 @@ namespace EngineName.Systems
             NetOutgoingMessage msg = _peer.CreateMessage();
             msg.Write((byte)Enums.MessageType.Entity);
             msg.WriteEntity(id, cBody,cTransform, modelfilename, IsPlayer);
-            _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
+
+            if (MasterNetConnection == null)
+                _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
+            else
+                _peer.SendMessage(msg, MasterNetConnection, NetDeliveryMethod.Unreliable, 0);
+            
         }
 
         /// <summary>Send simple string to all peers </summary>
@@ -189,7 +182,7 @@ namespace EngineName.Systems
                     msg.Write(metadata);
                     msg.WriteUnitVector3(datavector, 1);
                     break;
-                case Enums.MessageType.Int:
+                case Enums.MessageType.Int32:
                     int dataint = (int)datatosend;
                     msg.Write((byte)type);
                     msg.Write(metadata);
@@ -207,7 +200,13 @@ namespace EngineName.Systems
 
             }
             //ability to send diffrent types of data with ease
-            _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
+            if (MasterNetConnection==null) { 
+                _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
+            }
+            else
+            {
+                _peer.SendMessage(msg, MasterNetConnection, NetDeliveryMethod.Unreliable, 0);
+            }
         }
         /// <summary> Message loop to check type of message and handle it accordingly </summary>
         public void MessageLoop()
@@ -249,6 +248,7 @@ namespace EngineName.Systems
                                 var ip = _msg.ReadString();
                                 masterIp = ip;
                                 _isMaster = false;
+                                MasterNetConnection = _peer.Connections.FirstOrDefault(x => x.RemoteEndPoint.Address.ToString() == ip);
                                 Game1.Inst.Scene.Raise("startgamerequest", _msg.ReadString());
                                 _scanThread.Abort();
                             }
@@ -301,10 +301,14 @@ namespace EngineName.Systems
                             var data = _msg.ReadCTransform();
                             //Game1.Inst.Scene.Raise("network_data", data);
                         }
-                        else if (mType == Enums.MessageType.Int)
+                        else if (mType == Enums.MessageType.Int32)
                         {
                             var metadata = _msg.ReadString();
                             var data = _msg.ReadInt32();
+                            if (metadata == "network_game_end")
+                            {
+                                Game1.Inst.Scene.Raise("game_end", data);
+                            }
                             //Game1.Inst.Scene.Raise("network_data", data);
                         }
                         //Console.WriteLine("END ReceivePeersData Data");

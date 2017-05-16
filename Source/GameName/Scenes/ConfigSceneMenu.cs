@@ -13,9 +13,9 @@ namespace GameName.Scenes {
         private int numFlocks = 0;
         private int numPowerUps = 0;
         private int numTriggers = 0;
-        private int maxFlocks = 10;
-        private int maxPowerUps = 10;
-        private int maxTriggers = 10;
+        private int maxFlocks = 55;
+        private int maxPowerUps = 55;
+        private int maxTriggers = 55;
         private string[] maps = new string[]{
                 "Square_island_4x4",
                 "DinoIsland06"
@@ -30,15 +30,15 @@ namespace GameName.Scenes {
                 UpdateText("Map: " + maps[selectedMap]);
             });
             CreateLabel("Flocks of Animals: " + numFlocks, () => {
-                numFlocks = (numFlocks + 1) % maxFlocks;
+                numFlocks = (numFlocks + 5) % maxFlocks;
                 UpdateText("Flocks of animals: " + numFlocks);
             });
             CreateLabel("Number of Power-Ups: " + numPowerUps, () => {
-                numPowerUps = (numPowerUps + 1) % maxPowerUps;
+                numPowerUps = (numPowerUps + 5) % maxPowerUps;
                 UpdateText("Number of Power-Ups: " + numPowerUps);
             });
             CreateLabel("Number of Triggers: " + numTriggers, () => {
-                numTriggers = (numTriggers + 1) % maxTriggers;
+                numTriggers = (numTriggers + 5) % maxTriggers;
                 UpdateText("Number of Triggers: " + numTriggers);
             });
             CreateLabel("Start Game", () => {

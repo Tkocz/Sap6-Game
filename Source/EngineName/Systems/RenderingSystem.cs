@@ -76,46 +76,9 @@ namespace EngineName.Systems
                         continue;
                     // TODO: This might bug out with multiple mesh parts.
                     if (model.model.Tag == "water") {
-                            foreach (ModelMeshPart part in mesh.MeshParts) {                                Matrix world = mesh.ParentBone.Transform * transform.Frame;
-
-                                part.Effect.Parameters["World"].SetValue(world);
-                                part.Effect.Parameters["View"].SetValue(camera.View);
-                                part.Effect.Parameters["Projection"].SetValue(camera.Projection);
-                                part.Effect.Parameters["AmbientColor"].SetValue(new Vector4(0f, 0f, 1f, 1f));
-                                part.Effect.Parameters["AmbientIntensity"].SetValue(0.5f);
-                                
-                                part.Effect.Parameters["DiffuseLightDirection"].SetValue(new Vector3(0f, -1f, 2f));
-                                part.Effect.Parameters["DiffuseColor"].SetValue(new Vector4(0f, 0.8f, 0f, 1f));
-                                part.Effect.Parameters["DiffuseIntensity"].SetValue(0.5f);
-
-
-                                //Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * world));
-                                //part.Effect.Parameters["WorldInverseTranspose"].SetValue(world);
-
-                                CTransform cameraTransform = camPos;
-
-                                var viewVector = (camera.Target - cameraTransform.Position);
-                                viewVector.Normalize();
-                                //part.Effect.Parameters["ViewVector"].SetValue(viewVector);
-                                part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
-
-
-                                part.Effect.Parameters["Shininess"].SetValue(200f);
-                                part.Effect.Parameters["SpecularColor"].SetValue(new Vector4(1, 1, 1, 1));
-                                part.Effect.Parameters["SpecularIntensity"].SetValue(200f);
-
-                                //effect.Parameters["ModelTexture"].SetValue(texture);
-                                part.Effect.Parameters["NormalMap"].SetValue(normalMap);
-                                part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(mT));
-
-                                part.Effect.Parameters["Time"].SetValue(mT);
-                                //part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
-                                foreach (var pass in part.Effect.CurrentTechnique.Passes) {
-                                    pass.Apply();
-                                }                                
-                            mesh.Draw();
-                        }
-                    }
+                        // Drawn after.
+                        continue;
+                    }
                     else if (model.material != null) {
                         model.material.CamPos = camPos.Position;
                         model.material.Model = mesh.ParentBone.Transform * transform.Frame;
@@ -150,6 +113,13 @@ namespace EngineName.Systems
                             effect.EnableDefaultLighting();
                             effect.PreferPerPixelLighting = true;
 
+                            effect.LightingEnabled = true;
+                            effect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor;
+                            effect.DirectionalLight0.Direction = Game1.Inst.Scene.Direction;
+                            effect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.DiffuseColor;
+                            effect.DirectionalLight0.Enabled = true;
+                            effect.SpecularPower = 100;
+
                             effect.Projection = camera.Projection;
                             effect.View = camera.View;
                             effect.World = mesh.ParentBone.Transform * transform.Frame;
@@ -159,6 +129,77 @@ namespace EngineName.Systems
                     }
                 }
             }
+
+            foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
+                var key = component.Key;
+
+                if (key == excludeEid) {
+                    // TODO: This is originally a hack to simplify rendering of environment maps.
+                    continue;
+                }
+
+
+                C3DRenderable model = (C3DRenderable)component.Value;
+                if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
+                CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+
+                Matrix[] bones = new Matrix[model.model.Bones.Count];
+                model.model.CopyAbsoluteBoneTransformsTo(bones);
+                foreach (var mesh in model.model.Meshes)
+                {
+
+                    if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
+                        continue;
+                    // TODO: This might bug out with multiple mesh parts.
+                    if (model.model.Tag != "water") {
+                        continue;
+                    }
+
+                    foreach (ModelMeshPart part in mesh.MeshParts) {
+                        Matrix world = mesh.ParentBone.Transform * transform.Frame;
+
+                        part.Effect.Parameters["World"].SetValue(world);
+                        part.Effect.Parameters["View"].SetValue(camera.View);
+                        part.Effect.Parameters["Projection"].SetValue(camera.Projection);
+                        part.Effect.Parameters["AmbientColor"].SetValue(new Vector4(0f, 0f, 1f, 1f));
+                        part.Effect.Parameters["AmbientIntensity"].SetValue(0.5f);
+
+                        part.Effect.Parameters["DiffuseLightDirection"].SetValue(Game1.Inst.Scene.Direction);
+                        part.Effect.Parameters["DiffuseColor"].SetValue(new Vector4(0f, 0.8f, 0f, 1f));
+                        part.Effect.Parameters["DiffuseIntensity"].SetValue(0.5f);
+
+
+                        //Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * world));
+                        //part.Effect.Parameters["WorldInverseTranspose"].SetValue(world);
+
+                        CTransform cameraTransform = camPos;
+
+                        var viewVector = (camera.Target - cameraTransform.Position);
+                        viewVector.Normalize();
+                        //part.Effect.Parameters["ViewVector"].SetValue(viewVector);
+                        part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
+
+
+                        part.Effect.Parameters["Shininess"].SetValue(200f);
+                        part.Effect.Parameters["SpecularColor"].SetValue(new Vector4(1, 1, 1, 1));
+                        part.Effect.Parameters["SpecularIntensity"].SetValue(200f);
+
+                        //effect.Parameters["ModelTexture"].SetValue(texture);
+                        part.Effect.Parameters["NormalMap"].SetValue(normalMap);
+                        part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(mT));
+
+                        part.Effect.Parameters["Time"].SetValue(mT);
+                        //part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
+                        foreach (var pass in part.Effect.CurrentTechnique.Passes) {
+                            pass.Apply();
+                        }
+                        mesh.Draw();
+                    }
+                }
+            }
+
+            // -
         }
     }
+
 }

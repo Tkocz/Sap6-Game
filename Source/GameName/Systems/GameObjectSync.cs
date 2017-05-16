@@ -17,7 +17,18 @@ namespace GameName.Systems
     public class GameObjectSync : EcsSystem
     {
 
+
+        private Dictionary<int, CBody> prevCBody = new Dictionary<int, CBody>();
+        private Dictionary<int, CTransform> prevTransform = new Dictionary<int, CTransform>();
+        private Dictionary<int, CBody> newCBody = new Dictionary<int, CBody>();
+        private Dictionary<int, CTransform> newTransform = new Dictionary<int, CTransform>();
         private Random rnd = new Random();
+        private bool isMaster;
+
+        public GameObjectSync(bool ismaster)
+        {
+            isMaster = ismaster;
+        }
         public override void Init()
         {
             Game1.Inst.Scene.OnEvent("entityupdate", data =>
@@ -26,6 +37,7 @@ namespace GameName.Systems
                 addOrUpdatCObjects(entity);
             });
         }
+
 
         private void addOrUpdatCObjects(NetworkSystem.EntitySync data)
         {
@@ -55,19 +67,24 @@ namespace GameName.Systems
                 }
                 if(data.IsPlayer)
                    Game1.Inst.Scene.AddComponent(data.ID,new CPlayer());
-                //Game1.Inst.Scene.AddComponent(data.ID, new CSyncObject { Owner = false });
+                Game1.Inst.Scene.AddComponent(data.ID, new CSyncObject { Owner = false });
                 newCBody.Add(data.ID, data.CBody);
-                newpositions.Add(data.ID, data.CTransform);
+                newTransform.Add(data.ID, data.CTransform);
                 prevCBody.Add(data.ID, data.CBody);
-                prevpositions.Add(data.ID, data.CTransform);
+                prevTransform.Add(data.ID, data.CTransform);
             }
             else
             {
                 if (string.IsNullOrEmpty(data.ModelFileName))
                     return;
+                /*if (!newCBody.ContainsKey(data.ID))
+                {
+                    newCBody[data.ID] = data.CBody;
+                    newTransform[data.ID] = data.CTransform;
+                }*/
                 prevCBody[data.ID] = newCBody[data.ID];
-                prevpositions[data.ID] = newpositions[data.ID];
-                newpositions[data.ID] = data.CTransform;
+                prevTransform[data.ID] = newTransform[data.ID];
+                newTransform[data.ID] = data.CTransform;
                 newCBody[data.ID] = data.CBody;
             }
         }
@@ -116,7 +133,7 @@ namespace GameName.Systems
 
                 var cbody = (CBody) Game1.Inst.Scene.GetComponentFromEntity<CBody>(key);
                 var transform = (CTransform) Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
-                var newtransform = newpositions[key];
+                var newtransform = newTransform[key];
                 var newcbody = newCBody[key];
                 //Smooth
                 cbody.Velocity = Vector3.Lerp(cbody.Velocity, newcbody.Velocity, 0.1f);
@@ -131,9 +148,5 @@ namespace GameName.Systems
             }
         }
 
-        private Dictionary<int, CBody> prevCBody = new Dictionary<int, CBody>();
-        private Dictionary<int, CTransform> prevpositions = new Dictionary<int, CTransform>();
-        private Dictionary<int, CBody> newCBody = new Dictionary<int, CBody>();
-        private Dictionary<int, CTransform> newpositions = new Dictionary<int, CTransform>();
     }
 }

@@ -23,6 +23,11 @@ namespace EngineName {
         public int NumEntities {
             get { return m_Entities.Count; }
         }
+        /// <summary>Represents a game scenes directed lightsource.</summary>
+        public Vector3 DiffuseColor;
+        public Vector3 Direction;
+        public Vector3 SpecularColor;
+
         /*--------------------------------------
          * NESTED TYPES
          *------------------------------------*/
@@ -167,7 +172,7 @@ namespace EngineName {
     /// <summary>Performs cleanup logic for the scene.</summary>
     public virtual void Cleanup() {
         foreach (var system in m_Systems) {
-            system.Init();
+            system.Cleanup();
         }
 
         m_Systems.Clear();

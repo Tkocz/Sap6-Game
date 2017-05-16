@@ -16,7 +16,7 @@ namespace EngineName.Core
             CBody,
             Entity,
             Vector3,
-            Int,
+            Int32,
             Unknown,
         }
     }
