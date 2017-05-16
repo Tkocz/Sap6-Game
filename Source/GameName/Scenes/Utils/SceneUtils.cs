@@ -37,7 +37,7 @@ namespace GameName.Scenes.Utils {
                 model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),
                 fileName = "DummySphere"
             });
-
+            currentScene.AddComponent(ball, new CPickUp());
             return ball;
         }
 

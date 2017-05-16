@@ -51,8 +51,10 @@
     <Compile Include="Components\CFlock.cs" />
     <Compile Include="Components\CInput.cs" />
     <Compile Include="Components\CInventory.cs" />
+    <Compile Include="Components\CInventoryItem.cs" />
     <Compile Include="Components\CLogic.cs" />
     <Compile Include="Components\CParticle.cs" />
+    <Compile Include="Components\CPickUp.cs" />
     <Compile Include="Components\CSyncObject.cs" />
     <Compile Include="Components\Renderable\CAnimation.cs" />
     <Compile Include="Core\AiState.cs" />
