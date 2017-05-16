@@ -100,11 +100,11 @@ namespace GameName.Scenes
             player = AddEntity();
             AddComponent(player, new CBody() {
                 MaxVelocity = 5f,
-                InvMass = 1f,
+                InvMass = 0.01f,
                 SpeedMultiplier = 1,
                 Radius = 1,
                 Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)),
-                LinDrag = 0.8f,
+                LinDrag = 50f,
                 ReachableArea = new BoundingBox(new Vector3(-1.5f, -2, -1.5f), new Vector3(1.5f, 2, 1.5f)),
                 Restitution = 0.4f
             });
