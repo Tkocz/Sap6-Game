@@ -249,7 +249,9 @@ public class PhysicsSystem: EcsSystem {
         }
 
         Volatile.Write(ref mNumCollChecks, mCollEntityQueue.Count);
-        WaitHandle.SignalAndWait(mCollDetStart, mCollDetEnd);
+        mCollDetStart.Set();
+        mCollDetEnd.WaitOne();
+        //WaitHandle.SignalAndWait(mCollDetStart, mCollDetEnd);
 
         SolveCollisions();
     }
@@ -366,6 +368,9 @@ public class PhysicsSystem: EcsSystem {
             var scene = Game1.Inst.Scene;
 
             foreach (var e in q) {
+               //quickFix
+                if(e.Key == 0)
+                    continue;
                 var body   = (CBody)e.Value;
                 var transf = (CTransform)scene.GetComponentFromEntity<CTransform>(e.Key);
                 var p1     = transf.Position;
