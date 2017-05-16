@@ -64,7 +64,7 @@ namespace GameName.Systems
                         }
                     }
                     var enemyBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(closestEnemyId);
-                    if((CloseToEnemy(closestEnemyDistance) & FastSpeed(enemyBody.Velocity)).IsTrue()) {
+                    if((FuzzyUtil.Very(CloseToEnemy(closestEnemyDistance)) & FastSpeed(enemyBody.Velocity)).IsTrue()) {
                         if (npcComponent.State.GetType() != typeof(SEvade))
                             npcComponent.State = new SEvade(npcKey);
                     }

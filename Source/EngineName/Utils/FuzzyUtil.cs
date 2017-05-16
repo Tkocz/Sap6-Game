@@ -6,43 +6,61 @@ using System.Threading.Tasks;
 
 namespace EngineName.Utils {
     public static class FuzzyUtil {
-        private static float Very(float mu) {
-            return (float)Math.Pow(mu, 2);
+        /// <summary>
+        /// Hedge function for determining the hedge "very"
+        /// </summary>
+        /// <param name="mu">The FuzzyNumber to be changed by hedge function</param>
+        /// <returns>FuzzyNumber after hedge</returns>
+        public static FuzzyNumber Very(FuzzyNumber mu) {
+            return new FuzzyNumber(Math.Pow(mu.Value, 2));
         }
-        private static float Slightly(float mu) {
-            return (float)Math.Pow(mu, 1.7);
+        /// <summary>
+        /// Hedge function for determining the hedge "slightly"
+        /// </summary>
+        /// <param name="mu">The FuzzyNumber to be changed by hedge function</param>
+        /// <returns>FuzzyNumber after hedge</returns>
+        public static FuzzyNumber Slightly(FuzzyNumber mu) {
+            return new FuzzyNumber(Math.Pow(mu.Value, 1.7));
         }
-        private static float Little(float mu) {
-            return (float)Math.Pow(mu, 1.3);
+        /// <summary>
+        /// Hedge function for determining the hedge "little"
+        /// </summary>
+        /// <param name="mu">The FuzzyNumber to be changed by hedge function</param>
+        /// <returns>FuzzyNumber after hedge</returns>
+        public static FuzzyNumber Little(FuzzyNumber mu) {
+            return new FuzzyNumber(Math.Pow(mu.Value, 1.3));
         }
-
+        /// <summary>
+        /// Magic Member function for determining fuzzy value
+        /// </summary>
+        /// <param name="x">X variable is the input for determining the results</param>
+        /// <param name="top">The X-value which returns 1.0</param>
+        /// <returns></returns>
         public static double MagicFunction(double x, double top) {
             return (1 / (1 + Math.Pow((x - top) / 10, 2)));
         }
     }
+    /// <summary>
+    /// Class for fuzzy numbers and logic
+    /// </summary>
     public class FuzzyNumber {
+        private double m_value;
         public FuzzyNumber(double value) {
             m_value = value;
         }
-        private double m_value;
-
         public double Value {
             get { return m_value; }
             set { m_value = value; }
         }
-
         public bool IsTrue() {
             return m_value > 0.5;
         }
-
         public static FuzzyNumber operator |(FuzzyNumber A, FuzzyNumber B) {
             return new FuzzyNumber(Math.Max(A.m_value, B.m_value));
         }
-
         public static FuzzyNumber operator &(FuzzyNumber A, FuzzyNumber B) {
             return new FuzzyNumber(Math.Min(A.m_value, B.m_value));
         }
-
         public static FuzzyNumber operator !(FuzzyNumber A) {
             return new FuzzyNumber(1.0 - A.Value);
         }
