@@ -124,17 +124,13 @@ namespace GameName.Systems {
                     if(Game1.Inst.Scene.GetType() == typeof(WorldScene))
                     {
                         var scene = (WorldScene)Game1.Inst.Scene;
-                        var list = Game1.Inst.Scene.GetEntitiesWithComponent<CPickUp>();
                         var inv = (CInventory)Game1.Inst.Scene.GetComponentFromEntity<CInventory>(input.Key);
-                        foreach (var ball in list)
+                        foreach (int ball in scene.getBalls())
                         {
-                            var ballBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(ball.Key);
-
-                            if (body.ReachableArea.Intersects(ballBody.Aabb) && !inv.isFull)
+                            var ballBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(ball);
+                            if (body.ReachableArea.Intersects(ballBody.Aabb) && !inv.isFull && !inv.inventory.Contains(ball))
                             {
-                                var b = new CInventoryItem(ballBody);
-                                inv.items.Add(b);
-                                inv.IdsToRemove.Add(ball.Key);
+                                inv.inventory.Add(ball);
                                 prevState = currentState;
                                 // Return so only one item will be picked up.
                                 return;
@@ -147,17 +143,17 @@ namespace GameName.Systems {
                     if (Game1.Inst.Scene.EntityHasComponent<CInventory>(input.Key))
                     {
                         var inv = (CInventory)Game1.Inst.Scene.GetComponentFromEntity<CInventory>(input.Key);
-                        if (inv.items.Count > 0)
+                        if (inv.inventory.Count > 0)
                         {
-                            var item = inv.items.ElementAt(inv.items.Count - 1);
-
-                            var ts = dt * 100f * item.itemBody.SpeedMultiplier;
-                            var newItem = item;
-                            newItem.itemBody.Velocity += /*transform.Rotation.Forward
-                                              */ new Vector3(item.itemBody.Aabb.Max.X * 2 + .5f, 0f, item.itemBody.Aabb.Max.Z * 2 + .5f) * ts;
-
-                            inv.items.Remove(item);
-                            inv.itemsToRemove.Add(newItem);
+                            int itemId = inv.inventory.ElementAt(inv.inventory.Count - 1);
+                            inv.itemsToRemove.Add(itemId);
+                            //inv.inventory.Remove(itemId);
+                            var itemBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(itemId);
+                            var itemTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(itemId);
+                            itemTransform.Position = transform.Position;
+                            var throwSpeed = dt * 100f * itemBody.SpeedMultiplier;
+                            itemBody.Velocity += transform.Rotation.Forward
+                                              * new Vector3(itemBody.Aabb.Max.X * 2 + .5f, 0f, itemBody.Aabb.Max.Z * 2 + .5f) * throwSpeed;
                         }
                     }
                 }

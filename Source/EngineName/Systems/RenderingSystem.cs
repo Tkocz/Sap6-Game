@@ -55,7 +55,13 @@ namespace EngineName.Systems
 
             // Make a list of all items that are in an inventory, 
             // so we can skip them when rendering.
-
+            Dictionary<int, EcsComponent> inventoryComps = Game1.Inst.Scene.GetComponents<CInventory>();
+            List<int> itemsInInventory = new List<int>();
+            foreach(var inv in inventoryComps)
+            {
+                var temp = (CInventory)inv.Value;
+                itemsInInventory.AddRange(temp.inventory);
+            }
             int counter = 0;
             foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
                 var key = component.Key;
@@ -65,7 +71,8 @@ namespace EngineName.Systems
                     continue;
                 }
                 // Skip entities that are inside an inventory.
-
+                if (itemsInInventory.Contains(key))
+                    continue;
 
 
                 C3DRenderable model = (C3DRenderable)component.Value;
