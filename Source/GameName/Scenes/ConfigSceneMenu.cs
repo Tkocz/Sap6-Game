@@ -31,7 +31,7 @@ namespace GameName.Scenes {
             });
             CreateLabel("Flocks of Animals: " + numFlocks, () => {
                 numFlocks = (numFlocks + 5) % maxFlocks;
-                UpdateText("Flocks of animals: " + numFlocks);
+                UpdateText("Flocks of Animals: " + numFlocks);
             });
             CreateLabel("Number of Power-Ups: " + numPowerUps, () => {
                 numPowerUps = (numPowerUps + 5) % maxPowerUps;
