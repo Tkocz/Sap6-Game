@@ -202,15 +202,6 @@ namespace EngineName {
         return m_Entities;
     }
 
-    public Dictionary<int, EcsComponent> GetEntitiesWithComponent<T>() where T : EcsComponent
-    {
-        if (Components.ContainsKey(typeof(T)))
-        {
-            return Components[typeof(T)];
-        }
-        return null;
-    }
-
     /// <summary>Performs initialization logic for the scene.</summary>
     public virtual void Init() {
 
@@ -228,7 +219,6 @@ namespace EngineName {
         Components.Add(typeof(CSyncObject),new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CFlock),new Dictionary<int, EcsComponent>());
 		Components.Add(typeof(CInventory), new Dictionary<int, EcsComponent>());
-        Components.Add(typeof(CPickUp), new Dictionary<int, EcsComponent>());
 
 #if DEBUG
             AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));

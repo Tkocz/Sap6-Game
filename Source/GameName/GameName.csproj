@@ -64,7 +64,6 @@
     <Compile Include="Systems\AISystem.cs" />
     <Compile Include="Systems\GameObjectSync.cs" />
     <Compile Include="Systems\InputSystem.cs" />
-    <Compile Include="Systems\InventorySystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
