@@ -671,7 +671,6 @@ public class PhysicsSystem: EcsSystem {
 
         var pd = (minDist - d); // Mass adjusted penetration distance
 
-
         t1.Position += n*pd*m2;
         t2.Position -= n*pd*m1;
 
