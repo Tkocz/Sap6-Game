@@ -20,7 +20,7 @@ namespace EngineName.Components
         {
             get
             {
-                if (inventory.Count == MAXSIZE)
+                if (items.Count == MAXSIZE)
                     return true;
                 else
                     return false;
@@ -29,17 +29,14 @@ namespace EngineName.Components
         /// <summary>
         /// The items contained in an inventory
         /// </summary>
-        public List<int> inventory = new List<int>(MAXSIZE);
+        public List<CInventoryItem> items = new List<CInventoryItem>(MAXSIZE);
         /// <summary>
         /// Items that are to be removed from the inventory.
         /// </summary>
-        public List<int> itemsToRemove = new List<int>(MAXSIZE);
-
-        public void removeItems()
-        {
-            foreach (var item in itemsToRemove)
-                inventory.Remove(item);
-            itemsToRemove.Clear();
-        }
+        public List<CInventoryItem> itemsToRemove = new List<CInventoryItem>(MAXSIZE);
+        /// <summary>
+        /// Id's of entities that are now in an inventory and should therefore be removed in the coming update call.
+        /// </summary>
+        public List<int> IdsToRemove = new List<int>();
     }
 }
