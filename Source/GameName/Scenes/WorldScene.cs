@@ -117,7 +117,7 @@ namespace GameName.Scenes
             });
             AddComponent(player, new CInput());
             AddComponent(player, new CPlayer());
-            AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) });
+            AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, rnd.Next(0,50)), Scale = new Vector3(1f) });
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") , fileName = "viking" });
             AddComponent(player, new CSyncObject { fileName = "viking" });
             AddComponent(player, new CInventory());

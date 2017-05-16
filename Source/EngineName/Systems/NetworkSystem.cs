@@ -79,7 +79,12 @@ namespace EngineName.Systems
             Game1.Inst.Scene.OnEvent("sendentity", data =>
             {
                 var sync = (EntitySync)data;
-                SendCObject(sync.CTransform, sync.CBody, sync.ID, sync.ModelFileName,sync.IsPlayer);
+                SendCObject(sync.CTransform, sync.CBody, sync.ID, sync.ModelFileName,sync.IsPlayer,false);
+            });
+            Game1.Inst.Scene.OnEvent("sendentitylight", data =>
+            {
+                var sync = (EntitySync)data;
+                SendCObject(sync.CTransform, sync.CBody, sync.ID, sync.ModelFileName, sync.IsPlayer,true);
             });
             Game1.Inst.Scene.OnEvent("network_game_end",
             data =>
@@ -128,18 +133,23 @@ namespace EngineName.Systems
 
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
-
-        public void SendCObject(CTransform cTransform, CBody cBody, int id,string modelfilename, bool IsPlayer)
+        public void SendCObject(CTransform cTransform, CBody cBody, int id,string modelfilename, bool IsPlayer, bool isLight)
         {
             if (!havePeers())
             {
-                //Debug.WriteLine("No connections to send to.");
                 return;
             }
             NetOutgoingMessage msg = _peer.CreateMessage();
-            msg.Write((byte)Enums.MessageType.Entity);
-            msg.WriteEntity(id, cBody,cTransform, modelfilename, IsPlayer);
-
+            if (isLight)
+            {
+                msg.Write((byte) Enums.MessageType.Entity);
+                msg.WriteEntityLight(id, cBody, cTransform);
+            }
+            else
+            {
+                msg.Write((byte) Enums.MessageType.Entity);
+                msg.WriteEntity(id, cBody, cTransform, modelfilename, IsPlayer);
+            }
             if (MasterNetConnection == null)
                 _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
             else
@@ -279,15 +289,15 @@ namespace EngineName.Systems
                                 }
                             }
                         }
-                        else if (mType == Enums.MessageType.Entity)
+                        else if (mType == Enums.MessageType.Entity || mType == Enums.MessageType.EntityLight)
                         {
                             var cbody = new CBody();
                             var ctransform = new CTransform();
                             string modelname = "";
                             bool isPlayer = false;
-                            var id  =_msg.ReadEntity(ref cbody,  ref ctransform,  ref modelname, ref isPlayer);                           
+                            int id = 0;
+                            id = mType== Enums.MessageType.EntityLight ? _msg.ReadEntityLight(ref cbody, ref ctransform, ref modelname, ref isPlayer) : _msg.ReadEntity(ref cbody,  ref ctransform,  ref modelname, ref isPlayer);                           
                             Game1.Inst.Scene.Raise("entityupdate", new EntitySync { ID = id,CBody =cbody, CTransform = ctransform, ModelFileName = modelname,IsPlayer = isPlayer });
-
                         }
                         else if (mType == Enums.MessageType.CTransform)
                         {

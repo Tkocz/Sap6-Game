@@ -90,10 +90,10 @@ namespace GameName.Systems
         }
         private void syncObjects()
         {
-            var counter = 0;
+            counter++;
             foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
             {
-                counter++;
+                
                 var sync = (CSyncObject)pair.Value;
                 if (sync.Owner)
                 {
@@ -102,12 +102,18 @@ namespace GameName.Systems
                     var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(pair.Key);
                     var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(pair.Key);
                     var isPlayer = Game1.Inst.Scene.EntityHasComponent<CPlayer>(pair.Key);
-                    Game1.Inst.Scene.Raise("sendentity", new NetworkSystem.EntitySync() {CBody = cbody,CTransform = ctransform, ID =  pair.Key, ModelFileName = model.fileName,IsPlayer = isPlayer });
+                    if (counter < 10 || counter%10000 == 0)
+                        Game1.Inst.Scene.Raise("sendentity", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
+                    else
+                        Game1.Inst.Scene.Raise("sendentitylight", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
                 }
             }
         }
+        private int counter = 0;
         private const float updateInterval = (float)1 / 20;
         private float remaingTime = 0;
+        private float remaingTime2 = 0;
+        private const float updateInterva2 = 60;
 
         public override void Update(float t, float dt)
         {

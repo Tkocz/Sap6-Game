@@ -15,6 +15,7 @@ namespace EngineName.Core
             CTransform,
             CBody,
             Entity,
+            EntityLight,
             Vector3,
             Int32,
             Unknown,

@@ -341,6 +341,34 @@ namespace EngineName.Utils
             message.Write(cbody.RotAx);
             message.Write(cbody.RotVel);
         }
+        public static int ReadEntityLight(this NetBuffer message, ref CBody cBody, ref CTransform ctransform, ref string modelname, ref bool isPlayer)
+        {
+            int id = message.ReadInt32();
+            cBody.Velocity = message.ReadVector3();
+            ctransform.Position = message.ReadVector3();
+            ctransform.Rotation = message.ReadMatrix();
+            return id;
+        }
+        public static void WriteEntityLight(this NetBuffer message,int id, CBody cbody, CTransform cTransform)
+        {
+            //message.Write(cbody.Radius);
+            //message.Write(cbody.InvMass);
+            //message.Write(cbody.LinDrag);
+            //message.Write(cbody.Restitution);
+            //message.Write(cbody.SpeedMultiplier);
+            //message.Write(cbody.RotationMultiplier);
+            message.Write(id);
+            message.Write(cbody.Velocity);
+            message.Write(cTransform.Position);
+            message.WriteMatrix(cTransform.Rotation);
+            //message.Write(cbody.MaxVelocity);
+            //message.Write(cbody.EnableRot);
+            //message.WriteRotation(cbody.Rot, 8);
+            //message.Write(cbody.RotAx);
+            //message.Write(cbody.RotVel);
+        }
+
+
         public static int ReadEntity(this NetBuffer message, ref CBody cBody, ref CTransform ctransform, ref string modelname , ref bool isPlayer)
         {
             int id = message.ReadInt32();
@@ -359,5 +387,6 @@ namespace EngineName.Utils
             message.Write(modelname);
 
         }
+
     }
 }
