@@ -23,6 +23,11 @@ namespace EngineName {
         public int NumEntities {
             get { return m_Entities.Count; }
         }
+        /// <summary>Represents a game scenes directed lightsource.</summary>
+        public Vector3 DiffuseColor;
+        public Vector3 Direction;
+        public Vector3 SpecularColor;
+
         /*--------------------------------------
          * NESTED TYPES
          *------------------------------------*/
