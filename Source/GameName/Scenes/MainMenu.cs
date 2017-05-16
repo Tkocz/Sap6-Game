@@ -27,8 +27,9 @@ public sealed class MainMenu: MenuScene {
     public override void Init() {
         base.Init();
 
+#if DBG_MENU
         // Ugly, but useful during development.
-        /*foreach (var type in Assembly.GetExecutingAssembly().GetTypes()) {
+        foreach (var type in Assembly.GetExecutingAssembly().GetTypes()) {
             if (!type.IsSubclassOf(typeof (Scene)) || type == GetType()) {
                 continue;
             }
@@ -36,18 +37,23 @@ public sealed class MainMenu: MenuScene {
             CreateLabel(type.Name, () => {
                 Game1.Inst.EnterScene((Scene)Activator.CreateInstance(type));
             });
-        }*/
+        }
+#endif
+
         CreateLabel("Single-Player", () => {
             Game1.Inst.EnterScene(new ConfigSceneMenu());
         });
+
         CreateLabel("Multi-Player", () => {
-            
+
             Game1.Inst.EnterScene(new LobbyScene());
         });
+
         CreateLabel("Collisions", () => {
             Game1.Inst.EnterScene(new Dev.Collisions());
         });
-            CreateLabel("Quit", () => {
+
+        CreateLabel("Quit", () => {
             Game1.Inst.Exit();
         });
 
