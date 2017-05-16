@@ -43,7 +43,8 @@ namespace EngineName.Systems
             _config = new NetPeerConfiguration("Sap6_Networking")
             {
                 Port = _localport,
-                AcceptIncomingConnections = true
+                AcceptIncomingConnections = true,
+                UseMessageRecycling = true
             };
             _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             _config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -52,7 +53,6 @@ namespace EngineName.Systems
             
             _peer = new NetPeer(_config);
             _peer.Start();
-            
             _peer.DiscoverLocalPeers(_searchport);
 
             Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data , "metadata"));
@@ -70,7 +70,7 @@ namespace EngineName.Systems
             _scanThread = new Thread(ScanForNewPeers);
             _scanThread.Start();
 
-            InitLight();
+            DebugOverlay.Inst.DbgStr((a, b) => $" Cons: {_peer.Connections.Count} IsMaster: {_isMaster}");
         }
 
         public void InitLight()

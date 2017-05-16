@@ -168,14 +168,12 @@ namespace GameName.Scenes
             //    }
             //});
 
-            //Todo Fix triggers for all network players!
-            Utils.SceneUtils.CreateTriggerEvents(player, configs.numTriggers);
-            Utils.SceneUtils.CreateCollectables(configs.numPowerUps);
 
             if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
             {
                 Utils.SceneUtils.CreateAnimals(configs.numFlocks);
-                
+                Utils.SceneUtils.CreateTriggerEvents(configs.numTriggers);
+                Utils.SceneUtils.CreateCollectables(configs.numPowerUps);
                 // Add tree as sprint goal
                 int sprintGoal = AddEntity();
                 AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
