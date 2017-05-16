@@ -149,11 +149,14 @@ public class PhysicsSystem: EcsSystem {
     public override void Init() {
         base.Init();
 
+#if MT_PHYS
         mCollThreads = new Thread[Environment.ProcessorCount];
+#else
+        mCollThreads = new Thread[1];
+#endif
 
         for (var i = 0; i < mCollThreads.Length; i++) {
             mCollThreads[i] = new Thread(CollDetThread);
-            mCollThreads[i].Priority = ThreadPriority.BelowNormal;
             mCollThreads[i].IsBackground = true;
             mCollThreads[i].Start();
         }
