@@ -51,10 +51,10 @@ namespace GameName.Scenes
         }
         private void InitSceneLightSettings()
         {
-            DiffuseColor = Color.White.ToVector3();
-            Direction = new Vector3(0.1f, -1, 0);
-            SpecularColor = Color.Gray.ToVector3();
-            AmbientColor = new Vector3(0.2f);
+            DiffuseColor = new Vector3(1, 0.9607844f, 0.8078432f);
+            Direction = new Vector3(-0.5265408f, - 0.5735765f, - 0.6275069f);
+            SpecularColor = new Vector3(1, 0.9607844f, 0.8078432f);
+            AmbientColor = new Vector3(0.05333332f, 0.09882354f, 0.1819608f);
         }
         public override void Init()
         {
