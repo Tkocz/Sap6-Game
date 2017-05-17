@@ -41,12 +41,12 @@ namespace GameName.Scenes {
 #endif
 
         CreateLabel("Single-Player", () => {
-            Game1.Inst.EnterScene(new ConfigSceneMenu());
+            Game1.Inst.EnterScene(new ConfigSceneMenu(false));
         });
 
         CreateLabel("Multi-Player", () => {
 
-            Game1.Inst.EnterScene(new LobbyScene());
+            Game1.Inst.EnterScene(new ConfigSceneMenu(true));
         });
 
         CreateLabel("Collisions", () => {
