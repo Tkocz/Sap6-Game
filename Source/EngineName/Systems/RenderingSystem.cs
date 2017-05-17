@@ -110,10 +110,11 @@ namespace EngineName.Systems
                         for(int i = 0; i < mesh.MeshParts.Count; i++) {
                             var meshPart = mesh.MeshParts[i];
                             var effect = (BasicEffect)meshPart.Effect;
-                            effect.EnableDefaultLighting();
+                            //effect.EnableDefaultLighting();
                             effect.PreferPerPixelLighting = true;
 
                             effect.LightingEnabled = true;
+                            effect.AmbientLightColor = Game1.Inst.Scene.AmbientColor;
                             effect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor;
                             effect.DirectionalLight0.Direction = Game1.Inst.Scene.Direction;
                             effect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.DiffuseColor;
