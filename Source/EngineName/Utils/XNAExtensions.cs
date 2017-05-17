@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using EngineName.Components;
+using EngineName.Components.Renderable;
 using Lidgren.Network;
 
 using Microsoft.Xna.Framework;
@@ -153,8 +154,8 @@ namespace EngineName.Utils
             float y = unitVector.Y;
             float z = unitVector.Z;
             double invPi = 1.0 / Math.PI;
-            float phi = (float)(Math.Atan2(x, y) * invPi);
-            float theta = (float)(Math.Atan2(z, Math.Sqrt(x * x + y * y)) * (invPi * 2));
+            float phi = (float) (Math.Atan2(x, y) * invPi);
+            float theta = (float) (Math.Atan2(z, Math.Sqrt(x * x + y * y)) * (invPi * 2));
 
             int halfBits = numberOfBits / 2;
             message.WriteSignedSingle(phi, halfBits);
@@ -167,13 +168,13 @@ namespace EngineName.Utils
         public static Vector3 ReadUnitVector3(this NetBuffer message, int numberOfBits)
         {
             int halfBits = numberOfBits / 2;
-            float phi = message.ReadSignedSingle(halfBits) * (float)Math.PI;
-            float theta = message.ReadSignedSingle(numberOfBits - halfBits) * (float)(Math.PI * 0.5);
+            float phi = message.ReadSignedSingle(halfBits) * (float) Math.PI;
+            float theta = message.ReadSignedSingle(numberOfBits - halfBits) * (float) (Math.PI * 0.5);
 
             Vector3 retval;
-            retval.X = (float)(Math.Sin(phi) * Math.Cos(theta));
-            retval.Y = (float)(Math.Cos(phi) * Math.Cos(theta));
-            retval.Z = (float)Math.Sin(theta);
+            retval.X = (float) (Math.Sin(phi) * Math.Cos(theta));
+            retval.Y = (float) (Math.Cos(phi) * Math.Cos(theta));
+            retval.Z = (float) Math.Sin(theta);
 
             return retval;
         }
@@ -302,6 +303,7 @@ namespace EngineName.Utils
             retval.Frame = message.ReadMatrix();
             return retval;
         }
+
         public static void WriteCTransform(this NetBuffer message, CTransform transform)
         {
             message.Write(transform.Position);
@@ -309,11 +311,12 @@ namespace EngineName.Utils
             message.WriteMatrix(transform.Rotation);
             message.WriteMatrix(transform.Frame);
         }
+
         public static CBody ReadCBody(this NetBuffer message)
         {
             CBody retval = new CBody();
             retval.Radius = message.ReadFloat();
-            retval.InvMass =message.ReadFloat();
+            retval.InvMass = message.ReadFloat();
             retval.LinDrag = message.ReadFloat();
             retval.Restitution = message.ReadFloat();
             retval.SpeedMultiplier = message.ReadFloat();
@@ -326,6 +329,7 @@ namespace EngineName.Utils
             retval.RotVel = message.ReadFloat();
             return retval;
         }
+
         public static void WriteCBody(this NetBuffer message, CBody cbody)
         {
             message.Write(cbody.Radius);
@@ -337,11 +341,13 @@ namespace EngineName.Utils
             message.Write(cbody.Velocity);
             message.Write(cbody.MaxVelocity);
             message.Write(cbody.EnableRot);
-            message.WriteRotation(cbody.Rot,8);
+            message.WriteRotation(cbody.Rot, 8);
             message.Write(cbody.RotAx);
             message.Write(cbody.RotVel);
         }
-        public static int ReadEntityLight(this NetBuffer message, ref CBody cBody, ref CTransform ctransform, ref string modelname, ref bool isPlayer)
+
+        public static int ReadEntityLight(this NetBuffer message, ref CBody cBody, ref CTransform ctransform,
+            ref string modelname, ref bool isPlayer)
         {
             int id = message.ReadInt32();
             cBody.Velocity = message.ReadVector3();
@@ -349,27 +355,17 @@ namespace EngineName.Utils
             ctransform.Rotation = message.ReadMatrix();
             return id;
         }
-        public static void WriteEntityLight(this NetBuffer message,int id, CBody cbody, CTransform cTransform)
+
+        public static void WriteEntityLight(this NetBuffer message, int id, CBody cbody, CTransform cTransform)
         {
-            //message.Write(cbody.Radius);
-            //message.Write(cbody.InvMass);
-            //message.Write(cbody.LinDrag);
-            //message.Write(cbody.Restitution);
-            //message.Write(cbody.SpeedMultiplier);
-            //message.Write(cbody.RotationMultiplier);
             message.Write(id);
             message.Write(cbody.Velocity);
             message.Write(cTransform.Position);
             message.WriteMatrix(cTransform.Rotation);
-            //message.Write(cbody.MaxVelocity);
-            //message.Write(cbody.EnableRot);
-            //message.WriteRotation(cbody.Rot, 8);
-            //message.Write(cbody.RotAx);
-            //message.Write(cbody.RotVel);
         }
 
-
-        public static int ReadEntity(this NetBuffer message, ref CBody cBody, ref CTransform ctransform, ref string modelname , ref bool isPlayer)
+        public static int ReadEntity(this NetBuffer message, ref CBody cBody, ref CTransform ctransform,
+            ref string modelname, ref bool isPlayer)
         {
             int id = message.ReadInt32();
             isPlayer = message.ReadBoolean();
@@ -378,15 +374,33 @@ namespace EngineName.Utils
             modelname = message.ReadString();
             return id;
         }
-        public static void WriteEntity(this NetBuffer message, int id, CBody cbody, CTransform ctransform, string modelname, bool isPlayer)
+
+        public static void WriteEntity(this NetBuffer message, int id, CBody cbody, CTransform ctransform,
+            string modelname, bool isPlayer)
         {
             message.Write(id);
             message.Write(isPlayer);
             message.WriteCBody(cbody);
             message.WriteCTransform(ctransform);
             message.Write(modelname);
-
         }
 
+        public static void WriteCText(this NetBuffer message, CText cText)
+        {
+            message.Write(cText.format);
+            message.Write(cText.origin);
+            message.Write(cText.position);
+            message.Write(cText.color.ToVector3());
+        }
+
+        public static CText ReadCText(this NetBuffer message)
+        {
+            var ctext = new CText();
+            ctext.format = message.ReadString();
+            ctext.origin = message.ReadVector2();
+            ctext.position = message.ReadVector2();
+            ctext.color = new Color(message.ReadVector3());
+            return ctext;
+        }
     }
 }

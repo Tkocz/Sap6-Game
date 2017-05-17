@@ -31,13 +31,17 @@ namespace EngineName.Systems
         public NetConnection MasterNetConnection = null;
         private static long s_bpsBytes;
         private double kbps = 0;
+        private DateTime _timestart;
+        private List<Player> players = new List<Player>();
         public NetworkSystem()
         {
         }
         public NetworkSystem(int port)
         {
             _localport = port;
+            _timestart = DateTime.Now;
         }
+
         /// <summary>Inits networkssystems configures settings for lidgrens networks framework.</summary>
         public override void Init()
         {
@@ -52,7 +56,7 @@ namespace EngineName.Systems
             _config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
             _config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
             //_config.SimulatedLoss = 0.05f;
-            
+
             _peer = new NetPeer(_config);
             _peer.Start();
             _peer.DiscoverLocalPeers(_searchport);
@@ -67,9 +71,12 @@ namespace EngineName.Systems
                     Game1.Inst.Scene.Raise("startgamerequest", null);
                     _scanThread.Abort();
                 });
-
-
-
+            Game1.Inst.Scene.OnEvent("send_menuitem", data =>
+            {
+                var datasend = (MenuItem)data;
+                this.SendObject(datasend.CText, datasend.Id);
+            });
+  
             _scanThread = new Thread(ScanForNewPeers);
             _scanThread.Start();
 
@@ -120,6 +127,27 @@ namespace EngineName.Systems
             _peer.DiscoverLocalPeers(_searchport);
             return false;
         }
+
+        /// <summary>Send information about newly connected peer to all other peers for faster discovery </summary>
+        public void SendPeerPlayerInfo(string ip)
+        {
+            if (players.Count == 0)
+            {
+                players.Add(new Player {IP = ip, Time = _timestart, You = true});
+            }
+
+            if (havePeers())
+            {
+                NetOutgoingMessage msg = _peer.CreateMessage();
+
+                msg.Write((byte)Enums.MessageType.PlayerInfo);
+                var bin = _timestart.Ticks;
+                msg.Write(bin);
+                msg.Write(ip);
+                _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+            }
+        }
+
         /// <summary>Send information about newly connected peer to all other peers for faster discovery </summary>
         public void SendPeerInfo(IPAddress ip, int port)
         {
@@ -164,7 +192,7 @@ namespace EngineName.Systems
         }
 
         /// <summary>Send simple string to all peers </summary>
-        public void SendObject(object datatosend, string metadata)
+        public void SendObject(object datatosend, object metadata)
         {
             if (!havePeers())
             {
@@ -183,33 +211,40 @@ namespace EngineName.Systems
                 case Enums.MessageType.CBody:
                     var dataCbody = (CBody)datatosend;
                     msg.Write((byte)type);
-                    msg.Write(metadata);
+                    msg.Write((string)metadata);
                     msg.WriteCBody(dataCbody);
                     break;
                 case Enums.MessageType.CTransform:
                     var dataTransform = (CTransform)datatosend;
                     msg.Write((byte)type);
-                    msg.Write(metadata);
+                    msg.Write((string)metadata);
                     msg.WriteCTransform(dataTransform);
                     break;
                 case Enums.MessageType.Vector3:
                     var datavector = (Vector3)datatosend;
                     msg.Write((byte)type);
-                    msg.Write(metadata);
+                    msg.Write((string)metadata);
                     msg.WriteUnitVector3(datavector, 1);
                     break;
                 case Enums.MessageType.Int32:
                     int dataint = (int)datatosend;
                     msg.Write((byte)type);
-                    msg.Write(metadata);
+                    msg.Write((string)metadata);
                     msg.Write(dataint);
                     break;
                 case Enums.MessageType.String:
                     var datastring = (string)datatosend;
                     msg.Write((byte)type);
-                    msg.Write(metadata);
+                    msg.Write((string)metadata);
                     msg.Write(datastring);
                     break;
+                case Enums.MessageType.CText:
+                    var ctext = (CText)datatosend;
+                    msg.Write((byte)type);
+                    msg.Write((int)metadata);
+                    msg.WriteCText(ctext);
+                    break;
+
                 default:
                     Debug.WriteLine("unknownType");
                     break;
@@ -250,6 +285,7 @@ namespace EngineName.Systems
                         Debug.WriteLine("ReceivePeersData ConnectionApproval");
                         _msg.SenderConnection.Approve();
                         //broadcast this to all connected clients
+                        SendPeerPlayerInfo(_msg.SenderEndPoint.Address.ToString());
                         SendPeerInfo(_msg.SenderEndPoint.Address, _msg.SenderEndPoint.Port);
                         break;
                     case NetIncomingMessageType.Data:
@@ -318,6 +354,12 @@ namespace EngineName.Systems
                             var data = _msg.ReadCTransform();
                             //Game1.Inst.Scene.Raise("network_data", data);
                         }
+                        else if(mType == Enums.MessageType.CText)
+                        {
+                            var id = _msg.ReadInt32();
+                            var data = _msg.ReadCText();
+                            Game1.Inst.Scene.Raise("network_menu_data_received", new { id,data });
+                        }
                         else if (mType == Enums.MessageType.Int32)
                         {
                             var metadata = _msg.ReadString();
@@ -327,6 +369,13 @@ namespace EngineName.Systems
                                 Game1.Inst.Scene.Raise("game_end", data);
                             }
                             //Game1.Inst.Scene.Raise("network_data", data);
+                        }
+                        else if (mType == Enums.MessageType.PlayerInfo)
+                        {
+                            var date = _msg.ReadInt64();
+                            
+                            var ip = _msg.ReadString();
+                            players.Add(new Player {IP = ip, Time = new DateTime(date), You = false });
                         }
                         //Console.WriteLine("END ReceivePeersData Data");
                         break;
@@ -366,15 +415,6 @@ namespace EngineName.Systems
             }
         }
 
-        public class EntitySync
-        {
-            public bool IsPlayer { get; set; }
-            public CBody CBody { get; set; }
-            public CTransform CTransform { get; set; }
-            public int ID { get; set; }
-            public string ModelFileName { get; set; }
-        }
-
         public override void Cleanup()
         {
             _scanThread.Abort();
@@ -400,5 +440,27 @@ namespace EngineName.Systems
 
 
         }
+    }
+
+    public class Player
+    {
+
+        public string IP { get; set; }
+        public DateTime Time { get; set; }
+        public bool You { get; set; }
+    }
+
+    public class MenuItem
+    {
+        public int Id { get; set; }
+        public CText CText { get; set; }
+    }
+    public class EntitySync
+    {
+        public bool IsPlayer { get; set; }
+        public CBody CBody { get; set; }
+        public CTransform CTransform { get; set; }
+        public int ID { get; set; }
+        public string ModelFileName { get; set; }
     }
 }

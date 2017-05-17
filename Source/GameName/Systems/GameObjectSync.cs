@@ -38,13 +38,13 @@ namespace GameName.Systems
         {
             Game1.Inst.Scene.OnEvent("entityupdate", data =>
             {
-                var entity = (NetworkSystem.EntitySync) data;
+                var entity = (EntitySync) data;
                 addOrUpdatCObjects(entity);
             });
         }
 
 
-        private void addOrUpdatCObjects(NetworkSystem.EntitySync data)
+        private void addOrUpdatCObjects(EntitySync data)
         {
             //Add entity 
             if (!Game1.Inst.Scene.EntityHasComponent<CTransform>(data.ID))
@@ -118,9 +118,9 @@ namespace GameName.Systems
                     }
                     else { 
                         if (counter < 10 || counter % 10000 == 0)
-                            Game1.Inst.Scene.Raise("sendentity", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
+                            Game1.Inst.Scene.Raise("sendentity", new EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
                         else
-                            Game1.Inst.Scene.Raise("sendentitylight", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
+                            Game1.Inst.Scene.Raise("sendentitylight", new EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
                     }
                 }
             }
