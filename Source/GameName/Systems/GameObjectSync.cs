@@ -24,6 +24,11 @@ namespace GameName.Systems
         private Dictionary<int, CTransform> newTransform = new Dictionary<int, CTransform>();
         private Random rnd = new Random();
         private bool isMaster;
+        private int counter = 0;
+        private const float updateInterval = (float)1 / 20;
+        private const float updateIntervalSlow = (float)1 / 2;
+        private float remaingTime = 0;
+        private float remaingTimeSlow = 0;
 
         public GameObjectSync(bool ismaster)
         {
@@ -68,6 +73,7 @@ namespace GameName.Systems
                 if (data.IsPlayer)
                     Game1.Inst.Scene.AddComponent(data.ID, new CPlayer());
                 Game1.Inst.Scene.AddComponent(data.ID, new CSyncObject {Owner = false});
+
                 newCBody.Add(data.ID, data.CBody);
                 newTransform.Add(data.ID, data.CTransform);
                 prevCBody.Add(data.ID, data.CBody);
@@ -104,27 +110,36 @@ namespace GameName.Systems
                     var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(pair.Key);
                     var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(pair.Key);
                     var isPlayer = Game1.Inst.Scene.EntityHasComponent<CPlayer>(pair.Key);
-                    if (counter < 200 || counter%10000 == 0)
-                        Game1.Inst.Scene.Raise("sendentity", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
-                    else
-                        Game1.Inst.Scene.Raise("sendentitylight", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
+
+                    var totalspeed = Math.Sqrt(Math.Pow(cbody.Velocity.X, 2) + Math.Pow(cbody.Velocity.Z, 2));
+                    if (remaingTimeSlow < updateIntervalSlow && (totalspeed > 3 || totalspeed < -3))
+                    {
+                        continue;
+                    }
+                    else { 
+                        if (counter < 10 || counter % 10000 == 0)
+                            Game1.Inst.Scene.Raise("sendentity", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
+                        else
+                            Game1.Inst.Scene.Raise("sendentitylight", new NetworkSystem.EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
+                    }
                 }
             }
         }
-        private int counter = 0;
-        private const float updateInterval = (float)1 / 20;
-        private float remaingTime = 0;
-        private float remaingTime2 = 0;
-        private const float updateInterva2 = 60;
+
 
         public override void Update(float t, float dt)
         {
             remaingTime += dt;
+            remaingTimeSlow += dt;
             if (remaingTime > updateInterval)
             {
                 syncObjects();
                 remaingTime = 0;
             }
+            if (remaingTimeSlow > updateIntervalSlow)
+                remaingTimeSlow = 0;
+            
+
 
             //Todo Impliment Prediction for player movement  
             /*foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())

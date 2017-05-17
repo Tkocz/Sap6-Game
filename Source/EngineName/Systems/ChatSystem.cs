@@ -83,7 +83,7 @@ namespace EngineName.Systems
             }
             else if (key == Keys.RightControl)
             {
-                Game1.Inst.Scene.Raise("startgame", null);
+                Game1.Inst.Scene.Raise("send_setup_game", null);
             }
             else
             {

@@ -29,6 +29,8 @@ namespace EngineName.Systems
         public bool _isMaster =false;
         public string masterIp;
         public NetConnection MasterNetConnection = null;
+        private static long s_bpsBytes;
+        private double kbps = 0;
         public NetworkSystem()
         {
         }
@@ -55,9 +57,9 @@ namespace EngineName.Systems
             _peer.Start();
             _peer.DiscoverLocalPeers(_searchport);
 
-            Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data , "metadata"));
+            Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data, "metadata"));
             Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
-            Game1.Inst.Scene.OnEvent("startgame",
+            Game1.Inst.Scene.OnEvent("send_setup_game",
                 data =>
                 {
                     this.SendObject(_peer.Configuration.BroadcastAddress.ToString(), "StartEvent");
@@ -65,17 +67,21 @@ namespace EngineName.Systems
                     Game1.Inst.Scene.Raise("startgamerequest", null);
                     _scanThread.Abort();
                 });
-           
+
+
 
             _scanThread = new Thread(ScanForNewPeers);
             _scanThread.Start();
 
-            DebugOverlay.Inst.DbgStr((a, b) => $" Cons: {_peer.Connections.Count} IsMaster: {_isMaster}");
+            DebugOverlay.Inst.DbgStr((a, b) => $"Cons: {_peer.Connections.Count} IsMaster: {_isMaster}");
+            DebugOverlay.Inst.DbgStr((a, b) => $"Re: {kbps} kb/s");
         }
 
         public void InitLight()
         {
-            DebugOverlay.Inst.DbgStr((a, b) => $" Cons: {_peer.Connections.Count} IsMaster: {_isMaster}");
+
+            DebugOverlay.Inst.DbgStr((a, b) => $"Cons: {_peer.Connections.Count} IsMaster: {_isMaster}");
+            DebugOverlay.Inst.DbgStr((a, b) => $"Re: {kbps} kb/s");
             Game1.Inst.Scene.OnEvent("sendentity", data =>
             {
                 var sync = (EntitySync)data;
@@ -223,6 +229,7 @@ namespace EngineName.Systems
         {
             while ((_msg = _peer.ReadMessage()) != null)
             {
+                s_bpsBytes += _msg.LengthBytes;
                 switch (_msg.MessageType)
                 {
 
@@ -355,6 +362,7 @@ namespace EngineName.Systems
                         }
                         break;
                 }
+                
             }
         }
 
@@ -374,11 +382,23 @@ namespace EngineName.Systems
             base.Cleanup();
         }
 
+        private const double updateInterval = 0.5f;
+        private static double remaingTime;
 
         public override void Update(float t, float dt)
         {
-           
+
             MessageLoop();
+
+            remaingTime += dt;
+            if (remaingTime > updateInterval)
+            {
+                kbps = ((double)s_bpsBytes / remaingTime) / 1000;
+                s_bpsBytes = 0;
+                remaingTime = 0;
+            }      
+
+
         }
     }
 }

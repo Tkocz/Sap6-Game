@@ -48,6 +48,7 @@
     <Compile Include="Components\CHenNormalAnimation.cs" />
     <Compile Include="Components\CPlayer.cs" />
     <Compile Include="Dev\AiScene.cs" />
+    <Compile Include="Dev\LobbyScene.cs" />
     <Compile Include="Entities\EHen.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Scenes\ConfigSceneMenu.cs" />
@@ -57,7 +58,6 @@
     <Compile Include="Dev\Materials.cs" />
     <Compile Include="Dev\Particles.cs" />
     <Compile Include="Dev\PostFx.cs" />
-    <Compile Include="Dev\LobbyScene.cs" />
     <Compile Include="Scenes\Utils\SceneConfigs.cs" />
     <Compile Include="Scenes\Utils\SceneUtils.cs" />
     <Compile Include="Scenes\WorldScene.cs" />

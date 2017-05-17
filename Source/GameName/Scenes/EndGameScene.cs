@@ -18,7 +18,7 @@ namespace GameName.Scenes
         {            AddSystem(new Rendering2DSystem());
             base.Init();
             int text = AddEntity();
-            string winlos = won ? "You win" : "You lose";                        winlos = string.Format("Game Over, {0}" +                          " Your Time: {1} \n +" +                          " You picked up {2} number of balls", winlos, gameTime,ballCount);
+            string winlos = won ? "You win" : "You lose";                        winlos = string.Format("Game Over, {0}" +                          " Your Time: {1} \n" +                          " You picked up {2} number of balls", winlos, gameTime,ballCount);
             AddComponent<C2DRenderable>(text, new CText()
             {
                 
