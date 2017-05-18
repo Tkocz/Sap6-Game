@@ -21,7 +21,7 @@ namespace GameName.Dev
         {
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(
-                new Vector3(-200.0f, 0, -200f), 
+                new Vector3(-200.0f, 0, -200f),
                 200.0f * Vector3.One
             );
             //physicsSys.Gravity = Vector3.Zero;
@@ -41,11 +41,11 @@ namespace GameName.Dev
 #endif
 
             base.Init();
-            
+
             int player = AddEntity();
             AddComponent(player, new CBody() {
                 Radius = 1,
-                Aabb = new BoundingBox(new Vector3(-1, 0, -1), new Vector3(1, 2, 1)),
+                Aabb = new BoundingBox(new Vector3(-1, -1, -1), new Vector3(1, 1, 1)),
                 LinDrag = 5f,
                 InvMass = 1,
                 SpeedMultiplier = 1f,
@@ -68,7 +68,7 @@ namespace GameName.Dev
             });
             AddComponent(camera, new CInput());
             AddComponent(camera, new CTransform() { Position = new Vector3(100, 20, -100), Rotation = Matrix.Identity, Scale = Vector3.One });
-            
+
             SetupStaticObjects();
         }
         public override void Draw(float t, float dt)
@@ -137,6 +137,6 @@ namespace GameName.Dev
 
             return ball;
         }
-        
+
     }
 }

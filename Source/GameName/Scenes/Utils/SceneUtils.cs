@@ -91,12 +91,12 @@ namespace GameName.Scenes.Utils {
                     transformComponent.Position = new Vector3(memberX, y, memberZ);
                     transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
                         (float)(Math.PI * (rnd.NextDouble() * 2)));
-                    float scale = 1;
+                    float scale = 0.5f;
                     transformComponent.Scale = new Vector3(scale, scale, scale);
                     currentScene.AddComponent(id, transformComponent);
                     currentScene.AddComponent(id, new CBody {
                         InvMass = 0.05f,
-                        Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+                        Aabb = new BoundingBox(-scale * Vector3.One, scale * Vector3.One),
                         LinDrag = 0.8f,
                         Velocity = Vector3.Zero,
                         Radius = 1f,
