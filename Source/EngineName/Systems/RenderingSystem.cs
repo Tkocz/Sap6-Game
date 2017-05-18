@@ -125,6 +125,11 @@ namespace EngineName.Systems
 
                             effect.SpecularPower = 100;
 
+                            effect.FogEnabled = true;
+                            effect.FogStart = 35.0f;
+                            effect.FogEnd = 100.0f;
+                            effect.FogColor = new Vector3(0.4f, 0.6f, 0.8f);
+
                             effect.Projection = camera.Projection;
                             effect.View = camera.View;
                             effect.World = mesh.ParentBone.Transform * transform.Frame;

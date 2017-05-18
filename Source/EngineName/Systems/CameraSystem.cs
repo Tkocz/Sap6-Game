@@ -38,7 +38,7 @@ namespace EngineName.Systems
 
                 c.Y = yDist; // Lock camera to given height
 
-                cameraComponent.Target = p + Vector3.Up*2.2f;
+                cameraComponent.Target = p + Vector3.Up;
 
                 cameraComponent.View = Matrix.CreateLookAt(c, cameraComponent.Target, Vector3.Up);
             }
