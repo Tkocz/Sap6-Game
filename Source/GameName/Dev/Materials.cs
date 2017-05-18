@@ -34,9 +34,6 @@ public sealed class Materials: Scene {
     /// <summary>Used to create environment maps.</summary>
     private RenderingSystem mRenderer;
 
-    /// <summary>The skybox renderer.</summary>
-    private SkyBoxSystem mSkybox;
-
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
@@ -45,7 +42,6 @@ public sealed class Materials: Scene {
     public override void Init() {
         AddSystems(new                    LogicSystem(),
                    new                  PhysicsSystem() { Gravity = Vector3.Zero },
-                   mSkybox         = new SkyBoxSystem(),
                    mRenderer    = new RenderingSystem());
 
 #if DEBUG
@@ -109,8 +105,7 @@ public sealed class Materials: Scene {
             var rot = 0.0f;
             envMap = new EnvMapMaterial(mRenderer,
                                         ball,
-                                        (CTransform)GetComponentFromEntity<CTransform>(ball),
-                                        mSkybox);
+                                        (CTransform)GetComponentFromEntity<CTransform>(ball));
 
             // TODO: If the camera moves, this needs to be done every frame.
             envMap.SetCameraPos(new Vector3(9.0f, 12.0f, 18.0f));

@@ -27,7 +27,6 @@ namespace GameName.Dev
             //physicsSys.Gravity = Vector3.Zero;
             AddSystems(
                 new FpsCounterSystem(updatesPerSec: 10),
-                new SkyBoxSystem(),
                 new RenderingSystem(),
                 new CameraSystem(),
                 physicsSys,

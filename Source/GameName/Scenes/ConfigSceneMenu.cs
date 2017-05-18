@@ -190,7 +190,7 @@ namespace GameName.Scenes {
                 var id = AddEntity();
                 mPlayerList.Add(id);
                 var player = data[i];
-                var text = string.Format(id == 0 ? "M " : "" + "{0}", player.IP);
+                var text = string.Format((i == 0 ? "M " : "") + "{0}", player.IP);
                 var textSize = mFont.MeasureString(text);
                 AddComponent<C2DRenderable>(id, new CText {
                     format = text,
