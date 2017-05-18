@@ -103,10 +103,6 @@ public class Heightmap {
             verts[i].Normal.Normalize();
         }
 
-        foreach (var lol in verts) {
-            Console.WriteLine(lol.Position);
-        }
-
         var device = Game1.Inst.GraphicsDevice;
 
         var ibo = new IndexBuffer(device, typeof (int), indices.Length, BufferUsage.None);
