@@ -32,7 +32,7 @@ namespace EngineName.Systems
         private static long s_bpsBytes;
         private double kbps = 0;
         private DateTime _timestart;
-        private List<Player> players = new List<Player>();
+        private List<NetworkPlayer> players = new List<NetworkPlayer>();
         public NetworkSystem()
         {
         }
@@ -133,7 +133,7 @@ namespace EngineName.Systems
         {
             if (players.Count == 0)
             {
-                players.Add(new Player {IP = ip, Time = _timestart, You = true});
+                players.Add(new NetworkPlayer {IP = ip, Time = _timestart, You = true});
             }
 
             if (havePeers())
@@ -375,7 +375,7 @@ namespace EngineName.Systems
                             var date = _msg.ReadInt64();
                             
                             var ip = _msg.ReadString();
-                            players.Add(new Player {IP = ip, Time = new DateTime(date), You = false });
+                            players.Add(new NetworkPlayer {IP = ip, Time = new DateTime(date), You = false });
                         }
                         //Console.WriteLine("END ReceivePeersData Data");
                         break;
@@ -442,7 +442,7 @@ namespace EngineName.Systems
         }
     }
 
-    public class Player
+    public class NetworkPlayer
     {
 
         public string IP { get; set; }

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using EngineName.Systems;
 
 namespace GameName.Scenes {
     class ConfigSceneMenu : MenuScene {
@@ -61,11 +62,11 @@ namespace GameName.Scenes {
             });
 
             SfxUtil.PlayMusic("Sounds/Music/MainMenu");
-            OnEvent("update_peers", updatePeers);
+            //OnEvent("update_peers", updatePeers);
             OnEvent("selchanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
         }
 
-        private void updatePeers(dynamic data) {
+        private void updatePeers(List<NetworkPlayer> data) {
             if(!mMasterIsSet) {
                 // find if i am master or slave (loop through and find out, maybe sort list after time)
                 IsSlave = true;
@@ -80,7 +81,7 @@ namespace GameName.Scenes {
                 var id = AddEntity();
                 mPlayerList.Add(id);
                 AddComponent<C2DRenderable>(id, new CText {
-                    format = player.text
+                    //format = player.text
                 });
             }
         }
