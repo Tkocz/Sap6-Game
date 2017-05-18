@@ -35,8 +35,8 @@ namespace GameName.Scenes.Utils {
             });
             currentScene.AddComponent(ball, new CSyncObject());
             currentScene.AddComponent<C3DRenderable>(ball, new CImportedModel {
-                model = Game1.Inst.Content.Load<Model>("Models/DummySphere"),
-                fileName = "DummySphere"
+                model = Game1.Inst.Content.Load<Model>("Models/badboll"),
+                fileName = "badboll"
             });
             currentScene.AddComponent(ball, new CPickUp());
             return ball;

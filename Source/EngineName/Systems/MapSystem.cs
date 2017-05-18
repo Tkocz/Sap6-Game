@@ -85,8 +85,8 @@ namespace EngineName.Systems
             float sandStop = 225;
             float grassStart = 235;
             // TODO: material parameters for dino island, move to better location
-            sandStop = 100;
-            grassStart = 135;
+            sandStop = 110;
+            grassStart = 140;
 
             if (decimalCode < sandStop)
                 return sand;
@@ -177,6 +177,12 @@ namespace EngineName.Systems
                 for (int y = 0; y < terrainHeight; y++) {
                     compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
                     mHeightData[x, y] = colorMap[x + y * terrainWidth].R + transformComponent.Position.Y;
+					if (compHeight.elements.ContainsKey(colorMap[x + y * terrainWidth].B))
+					{
+						compHeight.EnvironmentSpawn.Add(new Vector4(x, mHeightData[x, y], y, colorMap[x + y * terrainWidth].B));
+
+					}
+					
                 }
             }
 
@@ -239,13 +245,13 @@ namespace EngineName.Systems
 
 		public void Load()
 		{
-
+			CHeightmap heightmap = null;
 			// for each heightmap component, create Model instance to enable Draw calls when rendering
 			foreach (var renderable in Game1.Inst.Scene.GetComponents<C3DRenderable>())
 			{
 				if (renderable.Value.GetType() != typeof(CHeightmap))
 					continue;
-				CHeightmap heightmap = (CHeightmap)renderable.Value;
+				heightmap = (CHeightmap)renderable.Value;
                 int key = renderable.Key;
 				/* use each color channel for different data, e.g.
 				 * R for height,
@@ -322,6 +328,7 @@ namespace EngineName.Systems
 				ground.Effect = basicEffect;
 
 				heightmap.model = new Model(mGraphicsDevice, bones, meshes);
+
 				heightmap.model.Tag = "Map";
 			}
 		}

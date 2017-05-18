@@ -20,7 +20,7 @@ namespace GameName.Scenes
         private float passedTime = 0.0f;
         private bool shouldLeave = false;
         private Random rnd = new Random();
-        private int worldSize = 300;
+        private int worldSize = 590;
         private int player;
         private int pickUpCount = 0;
         private bool won;
@@ -82,7 +82,7 @@ namespace GameName.Scenes
             );
 
 #if DEBUG
-            AddSystem(new DebugOverlay());
+           AddSystem(new DebugOverlay());
 #endif
 
             base.Init();
@@ -137,10 +137,24 @@ namespace GameName.Scenes
 
             // Heightmap entity
             int heightMap = AddEntity();
-            AddComponent<C3DRenderable>(heightMap, new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/" + configs.map) });
-            AddComponent(heightMap, new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) });
+			Dictionary<int, string> elementList = new Dictionary<int, string>();
+			elementList.Add(255, "LeafTree");
+			elementList.Add(245, "PalmTree");
+			elementList.Add(235, "tree");
+			elementList.Add(170, "rock2");
+			var heightMapComp = new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/" + configs.map), elements = elementList };
+			var heightTrans = new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) };
+            AddComponent<C3DRenderable>(heightMap, heightMapComp);
+            AddComponent(heightMap, heightTrans);
             // manually start loading all heightmap components, should be moved/automated
             mapSystem.Load();
+			foreach (var i in heightMapComp.EnvironmentSpawn)
+			{
+				int newElement = Game1.Inst.Scene.AddEntity();
+				Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5))});
+				Game1.Inst.Scene.AddComponent(newElement, new CTransform() { Position = new Vector3(i.X + heightTrans.Position.X, i.Y * heightTrans.Scale.Y - 1f, i.Z + heightTrans.Position.Z), Scale = new Vector3((float)rnd.NextDouble() * 0.25f + 0.75f), Rotation = Matrix.CreateRotationY((float)rnd.NextDouble() * MathHelper.Pi * 2f) });
+				Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + heightMapComp.elements[(int)i.W])  ,fileName = heightMapComp.elements[(int)i.W] });
+			}
             waterSys.Load();
             physicsSys.MapSystem = mapSystem;
 
