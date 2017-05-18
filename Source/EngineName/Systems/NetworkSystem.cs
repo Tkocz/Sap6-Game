@@ -24,7 +24,6 @@ namespace EngineName.Systems
         private int _searchport = 50001;
         private NetIncomingMessage _msg;
         private bool _bot = false;
-        private Thread _scanThread;
         private bool _scanForPeers = true;
         public bool _isMaster =false;
         public string masterIp;
@@ -33,6 +32,8 @@ namespace EngineName.Systems
         private double kbps = 0;
         private DateTime _timestart;
         private List<NetworkPlayer> players = new List<NetworkPlayer>();
+        private const double updateInterval = 2.5f;
+        private static double remaingTime;
         public NetworkSystem()
         {
         }
@@ -69,7 +70,7 @@ namespace EngineName.Systems
                     this.SendObject(_peer.Configuration.BroadcastAddress.ToString(), "StartEvent");
                     _isMaster = true;
                     Game1.Inst.Scene.Raise("startgamerequest", null);
-                    _scanThread.Abort();
+                    _scanForPeers = false;
                 });
             Game1.Inst.Scene.OnEvent("send_menuitem", data =>
             {
@@ -77,11 +78,12 @@ namespace EngineName.Systems
                 this.SendObject(datasend.CText, datasend.Id);
             });
   
-            _scanThread = new Thread(ScanForNewPeers);
-            _scanThread.Start();
+         
 
             DebugOverlay.Inst.DbgStr((a, b) => $"Cons: {_peer.Connections.Count} IsMaster: {_isMaster}");
             DebugOverlay.Inst.DbgStr((a, b) => $"Re: {kbps} kb/s");
+
+            players.Add(new NetworkPlayer { IP = _peer.Configuration.BroadcastAddress.ToString(), Time = _timestart, You = true});
         }
 
         public void InitLight()
@@ -108,13 +110,8 @@ namespace EngineName.Systems
         /// <summary>Periodically scan for new peers</summary>
         private void ScanForNewPeers()
         {
-            while (true)
-            {
-                _peer.DiscoverLocalPeers(_searchport);
-                Thread.Sleep(1000);
-                if(!_scanForPeers)
-                    return;
-            }   
+            _peer.DiscoverLocalPeers(_searchport);
+            SendPeerPlayerInfo();
         }
 
  
@@ -129,21 +126,14 @@ namespace EngineName.Systems
         }
 
         /// <summary>Send information about newly connected peer to all other peers for faster discovery </summary>
-        public void SendPeerPlayerInfo(string ip)
+        public void SendPeerPlayerInfo()
         {
-            if (players.Count == 0)
-            {
-                players.Add(new NetworkPlayer {IP = ip, Time = _timestart, You = true});
-            }
-
             if (havePeers())
             {
                 NetOutgoingMessage msg = _peer.CreateMessage();
-
                 msg.Write((byte)Enums.MessageType.PlayerInfo);
                 var bin = _timestart.Ticks;
                 msg.Write(bin);
-                msg.Write(ip);
                 _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
             }
         }
@@ -285,7 +275,6 @@ namespace EngineName.Systems
                         Debug.WriteLine("ReceivePeersData ConnectionApproval");
                         _msg.SenderConnection.Approve();
                         //broadcast this to all connected clients
-                        SendPeerPlayerInfo(_msg.SenderEndPoint.Address.ToString());
                         SendPeerInfo(_msg.SenderEndPoint.Address, _msg.SenderEndPoint.Port);
                         break;
                     case NetIncomingMessageType.Data:
@@ -303,7 +292,6 @@ namespace EngineName.Systems
                                 _isMaster = false;
                                 MasterNetConnection = _peer.Connections.FirstOrDefault(x => x.RemoteEndPoint.Address.ToString() == ip);
                                 Game1.Inst.Scene.Raise("startgamerequest", _msg.ReadString());
-                                _scanThread.Abort();
                             }
                             else if(metadata == "metadata")
                             {
@@ -358,7 +346,7 @@ namespace EngineName.Systems
                         {
                             var id = _msg.ReadInt32();
                             var data = _msg.ReadCText();
-                            Game1.Inst.Scene.Raise("network_menu_data_received", new { id,data });
+                            Game1.Inst.Scene.Raise("network_menu_data_received", new MenuItem { CText = data, Id = id });
                         }
                         else if (mType == Enums.MessageType.Int32)
                         {
@@ -372,10 +360,11 @@ namespace EngineName.Systems
                         }
                         else if (mType == Enums.MessageType.PlayerInfo)
                         {
-                            var date = _msg.ReadInt64();
-                            
-                            var ip = _msg.ReadString();
-                            players.Add(new NetworkPlayer {IP = ip, Time = new DateTime(date), You = false });
+                            var date = _msg.ReadInt64(); 
+                            if(!players.Any(x=>x.IP == _msg.SenderEndPoint.Address.ToString() + " " + _msg.SenderEndPoint.Port.ToString())) { 
+                                players.Add(new NetworkPlayer {IP = _msg.SenderEndPoint.Address.ToString() + " " + _msg.SenderEndPoint.Port.ToString(), Time = new DateTime(date), You = false });
+                                Game1.Inst.Scene.Raise("update_peers", players);
+                            }
                         }
                         //Console.WriteLine("END ReceivePeersData Data");
                         break;
@@ -417,13 +406,12 @@ namespace EngineName.Systems
 
         public override void Cleanup()
         {
-            _scanThread.Abort();
+            
             _peer.Shutdown("Shutting Down");
             base.Cleanup();
         }
 
-        private const double updateInterval = 0.5f;
-        private static double remaingTime;
+
 
         public override void Update(float t, float dt)
         {
@@ -431,13 +419,18 @@ namespace EngineName.Systems
             MessageLoop();
 
             remaingTime += dt;
+
+
+            //Dirty remove later
             if (remaingTime > updateInterval)
             {
                 kbps = ((double)s_bpsBytes / remaingTime) / 1000;
                 s_bpsBytes = 0;
                 remaingTime = 0;
-            }      
-
+                if (_scanForPeers) { 
+                    SendPeerPlayerInfo();
+                }
+            }
 
         }
     }
