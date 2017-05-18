@@ -46,7 +46,7 @@ namespace EngineName.Systems
         /// <summary>Inits networkssystems configures settings for lidgrens networks framework.</summary>
         public override void Init()
         {
-            
+            _timestart= DateTime.Now;
             _config = new NetPeerConfiguration("Sap6_Networking")
             {
                 Port = _localport,
@@ -362,8 +362,8 @@ namespace EngineName.Systems
                         {
                             var date = _msg.ReadInt64(); 
                             if(!players.Any(x=>x.IP == _msg.SenderEndPoint.Address.ToString() + " " + _msg.SenderEndPoint.Port.ToString())) { 
-                                players.Add(new NetworkPlayer {IP = _msg.SenderEndPoint.Address.ToString() + " " + _msg.SenderEndPoint.Port.ToString(), Time = new DateTime(date), You = false });
-                                Game1.Inst.Scene.Raise("update_peers", players);
+                                players.Add(new NetworkPlayer {IP = _msg.SenderEndPoint.Address.ToString() + " " + _msg.SenderEndPoint.Port.ToString(), Time = new DateTime(date), You = false });    
+                                Game1.Inst.Scene.Raise("update_peers", players.OrderBy(x=>x.Time).ToList());
                             }
                         }
                         //Console.WriteLine("END ReceivePeersData Data");

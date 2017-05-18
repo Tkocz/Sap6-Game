@@ -29,7 +29,11 @@ namespace GameName.Scenes {
         private List<int> mPlayerList = new List<int>();
         private bool mMasterIsSet = false;
         private NetworkSystem _networkSystem;
-        private List<int> labels = new List<int>(); 
+        private List<int> labels = new List<int>();
+        private int _map;
+        private int _flocks;
+        private int _powerups;
+        private int _triggers;
 
         /// <summary>Initializes the scene.</summary>
         public ConfigSceneMenu(bool IsMultiplayer, string[] args) {
@@ -62,10 +66,7 @@ namespace GameName.Scenes {
             }
 
         }
-        private int _map;
-        private int _flocks;
-        private int _powerups;
-        private int _triggers;
+
 
         private void CreateLabels()
         {
@@ -74,7 +75,7 @@ namespace GameName.Scenes {
                 // Map Select
                 selectedMap = (selectedMap + 1) % maps.Length;
                 UpdateText("Map: " + maps[selectedMap]);
-
+                sendMenuItem(_map);
             }, () =>
             {
                 // Map Increase
@@ -145,9 +146,19 @@ namespace GameName.Scenes {
            
         }
 
-        private void updateMenuItem(object menuItem)
+        private void updateMenuItem(object data)
         {
-            
+            var menuItem = (MenuItem)data;
+            if (EntityHasComponent<C2DRenderable>(menuItem.Id))
+            {
+                var text = (CText) GetComponentFromEntity<C2DRenderable>(menuItem.Id);
+                text.format = menuItem.CText.format;
+            }
+            else
+            {
+                menuItem.CText.font = mFont;   
+                AddComponent<C2DRenderable>(menuItem.Id,menuItem.CText);
+            }
         }
         private void sendMenuItem(int id)
         {
