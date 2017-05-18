@@ -22,3 +22,4 @@
 1494321857:2.0:Added Phong materials (AdsMaterial.fx)
 1494434971:2.0:Added computations for rotational mechanics
 1494626653:3.0:Optimized physics (parallelization + spatial partitioning).
+1495122708:5.0:Reworked heightmap loader + lots of fixes
