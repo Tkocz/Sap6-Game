@@ -23,7 +23,7 @@ namespace EngineName.Systems
                 CCamera cameraComponent = (CCamera)camera.Value;
                 CTransform playerTransform = (CTransform) Game1.Inst.Scene.GetComponentFromEntity<CTransform>(camera.Key);
                 Vector3 playerPosition = playerTransform.Position;
-                
+
                 var p = playerPosition;
                 Vector3 c;
                 var dist = cameraComponent.Distance;
@@ -38,7 +38,7 @@ namespace EngineName.Systems
 
                 c.Y = yDist; // Lock camera to given height
 
-                cameraComponent.Target = p;
+                cameraComponent.Target = p + Vector3.Up*2.2f;
 
                 cameraComponent.View = Matrix.CreateLookAt(c, cameraComponent.Target, Vector3.Up);
             }

@@ -129,8 +129,8 @@ namespace GameName.Scenes
 
             AddComponent(player, new CCamera(-50, 50)
             {
-                Height = 10,
-                Distance = 10,
+                Height = 6,
+                Distance = 5,
                 Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane, farplane)
                 ,
                 ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview * 1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane * 0.5f, farplane * 1.2f)
