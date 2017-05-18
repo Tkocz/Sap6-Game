@@ -1,4 +1,4 @@
-using EngineName.Components.Renderable;
+﻿using EngineName.Components.Renderable;
 using EngineName.Core;
 using System;
 using System.Collections.Generic;
@@ -110,8 +110,15 @@ namespace EngineName.Systems
                         for(int i = 0; i < mesh.MeshParts.Count; i++) {
                             var meshPart = mesh.MeshParts[i];
                             var effect = (BasicEffect)meshPart.Effect;
-                            effect.EnableDefaultLighting();
                             effect.PreferPerPixelLighting = true;
+                            effect.EnableDefaultLighting();
+                            effect.LightingEnabled = true;
+                            effect.AmbientLightColor = Game1.Inst.Scene.AmbientColor;
+                            effect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor;
+                            effect.DirectionalLight0.Direction = Game1.Inst.Scene.Direction;
+                            effect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.DiffuseColor;
+                            effect.DirectionalLight0.Enabled = true;
+                            effect.SpecularPower = 100;
 
                             effect.Projection = camera.Projection;
                             effect.View = camera.View;

@@ -272,8 +272,19 @@ namespace EngineName.Systems
 				CreateVerticesChunks(heightmap, ref vertices, 0, 0);
                 //basicEffect.Texture = heightmap.Image;
                 basicEffect.DiffuseColor = new Vector3(1, 1, 1);
-                basicEffect.SpecularPower = 20f;
+                basicEffect.SpecularPower = 100;
                 basicEffect.SpecularColor = new Vector3(0.25f);
+
+                basicEffect.EnableDefaultLighting();
+                basicEffect.LightingEnabled = true;
+                basicEffect.AmbientLightColor = Game1.Inst.Scene.AmbientColor;
+                basicEffect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor;
+                basicEffect.DirectionalLight0.Direction = Game1.Inst.Scene.Direction;
+                basicEffect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.DiffuseColor;
+                basicEffect.DirectionalLight0.Enabled = true;
+                basicEffect.PreferPerPixelLighting = true;
+
+
                 for (int j = 0; j < vertices.Values.Count; j++)
 				{
 					var vert = vertices[j];

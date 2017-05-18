@@ -64,12 +64,19 @@ namespace GameName.Systems
                         }
                     }
                     var enemyBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(closestEnemyId);
-                    if((FuzzyUtil.Very(CloseToEnemy(closestEnemyDistance)) & FastSpeed(enemyBody.Velocity)).IsTrue()) {
+                    
+                    // Save fuzzy values instead of recalculating on every rule
+                    var closeToEnemy = CloseToEnemy(closestEnemyDistance);
+                    var fastEnemySpeed = FastSpeed(enemyBody.Velocity);
+                    var mediumToEnemy = MediumToEnemy(closestEnemyDistance);
+
+                    // Test rules and set state accordingly
+                    if ((closeToEnemy & fastEnemySpeed).IsTrue()) {
                         if (npcComponent.State.GetType() != typeof(SEvade))
                             npcComponent.State = new SEvade(npcKey);
                     }
-                    else if (closestEnemyDistance < 50) {
-                        if (npcComponent.GetType() != typeof(SAware) && npcComponent.GetType() != typeof(SEvade))
+                    else if (((closeToEnemy | mediumToEnemy) & !fastEnemySpeed).IsTrue()) {
+                        if (npcComponent.State.GetType() != typeof(SAware))
                             npcComponent.State = new SAware(npcKey);
                     }
                     else if (npcComponent.State.GetType() != typeof(SIdle))
@@ -82,36 +89,36 @@ namespace GameName.Systems
         }
         // Distance to enemy
         private FuzzyNumber CloseToEnemy(float distance) {
-            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 40));
+            return FuzzyUtil.SigMF(distance, 20, 0.3);
         }
         private FuzzyNumber MediumToEnemy(float distance) {
-            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 80));
+            return (FuzzyUtil.SigMF(distance, 50, 15));
         }
         private FuzzyNumber FarToEnemy(float distance) {
-            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 100));
+            return (FuzzyUtil.GaussMF(distance, 100, -0.3));
         }
         // Distance to flock
         private FuzzyNumber CloseToFlock(float distance) {
-            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 5));
+            return (FuzzyUtil.SigMF(distance, 10, 0.3));
         }
         private FuzzyNumber MediumToFlock(float distance) {
-            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 10));
+            return (FuzzyUtil.GaussMF(distance, 15, 10));
         }
         private FuzzyNumber FarToFlock(float distance) {
-            return new FuzzyNumber(FuzzyUtil.MagicFunction(distance, 20));
+            return (FuzzyUtil.SigMF(distance, 20, -0.3));
         }
         // Enemy speed
         private FuzzyNumber FastSpeed(Vector3 velocity) {
             double speed = Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Z, 2));
-            return new FuzzyNumber(FuzzyUtil.MagicFunction(speed, 7));
+            return (FuzzyUtil.SigMF(speed, 5, -2));
         }
         private FuzzyNumber MediumSpeed(Vector3 velocity) {
             double speed = Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Z, 2));
-            return new FuzzyNumber(FuzzyUtil.MagicFunction(speed, 4));
+            return (FuzzyUtil.GaussMF(speed, 4, 1));
         }
         private FuzzyNumber SlowSpeed(Vector3 velocity) {
             double speed = Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Z, 2));
-            return new FuzzyNumber(FuzzyUtil.MagicFunction(speed, 2));
+            return (FuzzyUtil.SigMF(speed, 2, 2));
         }
     }
 }

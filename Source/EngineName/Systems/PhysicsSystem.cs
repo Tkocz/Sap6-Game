@@ -664,15 +664,18 @@ public class PhysicsSystem: EcsSystem {
         //       too lazy to figure it out until it becomes a problem!
         var m1 = ((float)Abs(s1.InvMass) > 0.0001f) ? 1.0f/s1.InvMass : 0.0f;
         var m2 = ((float)Abs(s2.InvMass) > 0.0001f) ? 1.0f/s2.InvMass : 0.0f;
-        var im = 1.0f/(m1 + m2);
-        var p  = (2.0f*(i2 - i1))*im;
+        var tm = m1 + m2;
+        m1 /= tm;
+        m2 /= tm;
+        var p  = (2.0f*(i2 - i1));
 
-        d = (minDist - d)*im; // Mass adjusted penetration distance
+        var pd = (minDist - d); // Mass adjusted penetration distance
 
-        t1.Position += n*d*s1.InvMass;
-        s1.Velocity += n*p*s1.InvMass*s1.Restitution;
-        t2.Position -= n*d*s2.InvMass;
-        s2.Velocity -= n*p*s2.InvMass*s2.Restitution;
+        t1.Position += n*pd*m2;
+        t2.Position -= n*pd*m1;
+
+        s1.Velocity += n*p*m2*s1.Restitution;
+        s2.Velocity -= n*p*m1*s2.Restitution;
 
         var c = 0.5f*(t1.Position + t2.Position);
 

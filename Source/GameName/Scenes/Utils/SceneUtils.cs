@@ -22,6 +22,7 @@ namespace GameName.Scenes.Utils {
             currentScene.AddComponent(ball, new CBody {
                 Aabb = new BoundingBox(-r * Vector3.One, r * Vector3.One),
                 Radius = r,
+                InvMass = 0.1f,
                 LinDrag = 0.2f,
                 Velocity = v,
                 Restitution = 0.3f
@@ -120,23 +121,25 @@ namespace GameName.Scenes.Utils {
             int chests = numPowerUps, hearts = numPowerUps;
             for (int i = 0; i < chests; i++) {
                 var id = currentScene.AddEntity();
-                currentScene.AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "Models/chest", model = Game1.Inst.Content.Load<Model>("Models/chest") });
+                currentScene.AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "chest", model = Game1.Inst.Content.Load<Model>("Models/chest") });
                 var z = (float)(rnd.NextDouble() * 300);// HERE
                 var x = (float)(rnd.NextDouble() * 300);// HERE
                 currentScene.AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(1f) });
                 currentScene.AddComponent(id, new CBody() { Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)) });
+                currentScene.AddComponent(id, new CSyncObject());
             }
             for (int i = 0; i < hearts; i++) {
                 var id = currentScene.AddEntity();
-                currentScene.AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "Models/heart", model = Game1.Inst.Content.Load<Model>("Models/heart") });
+                currentScene.AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "heart", model = Game1.Inst.Content.Load<Model>("Models/heart") });
                 var z = (float)(rnd.NextDouble() * 300);// HERE
                 var x = (float)(rnd.NextDouble() * 300);// HERE
                 currentScene.AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(1f) });
                 currentScene.AddComponent(id, new CBody() { Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)) });
+                currentScene.AddComponent(id, new CSyncObject());
             }
         }
         
-        public static void CreateTriggerEvents(int player, int numTriggers) {
+        public static void CreateTriggerEvents(int numTriggers) {
             var currentScene = Game1.Inst.Scene;
             Random rnd = new Random();
             
@@ -150,36 +153,56 @@ namespace GameName.Scenes.Utils {
                 if (rnd.NextDouble() > 0.5) {
                     // Falling balls event
                     currentScene.OnEvent("collision", data => {
-                        if ((((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
-                             ((PhysicsSystem.CollisionInfo)data).Entity2 == id)
-                               ||
-                            (((PhysicsSystem.CollisionInfo)data).Entity1 == id &&
-                             ((PhysicsSystem.CollisionInfo)data).Entity2 == player)) {
-                            CTransform playerPosition = (CTransform)currentScene.GetComponentFromEntity<CTransform>(player);
-                            for (var j = 0; j < 6; j++) {
-                                var r = 0.6f + (float)rnd.NextDouble() * 2.0f;
-                                var ballId = Utils.SceneUtils.CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 10f + 2.0f * j, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
-                                           new Vector3(0.0f, -50.0f, 0.0f), // Velocity
-                                           r);                              // Radius
-                                //balls.Add(ballId);
+                        foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>().Keys)
+                        {
+                            if ((((PhysicsSystem.CollisionInfo) data).Entity1 == player &&
+                                 ((PhysicsSystem.CollisionInfo) data).Entity2 == id)
+                                ||
+                                (((PhysicsSystem.CollisionInfo) data).Entity1 == id &&
+                                 ((PhysicsSystem.CollisionInfo) data).Entity2 == player))
+                            {
+                                CTransform playerPosition =
+                                    (CTransform) currentScene.GetComponentFromEntity<CTransform>(player);
+                                for (var j = 0; j < 6; j++)
+                                {
+                                    var r = 0.6f + (float) rnd.NextDouble() * 2.0f;
+                                    var ballId =
+                                        Utils.SceneUtils.CreateBall(
+                                            new Vector3((float) Math.Sin(j) * j + playerPosition.Position.X,
+                                                playerPosition.Position.Y + 10f + 2.0f * j,
+                                                (float) Math.Cos(j) * j + playerPosition.Position.Z), // Position
+                                            new Vector3(0.0f, -50.0f, 0.0f), // Velocity
+                                            r); // Radius
+                                    //balls.Add(ballId);
+                                }
                             }
                         }
                     });
                 } else {
                     // Balls spawns around the player
                     currentScene.OnEvent("collision", data => {
-                        if ((((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
-                             ((PhysicsSystem.CollisionInfo)data).Entity2 == id)
-                               ||
-                            (((PhysicsSystem.CollisionInfo)data).Entity1 == id &&
-                             ((PhysicsSystem.CollisionInfo)data).Entity2 == player)) {
-                            CTransform playerPosition = (CTransform)currentScene.GetComponentFromEntity<CTransform>(player);
-                            for (var j = 0; j < 6; j++) {
-                                var r = 0.6f + (float)rnd.NextDouble() * 2.0f;
-                                var ballId = Utils.SceneUtils.CreateBall(new Vector3((float)Math.Sin(j) * j + playerPosition.Position.X, playerPosition.Position.Y + 2f, (float)Math.Cos(j) * j + playerPosition.Position.Z), // Position
-                                           new Vector3(0.0f, 0.0f, 0.0f), // Velocity
-                                           r);                            // Radius
-                                //balls.Add(ballId);
+                        foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>().Keys)
+                        {
+                            if ((((PhysicsSystem.CollisionInfo) data).Entity1 == player &&
+                                 ((PhysicsSystem.CollisionInfo) data).Entity2 == id)
+                                ||
+                                (((PhysicsSystem.CollisionInfo) data).Entity1 == id &&
+                                 ((PhysicsSystem.CollisionInfo) data).Entity2 == player))
+                            {
+                                CTransform playerPosition =
+                                    (CTransform) currentScene.GetComponentFromEntity<CTransform>(player);
+                                for (var j = 0; j < 6; j++)
+                                {
+                                    var r = 0.6f + (float) rnd.NextDouble() * 2.0f;
+                                    var ballId =
+                                        Utils.SceneUtils.CreateBall(
+                                            new Vector3((float) Math.Sin(j) * j + playerPosition.Position.X,
+                                                playerPosition.Position.Y + 2f,
+                                                (float) Math.Cos(j) * j + playerPosition.Position.Z), // Position
+                                            new Vector3(0.0f, 0.0f, 0.0f), // Velocity
+                                            r); // Radius
+                                    //balls.Add(ballId);
+                                }
                             }
                         }
                     });

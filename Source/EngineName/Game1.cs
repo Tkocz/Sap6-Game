@@ -133,8 +133,8 @@ public class Game1: Game {
     protected override void Initialize() {
         base.Initialize();
 
-        Graphics.PreferredBackBufferWidth = 1920;
-        Graphics.PreferredBackBufferHeight = 1080;
+        Graphics.PreferredBackBufferWidth = 1280;
+        Graphics.PreferredBackBufferHeight = 720;
         Graphics.ApplyChanges();
 
         var profile = Graphics.GraphicsDevice.GraphicsProfile;

@@ -23,6 +23,7 @@ namespace GameName.Scenes
         private int worldSize = 590;
         private int player;
         private int pickUpCount = 0;
+        private bool won;
         private List<int> balls = new List<int>();
         private NetworkSystem _networkSystem;
         private WorldSceneConfig configs;
@@ -39,7 +40,7 @@ namespace GameName.Scenes
             if (shouldLeave) // TODO: When we parallelise this probably won't work.
             {
                 Game1.Inst.LeaveScene();
-                Game1.Inst.EnterScene(new EndGameScene(passedTime, pickUpCount));
+                Game1.Inst.EnterScene(new EndGameScene(passedTime, pickUpCount,won));
             }
             base.Draw(t, dt);
         }
@@ -48,9 +49,17 @@ namespace GameName.Scenes
         {
             Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
         }
+        private void InitSceneLightSettings()
+        {
+            DiffuseColor = new Vector3(1, 0.9607844f, 0.8078432f);
+            Direction = new Vector3(-0.5265408f, - 0.5735765f, - 0.6275069f);
+            SpecularColor = new Vector3(1, 0.9607844f, 0.8078432f);
+            AmbientColor = new Vector3(0.05333332f, 0.09882354f, 0.1819608f);
+        }
         public override void Init()
         {
             InitGameComponents();
+            InitSceneLightSettings();
 
             var mapSystem = new MapSystem();
             var waterSys = new WaterSystem();
@@ -83,7 +92,7 @@ namespace GameName.Scenes
             if (_networkSystem != null)
             {
 
-                var sync = new GameObjectSync();
+                var sync = new GameObjectSync(_networkSystem._isMaster);
                 _networkSystem.InitLight();
                 sync.Init();
                 AddSystem(_networkSystem);
@@ -103,15 +112,15 @@ namespace GameName.Scenes
                 SpeedMultiplier = 1,
                 Radius = 1,
                 Aabb = new BoundingBox(new Vector3(-1, -2, -1), new Vector3(1, 2, 1)),
-                LinDrag = 0.8f,
+                LinDrag = 50f,
                 ReachableArea = new BoundingBox(new Vector3(-1.5f, -2, -1.5f), new Vector3(1.5f, 2, 1.5f)),
-                Restitution = 0
+                Restitution = 0.4f
             });
             AddComponent(player, new CInput());
             AddComponent(player, new CPlayer());
-            AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, 0), Scale = new Vector3(1f) });
+            AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, rnd.Next(0,50)), Scale = new Vector3(1f) });
             AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") , fileName = "viking" });
-            AddComponent(player, new CSyncObject { fileName = "chest" });
+            AddComponent(player, new CSyncObject { fileName = "viking" });
             AddComponent(player, new CInventory());
 
             AddComponent(player, new CCamera(-50, 50)
@@ -150,21 +159,13 @@ namespace GameName.Scenes
             physicsSys.MapSystem = mapSystem;
 
 
-            // Add tree as sprint goal
-            int sprintGoal = AddEntity();
-            AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
-            AddComponent(sprintGoal, new CTransform() { Position = new Vector3(100, -0, 100), Scale = new Vector3(1f) });
-            var treefilename = "tree";
-            AddComponent<C3DRenderable>(sprintGoal, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/"+ treefilename)  ,fileName = treefilename });
-            OnEvent("collision", data => {
-                if ((((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
-                     ((PhysicsSystem.CollisionInfo)data).Entity2 == sprintGoal)
-                       ||
-                    (((PhysicsSystem.CollisionInfo)data).Entity2 == player &&
-                     ((PhysicsSystem.CollisionInfo)data).Entity1 == sprintGoal)) {
-                    shouldLeave = true; // We reached the goal and wants to leave the scene-
-                }
-            });
+            
+           OnEvent("game_end", data =>
+           {
+                won = Game1.Inst.Scene.EntityHasComponent<CInput>((int) data);
+                shouldLeave = true;
+               // We reached the goal and wants to leave the scene-
+           });
 
             //OnEvent("collision", data => {
             //    if (((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
@@ -188,20 +189,40 @@ namespace GameName.Scenes
             //        }
             //    }
             //});
-            
-            Utils.SceneUtils.CreateTriggerEvents(player, configs.numTriggers);
-            Utils.SceneUtils.CreateCollectables(configs.numPowerUps);
+
+
             if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
             {
                 Utils.SceneUtils.CreateAnimals(configs.numFlocks);
+                Utils.SceneUtils.CreateTriggerEvents(configs.numTriggers);
+                Utils.SceneUtils.CreateCollectables(configs.numPowerUps);
+                // Add tree as sprint goal
+                int sprintGoal = AddEntity();
+                AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
+                AddComponent(sprintGoal, new CTransform() { Position = new Vector3(100, -0, 100), Scale = new Vector3(1f) });
+                var treefilename = "tree";
+                AddComponent(sprintGoal, new CSyncObject());
+                AddComponent<C3DRenderable>(sprintGoal, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + treefilename), fileName = treefilename });
+
+                OnEvent("collision", data => {
+                    foreach (var key in Game1.Inst.Scene.GetComponents<CPlayer>().Keys)
+                    {
+                        if ((((PhysicsSystem.CollisionInfo)data).Entity1 == key &&
+                             ((PhysicsSystem.CollisionInfo)data).Entity2 == sprintGoal)
+                               ||
+                            (((PhysicsSystem.CollisionInfo)data).Entity2 == key &&
+                             ((PhysicsSystem.CollisionInfo)data).Entity1 == sprintGoal))
+                        {
+                            Game1.Inst.Scene.Raise("network_game_end", key);
+                            Game1.Inst.Scene.Raise("game_end", key);
+                        }
+                    }
+                });
+               
             }
 
             Log.GetLog().Debug("TestScene initialized.");
         }
-
-        
-
-        
 
         public override void Update(float t, float dt)
         {

@@ -23,6 +23,12 @@ namespace EngineName {
         public int NumEntities {
             get { return m_Entities.Count; }
         }
+        /// <summary>Represents a game scenes directed lightsource.</summary>
+        public Vector3 DiffuseColor;
+        public Vector3 Direction;
+        public Vector3 SpecularColor;
+        public Vector3 AmbientColor = new Vector3(0.2f);
+
         /*--------------------------------------
          * NESTED TYPES
          *------------------------------------*/
@@ -71,9 +77,10 @@ namespace EngineName {
         private int EntityCounter = -1;
         //wanted a more unique id... couldnt use standard random class in C# ...when started two instances of the game... same tick equals same id.. ;) probaly change!
         private CryptoRandom rnd = new CryptoRandom();
+
         /*--------------------------------------
-         * PUBLIC METHODS
-         *------------------------------------*/
+* PUBLIC METHODS
+*------------------------------------*/
 
         /// <summary>Raises the specified event in the scene.</summary>
         /// <param name="name">The name of the event to raise.</param>
@@ -167,7 +174,7 @@ namespace EngineName {
     /// <summary>Performs cleanup logic for the scene.</summary>
     public virtual void Cleanup() {
         foreach (var system in m_Systems) {
-            system.Init();
+            system.Cleanup();
         }
 
         m_Systems.Clear();
