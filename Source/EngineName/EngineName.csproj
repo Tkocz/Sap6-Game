@@ -72,6 +72,7 @@
     <Compile Include="Core\EcsComponent.cs" />
     <Compile Include="Core\EcsSystem.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Heightmap.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="MenuScene.cs" />
     <Compile Include="Scene.cs" />
