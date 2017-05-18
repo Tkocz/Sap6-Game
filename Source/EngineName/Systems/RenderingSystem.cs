@@ -112,12 +112,17 @@ namespace EngineName.Systems
                             var effect = (BasicEffect)meshPart.Effect;
                             effect.PreferPerPixelLighting = true;
                             effect.EnableDefaultLighting();
+                            effect.VertexColorEnabled = model.enableVertexColor;
                             effect.LightingEnabled = true;
                             effect.AmbientLightColor = Game1.Inst.Scene.AmbientColor;
-                            effect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor;
+
                             effect.DirectionalLight0.Direction = Game1.Inst.Scene.Direction;
                             effect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.DiffuseColor;
                             effect.DirectionalLight0.Enabled = true;
+                            effect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
+                            effect.DirectionalLight1.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
+                            effect.DirectionalLight2.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
+
                             effect.SpecularPower = 100;
 
                             effect.Projection = camera.Projection;

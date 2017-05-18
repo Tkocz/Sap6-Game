@@ -36,7 +36,7 @@ namespace GameName.Scenes
 
         public override void Draw(float t, float dt)
         {
-            Game1.Inst.GraphicsDevice.Clear(Color.Aqua);
+            Game1.Inst.GraphicsDevice.Clear(new Color(0.4f, 0.6f, 0.8f));
             if (shouldLeave) // TODO: When we parallelise this probably won't work.
             {
                 Game1.Inst.LeaveScene();
@@ -139,7 +139,9 @@ namespace GameName.Scenes
             // Heightmap entity
 
             int hme = AddEntity();
-            AddComponent<C3DRenderable>(hme, new C3DRenderable { model = heightmap.Model });
+            AddComponent<C3DRenderable>(hme, new C3DRenderable { model = heightmap.Model,
+                                                                 enableVertexColor = true,
+                                                                 specular = 0.0f });
             AddComponent(hme, new CTransform {
                 Position = Vector3.Zero,
                 Rotation = Matrix.Identity,

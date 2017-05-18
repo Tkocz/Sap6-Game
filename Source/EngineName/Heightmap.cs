@@ -8,6 +8,19 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+using EngineName.Components.Renderable;
+using EngineName.Core;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EngineName.Utils;
+using EngineName.Components;
+
+
 public class Heightmap {
     private Texture2D mTex;
 
@@ -20,7 +33,6 @@ public class Heightmap {
     private float mYScale;
 
     private Color[] mPixels;
-
     public Model Model { get; private set; }
 
     private Heightmap(Texture2D tex, int stepX, int stepY, bool smooth, float scale, float yScale) {
@@ -91,7 +103,7 @@ public class Heightmap {
         return new Heightmap(tex, stepX, stepY, smooth, scale, yScale);
     }
 
-    private void CreateModel(int[] indices, VertexPositionNormalTexture[] verts) {
+    private void CreateModel(int[] indices, VertexPositionNormalColor[] verts) {
         for (var i = 0; i < indices.Length-2; i += 3) {
             var i0 = indices[i];
             var i1 = indices[i+1];
@@ -116,7 +128,7 @@ public class Heightmap {
         ibo.SetData(indices);
 
         var vbo = new VertexBuffer(device,
-                                   VertexPositionNormalTexture.VertexDeclaration,
+                                   VertexPositionNormalColor.VertexDeclaration,
                                    verts.Length,
                                    BufferUsage.None);
         vbo.SetData(verts);
@@ -157,7 +169,7 @@ public class Heightmap {
         mTex.GetData<Color>(mPixels);
 
         var indices = new List<int>();
-        var verts   = new List<VertexPositionNormalTexture>();
+        var verts   = new List<VertexPositionNormalColor>();
 
         // Used for smooth normals.
         var indexCache = new Dictionary<Int64, int>();
@@ -168,6 +180,36 @@ public class Heightmap {
         var yScale = 1.0f/255.0f;
         var zScale = 1.0f/mTex.Height;
 
+        var rnd = new Random();
+
+        Func<float, float, float, Color> calcColor = (x, y, z) => {
+            Func<float, float, float, float> f1 = (a, b, r) => (1.0f-r)*a + r*b;
+            Func<Color, Color, float, Color> f = (a, b, r) =>
+                new Color(f1(a.R/255.0f, b.R/255.0f, r),
+                          f1(a.G/255.0f, b.G/255.0f, r),
+                          f1(a.B/255.0f, b.B/255.0f, r),
+                          f1(a.A/255.0f, b.A/255.0f, r));
+
+            var grassColor = new Color(0.4f, 0.7f, 0.42f);
+            var sandColor = new Color(0.9f, 0.8f, 0.6f);
+
+            var color = grassColor;
+
+            if (y < 0.0f) {
+                y += 0.35f;
+                color = f(grassColor,
+                          sandColor,
+                          2.0f/(1.0f + (float)Math.Pow(MathHelper.E, 30.0f*y)) - 1.0f);
+            }
+
+            var c1 = 0.05f * (float)(rnd.NextDouble() - 0.5f);
+            var c2 = 0.05f * (float)(rnd.NextDouble() - 0.5f);
+            var c3 = 0.05f * (float)(rnd.NextDouble() - 0.5f);
+            color = new Color(color.R/255.0f + c1, color.G/255.0f + c2, color.B/255.0f + c3, 1.0f);
+
+            return color;
+        };
+
         Func<int, int, int> calcVert = (i, j) => {
             Int64 key = ((Int64)i) << 32 | (Int64)j;
 
@@ -177,13 +219,13 @@ public class Heightmap {
             var y = mScale*(yScale*mPixels[k].B - 0.5f)*mYScale;
             var z = mScale*(zScale*j - 0.5f);
 
-            var u = (float)i / (mTex.Width  - 1);
-            var v = (float)j / (mTex.Height - 1);
+            // var u = (float)i / (mTex.Width  - 1);
+            // var v = (float)j / (mTex.Height - 1);
 
-            var vert = new VertexPositionNormalTexture {
-                Position          = new Vector3(x, y, z),
-                Normal            = Vector3.Zero,
-                TextureCoordinate = new Vector2(u, v)
+            var vert = new VertexPositionNormalColor {
+                Position = new Vector3(x, y, z),
+                Normal   = Vector3.Zero,
+                Color    = calcColor(x/mScale, (y/mScale)/mYScale, z/zScale)
             };
 
             if (mSmooth) {
@@ -208,8 +250,6 @@ public class Heightmap {
             indices.Add(v1);
             indices.Add(v2);
         };
-
-        var rnd = new Random();
 
         for (var i = 0; i < mTex.Width-mStepX; i += mStepX) {
             for (var j = 0; j < mTex.Height-mStepY; j += mStepY) {
