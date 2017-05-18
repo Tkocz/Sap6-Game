@@ -60,6 +60,13 @@ public class Heightmap {
         var k2 = i            + (j + mStepY)*mTex.Width;
         var k3 = (i + mStepX) + (j + mStepY)*mTex.Width;
 
+        var n = mTex.Width*mTex.Height - 1;
+        if (k0 < 0 || k1 < 0 || k2 < 0 || k3 < 0
+         || k0 > n || k1 > n || k2 > n || k3 > n)
+        {
+            return 0.0f;
+        }
+
         var c0 = mPixels[k0].B;
         var c1 = mPixels[k1].B;
         var c2 = mPixels[k2].B;
@@ -105,7 +112,7 @@ public class Heightmap {
 
         var device = Game1.Inst.GraphicsDevice;
 
-        var ibo = new IndexBuffer(device, typeof (int), indices.Length, BufferUsage.None);
+        var ibo = new IndexBuffer(device, typeof (int), indices.Length, BufferUsage .None);
         ibo.SetData(indices);
 
         var vbo = new VertexBuffer(device,

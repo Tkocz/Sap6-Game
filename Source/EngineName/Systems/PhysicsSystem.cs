@@ -138,7 +138,7 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>Gets or sets the world gravity vector, in meters per seconds squraed.</summary>
     public Vector3 Gravity { get; set; } = new Vector3(0.0f, -9.81f, 0.0f);
 
-    /// <summary>Gets or sets the height map.</summary>
+    /// <summary>Gets or sets the heightmap.</summary>
     public Heightmap Heightmap { get; set; }
 
     //--------------------------------------
@@ -451,13 +451,13 @@ public class PhysicsSystem: EcsSystem {
         // If we have a map system, check that we don't fall below the ground. This part is part of
         // game mechanics.
         if (Heightmap != null) {
-            // TODO: Removed check for NaN here, it needs to be debugged elsewhere!
-            //   HINT: Could be objects spawning inside each other.
+            //sometimes nan Values??
+            if (double.IsNaN(transf.Position.X))
+                return;
+            var mapHeight = Heightmap.HeightAt(transf.Position.X, transf.Position.Z);
 
-            var height = Heightmap.HeightAt(transf.Position.X, transf.Position.Z);
-
-            if (aabb.Min.Y < height) {
-                transf.Position.Y = height - body.Aabb.Min.Y;
+            if (aabb.Min.Y < mapHeight) {
+                transf.Position.Y = mapHeight - body.Aabb.Min.Y;
                 body.Velocity.Y *= -body.Restitution;
 
                 Scene.Raise("collisionwithground", new CollisionInfo { Entity1 = eid });

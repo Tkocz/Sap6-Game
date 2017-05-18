@@ -158,7 +158,7 @@ namespace GameName.Scenes
             AddComponent(heightMap, heightTrans);
             // manually start loading all heightmap components, should be moved/automated
 
-			foreach (var i in heightMapComp.EnvironmentSpawn)
+			foreach (var i in heightMapComp.EnvironmentSpawn )
 			{
 				int newElement = Game1.Inst.Scene.AddEntity ();
 				Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), InvTransf = Matrix.Identity });
