@@ -11,12 +11,15 @@ namespace EngineName.Core
         public enum MessageType
         {
             String,
+            PlayerInfo,
             PeerInformation,
             CTransform,
             CBody,
             Entity,
+            EntityLight,
             Vector3,
-            Int,
+            Int32,
+            CText,
             Unknown,
         }
     }

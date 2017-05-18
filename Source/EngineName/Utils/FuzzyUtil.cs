@@ -31,13 +31,24 @@ namespace EngineName.Utils {
             return new FuzzyNumber(Math.Pow(mu.Value, 1.3));
         }
         /// <summary>
-        /// Magic Member function for determining fuzzy value
+        /// Gaussian membership function for determining fuzzy value
         /// </summary>
         /// <param name="x">X variable is the input for determining the results</param>
         /// <param name="top">The X-value which returns 1.0</param>
-        /// <returns></returns>
-        public static double MagicFunction(double x, double top) {
-            return (1 / (1 + Math.Pow((x - top) / 10, 2)));
+        /// <param name="width">The width of the curve</param>
+        /// <returns>FuzzyNumber of membership function</returns>
+        public static FuzzyNumber GaussMF(double x, double top, double width) {
+            return new FuzzyNumber(1 / (1 + Math.Pow((x - top) / width, 2)));
+        }
+        /// <summary>
+        /// Sigmoidal membership function for determining fuzzy value
+        /// </summary>
+        /// <param name="x">X variable is the input for determining the results</param>
+        /// <param name="offset">The offset of the curve</param>
+        /// <param name="width">The width of the curve, negative number if ascending curve, positive number if descending curve</param>
+        /// <returns>FuzzyNumber of membership function</returns>
+        public static FuzzyNumber SigMF(double x, double offset, double width) {
+            return new FuzzyNumber(1 /(1 + Math.Exp(width*(x-offset))));
         }
     }
     /// <summary>

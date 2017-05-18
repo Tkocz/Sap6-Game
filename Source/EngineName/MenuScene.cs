@@ -82,10 +82,10 @@ public abstract class MenuScene: Scene {
 
     /// <summary>Indicates whether the selection can be changed in the menu. Used to prevent
     ///          selection spamming.</summary>
-    private bool mCanInteract = true;
+    public bool mCanInteract = true;
 
     /// <summary>The font used to render text in the menu.</summary>
-    private SpriteFont mFont;
+    protected SpriteFont mFont;
 
     /// <summary>The item that have been added to the menu.</summary>
     private readonly List<MenuItem> mItems = new List<MenuItem>();
@@ -96,6 +96,9 @@ public abstract class MenuScene: Scene {
     /// <summary>The menu selection highlight component used to render the selection highlight (e.g.
     ///          an arrow pointing to the currently highlighted item).</summary>
     private CText mSelHighlight;
+
+    protected bool canMove = true;
+    protected bool IsSlave;
 
     private float coolDown = 0.2f;
     //--------------------------------------
@@ -134,7 +137,8 @@ public abstract class MenuScene: Scene {
         coolDown -= dt;
         if (coolDown > 0.0f) mCanInteract = false;
 
-        var canMove  = true;
+        canMove = true;
+        
 
         if (keyboard.IsKeyDown(MoveUpKey)) {
             if (mCanInteract) {
