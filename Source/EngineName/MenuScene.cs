@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace EngineName {
 
 //--------------------------------------
@@ -128,73 +130,92 @@ public abstract class MenuScene: Scene {
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt) {
         // Position the selection highlight before delegating drawing.
-        mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
-        
-        Game1.Inst.GraphicsDevice.Clear(Color.White);
-        base.Draw(t, dt);
+        if (mItems.Any())
+        {
+            mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
 
-        var keyboard = Keyboard.GetState();
-        coolDown -= dt;
-        if (coolDown > 0.0f) mCanInteract = false;
+            Game1.Inst.GraphicsDevice.Clear(Color.White);
+            base.Draw(t, dt);
 
-        canMove = true;
-        
+            var keyboard = Keyboard.GetState();
+            coolDown -= dt;
+            if (coolDown > 0.0f) mCanInteract = false;
 
-        if (keyboard.IsKeyDown(MoveUpKey)) {
-            if (mCanInteract) {
-                mSelIndex -= 1;
-                if (mSelIndex < 0) {
-                    mSelIndex = mItems.Count - 1;
+            canMove = true;
+
+
+            if (keyboard.IsKeyDown(MoveUpKey))
+            {
+                if (mCanInteract)
+                {
+                    mSelIndex -= 1;
+                    if (mSelIndex < 0)
+                    {
+                        mSelIndex = mItems.Count - 1;
+                    }
+
+                    Raise("selchanged", mSelIndex);
                 }
 
-                Raise("selchanged", mSelIndex);
+                canMove = false;
             }
 
-            canMove = false;
-        }
+            if (keyboard.IsKeyDown(MoveDownKey))
+            {
+                if (mCanInteract)
+                {
+                    mSelIndex += 1;
+                    if (mSelIndex >= mItems.Count)
+                    {
+                        mSelIndex = 0;
+                    }
 
-        if (keyboard.IsKeyDown(MoveDownKey)) {
-            if (mCanInteract) {
-                mSelIndex += 1;
-                if (mSelIndex >= mItems.Count) {
-                    mSelIndex = 0;
+                    Raise("selchanged", mSelIndex);
                 }
 
-                Raise("selchanged", mSelIndex);
+                canMove = false;
             }
 
-            canMove = false;
-        }
+            if (keyboard.IsKeyDown(SelectKey))
+            {
+                if (mCanInteract)
+                {
+                    var s = mItems[mSelIndex].Text.format;
+                    Log.GetLog().Debug($"Selecting menu item: {s}");
+                    mItems[mSelIndex].Select();
+                }
 
-        if (keyboard.IsKeyDown(SelectKey)) {
-            if (mCanInteract) {
-                var s = mItems[mSelIndex].Text.format;
-                Log.GetLog().Debug($"Selecting menu item: {s}");
-                mItems[mSelIndex].Select();
+                canMove = false;
+            }
+            if (keyboard.IsKeyDown(DecreaseKey))
+            {
+                if (mCanInteract)
+                {
+                    var s = mItems[mSelIndex].Text.format;
+                    Log.GetLog().Debug($"Decreasing: {s}");
+                    mItems[mSelIndex].Decrease?.Invoke();
+                }
+
+                canMove = false;
+            }
+            if (keyboard.IsKeyDown(IncreaseKey))
+            {
+                if (mCanInteract)
+                {
+                    var s = mItems[mSelIndex].Text.format;
+                    Log.GetLog().Debug($"Increasing: {s}");
+                    mItems[mSelIndex].Increase?.Invoke();
+                }
+
+                canMove = false;
             }
 
-            canMove = false;
+            mCanInteract = canMove;
         }
-        if (keyboard.IsKeyDown(DecreaseKey)) {
-            if (mCanInteract) {
-                var s = mItems[mSelIndex].Text.format;
-                Log.GetLog().Debug($"Decreasing: {s}");
-                mItems[mSelIndex].Decrease?.Invoke();
-            }
-
-            canMove = false;
+        else
+        {
+            CreateLabel("Waiting for players", null);
         }
-        if (keyboard.IsKeyDown(IncreaseKey)) {
-            if (mCanInteract) {
-                var s = mItems[mSelIndex].Text.format;
-                Log.GetLog().Debug($"Increasing: {s}");
-                mItems[mSelIndex].Increase?.Invoke();
-            }
-
-            canMove = false;
-        }
-
-        mCanInteract = canMove;
     }
 
         //--------------------------------------
@@ -207,7 +228,7 @@ public abstract class MenuScene: Scene {
         /// <param name="cbIncrease">The label callback to invoke when the label is increased.</param>
         /// <param name="cbDecrease">The label callback to invoke when the label is decreased.</param>
         /// <param name="color">The label text color.</param>
-        protected void CreateLabel(string text, Action cbSelect, Action cbIncrease = null, Action cbDecrease = null, Color? color=null) {
+        protected int CreateLabel(string text, Action cbSelect, Action cbIncrease = null, Action cbDecrease = null, Color? color=null) {
         // TODO: Super messy solution but it's ok for now. Need better positioning of items.
         var screenWidth = Game1.Inst.GraphicsDevice.Viewport.Width;
         var x = screenWidth * 0.1f;
@@ -231,14 +252,15 @@ public abstract class MenuScene: Scene {
                 position = new Vector2(x, y)
             }
         };
-
-        AddComponent<C2DRenderable>(AddEntity(), label.Text);
+        var id = AddEntity();
+        AddComponent<C2DRenderable>(id, label.Text);
         mItems.Add(label);
+        return id;
     }
 
         protected void UpdateText(string text) {
             mItems[mSelIndex].Text.format = text;
-        } 
-}
+        }
+    }
 
 }

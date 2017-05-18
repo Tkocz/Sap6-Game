@@ -28,69 +28,138 @@ namespace GameName.Scenes {
         private bool mIsMultiplayer;
         private List<int> mPlayerList = new List<int>();
         private bool mMasterIsSet = false;
+        private NetworkSystem _networkSystem;
+        private List<int> labels = new List<int>(); 
 
         /// <summary>Initializes the scene.</summary>
-        public ConfigSceneMenu(bool IsMultiplayer) {
+        public ConfigSceneMenu(bool IsMultiplayer, string[] args) {
             mIsMultiplayer = IsMultiplayer;
+            if (IsMultiplayer)
+            {
+                if (args != null && args.Length > 0)
+                {
+                    _networkSystem = new NetworkSystem(50002);
+                }
+                else
+                    _networkSystem = new NetworkSystem();
+                AddSystem(_networkSystem);
+            }
         }
         public override void Init() {
             base.Init();
-            
-            CreateLabel("Map: " + maps[selectedMap], () => { // Map Select
+
+            if (mIsMultiplayer)
+            {
+              
+                OnEvent("update_peers", updatePeers);
+                OnEvent("selchanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
+            }
+            else
+            {
+
+                SfxUtil.PlayMusic("Sounds/Music/MainMenu");
+                CreateLabels();
+            }
+
+        }
+        private int _map;
+        private int _flocks;
+        private int _powerups;
+        private int _triggers;
+
+        private void CreateLabels()
+        {
+            _map = CreateLabel("Map: " + maps[selectedMap], () =>
+            {
+                // Map Select
                 selectedMap = (selectedMap + 1) % maps.Length;
                 UpdateText("Map: " + maps[selectedMap]);
-            }, () => { // Map Increase
+
+            }, () =>
+            {
+                // Map Increase
                 selectedMap = (selectedMap + 1) % maps.Length;
                 UpdateText("Map: " + maps[selectedMap]);
-            }, () => { // Map Decrease
+                sendMenuItem(_map);
+            }, () =>
+            {
+                // Map Decrease
                 selectedMap = (selectedMap - 1) % maps.Length;
                 UpdateText("Map: " + maps[selectedMap]);
+                sendMenuItem(_map);
             });
+            labels.Add(_map);
 
-            CreateLabel("Flocks of Animals: " + numFlocks, () => { // Animals Select
+            _flocks = CreateLabel("Flocks of Animals: " + numFlocks, () => { // Animals Select
                 numFlocks = (numFlocks + 5) % maxFlocks;
                 UpdateText("Flocks of Animals: " + numFlocks);
+                sendMenuItem(_flocks);
             }, () => { // Animals Increase
                 numFlocks = (numFlocks + 5) % maxFlocks;
                 UpdateText("Flocks of Animals: " + numFlocks);
+                sendMenuItem(_flocks);
             }, () => { // Animals Decrease
                 numFlocks = numFlocks > 0 ? (numFlocks - 5) % maxFlocks : maxFlocks - 5;
                 UpdateText("Flocks of Animals: " + numFlocks);
+                sendMenuItem(_flocks);
             });
+            labels.Add(_flocks);
 
-            CreateLabel("Number of Power-Ups: " + numPowerUps, () => { // Powerups Select
+            _powerups = CreateLabel("Number of Power-Ups: " + numPowerUps, () => { // Powerups Select
                 numPowerUps = (numPowerUps + 5) % maxPowerUps;
                 UpdateText("Number of Power-Ups: " + numPowerUps);
+                sendMenuItem(_powerups);
             }, () => { // Powerups Increase
                 numPowerUps = (numPowerUps + 5) % maxPowerUps;
                 UpdateText("Number of Power-Ups: " + numPowerUps);
+                sendMenuItem(_powerups);
             }, () => { // Powerups Decrease
                 numPowerUps = numPowerUps > 0 ? (numPowerUps - 5) % maxPowerUps : maxPowerUps - 5;
                 UpdateText("Number of Power-Ups: " + numPowerUps);
+                sendMenuItem(_powerups);
             });
+            labels.Add(_powerups);
 
-            CreateLabel("Number of Triggers: " + numTriggers, () => { // Triggers Select
+            _triggers = CreateLabel("Number of Triggers: " + numTriggers, () => { // Triggers Select
                 numTriggers = (numTriggers + 5) % maxTriggers;
                 UpdateText("Number of Triggers: " + numTriggers);
+                sendMenuItem(_triggers);
             }, () => { // Triggers Increase
                 numTriggers = (numTriggers + 5) % maxTriggers;
                 UpdateText("Number of Triggers: " + numTriggers);
+                sendMenuItem(_triggers);
             }, () => { // Triggers Decrease
                 numTriggers = numTriggers > 0 ? (numTriggers - 5) % maxTriggers : maxTriggers - 5;
                 UpdateText("Number of Triggers: " + numTriggers);
+                sendMenuItem(_triggers);
             });
+            labels.Add(_triggers);
 
-            CreateLabel("Start Game", () => {
+             CreateLabel("Start Game", () => {
                 var configs = new WorldSceneConfig(numFlocks, numPowerUps, numTriggers, maps[selectedMap], null);
                 Game1.Inst.EnterScene(new WorldScene(configs));
             });
             CreateLabel("Return", () => {
                 Game1.Inst.LeaveScene();
             });
+           
+        }
 
-            SfxUtil.PlayMusic("Sounds/Music/MainMenu");
-            OnEvent("update_peers", updatePeers);
-            OnEvent("selchanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
+        private void updateMenuItem(object menuItem)
+        {
+            
+        }
+        private void sendMenuItem(int id)
+        {
+            var ctext = (CText)GetComponentFromEntity<C2DRenderable>(id);
+            Raise("send_menuitem", new MenuItem { CText = ctext, Id = id });
+        }
+        private void sendMenu()
+        {
+            foreach (var id in labels)
+            {
+               sendMenuItem(id);
+            }
         }
 
         private void updatePeers(object input) {
@@ -100,6 +169,15 @@ namespace GameName.Scenes {
             if (!mMasterIsSet) {
                 // find if i am master or slave
                 IsSlave = !data[0].You;
+                if (!IsSlave)
+                {
+                    CreateLabels();
+                    sendMenu();
+                }
+                else
+                {
+                    OnEvent("network_menu_data_received", updateMenuItem);
+                }
                 mMasterIsSet = true;
             }
             // remove current player list

@@ -127,7 +127,7 @@ namespace EngineName {
             return EntityCounter;
         }
         /// <summary>Removes the specified entity from the scene.</summary>
-        /// <param name="eid">The entity to remove from the scene.</param>
+        /// <param name="entity">The entity to remove from the scene.</param>
         /// 
         public void RemoveEntity(int eid) {
             mEntsToRemove.Add(eid);
