@@ -22,7 +22,8 @@ namespace GameName.Scenes {
         private int maxTriggers = 55;
         private string[] maps = new string[]{
             "Square_island_4x4",
-            "DinoIsland06"
+            "DinoIsland06",
+            "DinoIsland06Mumbo"
         };
         private int selectedMap = 0;
         private bool mIsMultiplayer;
@@ -67,17 +68,17 @@ namespace GameName.Scenes {
         }
 
         private void updatePeers(List<NetworkPlayer> data) {
-            if(!mMasterIsSet) {
+            if (!mMasterIsSet) {
                 // find if i am master or slave (loop through and find out, maybe sort list after time)
                 IsSlave = true;
                 mMasterIsSet = true;
             }
             // remove current player list
-            foreach(var id in mPlayerList) {
+            foreach (var id in mPlayerList) {
                 RemoveEntity(id);
             }
             // build new player list
-            foreach(var player in data) {
+            foreach (var player in data) {
                 var id = AddEntity();
                 mPlayerList.Add(id);
                 AddComponent<C2DRenderable>(id, new CText {
@@ -108,5 +109,8 @@ namespace GameName.Scenes {
                 font = mFont,
                 format = text,
                 origin = Vector2.Zero,
-                position = new Vector2(screenWidth - screenWidth*0.1f - textSize.X, screenWidth*0.05f + mPlayerList.Count*30)
-            };
+                position = new Vector2(screenWidth - screenWidth * 0.1f - textSize.X, screenWidth * 0.05f + mPlayerList.Count * 30)
+            };
+        }
+    }
+}
