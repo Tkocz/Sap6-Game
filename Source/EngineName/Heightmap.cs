@@ -207,9 +207,9 @@ public class Heightmap {
 
         var indexCounter = 0;
 
-        var xScale = 1.0f/mTex.Width;
+        var xScale = 1.0f/(mTex.Width-1);
         var yScale = 1.0f/255.0f;
-        var zScale = 1.0f/mTex.Height;
+        var zScale = 1.0f/(mTex.Height-1);
 
         var rnd = new Random();
 

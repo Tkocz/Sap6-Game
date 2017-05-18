@@ -142,7 +142,7 @@ namespace GameName.Scenes
             int hme = AddEntity();
             AddComponent<C3DRenderable>(hme, new C3DRenderable { model = heightmap.Model,
                                                                  enableVertexColor = true,
-                                                                 specular = 0.0f });
+                                                                 specular = 0.03f });
             AddComponent(hme, new CTransform {
                 Position = Vector3.Zero,
                 Rotation = Matrix.Identity,

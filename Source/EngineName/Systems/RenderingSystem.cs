@@ -121,7 +121,9 @@ namespace EngineName.Systems
                             effect.DirectionalLight0.Enabled = true;
                             effect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
                             effect.DirectionalLight1.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
+                            effect.DirectionalLight1.DiffuseColor = Game1.Inst.Scene.DiffuseColor*0.7f;
                             effect.DirectionalLight2.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
+                            effect.DirectionalLight2.DiffuseColor = Game1.Inst.Scene.DiffuseColor*0.5f;
 
                             effect.SpecularPower = 100;
 

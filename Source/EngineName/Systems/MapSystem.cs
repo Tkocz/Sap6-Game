@@ -35,7 +35,7 @@ namespace EngineName.Systems
                     continue;
                 var heightmap = (CHeightmap)renderable.Value;
                 var key = renderable.Key;
-                
+
                 CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
 
                 x -= transform.Position.X;
@@ -179,10 +179,11 @@ namespace EngineName.Systems
                     mHeightData[x, y] = colorMap[x + y * terrainWidth].R + transformComponent.Position.Y;
 					if (compHeight.elements.ContainsKey(colorMap[x + y * terrainWidth].B))
 					{
-						compHeight.EnvironmentSpawn.Add(new Vector4(x, mHeightData[x, y], y, colorMap[x + y * terrainWidth].B));
+                                            var s= 0.05f;
+						compHeight.EnvironmentSpawn.Add(new Vector4(s*x, mHeightData[x, y], s*y, colorMap[x + y * terrainWidth].B));
 
 					}
-					
+
                 }
             }
 
