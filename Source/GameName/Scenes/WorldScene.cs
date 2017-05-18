@@ -27,7 +27,7 @@ namespace GameName.Scenes
         private List<int> balls = new List<int>();
         private NetworkSystem _networkSystem;
         private WorldSceneConfig configs;
-        
+
         public WorldScene(WorldSceneConfig configs) {
             this.configs = configs;
             if(configs.network != null)
@@ -123,8 +123,8 @@ namespace GameName.Scenes
 
             AddComponent(player, new CCamera(-50, 50)
             {
-                Height = 20,
-                Distance = 20,
+                Height = 10,
+                Distance = 10,
                 Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane, farplane)
                 ,
                 ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview * 1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane * 0.5f, farplane * 1.2f)
@@ -157,7 +157,7 @@ namespace GameName.Scenes
             physicsSys.MapSystem = mapSystem;
 
 
-            
+
            OnEvent("game_end", data =>
            {
                 won = Game1.Inst.Scene.EntityHasComponent<CInput>((int) data);
@@ -216,7 +216,7 @@ namespace GameName.Scenes
                         }
                     }
                 });
-               
+
             }
 
             Log.GetLog().Debug("TestScene initialized.");
