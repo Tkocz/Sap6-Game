@@ -65,6 +65,7 @@ namespace GameName.Scenes
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
             physicsSys.InvSpatPartSize = 0.07f;
+            physicsSys.Gravity *= 2.0f;
             AddSystems(
                 new RenderingSystem(),
                 new CameraSystem(),
@@ -116,9 +117,9 @@ namespace GameName.Scenes
                 SpeedMultiplier = 1,
                 Radius = 1,
                 Aabb = new BoundingBox(new Vector3(-0.5f, -0.9f, -0.5f), new Vector3(0.5f, 0.9f, 0.5f)),
-                LinDrag = 50f,
+                LinDrag = 0.8f,
                 ReachableArea = new BoundingBox(new Vector3(-1.5f, -2.0f, -1.5f), new Vector3(1.5f, 2.0f, 1.5f)),
-                Restitution = 0.4f
+                Restitution = 0.1f
             });
             AddComponent(player, new CInput());
             AddComponent(player, new CPlayer());

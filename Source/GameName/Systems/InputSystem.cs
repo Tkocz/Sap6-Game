@@ -33,7 +33,7 @@ namespace GameName.Systems {
                     isInAir = false;
                 }
             });
-            
+
             base.Init();
         }
 
@@ -76,7 +76,7 @@ namespace GameName.Systems {
                     }
                 }*/
 
-                //For Network Chat           
+                //For Network Chat
                 foreach (Keys key in pressedKeys)
                 {
                     if (lastPressedKeys != null && !lastPressedKeys.Contains(key))
@@ -92,8 +92,8 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(Keys.Escape))
                     Game1.Inst.Exit(); // TODO: We Should leave the scene
 
-                var movementSpeed = dt * 3f * body.SpeedMultiplier;
-                var rotationSpeed = dt * 3f * body.RotationMultiplier;
+                var movementSpeed = dt * 100f * body.SpeedMultiplier;
+                var rotationSpeed = dt * 2.4f * body.RotationMultiplier;
 
                 Vector3 acceleration = Vector3.Zero;
 
@@ -102,12 +102,18 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
                     acceleration += movementSpeed * transform.Frame.Backward;
 
-                if (acceleration.X + body.Velocity.X < body.MaxVelocity && acceleration.X + body.Velocity.X > -body.MaxVelocity)
-                    body.Velocity.X += acceleration.X;
+
+                acceleration.Y = 0.0f;
+                    body.Velocity += acceleration - dt*body.Velocity*10.0f*new Vector3(1.0f, 0.0f, 1.0f);
+
+
+
+                //if (acceleration.X + body.Velocity.X < body.MaxVelocity && acceleration.X + body.Velocity.X > -body.MaxVelocity)
+                ///body.Velocity.X += acceleration.X;
                 //if (acceleration.Y + body.Velocity.Y < body.MaxVelocity || acceleration.Y + body.Velocity.Y > -body.MaxVelocity)
                   //  body.Velocity.Y += acceleration.Y;
-                if (acceleration.Z + body.Velocity.Z < body.MaxVelocity && acceleration.Z + body.Velocity.Z > -body.MaxVelocity)
-                    body.Velocity.Z += acceleration.Z;
+                //if (acceleration.Z + body.Velocity.Z < body.MaxVelocity && acceleration.Z + body.Velocity.Z > -body.MaxVelocity)
+                    //body.Velocity.Z += acceleration.Z;
 
                 if (currentState.IsKeyDown(inputValue.LeftMovementKey)) {
                     yaw = rotationSpeed;
@@ -116,7 +122,7 @@ namespace GameName.Systems {
                     yaw = -rotationSpeed;
                 }
                 if (currentState.IsKeyDown(Keys.Space) && !isInAir) {
-                    body.Velocity.Y += 10f;
+                    body.Velocity.Y += 14f;
                     isInAir = true;
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
@@ -192,7 +198,7 @@ namespace GameName.Systems {
 
                 ((LookAtCamera)Camera).Target = p;
                 ((LookAtCamera)Camera).Position = c;
-                
+
                 return Matrix.CreateLookAt(Position, (Vector3)m_Target, Up);
 
             */
