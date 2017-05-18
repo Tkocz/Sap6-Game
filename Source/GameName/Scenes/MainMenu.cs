@@ -1,24 +1,28 @@
 namespace GameName.Scenes {
 
-    //--------------------------------------
-    // USINGS
-    //--------------------------------------
+//--------------------------------------
+// USINGS
+//--------------------------------------
 
-    using System;
-    using System.Reflection;
+using System;
+using System.Reflection;
 
-    using EngineName;
-    using EngineName.Utils;
-    using EngineName.Components.Renderable;
-    using Microsoft.Xna.Framework;    //--------------------------------------
-    using Microsoft.Xna.Framework.Graphics;    // CLASSES
-    //--------------------------------------
+using EngineName;
+using EngineName.Utils;
+using EngineName.Components.Renderable;
 
-    // NOTE: This scene is a WIP and will be changed continually to provide new options. Option *pages*
-    //       are scoped out of this scene and should thus be *separate* scenes entered into.
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
-    /// <summary>Provides the main menu.</summary>
-    public sealed class MainMenu: MenuScene {
+//--------------------------------------
+// CLASSES
+//--------------------------------------
+
+// NOTE: This scene is a WIP and will be changed continually to provide new options. Option *pages*
+//       are scoped out of this scene and should thus be *separate* scenes entered into.
+
+/// <summary>Provides the main menu.</summary>
+public sealed class MainMenu: MenuScene {
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
@@ -27,7 +31,6 @@ namespace GameName.Scenes {
     public override void Init() {
         base.Init();
 
-#if DBG_MENU
         // Ugly, but useful during development.
         foreach (var type in Assembly.GetExecutingAssembly().GetTypes()) {
             if (!type.IsSubclassOf(typeof (Scene)) || type == GetType()) {
@@ -38,7 +41,6 @@ namespace GameName.Scenes {
                 Game1.Inst.EnterScene((Scene)Activator.CreateInstance(type));
             });
         }
-#endif
 
         CreateLabel("Single-Player", () => {
             Game1.Inst.EnterScene(new ConfigSceneMenu(false,null));
@@ -68,7 +70,7 @@ namespace GameName.Scenes {
             format = text,
             origin = Vector2.Zero,
             position = new Vector2(
-                screenCenter.X - textSize.X * 0.5f, 
+                screenCenter.X - textSize.X * 0.5f,
                 screenCenter.Y - textSize.Y - 20
             )
         });
