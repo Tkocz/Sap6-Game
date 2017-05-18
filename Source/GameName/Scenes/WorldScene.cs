@@ -151,7 +151,7 @@ namespace GameName.Scenes
 			foreach (var i in heightMapComp.EnvironmentSpawn)
 			{
 				int newElement = Game1.Inst.Scene.AddEntity();
-				Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5))});
+				Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), InvTransf = Matrix.Identity });
 				Game1.Inst.Scene.AddComponent(newElement, new CTransform() { Position = new Vector3(i.X + heightTrans.Position.X, i.Y * heightTrans.Scale.Y - 1f, i.Z + heightTrans.Position.Z), Scale = new Vector3((float)rnd.NextDouble() * 0.25f + 0.75f), Rotation = Matrix.CreateRotationY((float)rnd.NextDouble() * MathHelper.Pi * 2f) });
 				Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + heightMapComp.elements[(int)i.W])  ,fileName = heightMapComp.elements[(int)i.W] });
 			}

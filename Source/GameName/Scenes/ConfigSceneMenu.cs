@@ -63,14 +63,17 @@ namespace GameName.Scenes {
             });
 
             SfxUtil.PlayMusic("Sounds/Music/MainMenu");
-            //OnEvent("update_peers", updatePeers);
+            OnEvent("update_peers", updatePeers);
             OnEvent("selchanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
         }
 
-        private void updatePeers(List<NetworkPlayer> data) {
+        private void updatePeers(object input) {
+            var data  = input as List<NetworkPlayer>;
+            if (data == null) return;
+
             if (!mMasterIsSet) {
-                // find if i am master or slave (loop through and find out, maybe sort list after time)
-                IsSlave = true;
+                // find if i am master or slave
+                IsSlave = !data[0].You;
                 mMasterIsSet = true;
             }
             // remove current player list
@@ -78,11 +81,19 @@ namespace GameName.Scenes {
                 RemoveEntity(id);
             }
             // build new player list
-            foreach (var player in data) {
+            var screenWidth = Game1.Inst.GraphicsDevice.Viewport.Width;
+            for (int i = 0; i < data.Count; i++) {
                 var id = AddEntity();
                 mPlayerList.Add(id);
+                var player = data[i];
+                var text = string.Format(id == 0 ? "M " : "" + "{0}", player.IP);
+                var textSize = mFont.MeasureString(text);
                 AddComponent<C2DRenderable>(id, new CText {
-                    //format = player.text
+                    format = text,
+                    color = player.You ? Color.White : Color.Gray,
+                    font = mFont,
+                    origin = Vector2.Zero,
+                    position = new Vector2(screenWidth - screenWidth * 0.1f - textSize.X, screenWidth * 0.05f + mPlayerList.Count * 30)
                 });
             }
         }
@@ -93,24 +104,16 @@ namespace GameName.Scenes {
             canMove = true;
             if (keyboard.IsKeyDown(Keys.A)) {
                 if (mCanInteract) {
-                    AddPlayer(true);
+                    AddPlayer(false);
+                    Raise("update_peers", fakeNetworkList);
                 }
                 canMove = false;
             }
             base.Draw(t, dt);
         }
+        private List<NetworkPlayer> fakeNetworkList = new List<NetworkPlayer>();
         private void AddPlayer(bool slave) {
-            var screenWidth = Game1.Inst.GraphicsDevice.Viewport.Width;
-            var id = AddEntity();
-            var text = string.Format("Player{0}", mPlayerList.Count + 1);
-            var textSize = mFont.MeasureString(text);
-            var player = new CText {
-                color = Color.Black,
-                font = mFont,
-                format = text,
-                origin = Vector2.Zero,
-                position = new Vector2(screenWidth - screenWidth * 0.1f - textSize.X, screenWidth * 0.05f + mPlayerList.Count * 30)
-            };
+            fakeNetworkList.Add(new NetworkPlayer { IP = "localhost", Time = DateTime.Now, You = fakeNetworkList.Count == 0 });
         }
     }
 }
