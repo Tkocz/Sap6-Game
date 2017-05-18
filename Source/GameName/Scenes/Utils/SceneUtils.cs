@@ -44,7 +44,7 @@ namespace GameName.Scenes.Utils {
 
         public static void CreateAnimals(int numFlocks) {
             var currentScene = Game1.Inst.Scene;
-            
+
             int flockCount = (int)(rnd.NextDouble() * 5) + 3;
             int membersPerFlock = (int)(rnd.NextDouble() * 10) + 10;
             var flockRadius = membersPerFlock;
@@ -116,7 +116,7 @@ namespace GameName.Scenes.Utils {
 
         public static void CreateCollectables(int numPowerUps) {
             var currentScene = Game1.Inst.Scene;
-            
+
             // TODO: get the global value of the worldsize
             int chests = numPowerUps, hearts = numPowerUps;
             for (int i = 0; i < chests; i++) {
@@ -124,8 +124,9 @@ namespace GameName.Scenes.Utils {
                 currentScene.AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "chest", model = Game1.Inst.Content.Load<Model>("Models/chest") });
                 var z = (float)(rnd.NextDouble() * 300);// HERE
                 var x = (float)(rnd.NextDouble() * 300);// HERE
-                currentScene.AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(1f) });
-                currentScene.AddComponent(id, new CBody() { Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)) });
+                var chestScale = 0.25f;
+                currentScene.AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(chestScale) });
+                currentScene.AddComponent(id, new CBody() { Aabb = new BoundingBox(-chestScale * Vector3.One, chestScale * Vector3.One) });
                 currentScene.AddComponent(id, new CSyncObject());
             }
             for (int i = 0; i < hearts; i++) {
@@ -138,11 +139,11 @@ namespace GameName.Scenes.Utils {
                 currentScene.AddComponent(id, new CSyncObject());
             }
         }
-        
+
         public static void CreateTriggerEvents(int numTriggers) {
             var currentScene = Game1.Inst.Scene;
             Random rnd = new Random();
-            
+
             // TODO: get the global value of the worldsize
             for (int i = 0; i < numTriggers; i++) {
                 int id = currentScene.AddEntity();
