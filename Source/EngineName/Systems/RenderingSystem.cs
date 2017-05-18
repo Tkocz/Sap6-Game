@@ -72,8 +72,8 @@ namespace EngineName.Systems
                 foreach (var mesh in model.model.Meshes)
                 {
 
-                    if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
-                        continue;
+                    //if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
+                    //    continue;
                     // TODO: This might bug out with multiple mesh parts.
                     if (model.model.Tag == "water") {
                         // Drawn after.
@@ -148,8 +148,8 @@ namespace EngineName.Systems
                 foreach (var mesh in model.model.Meshes)
                 {
 
-                    if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
-                        continue;
+                    //if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
+                    //    continue;
                     // TODO: This might bug out with multiple mesh parts.
                     if (model.model.Tag != "water") {
                         continue;
