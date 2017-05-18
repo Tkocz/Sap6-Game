@@ -636,3 +636,9 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/FFFForward_Large.spritefont
 
+#begin Effects/CubeMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/CubeMap.fx
+
