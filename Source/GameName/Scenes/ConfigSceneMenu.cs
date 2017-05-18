@@ -25,22 +25,50 @@ namespace GameName.Scenes {
         public override void Init() {
             base.Init();
             
-            CreateLabel("Map: " + maps[selectedMap], () => {
+            CreateLabel("Map: " + maps[selectedMap], () => { // Map Select
+                selectedMap = (selectedMap + 1) % maps.Length;
+                UpdateText("Map: " + maps[selectedMap]);
+            }, () => { // Map Increase
+                selectedMap = (selectedMap + 1) % maps.Length;
+                UpdateText("Map: " + maps[selectedMap]);
+            }, () => { // Map Decrease
                 selectedMap = (selectedMap + 1) % maps.Length;
                 UpdateText("Map: " + maps[selectedMap]);
             });
-            CreateLabel("Flocks of Animals: " + numFlocks, () => {
+
+            CreateLabel("Flocks of Animals: " + numFlocks, () => { // Animals Select
                 numFlocks = (numFlocks + 5) % maxFlocks;
-                UpdateText("Flocks of animals: " + numFlocks);
+                UpdateText("Flocks of Animals: " + numFlocks);
+            }, () => { // Animals Increase
+                numFlocks = (numFlocks + 5) % maxFlocks;
+                UpdateText("Flocks of Animals: " + numFlocks);
+            }, () => { // Animals Decrease
+                numFlocks = numFlocks > 0 ? (numFlocks - 5) % maxFlocks : maxFlocks - 5;
+                UpdateText("Flocks of Animals: " + numFlocks);
             });
-            CreateLabel("Number of Power-Ups: " + numPowerUps, () => {
+
+            CreateLabel("Number of Power-Ups: " + numPowerUps, () => { // Powerups Select
                 numPowerUps = (numPowerUps + 5) % maxPowerUps;
                 UpdateText("Number of Power-Ups: " + numPowerUps);
+            }, () => { // Powerups Increase
+                numPowerUps = (numPowerUps + 5) % maxPowerUps;
+                UpdateText("Number of Power-Ups: " + numPowerUps);
+            }, () => { // Powerups Decrease
+                numPowerUps = numPowerUps > 0 ? (numPowerUps - 5) % maxPowerUps : maxPowerUps - 5;
+                UpdateText("Number of Power-Ups: " + numPowerUps);
             });
-            CreateLabel("Number of Triggers: " + numTriggers, () => {
+
+            CreateLabel("Number of Triggers: " + numTriggers, () => { // Triggers Select
                 numTriggers = (numTriggers + 5) % maxTriggers;
                 UpdateText("Number of Triggers: " + numTriggers);
+            }, () => { // Triggers Increase
+                numTriggers = (numTriggers + 5) % maxTriggers;
+                UpdateText("Number of Triggers: " + numTriggers);
+            }, () => { // Triggers Decrease
+                numTriggers = numTriggers > 0 ? (numTriggers - 5) % maxTriggers : maxTriggers - 5;
+                UpdateText("Number of Triggers: " + numTriggers);
             });
+
             CreateLabel("Start Game", () => {
                 var configs = new WorldSceneConfig(numFlocks, numPowerUps, numTriggers, maps[selectedMap], null);
                 Game1.Inst.EnterScene(new WorldScene(configs));

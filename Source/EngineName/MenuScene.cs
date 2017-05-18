@@ -53,19 +53,28 @@ public abstract class MenuScene: Scene {
 
     /// <summary>Gets or sets the key used to select the highlighted menu item.</summary>
     public Keys SelectKey   { get; set; } = Keys.Enter;
+    public Keys IncreaseKey   { get; set; } = Keys.Right;
+    public Keys DecreaseKey   { get; set; } = Keys.Left;
 
-    //--------------------------------------
-    // NESTED TYPES
-    //--------------------------------------
+        //--------------------------------------
+        // NESTED TYPES
+        //--------------------------------------
 
-    /// <summary>Represents a menu item.</summary>
+        /// <summary>Represents a menu item.</summary>
     private class MenuItem {
         /// <summary>The callback to invoke when the item is activated.</summary>
         public Action Select;
 
+        /// <summary>The callback to invoke when the item is active and increased.</summary>
+        public Action Increase;
+
+        /// <summary>The callback to invoke when the item is activat and decreased.</summary>
+        public Action Decrease;
+
         /// <summary>The text component used to render the item.</summary>
         public CText Text;
-    }
+
+        }
 
     //--------------------------------------
     // NON-PUBLIC FIELDS
@@ -88,6 +97,7 @@ public abstract class MenuScene: Scene {
     ///          an arrow pointing to the currently highlighted item).</summary>
     private CText mSelHighlight;
 
+    private float coolDown = 0.2f;
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
@@ -116,11 +126,14 @@ public abstract class MenuScene: Scene {
     public override void Draw(float t, float dt) {
         // Position the selection highlight before delegating drawing.
         mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
-
+        
         Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
 
         var keyboard = Keyboard.GetState();
+        coolDown -= dt;
+        if (coolDown > 0.0f) mCanInteract = false;
+
         var canMove  = true;
 
         if (keyboard.IsKeyDown(MoveUpKey)) {
@@ -158,19 +171,39 @@ public abstract class MenuScene: Scene {
 
             canMove = false;
         }
+        if (keyboard.IsKeyDown(DecreaseKey)) {
+            if (mCanInteract) {
+                var s = mItems[mSelIndex].Text.format;
+                Log.GetLog().Debug($"Decreasing: {s}");
+                mItems[mSelIndex].Decrease?.Invoke();
+            }
+
+            canMove = false;
+        }
+        if (keyboard.IsKeyDown(IncreaseKey)) {
+            if (mCanInteract) {
+                var s = mItems[mSelIndex].Text.format;
+                Log.GetLog().Debug($"Increasing: {s}");
+                mItems[mSelIndex].Increase?.Invoke();
+            }
+
+            canMove = false;
+        }
 
         mCanInteract = canMove;
     }
 
-    //--------------------------------------
-    // NON-PUBLIC METHODS
-    //--------------------------------------
+        //--------------------------------------
+        // NON-PUBLIC METHODS
+        //--------------------------------------
 
-    /// <summary>Creates a selectable menu label with the specified text and callback.</summary>
-    /// <param name="text">The text to display on the label, in the menu.</param>
-    /// <param name="cb">The label callback to invoke when the label is selected.</param>
-    /// <param name="color">The label text color.</param>
-    protected void CreateLabel(string text, Action cb, Color? color=null) {
+        /// <summary>Creates a selectable menu label with the specified text and callback.</summary>
+        /// <param name="text">The text to display on the label, in the menu.</param>
+        /// <param name="cbSelect">The label callback to invoke when the label is selected.</param>
+        /// <param name="cbIncrease">The label callback to invoke when the label is increased.</param>
+        /// <param name="cbDecrease">The label callback to invoke when the label is decreased.</param>
+        /// <param name="color">The label text color.</param>
+        protected void CreateLabel(string text, Action cbSelect, Action cbIncrease = null, Action cbDecrease = null, Color? color=null) {
         // TODO: Super messy solution but it's ok for now. Need better positioning of items.
 
         var x = 300;
@@ -180,10 +213,12 @@ public abstract class MenuScene: Scene {
             y = (int)mItems[mItems.Count - 1].Text.position.Y + 30;
         }
 
-        // ---
+            // ---
 
         var label = new MenuItem {
-            Select = cb,
+            Select = cbSelect,
+            Increase = cbIncrease,
+            Decrease = cbDecrease,
             Text   = new CText {
                 color    = color ?? Color.Black,
                 font     = mFont,
