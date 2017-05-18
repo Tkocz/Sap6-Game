@@ -64,7 +64,7 @@ namespace GameName.Scenes
             var waterSys = new WaterSystem();
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
-            physicsSys.InvSpatPartSize = 0.1f;
+            physicsSys.InvSpatPartSize = 0.07f;
             AddSystems(
                 new RenderingSystem(),
                 new CameraSystem(),
@@ -85,7 +85,7 @@ namespace GameName.Scenes
                                            stepX: 16,
                                            stepY: 16,
                                            smooth: false,
-                                           scale: 500.0f,
+                                           scale: 200.0f,
                                            yScale: 0.3f);
             physicsSys.Heightmap = heightmap;
 

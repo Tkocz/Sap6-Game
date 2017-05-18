@@ -168,6 +168,37 @@ public class Heightmap {
         mPixels = new Color[mTex.Width*mTex.Height];
         mTex.GetData<Color>(mPixels);
 
+        var blurPixels = new int[mPixels.Length];
+
+        Func<int, int> calcBlur = (int k) => {
+            const int n = 16;
+            int val = 0;
+            int count = 0;
+
+            for (var i = -n; i <= n; i++) {
+                var a = k + i*mTex.Height;
+                for (var j = -n; j <= n; j++) {
+                    var k0 = a + j;
+                    if (k0 < 0 || k0 >= mPixels.Length) {
+                        continue;
+                    }
+
+                    count++;
+                    val += mPixels[k0].B;
+                }
+            }
+
+            return val/count;
+        };
+
+        Parallel.For(0, mPixels.Length, i => {
+            blurPixels[i] = calcBlur(i);
+        });
+
+        for (var i = 0; i < mPixels.Length; i++) {
+            mPixels[i] = new Color(0, 0, blurPixels[i]);
+        }
+
         var indices = new List<int>();
         var verts   = new List<VertexPositionNormalColor>();
 
@@ -190,16 +221,16 @@ public class Heightmap {
                           f1(a.B/255.0f, b.B/255.0f, r),
                           f1(a.A/255.0f, b.A/255.0f, r));
 
-            var grassColor = new Color(0.4f, 0.7f, 0.42f);
+            var grassColor = new Color(0.5f, 0.66f, 0.5f);
             var sandColor = new Color(0.9f, 0.8f, 0.6f);
 
             var color = grassColor;
 
             if (y < 0.0f) {
-                y += 0.35f;
+                y += 0.4f;
                 color = f(grassColor,
                           sandColor,
-                          2.0f/(1.0f + (float)Math.Pow(MathHelper.E, 30.0f*y)) - 1.0f);
+                          2.0f/(1.0f + (float)Math.Pow(MathHelper.E, 40.0f*y)) - 1.0f);
             }
 
             var c1 = 0.05f * (float)(rnd.NextDouble() - 0.5f);
