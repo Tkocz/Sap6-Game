@@ -21,9 +21,8 @@ namespace GameName.Scenes {
         private int maxPowerUps = 55;
         private int maxTriggers = 55;
         private string[] maps = new string[]{
-            "Square_island_4x4",
-            "DinoIsland06",
-            "DinoIsland06Mumbo"
+            //"Square_island_4x4",
+            "DinoIsland",
         };
         private int selectedMap = 0;
         private bool mIsMultiplayer;
@@ -44,7 +43,7 @@ namespace GameName.Scenes {
                 selectedMap = (selectedMap + 1) % maps.Length;
                 UpdateText("Map: " + maps[selectedMap]);
             }, () => { // Map Decrease
-                selectedMap = (selectedMap + 1) % maps.Length;
+                selectedMap = (selectedMap - 1) % maps.Length;
                 UpdateText("Map: " + maps[selectedMap]);
             });
 
@@ -117,10 +116,10 @@ namespace GameName.Scenes {
                 var textSize = mFont.MeasureString(text);
                 AddComponent<C2DRenderable>(id, new CText {
                     format = text,
-                    color = player.You ? Color.White : Color.Gray,
+                    color = player.You ? Color.Black : Color.Gray,
                     font = mFont,
                     origin = Vector2.Zero,
-                    position = new Vector2(screenWidth - screenWidth * 0.1f - textSize.X, screenWidth * 0.05f + mPlayerList.Count * 30)
+                    position = new Vector2(screenWidth - screenWidth * 0.1f - textSize.X, screenWidth * 0.05f + i * 30)
                 });
             }
         }
@@ -140,7 +139,7 @@ namespace GameName.Scenes {
         }
         private List<NetworkPlayer> fakeNetworkList = new List<NetworkPlayer>();
         private void AddPlayer(bool slave) {
-            fakeNetworkList.Add(new NetworkPlayer { IP = "localhost", Time = DateTime.Now, You = fakeNetworkList.Count == 0 });
+            fakeNetworkList.Add(new NetworkPlayer { IP = fakeNetworkList.Count == 1 ? "YOU" : "localhost", Time = DateTime.Now, You = fakeNetworkList.Count == 1 });
         }
     }
 }

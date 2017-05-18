@@ -111,14 +111,14 @@ public abstract class MenuScene: Scene {
 
         base.Init();
 
-        mFont = Game1.Inst.Content.Load<SpriteFont>("Fonts/sector034");
+        mFont = Game1.Inst.Content.Load<SpriteFont>("Fonts/FFFForward");
 
         AddComponent<C2DRenderable>(AddEntity(), mSelHighlight = new CText {
             color    = Color.Black,
             font     = mFont,
             format   = "--->",
             origin   = Vector2.Zero,
-            position = new Vector2(150, 0)
+            position = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width*0.1f - 70, 0)
         });
     }
 
@@ -209,9 +209,9 @@ public abstract class MenuScene: Scene {
         /// <param name="color">The label text color.</param>
         protected void CreateLabel(string text, Action cbSelect, Action cbIncrease = null, Action cbDecrease = null, Color? color=null) {
         // TODO: Super messy solution but it's ok for now. Need better positioning of items.
-
-        var x = 300;
-        var y = 100;
+        var screenWidth = Game1.Inst.GraphicsDevice.Viewport.Width;
+        var x = screenWidth * 0.1f;
+        var y = screenWidth * 0.05f;
 
         if (mItems.Count > 0) {
             y = (int)mItems[mItems.Count - 1].Text.position.Y + 30;
