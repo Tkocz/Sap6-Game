@@ -33,9 +33,6 @@ public class EnvMapMaterial: MaterialShader {
     /// <summary>The renderer to use when rendering the environment map.</summary>
     private readonly RenderingSystem mRenderer;
 
-    /// <summary>Skybox renderer.</summary>
-    private readonly SkyBoxSystem mSkybox;
-
     //--------------------------------------
     // PUBLIC CONSTRUCTORS
     //--------------------------------------
@@ -46,18 +43,15 @@ public class EnvMapMaterial: MaterialShader {
     /// <param name="transf">The transform component of the entity to environment map.</param>
     /// <param name="material">The effect to use as material. Normally this should be set to a cube
     ///                        map shader.</param>
-    /// <param name="skybox">The skybox renderer.</param>
     public EnvMapMaterial(RenderingSystem renderer,
                           int             eid,
                           CTransform      transf,
-                          Effect          material,
-                          SkyBoxSystem    skybox=null)
+                          Effect          material)
         : base(material)
     {
         mEid      = eid;
         mRenderer = renderer;
         mTransf   = transf;
-        mSkybox   = skybox;
 
         var device = Game1.Inst.GraphicsDevice;
 
@@ -80,12 +74,10 @@ public class EnvMapMaterial: MaterialShader {
     /// <param name="renderer">The renderer to use when rendering the environment maps.</param>
     /// <param name="eid">The id of the entity to which the environment map belongs.</param>
     /// <param name="transf">The transform component of the entity to environment map.</param>
-    /// <param name="skybox">The skybox renderer.</param>
     public EnvMapMaterial(RenderingSystem renderer,
                           int             eid,
-                          CTransform      transf,
-                          SkyBoxSystem    skybox=null)
-        : this(renderer, eid, transf, Game1.Inst.Content.Load<Effect>("Effects/CubeMap"), skybox)
+                          CTransform      transf)
+        : this(renderer, eid, transf, Game1.Inst.Content.Load<Effect>("Effects/CubeMap"))
     {
     }
 
@@ -133,10 +125,6 @@ public class EnvMapMaterial: MaterialShader {
             cams[i].Projection = Matrix.CreatePerspectiveFieldOfView(fovRad, aspect, zNear, zFar);
             GfxUtil.SetRT(mEnvRTs[i]);
             Game1.Inst.GraphicsDevice.Clear(Color.White);
-
-            if (mSkybox != null) {
-                mSkybox.DrawSkybox(cams[i]);
-            }
 
             mRenderer.DrawScene(cams[i], mEid, mTransf);
         }

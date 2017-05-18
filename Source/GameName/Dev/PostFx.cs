@@ -40,9 +40,6 @@ public sealed class PostFx: Scene {
     /// <summary>Used to create environment maps.</summary>
     private RenderingSystem mRenderer;
 
-    /// <summary>The skybox renderer.</summary>
-    private SkyBoxSystem mSkybox;
-
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
@@ -51,7 +48,6 @@ public sealed class PostFx: Scene {
     public override void Init() {
         AddSystems(new                    LogicSystem(),
                    new                  PhysicsSystem(),
-                   mSkybox      = new SkyBoxSystem(),
                    mRenderer    = new RenderingSystem());
 
 #if DEBUG

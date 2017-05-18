@@ -67,8 +67,6 @@ namespace GameName.Scenes
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
             physicsSys.InvSpatPartSize = 0.1f;
             AddSystems(
-                new FpsCounterSystem(updatesPerSec: 10),
-                new SkyBoxSystem(),
                 new RenderingSystem(),
                 new CameraSystem(),
                 physicsSys,
