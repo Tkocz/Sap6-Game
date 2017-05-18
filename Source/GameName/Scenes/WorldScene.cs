@@ -61,7 +61,6 @@ namespace GameName.Scenes
             InitGameComponents();
             InitSceneLightSettings();
 
-            var mapSystem = new MapSystem();
             var waterSys = new WaterSystem();
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
@@ -70,7 +69,6 @@ namespace GameName.Scenes
                 new RenderingSystem(),
                 new CameraSystem(),
                 physicsSys,
-                mapSystem,
                 new InputSystem(),
                 waterSys,
                 new Rendering2DSystem(),
@@ -82,6 +80,14 @@ namespace GameName.Scenes
 #if DEBUG
            AddSystem(new DebugOverlay());
 #endif
+
+            var heightmap = Heightmap.Load("Textures/HeightMap",
+                                           stepX: 16,
+                                           stepY: 16,
+                                           smooth: false,
+                                           scale: 500.0f,
+                                           yScale: 0.3f);
+            physicsSys.Heightmap = heightmap;
 
             base.Init();
 
@@ -129,11 +135,17 @@ namespace GameName.Scenes
                 ,
                 ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview * 1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane * 0.5f, farplane * 1.2f)
             });
-            //AddComponent(camera, new CInput());
-            //AddComponent(camera, new CTransform() { Position = new Vector3(-50, 50, 0), Rotation = Matrix.Identity, Scale = Vector3.One });
-
 
             // Heightmap entity
+
+            int hme = AddEntity();
+            AddComponent<C3DRenderable>(hme, new C3DRenderable { model = heightmap.Model });
+            AddComponent(hme, new CTransform {
+                Position = Vector3.Zero,
+                Rotation = Matrix.Identity,
+                Scale    = Vector3.One
+            });
+
             int heightMap = AddEntity();
 			Dictionary<int, string> elementList = new Dictionary<int, string>();
 			elementList.Add(255, "LeafTree");
@@ -145,18 +157,15 @@ namespace GameName.Scenes
             AddComponent<C3DRenderable>(heightMap, heightMapComp);
             AddComponent(heightMap, heightTrans);
             // manually start loading all heightmap components, should be moved/automated
-            mapSystem.Load();
+
 			foreach (var i in heightMapComp.EnvironmentSpawn)
 			{
-				int newElement = Game1.Inst.Scene.AddEntity();
+				int newElement = Game1.Inst.Scene.AddEntity ();
 				Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), InvTransf = Matrix.Identity });
 				Game1.Inst.Scene.AddComponent(newElement, new CTransform() { Position = new Vector3(i.X + heightTrans.Position.X, i.Y * heightTrans.Scale.Y - 1f, i.Z + heightTrans.Position.Z), Scale = new Vector3((float)rnd.NextDouble() * 0.25f + 0.75f), Rotation = Matrix.CreateRotationY((float)rnd.NextDouble() * MathHelper.Pi * 2f) });
 				Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + heightMapComp.elements[(int)i.W])  ,fileName = heightMapComp.elements[(int)i.W] });
 			}
             waterSys.Load();
-            physicsSys.MapSystem = mapSystem;
-
-
 
            OnEvent("game_end", data =>
            {
