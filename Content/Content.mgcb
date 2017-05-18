@@ -10,7 +10,8 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:..\Source\ContentPipeline\bin\Debug\ContentPipeline.dll
+/reference:../packages/InfinitespaceStudios.Pipeline.1.0.8/tools/InfinitespaceStudios.Pipeline.dll
+/reference:../ContentPipeline/bin/Debug/ContentPipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -28,13 +29,19 @@
 
 #begin Effects/Distort.fx
 /importer:EffectImporter
-/processor:EffectProcessor
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=pipeline.infinitespace-studios.co.uk
+/processorParam:RemotePort=443
+/processorParam:Protocol=https
 /processorParam:DebugMode=Auto
 /build:Effects/Distort.fx
 
 #begin Effects/DebugMaterial.fx
 /importer:EffectImporter
-/processor:EffectProcessor
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=pipeline.infinitespace-studios.co.uk
+/processorParam:RemotePort=443
+/processorParam:Protocol=https
 /processorParam:DebugMode=Auto
 /build:Effects/DebugMaterial.fx
 
@@ -52,7 +59,10 @@
 
 #begin Effects/Water.fx
 /importer:EffectImporter
-/processor:EffectProcessor
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=pipeline.infinitespace-studios.co.uk
+/processorParam:RemotePort=443
+/processorParam:Protocol=https
 /processorParam:DebugMode=Auto
 /build:Effects/Water.fx
 
@@ -325,13 +335,19 @@
 
 #begin Effects/AdsMaterial.fx
 /importer:EffectImporter
-/processor:EffectProcessor
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=pipeline.infinitespace-studios.co.uk
+/processorParam:RemotePort=443
+/processorParam:Protocol=https
 /processorParam:DebugMode=Auto
 /build:Effects/AdsMaterial.fx
 
 #begin Effects/CubeMap.fx
 /importer:EffectImporter
-/processor:EffectProcessor
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=pipeline.infinitespace-studios.co.uk
+/processorParam:RemotePort=443
+/processorParam:Protocol=https
 /processorParam:DebugMode=Auto
 /build:Effects/CubeMap.fx
 
@@ -610,4 +626,54 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=DxtCompressed
 /build:Models/PalmTree.fbx
+
+#begin Models/LeafTree.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=DxtCompressed
+/build:Models/LeafTree.fbx
+
+#begin Textures/DinoIsland06mumbo.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/DinoIsland06mumbo.png
+
+#begin Models/badboll.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=DxtCompressed
+/build:Models/badboll.fbx
 

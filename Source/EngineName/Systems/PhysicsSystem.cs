@@ -133,7 +133,7 @@ public class PhysicsSystem: EcsSystem {
     /// <summary>Gets or sets the world bounds, as a bounding box with dimensions specified in
     ///          meters.</summary>
     public BoundingBox Bounds { get; set; } =
-        new BoundingBox(-10.0f*Vector3.One, 10.0f*Vector3.One);
+        new BoundingBox(-10f*Vector3.One, 10.0f*Vector3.One);
 
     /// <summary>Gets or sets the world gravity vector, in meters per seconds squraed.</summary>
     public Vector3 Gravity { get; set; } = new Vector3(0.0f, -9.81f, 0.0f);

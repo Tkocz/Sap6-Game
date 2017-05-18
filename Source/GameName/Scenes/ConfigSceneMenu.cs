@@ -18,7 +18,8 @@ namespace GameName.Scenes {
         private int maxTriggers = 10;
         private string[] maps = new string[]{
                 "Square_island_4x4",
-                "DinoIsland06"
+                "DinoIsland06",
+				"DinoIsland06Mumbo"
             };
         private int selectedMap = 0;
         /// <summary>Initializes the scene.</summary>
