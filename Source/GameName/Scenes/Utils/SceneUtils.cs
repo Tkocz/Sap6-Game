@@ -41,7 +41,6 @@ namespace GameName.Scenes.Utils {
             currentScene.AddComponent(ball, new CPickUp());
             return ball;
         }
-
         public static void CreateAnimals(int numFlocks,int worldsize) {
             var currentScene = Game1.Inst.Scene;
 
@@ -70,14 +69,32 @@ namespace GameName.Scenes.Utils {
 
                 for (int i = 0; i < membersPerFlock; i++) {
                     int id = currentScene.AddEntity();
+                    
+                    Func<float, Matrix> npcAnim = (t) => {
+                        var transf = (CTransform)currentScene.GetComponentFromEntity<CTransform>(id);
+                        var body = (CBody)currentScene.GetComponentFromEntity<CBody>(id);
+
+                        // Wiggle wiggle!
+                        var x = 0.3f * Vector3.Dot(transf.Frame.Forward, body.Velocity);
+                        var walk =
+                            Matrix.CreateFromAxisAngle(Vector3.Forward, x * 0.1f * (float)Math.Cos(t * 24.0f))
+                          * Matrix.CreateTranslation(Vector3.Up * -x * 0.1f * (float)Math.Sin(t * 48.0f));
+
+                        var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f * (float)Math.Sin(t * 2.0f));
+
+                        return walk * idle;
+                    };
+
                     if (flockAnimal.Equals("hen")) {
                         // TODO: Make animals have different animations based on state
-                        CAnimation normalAnimation = new CHenNormalAnimation();
+                        CAnimation normalAnimation = new CHenNormalAnimation { animFn = npcAnim };
                         // Set a random offset to animation so not all animals are synced
                         normalAnimation.CurrentKeyframe = rnd.Next(normalAnimation.Keyframes.Count - 1);
+                        // Random animation speed between 0.8-1.0
+                        normalAnimation.AnimationSpeed = (float)rnd.NextDouble() * 0.2f + 0.8f;
                         currentScene.AddComponent<C3DRenderable>(id, normalAnimation);
                     } else {
-                        CImportedModel modelComponent = new CImportedModel();
+                        CImportedModel modelComponent = new CImportedModel { animFn = npcAnim };
                         modelComponent.fileName = flockAnimal;
                         modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName);
                         currentScene.AddComponent<C3DRenderable>(id, modelComponent);
@@ -91,7 +108,7 @@ namespace GameName.Scenes.Utils {
                     transformComponent.Position = new Vector3(memberX, y, memberZ);
                     transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
                         (float)(Math.PI * (rnd.NextDouble() * 2)));
-                    float scale = 0.5f;
+                    float scale = 1f;
                     transformComponent.Scale = new Vector3(scale, scale, scale);
                     currentScene.AddComponent(id, transformComponent);
                     currentScene.AddComponent(id, new CBody {
@@ -100,8 +117,8 @@ namespace GameName.Scenes.Utils {
                         LinDrag = 0.8f,
                         Velocity = Vector3.Zero,
                         Radius = 1f,
-                        SpeedMultiplier = 0.5f,
-                        MaxVelocity = 5,
+                        SpeedMultiplier = scale,
+                        MaxVelocity = 4,
                         Restitution = 0
                     });
                     // health value of npcs, maybe change per species/flock/member?

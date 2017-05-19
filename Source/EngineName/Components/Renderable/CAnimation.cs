@@ -17,6 +17,10 @@ namespace EngineName.Components.Renderable {
         /// <summary>
         /// Current keyframe position
         /// </summary>
-        public int CurrentKeyframe = 0;
+        public float CurrentKeyframe = 0;
+        /// <summary>
+        /// Animation speed multiplier
+        /// </summary>
+        public float AnimationSpeed = 1;
     }
 }

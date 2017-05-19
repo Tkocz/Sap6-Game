@@ -32,13 +32,16 @@ namespace EngineName.Systems {
 
             var h1 = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(e1);
             var h2 = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(e2);
-
+            var e1IsJumper = Game1.Inst.Scene.EntityHasComponent<CInput>(e1);
             // Check for damage collision (testing for jumping on something)
-            if(Vector3.Dot(collision.Normal, Vector3.Up) > Math.Cos(MathHelper.PiOver4)) {
+            if (Vector3.Dot(collision.Normal, Vector3.Up) > Math.Cos(MathHelper.PiOver4)) {
+                var receiver = h1;
+                if (e1IsJumper)
+                    receiver = h2;
                 // if entity has invincibility time left, no damage dealt
-                if (h2.InvincibilityTime > 0) return;
-                h2.Health -= 1; // TODO: hard coded damage should be replaced to component-based solution
-                h2.InvincibilityTime = h2.DamageResistance * 1; // TODO: change hard coded time to something more appropraiate
+                if (receiver.InvincibilityTime > 0) return;
+                receiver.Health -= receiver.DamageResistance * 1; // TODO: hard coded damage should be replaced to component-based solution
+                receiver.InvincibilityTime = 1; // TODO: change hard coded time to something more appropraiate
             }
         }
         public override void Update(float t, float dt) {
