@@ -195,29 +195,6 @@ public class PhysicsSystem: EcsSystem {
         mColls1.Clear();
         mColls2.Clear();
 
-        // -------------------------------------------------
-        // TODO: I'm commenting this out because:
-        //       1) The physics system is in the engine project - not all games want an inventory
-        //          (which is a very game-specific concept) so it should not be in the engine, but
-        //          rather in the game project.
-        //       2) It's harmful to the performance of the physics system (which lags heavily in the
-        //          Dev.Collisions scene with this check enabled).
-        //
-        //       My suggestion is to re-implement this functionality as a separate system in the
-        //       game project.
-        // Skip entities that are in an inventory, since it aint't possible to collide with them
-        // while they're inside an inventory.
-        //     -- Philip Arvidsson <philip@philiparvidsson.com>
-        //
-        // Dictionary<int, EcsComponent> inventoryComps = Game1.Inst.Scene.GetComponents<CInventory>();
-        // List<int> itemsInInventory = new List<int>();
-        // foreach (var inv in inventoryComps)
-        // {
-        //     var temp = (CInventory)inv.Value;
-        //     itemsInInventory.AddRange(temp.inventory);
-        // }
-        // -------------------------------------------------
-
         // We don't want to clear sp here, just every single cell. Otherwise it will keep being
         // reallocated, and we don't want that.
         foreach (var sp in mSpatPart) {

@@ -75,7 +75,8 @@ namespace GameName.Scenes
                 new Rendering2DSystem(),
                 new AISystem(),
                 new AnimationSystem(),
-                new InventorySystem()
+                new InventorySystem(),
+                new HealthSystem()
             );
 
 #if DEBUG
@@ -147,6 +148,7 @@ namespace GameName.Scenes
             AddComponent<C3DRenderable>(player, new CImportedModel() { animFn = playerAnim, model = Game1.Inst.Content.Load<Model>("Models/viking") , fileName = "viking" });
             AddComponent(player, new CSyncObject { fileName = "viking" });
             AddComponent(player, new CInventory());
+            AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
 
             AddComponent(player, new CCamera(-50, 50)
             {

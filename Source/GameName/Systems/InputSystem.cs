@@ -122,7 +122,7 @@ namespace GameName.Systems {
                     yaw = -rotationSpeed;
                 }
                 if (currentState.IsKeyDown(Keys.Space) && !isInAir) {
-                    body.Velocity.Y += 14f;
+                    body.Velocity.Y += 11f;
                     isInAir = true;
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
