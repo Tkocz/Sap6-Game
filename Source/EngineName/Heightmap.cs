@@ -47,6 +47,8 @@ public class Heightmap {
     ///          mHeights[x+y*mTex.Width]</summary>
     private float[] mHeights;
 
+    private Color[] mPixels;
+
     /// <summary>Whether the direction of the diagonal of each quad sould be randomized.</summary>
     private bool mRandomTris;
 
@@ -97,6 +99,10 @@ public class Heightmap {
         // Probably bad idea to do this amount of work in ctor but who really cares? This ctor is
         // private anyway.
         Init();
+    }
+
+    public Color ColorAt(int x, int y) {
+        return mPixels[x + y*mTex.Width];
     }
 
     /// <summary>Figures out the height at the specified x- and z-coordinates. The coordinates
@@ -252,6 +258,7 @@ public class Heightmap {
         meshes.Add(mesh);
 
         Model = new Model(device, bones, meshes);
+        Model.Tag = "Heightmap";
     }
 
     /// <summary>Initializes the heightmap.</summary>
@@ -262,13 +269,13 @@ public class Heightmap {
 
         mHeights = new float[mTex.Width*mTex.Height];
 
-        var pixels = new Color[mHeights.Length];
-        mTex.GetData<Color>(pixels);
+        mPixels = new Color[mHeights.Length];
+        mTex.GetData<Color>(mPixels);
 
         for (var i = 0; i < mHeights.Length; i++) {
             // Keep red channel as height. Why red channel? Because it was used in the previous
             // implementation. Works well.
-            mHeights[i] = pixels[i].R;
+            mHeights[i] = mPixels[i].R;
         }
 
         //--------------------
