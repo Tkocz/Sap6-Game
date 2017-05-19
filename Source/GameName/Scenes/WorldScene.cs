@@ -21,7 +21,8 @@ namespace GameName.Scenes
         private bool shouldLeave = false;
         private Random rnd = new Random();
         private int worldSize = 590;
-        private int heightMapScale = 200;
+        private int heightMapScale = 300;
+        private float yScaleMap = 0.4f;
         private int player;
         private int pickUpCount = 0;
         private bool won;
@@ -62,21 +63,36 @@ namespace GameName.Scenes
             InitGameComponents();
             InitSceneLightSettings();
 
+            //todo set waterheight depending on 
             var waterSys = new WaterSystem();
+            if (configs.map == "Tropical") //"DinoIsland"
+            {  
+                waterSys.WaterHeight = -3;
+                heightMapScale = 200;
+                yScaleMap = 0.1f;
+            }
+            else if(configs.map == "UpNorth"){ //HeightMap
+                heightMapScale = 300;
+                yScaleMap = 0.5f;
+                waterSys.WaterHeight = -58;
+            }
+            
+
+
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
             physicsSys.InvSpatPartSize = 0.07f;
             physicsSys.Gravity *= 2.0f;
             AddSystems(
-                new RenderingSystem(),
-                new CameraSystem(),
+                waterSys,
                 physicsSys,
                 new InputSystem(),
-                waterSys,
-                new Rendering2DSystem(),
                 new AISystem(),
                 new AnimationSystem(),
-                new InventorySystem()
+                new InventorySystem(),
+                new CameraSystem(),
+                new RenderingSystem(),
+                new Rendering2DSystem()
             );
 
 #if DEBUG
@@ -88,7 +104,7 @@ namespace GameName.Scenes
                                            stepY      : 8,
                                            smooth     : false,
                                            scale      : heightMapScale,
-                                           yScale     : 0.1f,
+                                           yScale     : yScaleMap,
                                            randomTris : true,
                                            blur       : 16);
 
@@ -112,7 +128,7 @@ namespace GameName.Scenes
             // Camera entity
             float fieldofview = MathHelper.PiOver2;
             float nearplane = 0.1f;
-            float farplane = 1000f;
+            float farplane = 100f;
 
             player = AddEntity();
 

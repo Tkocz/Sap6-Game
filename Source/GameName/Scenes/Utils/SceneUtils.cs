@@ -42,7 +42,7 @@ namespace GameName.Scenes.Utils {
             return ball;
         }
 
-        public static void CreateAnimals(int numFlocks) {
+        public static void CreateAnimals(int numFlocks,int worldsize) {
             var currentScene = Game1.Inst.Scene;
 
             int flockCount = (int)(rnd.NextDouble() * 5) + 3;
@@ -63,10 +63,10 @@ namespace GameName.Scenes.Utils {
                 string flockAnimal = animal > 0.66 ? "flossy" : animal > 0.33 ? "goose" : "hen";
 
                 // TODO: get the global value of the worldsize
-                int flockX = (int)(rnd.NextDouble() * 300);// HERE
-                int flockZ = (int)(rnd.NextDouble() * 300);// HERE
+                int flockX = (int)(rnd.NextDouble() * worldsize);
+                int flockZ = (int)(rnd.NextDouble() * worldsize);
                 CTransform flockTransform = new CTransform { Position = new Vector3(flockX, 0, flockZ) };
-                flockTransform.Position += new Vector3(-300 / 2, 0, -300 / 2);// HERE
+                flockTransform.Position += new Vector3(-worldsize, 0, -worldsize);
 
                 for (int i = 0; i < membersPerFlock; i++) {
                     int id = currentScene.AddEntity();
@@ -114,7 +114,7 @@ namespace GameName.Scenes.Utils {
             }
         }
 
-        public static void CreateCollectables(int numPowerUps) {
+        public static void CreateCollectables(int numPowerUps, int worldsize) {
             var currentScene = Game1.Inst.Scene;
 
             // TODO: get the global value of the worldsize
@@ -122,8 +122,8 @@ namespace GameName.Scenes.Utils {
             for (int i = 0; i < chests; i++) {
                 var id = currentScene.AddEntity();
                 currentScene.AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "chest", model = Game1.Inst.Content.Load<Model>("Models/chest") });
-                var z = (float)(rnd.NextDouble() * 300);// HERE
-                var x = (float)(rnd.NextDouble() * 300);// HERE
+                var z = (float)(rnd.NextDouble() * worldsize);
+                var x = (float)(rnd.NextDouble() * worldsize);
                 var chestScale = 0.25f;
                 currentScene.AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(chestScale) });
                 currentScene.AddComponent(id, new CBody() { Aabb = new BoundingBox(-chestScale * Vector3.One, chestScale * Vector3.One) });
@@ -132,25 +132,25 @@ namespace GameName.Scenes.Utils {
             for (int i = 0; i < hearts; i++) {
                 var id = currentScene.AddEntity();
                 currentScene.AddComponent<C3DRenderable>(id, new CImportedModel { fileName = "heart", model = Game1.Inst.Content.Load<Model>("Models/heart") });
-                var z = (float)(rnd.NextDouble() * 300);// HERE
-                var x = (float)(rnd.NextDouble() * 300);// HERE
+                var z = (float)(rnd.NextDouble() * worldsize);
+                var x = (float)(rnd.NextDouble() * worldsize);
                 currentScene.AddComponent(id, new CTransform { Position = new Vector3(x, -50, z), Scale = new Vector3(1f) });
                 currentScene.AddComponent(id, new CBody() { Aabb = new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)) });
                 currentScene.AddComponent(id, new CSyncObject());
             }
         }
 
-        public static void CreateTriggerEvents(int numTriggers) {
+        public static void CreateTriggerEvents(int numTriggers, int worldsize) {
             var currentScene = Game1.Inst.Scene;
             Random rnd = new Random();
 
             // TODO: get the global value of the worldsize
             for (int i = 0; i < numTriggers; i++) {
                 int id = currentScene.AddEntity();
+                var z = (float)(rnd.NextDouble() * worldsize);
+                var x = (float)(rnd.NextDouble() * worldsize);
                 currentScene.AddComponent(id, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
-                currentScene.AddComponent(id, new CTransform() { Position = new Vector3(rnd.Next(-300, 300), -0, // HERE
-                                                                                        rnd.Next(-300, 300)),// HERE
-                                                                                        Scale = new Vector3(1f) });
+                currentScene.AddComponent(id, new CTransform() { Position = new Vector3(x, -50, z),Scale = new Vector3(1f) });
                 if (rnd.NextDouble() > 0.5) {
                     // Falling balls event
                     currentScene.OnEvent("collision", data => {

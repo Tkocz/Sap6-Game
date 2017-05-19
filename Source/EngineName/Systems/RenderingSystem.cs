@@ -54,7 +54,8 @@ namespace EngineName.Systems
             }
 
             int counter = 0;
-            foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
+            var scene = Game1.Inst.Scene;
+            foreach (var component in scene.GetComponents<C3DRenderable>()) {
                 var key = component.Key;
 
                 if (key == excludeEid) {
@@ -65,7 +66,7 @@ namespace EngineName.Systems
 
                 C3DRenderable model = (C3DRenderable)component.Value;
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
-                CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+                CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
                 var anim = Matrix.Identity;
 
                 if (model.animFn != null) {
@@ -77,12 +78,20 @@ namespace EngineName.Systems
                 foreach (var mesh in model.model.Meshes)
                 {
 
-                    //if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
-                    //    continue;
+                    if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame))
+                        == ContainmentType.Disjoint)
+                    {
+                        // TODO: This is a really ugly hack. :-(
+                        if (model.model.Tag != "Heightmap") {
+                            break;
+                        }
+                    }
+
+
                     // TODO: This might bug out with multiple mesh parts.
                     if (model.model.Tag == "water") {
                         // Drawn after.
-                        continue;
+                        break;
                     }
                     else if (model.material != null) {
                         model.material.CamPos = camPos.Position;
@@ -112,34 +121,40 @@ namespace EngineName.Systems
                         }
                     }
                     else {
+                        var lastEffect = (Effect)null;
                         for(int i = 0; i < mesh.MeshParts.Count; i++) {
                             var meshPart = mesh.MeshParts[i];
                             var effect = (BasicEffect)meshPart.Effect;
-                            effect.PreferPerPixelLighting = true;
-                            effect.EnableDefaultLighting();
-                            effect.VertexColorEnabled = model.enableVertexColor;
-                            effect.LightingEnabled = true;
-                            effect.AmbientLightColor = Game1.Inst.Scene.AmbientColor;
 
-                            effect.DirectionalLight0.Direction = Game1.Inst.Scene.Direction;
-                            effect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.DiffuseColor;
-                            effect.DirectionalLight0.Enabled = true;
-                            effect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
-                            effect.DirectionalLight1.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
-                            effect.DirectionalLight1.DiffuseColor = Game1.Inst.Scene.DiffuseColor*0.7f;
-                            effect.DirectionalLight2.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
-                            effect.DirectionalLight2.DiffuseColor = Game1.Inst.Scene.DiffuseColor*0.5f;
+                            if (lastEffect != effect) {
+                                effect.PreferPerPixelLighting = true;
+                                effect.EnableDefaultLighting();
+                                effect.VertexColorEnabled = model.enableVertexColor;
+                                effect.LightingEnabled = true;
+                                effect.AmbientLightColor = scene.AmbientColor;
 
-                            effect.SpecularPower = 100;
+                                effect.DirectionalLight0.Direction = scene.Direction;
+                                effect.DirectionalLight0.DiffuseColor = scene.DiffuseColor;
+                                effect.DirectionalLight0.Enabled = true;
+                                effect.DirectionalLight0.SpecularColor = scene.SpecularColor * model.specular;
+                                effect.DirectionalLight1.SpecularColor = scene.SpecularColor * model.specular;
+                                effect.DirectionalLight1.DiffuseColor = scene.DiffuseColor*0.7f;
+                                effect.DirectionalLight2.SpecularColor = scene.SpecularColor * model.specular;
+                                effect.DirectionalLight2.DiffuseColor = scene.DiffuseColor*0.5f;
 
-                            effect.FogEnabled = true;
-                            effect.FogStart = 35.0f;
-                            effect.FogEnd = 100.0f;
-                            effect.FogColor = new Vector3(0.4f, 0.6f, 0.8f);
+                                effect.SpecularPower = 100;
 
-                            effect.Projection = camera.Projection;
-                            effect.View = camera.View;
-                            effect.World = mesh.ParentBone.Transform * anim * transform.Frame;
+                                effect.FogEnabled = true;
+                                effect.FogStart = 35.0f;
+                                effect.FogEnd = 100.0f;
+                                effect.FogColor = new Vector3(0.4f, 0.6f, 0.8f);
+
+                                effect.Projection = camera.Projection;
+                                effect.View = camera.View;
+                                effect.World = mesh.ParentBone.Transform * anim * transform.Frame;
+                            }
+
+                            lastEffect = effect;
                         }
 
                         mesh.Draw();
@@ -147,7 +162,7 @@ namespace EngineName.Systems
                 }
             }
 
-            foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
+            foreach (var component in scene.GetComponents<CWater>()) {
                 var key = component.Key;
 
                 if (key == excludeEid) {
@@ -156,60 +171,36 @@ namespace EngineName.Systems
                 }
 
 
-                C3DRenderable model = (C3DRenderable)component.Value;
+                C3DRenderable model = (C3DRenderable)scene.GetComponentFromEntity<C3DRenderable>(key);
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
-                CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+                CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
 
                 Matrix[] bones = new Matrix[model.model.Bones.Count];
                 model.model.CopyAbsoluteBoneTransformsTo(bones);
                 foreach (var mesh in model.model.Meshes)
                 {
-
-                    //if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
-                    //    continue;
-                    // TODO: This might bug out with multiple mesh parts.
-                    if (model.model.Tag != "water") {
-                        continue;
-                    }
-
                     foreach (ModelMeshPart part in mesh.MeshParts) {
                         Matrix world = mesh.ParentBone.Transform * transform.Frame;
 
                         part.Effect.Parameters["World"].SetValue(world);
                         part.Effect.Parameters["View"].SetValue(camera.View);
                         part.Effect.Parameters["Projection"].SetValue(camera.Projection);
-                        part.Effect.Parameters["AmbientColor"].SetValue(new Vector4(0f, 0f, 1f, 1f));
-                        part.Effect.Parameters["AmbientIntensity"].SetValue(0.5f);
-
-                        part.Effect.Parameters["DiffuseLightDirection"].SetValue(new Vector3(0f, -1f, 2f));
-                        part.Effect.Parameters["DiffuseColor"].SetValue(new Vector4(0f, 0.8f, 0f, 1f));
-                        part.Effect.Parameters["DiffuseIntensity"].SetValue(0.5f);
+                        part.Effect.Parameters["CameraPosition"].SetValue(camPos.Position);
 
 
-                        //Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * world));
-                        //part.Effect.Parameters["WorldInverseTranspose"].SetValue(world);
+                        //part.Effect.Parameters["Shininess"].SetValue(200f);
+                        //part.Effect.Parameters["SpecularColor"].SetValue(new Vector4(1, 1, 1, 1));
+                        //part.Effect.Parameters["SpecularIntensity"].SetValue(200f);
 
-                        CTransform cameraTransform = camPos;
-
-                        var viewVector = (camera.Target - cameraTransform.Position);
-                        viewVector.Normalize();
-                        //part.Effect.Parameters["ViewVector"].SetValue(viewVector);
-                        part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
-
-
-                        part.Effect.Parameters["Shininess"].SetValue(200f);
-                        part.Effect.Parameters["SpecularColor"].SetValue(new Vector4(1, 1, 1, 1));
-                        part.Effect.Parameters["SpecularIntensity"].SetValue(200f);
-
-                        //effect.Parameters["ModelTexture"].SetValue(texture);
-                        part.Effect.Parameters["NormalMap"].SetValue(normalMap);
-                        part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(mT));
+                        //part.Effect.Parameters["NormalMap"].SetValue(normalMap);
+                        //part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(mT));
 
                         part.Effect.Parameters["Time"].SetValue(mT);
-                        //part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
+
                         foreach (var pass in part.Effect.CurrentTechnique.Passes) {
                             pass.Apply();
                         }
+
                         mesh.Draw();
                     }
                 }
