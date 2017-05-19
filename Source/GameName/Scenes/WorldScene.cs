@@ -91,6 +91,7 @@ namespace GameName.Scenes
                 new AnimationSystem(),
                 new InventorySystem(),
                 new CameraSystem(),
+                new RenderingSystem(),
                 new Rendering2DSystem(),
                 new HealthSystem()
             );
