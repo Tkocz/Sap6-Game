@@ -56,18 +56,6 @@
 /processorParam:DebugMode=Auto
 /build:Effects/Water.fx
 
-#begin Textures/HeightMap.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/HeightMap.png
-
 #begin Textures/rocktex2.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -593,18 +581,6 @@
 /processorParam:TextureFormat=DxtCompressed
 /build:Models/LeafTree.fbx
 
-#begin Textures/DinoIsland.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/DinoIsland.png
-
 #begin Models/badboll.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -641,4 +617,28 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/CubeMap.fx
+
+#begin Textures/UpNorth.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/UpNorth.png
+
+#begin Textures/Tropical.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Tropical.png
 
