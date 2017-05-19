@@ -34,7 +34,7 @@ sampler2D bumpSampler = sampler_state {
 
 struct VertexShaderInput {
   float4 Position : POSITION0;
-  float3 Normal : NORMAL0;
+  nointerpolation float3 Normal : NORMAL0;
   float2 TextureCoordinate : TEXCOORD0;
   float4 Color : COLOR0;
 };
@@ -42,7 +42,7 @@ struct VertexShaderInput {
 struct VertexShaderOutput {
   float4 Position : POSITION0;
   float2 TextureCoordinate : TEXCOORD0;
-  float3 Normal : TEXCOORD1;
+  nointerpolation float3 Normal : TEXCOORD1;
   float4 Color : COLOR0;
   float4 WorldPos : TEXCOORD4;
 };
@@ -95,15 +95,17 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0 {
 
   float3 color = float3(0.2, 0.3, 0.5);
 
+  const float nDif = 4.0;
+  const float nSpec = 2.0;
   float ambFac  = 0.5f;
-  float difFac  = max(0.0, dot(l, n));
-  float specFac = max(0.0, pow(dot(l, rv), 90.0));
+  float difFac  = int(max(0.0, dot(l, n))*nDif)/nDif;
+  float specFac = int(max(0.0, pow(dot(l, rv), 90.0))*nSpec)/nSpec;
 
-  float3 amb   = color * ambFac;
-  float3 dif   = color * difFac;
-  float3 spec  = float3(1.0, 1.0, 1.0) * specFac;
+  float3 amb  = color * ambFac;
+  float3 dif  = color * difFac;
+  float3 spec = float3(1.0, 1.0, 1.0) * specFac;
 
-  return float4(amb+dif+spec, 0.5*(difFac+specFac));
+  return float4(amb+dif+spec, 0.2+0.4*(difFac+specFac));
 }
 technique BasicColorDrawing {
   pass Pass1 {
