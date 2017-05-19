@@ -18,10 +18,10 @@ namespace EngineName.Components
         public Vector3 Target = Vector3.Zero;
         public Vector3 Position = Vector3.Zero;
         public float Heading  = 0f;
-        public int Height     = -50;
-        public int Distance   = 50;
+        public float Height     = -50;
+        public float Distance   = 50;
         public CCamera(){}
-        public CCamera(int height, int distance){
+        public CCamera(float height, float distance){
             Height = height;
             Distance = distance;
         }

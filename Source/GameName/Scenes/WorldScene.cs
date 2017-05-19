@@ -170,10 +170,10 @@ namespace GameName.Scenes
             AddComponent(player, new CInventory());
             AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
 
-            AddComponent(player, new CCamera(-50, 50)
+            AddComponent(player, new CCamera
             {
-                Height = 5,
-                Distance = 5,
+                Height = 3.5f,
+                Distance = 3.5f,
                 Projection = Matrix.CreatePerspectiveFieldOfView(fieldofview, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane, farplane)
                 ,
                 ClipProjection = Matrix.CreatePerspectiveFieldOfView(fieldofview * 1.2f, Game1.Inst.GraphicsDevice.Viewport.AspectRatio, nearplane * 0.5f, farplane * 1.2f)
