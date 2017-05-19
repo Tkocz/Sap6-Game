@@ -44,8 +44,9 @@ namespace EngineName.Systems
                     continue;
                 CHeightmap heightmap = (CHeightmap) renderable.Value;
 
-                var terrainHeight = 200.0f;
-                var terrainWidth = 200.0f;
+                // TODO: Should match map scale.
+                var terrainHeight = 300.0f;
+                var terrainWidth = 300.0f;
 
                 int counter = 0;
                 indices = new int[(Resolution - 1) * (Resolution - 1) * 6];
