@@ -45,7 +45,7 @@ public sealed class MainMenu: MenuScene {
                 Game1.Inst.EnterScene((Scene)Activator.CreateInstance(type));
             });
         }
-        #else
+        #endif
         CreateLabel("Single-Player", () => {
             Game1.Inst.EnterScene(new ConfigSceneMenu(false, _args));
         });
@@ -54,7 +54,7 @@ public sealed class MainMenu: MenuScene {
 
             Game1.Inst.EnterScene(new ConfigSceneMenu(true, _args));
         });
-        #endif
+
 
             CreateLabel("Quit", () => {
             Game1.Inst.Exit();
