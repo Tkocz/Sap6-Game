@@ -134,7 +134,7 @@ namespace GameName.Scenes
                 MaxVelocity = 5f,
                 InvMass = 0.01f,
                 SpeedMultiplier = 1,
-                Radius = 1,
+                Radius = 0.9f,
                 Aabb = new BoundingBox(new Vector3(-0.5f, -0.9f, -0.5f), new Vector3(0.5f, 0.9f, 0.5f)),
                 LinDrag = 0.8f,
                 ReachableArea = new BoundingBox(new Vector3(-1.5f, -2.0f, -1.5f), new Vector3(1.5f, 2.0f, 1.5f)),
