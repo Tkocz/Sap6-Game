@@ -20,11 +20,11 @@ namespace EngineName.Systems
         private int[] vibrations;
         private Effect bEffect;
 
-        public float WaterHeight = -9;
+        public float WaterHeight = -38;
         public byte WaterOpacity = 100;
         public int Resolution = 40; // vertices per direction
         public float Frequency = 1.5f;
-        public float Amplitude = 0.2f;
+        public float Amplitude = 0.0f;
         public float Bias = 0.5f;
 
         public override void Init()
@@ -45,10 +45,10 @@ namespace EngineName.Systems
                 if (renderable.Value.GetType() != typeof(CHeightmap))
                     continue;
                 CHeightmap heightmap = (CHeightmap) renderable.Value;
-                
-                var terrainHeight = heightmap.Image.Height;
-                var terrainWidth = heightmap.Image.Width;
-                
+
+                var terrainHeight = heightmap.Image.Height*0.8f;
+                var terrainWidth = heightmap.Image.Width*0.8f;
+
                 int counter = 0;
                 indices = new int[(Resolution - 1) * (Resolution - 1) * 6];
                 vertices = new VertexPositionNormalTexture[Resolution * Resolution];
@@ -57,10 +57,10 @@ namespace EngineName.Systems
                 {
                     for (int y = 0; y < Resolution; y++)
                     {
-                        vertices[x + y * Resolution].Position = new Vector3((terrainWidth/Resolution)*x, heightmap.LowestPoint + WaterHeight, (terrainHeight/Resolution)*y);
+                        vertices[x + y * Resolution].Position = new Vector3((terrainWidth/Resolution)*(x-Resolution/2), heightmap.LowestPoint + WaterHeight, (terrainHeight/Resolution)*(y-Resolution/2));
                         var color = Color.Blue;
                         color.A = WaterOpacity;
-                        vertices[x + y * Resolution].TextureCoordinate = new Vector2(x * 0.005f, y * 0.005f);
+                        vertices[x + y * Resolution].TextureCoordinate = new Vector2(x * 0.05f, y * 0.05f);
                     }
                 }
                 for (int y = 0; y < Resolution - 1; y++)
@@ -121,7 +121,7 @@ namespace EngineName.Systems
 
                 ModelMesh mesh = new ModelMesh(mGraphicsDevice, parts);
                 meshPart.Effect = bEffect;
-                
+
 
                 mesh.Name = "water";
                 // TODO: Match with map parameters
@@ -139,11 +139,14 @@ namespace EngineName.Systems
 
             }
             int id = Game1.Inst.Scene.AddEntity();
-           
+
             // TODO: Match with map
             Game1.Inst.Scene.AddComponent(id, new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1f) });
             CModel = new CImportedModel() { model = model };
             Game1.Inst.Scene.AddComponent<C3DRenderable>(id, CModel);
+
+            // Dummy component hack to speed up rendering.
+            Game1.Inst.Scene.AddComponent<CWater>(id, new CWater());
         }
     }
 }

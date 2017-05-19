@@ -51,9 +51,9 @@ struct VertexShaderOutput {
 float CalculateHeight(float4 Position) {
     int phase = (Position.x + Position.z % 2) * 2;
     float newHeight = (Amplitude * sin(Frequency * Time + phase) + Bias);
-     
+
     return newHeight * 10;
- 
+
 }
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input) {
@@ -64,7 +64,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input) {
     output.Position = mul(viewPosition, Projection);
 
     output.Position.y += CalculateHeight(input.Position);
-    
+
     float4 worldNormal = mul(float4(input.Normal.xyz, 0), World);
     float4 viewNormal = mul(float4(worldNormal.xyz, 0), View);
     output.Normal = normalize(viewNormal);

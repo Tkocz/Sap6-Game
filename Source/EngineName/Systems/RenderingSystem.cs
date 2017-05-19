@@ -54,7 +54,8 @@ namespace EngineName.Systems
             }
 
             int counter = 0;
-            foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
+            var scene = Game1.Inst.Scene;
+            foreach (var component in scene.GetComponents<C3DRenderable>()) {
                 var key = component.Key;
 
                 if (key == excludeEid) {
@@ -65,7 +66,7 @@ namespace EngineName.Systems
 
                 C3DRenderable model = (C3DRenderable)component.Value;
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
-                CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+                CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
                 var anim = Matrix.Identity;
 
                 if (model.animFn != null) {
@@ -77,12 +78,20 @@ namespace EngineName.Systems
                 foreach (var mesh in model.model.Meshes)
                 {
 
-                    //if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
-                    //    continue;
+                    if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame))
+                        == ContainmentType.Disjoint)
+                    {
+                        // TODO: This is a really ugly hack. :-(
+                        if (model.model.Tag != "Heightmap") {
+                            break;
+                        }
+                    }
+
+
                     // TODO: This might bug out with multiple mesh parts.
                     if (model.model.Tag == "water") {
                         // Drawn after.
-                        continue;
+                        break;
                     }
                     else if (model.material != null) {
                         model.material.CamPos = camPos.Position;
@@ -112,34 +121,40 @@ namespace EngineName.Systems
                         }
                     }
                     else {
+                        var lastEffect = (Effect)null;
                         for(int i = 0; i < mesh.MeshParts.Count; i++) {
                             var meshPart = mesh.MeshParts[i];
                             var effect = (BasicEffect)meshPart.Effect;
-                            effect.PreferPerPixelLighting = true;
-                            effect.EnableDefaultLighting();
-                            effect.VertexColorEnabled = model.enableVertexColor;
-                            effect.LightingEnabled = true;
-                            effect.AmbientLightColor = Game1.Inst.Scene.AmbientColor;
 
-                            effect.DirectionalLight0.Direction = Game1.Inst.Scene.Direction;
-                            effect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.DiffuseColor;
-                            effect.DirectionalLight0.Enabled = true;
-                            effect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
-                            effect.DirectionalLight1.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
-                            effect.DirectionalLight1.DiffuseColor = Game1.Inst.Scene.DiffuseColor*0.7f;
-                            effect.DirectionalLight2.SpecularColor = Game1.Inst.Scene.SpecularColor * model.specular;
-                            effect.DirectionalLight2.DiffuseColor = Game1.Inst.Scene.DiffuseColor*0.5f;
+                            if (lastEffect != effect) {
+                                effect.PreferPerPixelLighting = true;
+                                effect.EnableDefaultLighting();
+                                effect.VertexColorEnabled = model.enableVertexColor;
+                                effect.LightingEnabled = true;
+                                effect.AmbientLightColor = scene.AmbientColor;
 
-                            effect.SpecularPower = 100;
+                                effect.DirectionalLight0.Direction = scene.Direction;
+                                effect.DirectionalLight0.DiffuseColor = scene.DiffuseColor;
+                                effect.DirectionalLight0.Enabled = true;
+                                effect.DirectionalLight0.SpecularColor = scene.SpecularColor * model.specular;
+                                effect.DirectionalLight1.SpecularColor = scene.SpecularColor * model.specular;
+                                effect.DirectionalLight1.DiffuseColor = scene.DiffuseColor*0.7f;
+                                effect.DirectionalLight2.SpecularColor = scene.SpecularColor * model.specular;
+                                effect.DirectionalLight2.DiffuseColor = scene.DiffuseColor*0.5f;
 
-                            effect.FogEnabled = true;
-                            effect.FogStart = 35.0f;
-                            effect.FogEnd = 100.0f;
-                            effect.FogColor = new Vector3(0.4f, 0.6f, 0.8f);
+                                effect.SpecularPower = 100;
 
-                            effect.Projection = camera.Projection;
-                            effect.View = camera.View;
-                            effect.World = mesh.ParentBone.Transform * anim * transform.Frame;
+                                effect.FogEnabled = true;
+                                effect.FogStart = 35.0f;
+                                effect.FogEnd = 100.0f;
+                                effect.FogColor = new Vector3(0.4f, 0.6f, 0.8f);
+
+                                effect.Projection = camera.Projection;
+                                effect.View = camera.View;
+                                effect.World = mesh.ParentBone.Transform * anim * transform.Frame;
+                            }
+
+                            lastEffect = effect;
                         }
 
                         mesh.Draw();
@@ -147,7 +162,7 @@ namespace EngineName.Systems
                 }
             }
 
-            foreach (var component in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
+            foreach (var component in scene.GetComponents<CWater>()) {
                 var key = component.Key;
 
                 if (key == excludeEid) {
@@ -156,22 +171,14 @@ namespace EngineName.Systems
                 }
 
 
-                C3DRenderable model = (C3DRenderable)component.Value;
+                C3DRenderable model = (C3DRenderable)scene.GetComponentFromEntity<C3DRenderable>(key);
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
-                CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+                CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
 
                 Matrix[] bones = new Matrix[model.model.Bones.Count];
                 model.model.CopyAbsoluteBoneTransformsTo(bones);
                 foreach (var mesh in model.model.Meshes)
                 {
-
-                    //if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) == ContainmentType.Disjoint)
-                    //    continue;
-                    // TODO: This might bug out with multiple mesh parts.
-                    if (model.model.Tag != "water") {
-                        continue;
-                    }
-
                     foreach (ModelMeshPart part in mesh.MeshParts) {
                         Matrix world = mesh.ParentBone.Transform * transform.Frame;
 
