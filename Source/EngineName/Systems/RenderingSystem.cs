@@ -185,38 +185,22 @@ namespace EngineName.Systems
                         part.Effect.Parameters["World"].SetValue(world);
                         part.Effect.Parameters["View"].SetValue(camera.View);
                         part.Effect.Parameters["Projection"].SetValue(camera.Projection);
-                        part.Effect.Parameters["AmbientColor"].SetValue(new Vector4(0f, 0f, 1f, 1f));
-                        part.Effect.Parameters["AmbientIntensity"].SetValue(0.5f);
-
-                        part.Effect.Parameters["DiffuseLightDirection"].SetValue(new Vector3(0f, -1f, 2f));
-                        part.Effect.Parameters["DiffuseColor"].SetValue(new Vector4(0f, 0.8f, 0f, 1f));
-                        part.Effect.Parameters["DiffuseIntensity"].SetValue(0.5f);
+                        part.Effect.Parameters["CameraPosition"].SetValue(camPos.Position);
 
 
-                        //Matrix worldInverseTransposeMatrix = Matrix.Transpose(Matrix.Invert(mesh.ParentBone.Transform * world));
-                        //part.Effect.Parameters["WorldInverseTranspose"].SetValue(world);
+                        //part.Effect.Parameters["Shininess"].SetValue(200f);
+                        //part.Effect.Parameters["SpecularColor"].SetValue(new Vector4(1, 1, 1, 1));
+                        //part.Effect.Parameters["SpecularIntensity"].SetValue(200f);
 
-                        CTransform cameraTransform = camPos;
-
-                        var viewVector = (camera.Target - cameraTransform.Position);
-                        viewVector.Normalize();
-                        //part.Effect.Parameters["ViewVector"].SetValue(viewVector);
-                        part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
-
-
-                        part.Effect.Parameters["Shininess"].SetValue(200f);
-                        part.Effect.Parameters["SpecularColor"].SetValue(new Vector4(1, 1, 1, 1));
-                        part.Effect.Parameters["SpecularIntensity"].SetValue(200f);
-
-                        //effect.Parameters["ModelTexture"].SetValue(texture);
-                        part.Effect.Parameters["NormalMap"].SetValue(normalMap);
-                        part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(mT));
+                        //part.Effect.Parameters["NormalMap"].SetValue(normalMap);
+                        //part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(mT));
 
                         part.Effect.Parameters["Time"].SetValue(mT);
-                        //part.Effect.Parameters["CameraPosition"].SetValue(cameraTransform.Position);
+
                         foreach (var pass in part.Effect.CurrentTechnique.Passes) {
                             pass.Apply();
                         }
+
                         mesh.Draw();
                     }
                 }

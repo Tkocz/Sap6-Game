@@ -20,12 +20,11 @@ namespace EngineName.Systems
         private int[] vibrations;
         private Effect bEffect;
 
-        public float WaterHeight = -38;
+        public float WaterHeight = -33;
         public byte WaterOpacity = 100;
-        public int Resolution = 40; // vertices per direction
+        public int Resolution = 100; // vertices per direction
         public float Frequency = 1.5f;
-        public float Amplitude = 0.0f;
-        public float Bias = 0.5f;
+        public float Amplitude = 0.2f;
 
         public override void Init()
         {
@@ -34,7 +33,6 @@ namespace EngineName.Systems
             bEffect = Game1.Inst.Content.Load<Effect>("Effects/Water");
             bEffect.Parameters["Frequency"].SetValue(Frequency);
             bEffect.Parameters["Amplitude"].SetValue(Amplitude);
-            bEffect.Parameters["Bias"].SetValue(Bias);
         }
 
         public void Load()
@@ -46,8 +44,8 @@ namespace EngineName.Systems
                     continue;
                 CHeightmap heightmap = (CHeightmap) renderable.Value;
 
-                var terrainHeight = heightmap.Image.Height*0.8f;
-                var terrainWidth = heightmap.Image.Width*0.8f;
+                var terrainHeight = 200.0f;
+                var terrainWidth = 200.0f;
 
                 int counter = 0;
                 indices = new int[(Resolution - 1) * (Resolution - 1) * 6];
@@ -57,10 +55,18 @@ namespace EngineName.Systems
                 {
                     for (int y = 0; y < Resolution; y++)
                     {
-                        vertices[x + y * Resolution].Position = new Vector3((terrainWidth/Resolution)*(x-Resolution/2), heightmap.LowestPoint + WaterHeight, (terrainHeight/Resolution)*(y-Resolution/2));
+                        var vx = terrainWidth * (float)((float)x/Resolution  - 0.5f);
+                        var vy = terrainHeight * (float)((float)y/Resolution - 0.5f);
+
+                        var txs = 1.0f;
+                        var u = txs*(float)x/Resolution;
+                        var v = txs*(float)y/Resolution;
+
+
+                        vertices[x + y * Resolution].Position = new Vector3(vx, heightmap.LowestPoint + WaterHeight, vy);
                         var color = Color.Blue;
                         color.A = WaterOpacity;
-                        vertices[x + y * Resolution].TextureCoordinate = new Vector2(x * 0.05f, y * 0.05f);
+                        vertices[x + y * Resolution].TextureCoordinate = new Vector2(u, v);
                     }
                 }
                 for (int y = 0; y < Resolution - 1; y++)
@@ -141,7 +147,7 @@ namespace EngineName.Systems
             int id = Game1.Inst.Scene.AddEntity();
 
             // TODO: Match with map
-            Game1.Inst.Scene.AddComponent(id, new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1f) });
+            Game1.Inst.Scene.AddComponent(id, new CTransform() { Position = Vector3.Zero, Rotation = Matrix.Identity, Scale = new Vector3(1f) });
             CModel = new CImportedModel() { model = model };
             Game1.Inst.Scene.AddComponent<C3DRenderable>(id, CModel);
 
