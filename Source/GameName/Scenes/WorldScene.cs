@@ -87,7 +87,7 @@ namespace GameName.Scenes
                                            stepY      : 8,
                                            smooth     : false,
                                            scale      : 200.0f,
-                                           yScale     : 0.1f,
+                                           yScale     : 0.4f,
                                            randomTris : true,
                                            blur       : 16);
 
