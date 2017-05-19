@@ -26,7 +26,7 @@ namespace GameName.Scenes
         private int player;
         private int pickUpCount = 0;
         private bool won;
-        private List<int> balls = new List<int>();
+
         private NetworkSystem _networkSystem;
         private WorldSceneConfig configs;
         private Effect mUnderWaterFx;
