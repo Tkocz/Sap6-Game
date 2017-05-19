@@ -106,7 +106,17 @@ public abstract class MenuScene: Scene {
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
-
+    public void addArrow()
+    {
+        AddComponent<C2DRenderable>(AddEntity(), mSelHighlight = new CText
+        {
+            color = Color.Black,
+            font = mFont,
+            format = "--->",
+            origin = Vector2.Zero,
+            position = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.1f - 70, 0)
+        });
+     }
     /// <summary>Initializes the menu.</summary>
     public override void Init() {
         AddSystems(new Rendering2DSystem());
@@ -114,14 +124,8 @@ public abstract class MenuScene: Scene {
         base.Init();
 
         mFont = Game1.Inst.Content.Load<SpriteFont>("Fonts/FFFForward");
-
-        AddComponent<C2DRenderable>(AddEntity(), mSelHighlight = new CText {
-            color    = Color.Black,
-            font     = mFont,
-            format   = "--->",
-            origin   = Vector2.Zero,
-            position = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width*0.1f - 70, 0)
-        });
+        
+       
     }
 
     /// <summary>Performs draw logic (and, in the case of the <see cref="MenuScene"/> class, some
@@ -130,92 +134,87 @@ public abstract class MenuScene: Scene {
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt) {
         // Position the selection highlight before delegating drawing.
-        if (mItems.Any())
-        {
+
+        if(mSelHighlight !=null)
             mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
 
-            Game1.Inst.GraphicsDevice.Clear(Color.White);
-            base.Draw(t, dt);
+        Game1.Inst.GraphicsDevice.Clear(Color.White);
+        base.Draw(t, dt);
 
-            var keyboard = Keyboard.GetState();
-            coolDown -= dt;
-            if (coolDown > 0.0f) mCanInteract = false;
+        var keyboard = Keyboard.GetState();
+        coolDown -= dt;
+        if (coolDown > 0.0f) mCanInteract = false;
 
-            canMove = true;
+        canMove = true;
 
 
-            if (keyboard.IsKeyDown(MoveUpKey))
-            {
-                if (mCanInteract)
-                {
-                    mSelIndex -= 1;
-                    if (mSelIndex < 0)
-                    {
-                        mSelIndex = mItems.Count - 1;
-                    }
-
-                    Raise("selchanged", mSelIndex);
-                }
-
-                canMove = false;
-            }
-
-            if (keyboard.IsKeyDown(MoveDownKey))
-            {
-                if (mCanInteract)
-                {
-                    mSelIndex += 1;
-                    if (mSelIndex >= mItems.Count)
-                    {
-                        mSelIndex = 0;
-                    }
-
-                    Raise("selchanged", mSelIndex);
-                }
-
-                canMove = false;
-            }
-
-            if (keyboard.IsKeyDown(SelectKey))
-            {
-                if (mCanInteract)
-                {
-                    var s = mItems[mSelIndex].Text.format;
-                    Log.GetLog().Debug($"Selecting menu item: {s}");
-                    mItems[mSelIndex].Select();
-                }
-
-                canMove = false;
-            }
-            if (keyboard.IsKeyDown(DecreaseKey))
-            {
-                if (mCanInteract)
-                {
-                    var s = mItems[mSelIndex].Text.format;
-                    Log.GetLog().Debug($"Decreasing: {s}");
-                    mItems[mSelIndex].Decrease?.Invoke();
-                }
-
-                canMove = false;
-            }
-            if (keyboard.IsKeyDown(IncreaseKey))
-            {
-                if (mCanInteract)
-                {
-                    var s = mItems[mSelIndex].Text.format;
-                    Log.GetLog().Debug($"Increasing: {s}");
-                    mItems[mSelIndex].Increase?.Invoke();
-                }
-
-                canMove = false;
-            }
-
-            mCanInteract = canMove;
-        }
-        else
+        if (keyboard.IsKeyDown(MoveUpKey))
         {
-            CreateLabel("Waiting for players", null);
+            if (mCanInteract)
+            {
+                mSelIndex -= 1;
+                if (mSelIndex < 0)
+                {
+                    mSelIndex = mItems.Count - 1;
+                }
+
+                Raise("selchanged", mSelIndex);
+            }
+
+            canMove = false;
         }
+
+        if (keyboard.IsKeyDown(MoveDownKey))
+        {
+            if (mCanInteract)
+            {
+                mSelIndex += 1;
+                if (mSelIndex >= mItems.Count)
+                {
+                    mSelIndex = 0;
+                }
+
+                Raise("selchanged", mSelIndex);
+            }
+
+            canMove = false;
+        }
+
+        if (keyboard.IsKeyDown(SelectKey))
+        {
+            if (mCanInteract)
+            {
+                var s = mItems[mSelIndex].Text.format;
+                Log.GetLog().Debug($"Selecting menu item: {s}");
+                mItems[mSelIndex].Select();
+            }
+
+            canMove = false;
+        }
+        if (keyboard.IsKeyDown(DecreaseKey))
+        {
+            if (mCanInteract)
+            {
+                var s = mItems[mSelIndex].Text.format;
+                Log.GetLog().Debug($"Decreasing: {s}");
+                mItems[mSelIndex].Decrease?.Invoke();
+            }
+
+            canMove = false;
+        }
+        if (keyboard.IsKeyDown(IncreaseKey))
+        {
+            if (mCanInteract)
+            {
+                var s = mItems[mSelIndex].Text.format;
+                Log.GetLog().Debug($"Increasing: {s}");
+                mItems[mSelIndex].Increase?.Invoke();
+            }
+
+            canMove = false;
+        }
+
+        mCanInteract = canMove;
     }
 
         //--------------------------------------

@@ -37,7 +37,7 @@ using GameName.Scenes;
 #if DBG_MENU
 	using (var game = new Game1(new MainMenu())) {
 #else
-	using (var game = new Game1(new ConfigSceneMenu(false, args))) {
+	using (var game = new Game1(new ConfigSceneMenu(true, args))) {
 #endif
             game.Run();
         }
