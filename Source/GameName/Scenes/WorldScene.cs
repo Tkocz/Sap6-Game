@@ -67,8 +67,8 @@ namespace GameName.Scenes
             var waterSys = new WaterSystem();
             if (configs.map == "Tropical") //"DinoIsland"
             {  
-                waterSys.WaterHeight = -3;
-                heightMapScale = 200;
+                waterSys.WaterHeight = -7;
+                heightMapScale = 300;
                 yScaleMap = 0.1f;
             }
             else if(configs.map == "UpNorth"){ //HeightMap
@@ -112,7 +112,7 @@ namespace GameName.Scenes
 
             base.Init();
 
-			SceneUtils.SpawnEnvironment(heightmap);
+			SceneUtils.SpawnEnvironment(heightmap, heightMapScale);
 
 
             //add network after init
