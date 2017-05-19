@@ -32,16 +32,27 @@ public class Heightmap {
     private float mScale;
     private float mYScale;
 
-    private Color[] mPixels;
+    private float[] mHeights;
+
+    private bool mRandomTris;
+
     public Model Model { get; private set; }
 
-    private Heightmap(Texture2D tex, int stepX, int stepY, bool smooth, float scale, float yScale) {
-        mTex    = tex;
-        mStepX  = stepX;
-        mStepY  = stepY;
-        mSmooth = smooth;
-        mScale  = scale;
-        mYScale = yScale;
+    private Heightmap(Texture2D tex,
+                      int stepX,
+                      int stepY,
+                      bool smooth,
+                      float scale,
+                      float yScale,
+                      bool randomTris)
+    {
+        mTex        = tex;
+        mStepX      = stepX;
+        mStepY      = stepY;
+        mSmooth     = smooth;
+        mScale      = scale;
+        mYScale     = yScale;
+        mRandomTris = randomTris;
 
         // Probably bad idea to do this amount of work in ctor but who really cares?
         Init();
@@ -79,15 +90,15 @@ public class Heightmap {
             return 0.0f;
         }
 
-        var c0 = mPixels[k0].B;
-        var c1 = mPixels[k1].B;
-        var c2 = mPixels[k2].B;
-        var c3 = mPixels[k3].B;
+        var h0 = mHeights[k0];
+        var h1 = mHeights[k1];
+        var h2 = mHeights[k2];
+        var h3 = mHeights[k3];
 
         Func<float, float, float, float> f = (a, b, r) => (1.0f-r)*a + r*b;
 
-        var c = f(f(c0, c1, fi), f(c2, c3, fi), fj);
-        var y = mScale*(yScale*c - 0.5f)*mYScale;
+        var h = f(f(h0, h1, fi), f(h2, h3, fi), fj);
+        var y = mScale*(yScale*h - 0.5f)*mYScale - 0.05f; // 5cm under the surface
 
         return y;
     }
@@ -97,10 +108,11 @@ public class Heightmap {
                                  int stepY=1,
                                  bool smooth=true,
                                  float scale=1.0f,
-                                 float yScale=1.0f)
+                                 float yScale=1.0f,
+                                 bool randomTris=true)
     {
         var tex = Game1.Inst.Content.Load<Texture2D>(name);
-        return new Heightmap(tex, stepX, stepY, smooth, scale, yScale);
+        return new Heightmap(tex, stepX, stepY, smooth, scale, yScale, randomTris);
     }
 
     private void CreateModel(int[] indices, VertexPositionNormalColor[] verts) {
@@ -165,38 +177,45 @@ public class Heightmap {
     }
 
     private void Init() {
-        mPixels = new Color[mTex.Width*mTex.Height];
-        mTex.GetData<Color>(mPixels);
+        mHeights = new float[mTex.Width*mTex.Height];
 
-        var blurPixels = new int[mPixels.Length];
+        var pixels = new Color[mHeights.Length];
+        mTex.GetData<Color>(pixels);
 
-        Func<int, int> calcBlur = (int k) => {
-            const int n = 16;
-            int val = 0;
-            int count = 0;
+        for (var i = 0; i < mHeights.Length; i++) {
+            mHeights[i] = pixels[i].B;
+        }
 
-            for (var i = -n; i <= n; i++) {
+        var blurPixels = new float[mHeights.Length];
+
+        Func<int, float> calcBlur = (int k) => {
+            const int N = 16;
+
+            var val   = 0.0f;
+            var count = 0;
+
+            for (var i = -N; i <= N; i++) {
                 var a = k + i*mTex.Height;
-                for (var j = -n; j <= n; j++) {
+                for (var j = -N; j <= N; j++) {
                     var k0 = a + j;
-                    if (k0 < 0 || k0 >= mPixels.Length) {
+                    if (k0 < 0 || k0 >= mHeights.Length) {
                         continue;
                     }
 
                     count++;
-                    val += mPixels[k0].B;
+                    val += mHeights[k0];
                 }
             }
 
             return val/count;
         };
 
-        Parallel.For(0, mPixels.Length, i => {
+        Parallel.For(0, mHeights.Length, i => {
             blurPixels[i] = calcBlur(i);
         });
 
-        for (var i = 0; i < mPixels.Length; i++) {
-            mPixels[i] = new Color(0, 0, blurPixels[i]);
+        for (var i = 0; i < mHeights.Length; i++) {
+            mHeights[i] = blurPixels[i];
         }
 
         var indices = new List<int>();
@@ -221,22 +240,33 @@ public class Heightmap {
                           f1(a.B/255.0f, b.B/255.0f, r),
                           f1(a.A/255.0f, b.A/255.0f, r));
 
-            var grassColor = new Color(0.5f, 0.66f, 0.5f);
-            var sandColor = new Color(0.9f, 0.8f, 0.6f);
+            var r1 = 0.1f * (float)(rnd.NextDouble() - 0.5f);
+            var r2 = 0.1f * (float)(rnd.NextDouble() - 0.5f);
+            var r3 = 0.1f * (float)(rnd.NextDouble() - 0.5f);
+
+            var rockColor  = new Color(0.6f+r1, 0.6f+r1, 0.65f+r1);
+            var grassColor = new Color(0.2f+0.3f*r1, 0.4f+0.3f*r2, 0.3f+0.3f*r3);
+            var sandColor  = new Color(0.3f+0.3f*r1, 0.1f+0.3f*r2, 0.0f+0.3f*r2);
 
             var color = grassColor;
 
             if (y < 0.0f) {
                 y += 0.4f;
+                var r = 2.0f/(1.0f + (float)Math.Pow(MathHelper.E, 40.0f*y)) - 1.0f;
+                r = Math.Max(Math.Min(r, 1.0f), 0.0f);
                 color = f(grassColor,
                           sandColor,
-                          2.0f/(1.0f + (float)Math.Pow(MathHelper.E, 40.0f*y)) - 1.0f);
+                          r);
             }
 
-            var c1 = 0.05f * (float)(rnd.NextDouble() - 0.5f);
-            var c2 = 0.05f * (float)(rnd.NextDouble() - 0.5f);
-            var c3 = 0.05f * (float)(rnd.NextDouble() - 0.5f);
-            color = new Color(color.R/255.0f + c1, color.G/255.0f + c2, color.B/255.0f + c3, 1.0f);
+            if (y > 0.05f) {
+                y -= 0.05f;
+                var r = 2.0f/(1.0f + (float)Math.Pow(MathHelper.E, -90.0f*y)) - 1.0f;
+                r = Math.Max(Math.Min(r, 1.0f), 0.0f);
+                color = f(grassColor,
+                          rockColor,
+                          r);
+            }
 
             return color;
         };
@@ -247,7 +277,7 @@ public class Heightmap {
             var k = i + j*mTex.Width;
 
             var x = mScale*(xScale*i - 0.5f);
-            var y = mScale*(yScale*mPixels[k].B - 0.5f)*mYScale;
+            var y = mScale*(yScale*mHeights[k] - 0.5f)*mYScale;
             var z = mScale*(zScale*j - 0.5f);
 
             // var u = (float)i / (mTex.Width  - 1);
@@ -256,7 +286,7 @@ public class Heightmap {
             var vert = new VertexPositionNormalColor {
                 Position = new Vector3(x, y, z),
                 Normal   = Vector3.Zero,
-                Color    = calcColor(x/mScale, (y/mScale)/mYScale, z/zScale)
+                Color    = calcColor(x/mScale, (y/mScale)/mYScale, z/mScale)
             };
 
             if (mSmooth) {
@@ -284,7 +314,7 @@ public class Heightmap {
 
         for (var i = 0; i < mTex.Width-mStepX; i += mStepX) {
             for (var j = 0; j < mTex.Height-mStepY; j += mStepY) {
-                if (rnd.Next(0, 2) == 1) {
+                if (!mRandomTris || rnd.Next(0, 2) == 1) {
                     calcTri(i       , j       , i+mStepX, j       , i+mStepX, j+mStepY);
                     calcTri(i+mStepX, j+mStepY, i       , j+mStepY, i       , j);
                 }
