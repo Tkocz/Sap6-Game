@@ -17,7 +17,6 @@ namespace EngineName.Systems
         private int[] indices = null;
         private VertexPositionNormalTexture[] vertices;
         private CImportedModel CModel;
-        private int[] vibrations;
         private Effect bEffect;
 
         public float WaterHeight = -33;

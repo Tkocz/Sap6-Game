@@ -172,7 +172,7 @@ namespace EngineName.Systems
 
 			compHeight.HeightData = new Color[terrainWidth, terrainHeight];
             mHeightData = new float[terrainWidth, terrainHeight];
-            Random rn = new Random();
+
             for (int x = 0; x < terrainWidth; x++) {
                 for (int y = 0; y < terrainHeight; y++) {
                     compHeight.HeightData[x, y] = colorMap[x + y * terrainWidth];
@@ -342,8 +342,8 @@ namespace EngineName.Systems
 			// Normals
 			Vector3 RIGHT = new Vector3(1, 0, 0); // +X
 			Vector3 LEFT = new Vector3(-1, 0, 0); // -X
-			Vector3 UP = new Vector3(0, 1, 0); // +Y
-			Vector3 DOWN = new Vector3(0, -1, 0); // -Y
+			// Vector3 UP = new Vector3(0, 1, 0); // +Y
+			// Vector3 DOWN = new Vector3(0, -1, 0); // -Y
 			Vector3 FORWARD = new Vector3(0, 0, 1); // +Z
 			Vector3 BACKWARD = new Vector3(0, 0, -1); // -Z
 

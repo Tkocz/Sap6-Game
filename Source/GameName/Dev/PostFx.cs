@@ -37,9 +37,6 @@ public sealed class PostFx: Scene {
     /// <summary>Off-screen render-target used as texture for the pixel shader.</summary>
     private RenderTarget2D mRT;
 
-    /// <summary>Used to create environment maps.</summary>
-    private RenderingSystem mRenderer;
-
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
@@ -48,7 +45,7 @@ public sealed class PostFx: Scene {
     public override void Init() {
         AddSystems(new                    LogicSystem(),
                    new                  PhysicsSystem(),
-                   mRenderer    = new RenderingSystem());
+                                  new RenderingSystem());
 
 #if DEBUG
         AddSystem(new DebugOverlay());
@@ -110,12 +107,9 @@ public sealed class PostFx: Scene {
                                             Rotation = Matrix.Identity,
                                             Scale    = r*Vector3.One });
 
-        EnvMapMaterial envMap = null;
-
         AddComponent<C3DRenderable>(ball, new CImportedModel {
             model  = Game1.Inst.Content.Load<Model>("Models/DummySphere")
         });
-
 
         return ball;
     }

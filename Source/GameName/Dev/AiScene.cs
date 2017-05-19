@@ -15,8 +15,6 @@ namespace GameName.Dev
 {
     public class AiScene : Scene
     {
-        private RenderingSystem mRenderer;
-
         public override void Init()
         {
             var physicsSys = new PhysicsSystem();
@@ -84,7 +82,7 @@ namespace GameName.Dev
             {
                 int id = AddEntity();
                 CImportedModel modelComponent = new CImportedModel();
-                double random = rn.NextDouble();
+
                 modelComponent.fileName = "flossy";
                 modelComponent.model = Game1.Inst.Content.Load<Model>("Models/" + modelComponent.fileName);
                 AddComponent<C3DRenderable>(id, modelComponent);

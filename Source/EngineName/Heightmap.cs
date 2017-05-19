@@ -218,8 +218,8 @@ public class Heightmap {
             verts[i1].Normal += n;
             verts[i2].Normal += n;
 
-            var c = new Color((verts[i0].Color.R + verts[i1].Color.R + verts[i2].Color.R) / 3, 
-                              (verts[i0].Color.G + verts[i1].Color.G + verts[i2].Color.G) / 3, 
+            var c = new Color((verts[i0].Color.R + verts[i1].Color.R + verts[i2].Color.R) / 3,
+                              (verts[i0].Color.G + verts[i1].Color.G + verts[i2].Color.G) / 3,
                               (verts[i0].Color.B + verts[i1].Color.B + verts[i2].Color.B) / 3);
 
             verts[i0].Color = verts[i1].Color = verts[i2].Color = c;
@@ -340,7 +340,7 @@ public class Heightmap {
         var verts   = new List<VertexPositionNormalColor>();
 
         // Used for smooth normals.
-        var indexCache = new Dictionary<Int64, int>();
+        var indexCache = new Dictionary<UInt64, int>();
 
         var indexCounter = 0;
 
@@ -394,7 +394,7 @@ public class Heightmap {
         };
 
         Func<int, int, int> calcVert = (i, j) => {
-            Int64 key = ((Int64)i) << 32 | (Int64)j;
+            UInt64 key = ((UInt64)i) << 32 | (UInt64)j;
 
             var k = i + j*mTex.Width;
 

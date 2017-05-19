@@ -46,7 +46,7 @@ namespace GameName.Systems
 
         private void addOrUpdatCObjects(EntitySync data)
         {
-            //Add entity 
+            //Add entity
             if (!Game1.Inst.Scene.EntityHasComponent<CTransform>(data.ID))
             {
                 //calculate BoundindBox since we have the data do this
@@ -90,7 +90,7 @@ namespace GameName.Systems
                     newTransform[data.ID].Position = data.CTransform.Position;
                     newTransform[data.ID].Rotation = data.CTransform.Rotation;
                 }
-                else { 
+                else {
                     newTransform[data.ID] = data.CTransform;
                     newCBody[data.ID] = data.CBody;
                 }
@@ -101,11 +101,10 @@ namespace GameName.Systems
             counter++;
             foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
             {
-                
+
                 var sync = (CSyncObject)pair.Value;
                 if (sync.Owner)
                 {
-                    string filename = "";
                     var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(pair.Key);
                     var ctransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(pair.Key);
                     var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(pair.Key);
@@ -116,7 +115,7 @@ namespace GameName.Systems
                     {
                         continue;
                     }
-                    else {*/ 
+                    else {*/
                         if (counter < 10 || counter % 10000 == 0)
                             Game1.Inst.Scene.Raise("sendentity", new EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
                         else
@@ -142,17 +141,17 @@ namespace GameName.Systems
             }
             if (remaingTimeSlow > updateIntervalSlow)
                 remaingTimeSlow = 0;
-            
 
 
-            //Todo Impliment Prediction for player movement  
+
+            //Todo Impliment Prediction for player movement
             /*foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
             {
                 var sync = (CSyncObject)pair.Value;
                 if (!sync.Owner)
                 {
-                 
-                    
+
+
                 }
             }*/
             foreach (var key in newCBody.Keys)

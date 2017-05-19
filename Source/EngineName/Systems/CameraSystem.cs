@@ -11,10 +11,7 @@ using System.Threading.Tasks;
 namespace EngineName.Systems
 {
     public class CameraSystem : EcsSystem {
-        private GraphicsDevice mGraphicsDevice;
-
         public override void Init() {
-            mGraphicsDevice = Game1.Inst.GraphicsDevice;
             base.Init();
         }
         public override void Update(float t, float dt)

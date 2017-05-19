@@ -55,7 +55,6 @@ public class ParticleSystem: EcsSystem {
         foreach (var cb in mPartsToSpawn) {
             var eid = Scene.AddEntity();
 
-            var components = cb();
             foreach (var component in cb()) {
                 Scene.AddComponent(eid, component, component.GetType());
             }

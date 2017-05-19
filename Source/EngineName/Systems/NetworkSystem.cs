@@ -13,6 +13,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+#pragma warning disable CS0219
+#pragma warning disable CS0169
+
 namespace EngineName.Systems
 {
     public class NetworkSystem : EcsSystem
@@ -76,8 +79,8 @@ namespace EngineName.Systems
                 var datasend = (MenuItem)data;
                 this.SendObject(datasend.CText, datasend.Id);
             });
-  
-         
+
+
 
             DebugOverlay.Inst.DbgStr((a, b) => $"Cons: {_peer.Connections.Count} IsMaster: {_isMaster}");
             DebugOverlay.Inst.DbgStr((a, b) => $"Re: {kbps} kb/s");
@@ -113,7 +116,7 @@ namespace EngineName.Systems
             SendPeerPlayerInfo();
         }
 
- 
+
         /// <summary>Checks if have peers, so its possible to send stuff</summary>
         private bool havePeers()
         {
@@ -177,7 +180,7 @@ namespace EngineName.Systems
                 _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
             else
                 _peer.SendMessage(msg, MasterNetConnection, NetDeliveryMethod.Unreliable, 0);
-            
+
         }
 
         /// <summary>Send simple string to all peers </summary>
@@ -188,7 +191,7 @@ namespace EngineName.Systems
                 Debug.WriteLine("No connections to send to.");
                 return;
             }
-            
+
             Enums.MessageType type = Enums.MessageType.Unknown;
             Enum.TryParse(datatosend.GetType().Name, out type);
             if(type== Enums.MessageType.Unknown)
@@ -240,7 +243,7 @@ namespace EngineName.Systems
 
             }
             //ability to send diffrent types of data with ease
-            if (MasterNetConnection==null) { 
+            if (MasterNetConnection==null) {
                 _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
             }
             else
@@ -266,7 +269,7 @@ namespace EngineName.Systems
                         //Debug.WriteLine("ReceivePeersData DiscoveryResponse CONNECT");
                         if (_peer.Connections.Any(x => x.RemoteEndPoint.Address.Equals(_msg.SenderEndPoint.Address)))
                             Debug.WriteLine("allreadyConnected");
-                        else { 
+                        else {
                              _peer.Connect(_msg.SenderEndPoint);
                         }
                         break;
@@ -280,7 +283,7 @@ namespace EngineName.Systems
                         //another client sent us data
                         //Read TypeData First
                         Enums.MessageType mType = (Enums.MessageType) _msg.ReadByte();
-           
+
                         if (mType == Enums.MessageType.String)
                         {
                             var metadata = _msg.ReadString();
@@ -325,7 +328,7 @@ namespace EngineName.Systems
                             string modelname = "";
                             bool isPlayer = false;
                             int id = 0;
-                            id = mType== Enums.MessageType.EntityLight ? _msg.ReadEntityLight(ref cbody, ref ctransform, ref modelname, ref isPlayer) : _msg.ReadEntity(ref cbody,  ref ctransform,  ref modelname, ref isPlayer);                           
+                            id = mType== Enums.MessageType.EntityLight ? _msg.ReadEntityLight(ref cbody, ref ctransform, ref modelname, ref isPlayer) : _msg.ReadEntity(ref cbody,  ref ctransform,  ref modelname, ref isPlayer);
                             Game1.Inst.Scene.Raise("entityupdate", new EntitySync { ID = id,CBody =cbody, CTransform = ctransform, ModelFileName = modelname,IsPlayer = isPlayer });
                         }
                         else if (mType == Enums.MessageType.CTransform)
@@ -358,9 +361,9 @@ namespace EngineName.Systems
                         }
                         else if (mType == Enums.MessageType.PlayerInfo)
                         {
-                            var date = _msg.ReadInt64(); 
-                            if(!players.Any(x=>x.IP == _msg.SenderEndPoint.Address.ToString() + " " + _msg.SenderEndPoint.Port.ToString())) { 
-                                players.Add(new NetworkPlayer {IP = _msg.SenderEndPoint.Address.ToString() + " " + _msg.SenderEndPoint.Port.ToString(), Time = new DateTime(date), You = false });    
+                            var date = _msg.ReadInt64();
+                            if(!players.Any(x=>x.IP == _msg.SenderEndPoint.Address.ToString() + " " + _msg.SenderEndPoint.Port.ToString())) {
+                                players.Add(new NetworkPlayer {IP = _msg.SenderEndPoint.Address.ToString() + " " + _msg.SenderEndPoint.Port.ToString(), Time = new DateTime(date), You = false });
                                 Game1.Inst.Scene.Raise("update_peers", players.OrderBy(x=>x.Time).ToList());
                             }
                         }
@@ -398,13 +401,13 @@ namespace EngineName.Systems
                         }
                         break;
                 }
-                
+
             }
         }
 
         public override void Cleanup()
         {
-            
+
             _peer.Shutdown("Shutting Down");
             base.Cleanup();
         }
@@ -425,7 +428,7 @@ namespace EngineName.Systems
                 kbps = ((double)s_bpsBytes / remaingTime) / 1000;
                 s_bpsBytes = 0;
                 remaingTime = 0;
-                if (_scanForPeers) { 
+                if (_scanForPeers) {
                     SendPeerPlayerInfo();
                 }
             }
@@ -455,3 +458,6 @@ namespace EngineName.Systems
         public string ModelFileName { get; set; }
     }
 }
+
+#pragma warning restore CS0219
+#pragma warning restore CS0169

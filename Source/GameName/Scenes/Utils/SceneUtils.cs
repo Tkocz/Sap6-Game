@@ -44,7 +44,6 @@ namespace GameName.Scenes.Utils {
         public static void CreateAnimals(int numFlocks,int worldsize) {
             var currentScene = Game1.Inst.Scene;
 
-            int flockCount = (int)(rnd.NextDouble() * 5) + 3;
             int membersPerFlock = (int)(rnd.NextDouble() * 10) + 10;
             var flockRadius = membersPerFlock;
             for (int f = 0; f < numFlocks; f++) {
@@ -214,13 +213,12 @@ namespace GameName.Scenes.Utils {
                                 for (var j = 0; j < 6; j++)
                                 {
                                     var r = 0.6f + (float) rnd.NextDouble() * 2.0f;
-                                    var ballId =
-                                        Utils.SceneUtils.CreateBall(
-                                            new Vector3((float) Math.Sin(j) * j + playerPosition.Position.X,
-                                                playerPosition.Position.Y + 10f + 2.0f * j,
-                                                (float) Math.Cos(j) * j + playerPosition.Position.Z), // Position
-                                            new Vector3(0.0f, -50.0f, 0.0f), // Velocity
-                                            r); // Radius
+                                    Utils.SceneUtils.CreateBall(
+                                        new Vector3((float) Math.Sin(j) * j + playerPosition.Position.X,
+                                                    playerPosition.Position.Y + 10f + 2.0f * j,
+                                                    (float) Math.Cos(j) * j + playerPosition.Position.Z), // Position
+                                        new Vector3(0.0f, -50.0f, 0.0f), // Velocity
+                                        r); // Radius
                                     //balls.Add(ballId);
                                 }
                             }
@@ -242,12 +240,11 @@ namespace GameName.Scenes.Utils {
                                 for (var j = 0; j < 6; j++)
                                 {
                                     var r = 0.6f + (float) rnd.NextDouble() * 2.0f;
-                                    var ballId =
-                                        Utils.SceneUtils.CreateBall(
-                                            new Vector3((float) Math.Sin(j) * j + playerPosition.Position.X,
-                                                playerPosition.Position.Y + 2f,
-                                                (float) Math.Cos(j) * j + playerPosition.Position.Z), // Position
-                                            new Vector3(0.0f, 0.0f, 0.0f), // Velocity
+                                    Utils.SceneUtils.CreateBall(
+                                        new Vector3((float) Math.Sin(j) * j + playerPosition.Position.X,
+                                            playerPosition.Position.Y + 2f,
+                                            (float) Math.Cos(j) * j + playerPosition.Position.Z), // Position
+                                        new Vector3(0.0f, 0.0f, 0.0f), // Velocity
                                             r); // Radius
                                     //balls.Add(ballId);
                                 }

@@ -36,7 +36,6 @@ namespace GameName.AiStates
             foreach (var player in Game1.Inst.Scene.GetComponents<CInput>()) {
                 if (!Game1.Inst.Scene.EntityHasComponent<CBody>(player.Key))
                     continue;
-                var playerBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(player.Key);
                 var playerTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(player.Key);
 
                 var positionDiff = playerTransform.Position - npcTransform.Position;

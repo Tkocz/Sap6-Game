@@ -12,7 +12,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using EngineName.Utils;
 
 namespace GameName.Scenes
 {
@@ -292,17 +291,6 @@ namespace GameName.Scenes
         {
             passedTime += dt;
 
-            Dictionary<int, EcsComponent> cameras = GetComponents<CCamera>();
-
-            /*foreach (var camera in cameras) {
-                CTransform cameraPos = (CTransform)GetComponentFromEntity<CTransform>(camera.Key);
-                CTransform playerPos = (CTransform)GetComponentFromEntity<CTransform>(player);
-                cameraPos.Position.X = playerPos.Position.X + ((CCamera)camera.Value).Distance;
-                cameraPos.Position.Y = playerPos.Position.Y + ((CCamera)camera.Value).Height;
-                cameraPos.Position.Z = playerPos.Position.Z + ((CCamera)camera.Value).Distance;
-                //((CCamera)camera.Value).Target = playerPos.Position;
-                //((CCamera)camera.Value).Heading += 0.1f;
-            }*/
             // TODO: Move to more appropriate location, only trying out heart rotation looks
             foreach(var comp in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {
                 if (comp.Value.GetType() != typeof(CImportedModel))

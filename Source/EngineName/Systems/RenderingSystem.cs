@@ -12,15 +12,9 @@ using Microsoft.Xna.Framework;
 namespace EngineName.Systems
 {
     public class RenderingSystem : EcsSystem {
-        private GraphicsDevice mGraphicsDevice;
-        private Texture2D normalMap;
         private float mT;
-        private float mDT;
 
         public override void Init() {
-            mGraphicsDevice = Game1.Inst.GraphicsDevice;
-            normalMap = Game1.Inst.Content.Load<Texture2D>("Textures/water_bump");
-
             base.Init();
         }
         public override void Update(float t, float dt) {
@@ -28,7 +22,6 @@ namespace EngineName.Systems
         }
         public override void Draw(float t, float dt) {
             mT = t;
-            mDT = dt;
 
             base.Draw(t, dt);
 
@@ -55,7 +48,6 @@ namespace EngineName.Systems
                     Matrix.CreateTranslation(transformComponent.Position);
             }
 
-            int counter = 0;
             var scene = Game1.Inst.Scene;
             foreach (var component in scene.GetComponents<C3DRenderable>()) {
                 var key = component.Key;
@@ -84,14 +76,14 @@ namespace EngineName.Systems
                         == ContainmentType.Disjoint)
                     {
                         // TODO: This is a really ugly hack. :-(
-                        if (model.model.Tag != "Heightmap") {
+                        if ((string)model.model.Tag != "Heightmap") {
                             break;
                         }
                     }
 
 
                     // TODO: This might bug out with multiple mesh parts.
-                    if (model.model.Tag == "water") {
+                    if ((string)model.model.Tag == "water") {
                         // Drawn after.
                         break;
                     }

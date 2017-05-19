@@ -39,10 +39,9 @@ namespace GameName.Systems
                 var flockSize = new Vector3(flock.Members.Count);
                 flock.Centroid = theCenter / flockSize;
                 flock.AvgVelocity = theVelocity / flockSize;
-                
+
                 foreach (var npcKey in flock.Members) {
                     var npcComponent = (CAI)Game1.Inst.Scene.GetComponentFromEntity<CAI>(npcKey);
-                    var npcBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(npcKey);
                     var npcTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(npcKey);
                     if (npcComponent.State == null)
                         npcComponent.State = new SIdle(npcKey);
@@ -64,7 +63,7 @@ namespace GameName.Systems
                         }
                     }
                     var enemyBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(closestEnemyId);
-                    
+
                     // Save fuzzy values instead of recalculating on every rule
                     var closeToEnemy = CloseToEnemy(closestEnemyDistance);
                     var fastEnemySpeed = FastSpeed(enemyBody.Velocity);
