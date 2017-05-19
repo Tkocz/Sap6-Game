@@ -133,13 +133,16 @@ public abstract class MenuScene: Scene {
     /// <param name="t">The total game time, in seconds.</param>
     /// <param name="dt">The game time, in seconds, since the last call to this method.</param>
     public override void Draw(float t, float dt) {
-        // Position the selection highlight before delegating drawing.
-
-        if(mSelHighlight !=null)
-            mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
+            // Position the selection highlight before delegating drawing.
 
         Game1.Inst.GraphicsDevice.Clear(Color.White);
         base.Draw(t, dt);
+
+        if(mSelHighlight ==null)
+           return;
+
+        mSelHighlight.position.Y = mItems[mSelIndex].Text.position.Y;
+
 
         var keyboard = Keyboard.GetState();
         coolDown -= dt;

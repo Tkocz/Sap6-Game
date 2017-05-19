@@ -111,16 +111,20 @@ namespace GameName.Systems
                     var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(pair.Key);
                     var isPlayer = Game1.Inst.Scene.EntityHasComponent<CPlayer>(pair.Key);
 
-                    var totalspeed = Math.Sqrt(Math.Pow(cbody.Velocity.X, 2) + Math.Pow(cbody.Velocity.Z, 2));
-                    if (remaingTimeSlow < updateIntervalSlow && (totalspeed > 3 || totalspeed < -3))
+                    /*var totalspeed = Math.Sqrt(Math.Pow(cbody.Velocity.X, 2) + Math.Pow(cbody.Velocity.Z, 2));
+                    if (counter > 10 && remaingTimeSlow < updateIntervalSlow && (totalspeed < 1 || totalspeed > -1))
                     {
                         continue;
                     }
-                    else { 
+                    else {*/ 
                         if (counter < 10 || counter % 10000 == 0)
                             Game1.Inst.Scene.Raise("sendentity", new EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
                         else
                             Game1.Inst.Scene.Raise("sendentitylight", new EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
+                    //}
+                    if (counter == 10000)
+                    {
+                        counter = 10;
                     }
                 }
             }
