@@ -1,50 +1,89 @@
 namespace EngineName {
 
-// TODO: I'm skipping comments here, will (maybe) add them later. Ask Philip if anything is unclear.
+/*--------------------------------------
+ * USINGS
+ *------------------------------------*/
 
 using System;
 using System.Collections.Generic;
-
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-
-using EngineName.Components.Renderable;
-using EngineName.Core;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using EngineName.Utils;
-using EngineName.Components;
 
+using Core;
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+/*--------------------------------------
+ * CLASSES
+ *------------------------------------*/
+
+/// <summary>Represents a height map created from a two-dimensional texture.</summary>
 public class Heightmap {
+    /*--------------------------------------
+     * NON-PUBLIC FIELDS
+     *------------------------------------*/
+
+    /// <summary>The heightmap texture.</summary>
     private Texture2D mTex;
 
+    /// <summary>The number of pixels to "skip" along the x-axis to create a more "low poly"
+    ///          heightmap.</summary>
     private int mStepX;
+
+    /// <summary>The number of pixels to "skip" along the y-axis to create a more "low poly"
+    ///          heightmap.</summary>
     private int mStepY;
 
+    /// <summary>Indicates whether the heightmap should have smooth shading.</summary>
     private bool mSmooth;
 
+    /// <summary>The scale of the heightmap (along all axes).</summary>
     private float mScale;
+
+    /// <summary>The scale of the heightmap (along the y-axis).</summary>
     private float mYScale;
 
+    /// <summary>A one-dimensional array of heights representing the heightmap. Height(x, y) =
+    ///          mHeights[x+y*mTex.Width]</summary>
     private float[] mHeights;
 
+    /// <summary>Whether the direction of the diagonal of each quad sould be randomized.</summary>
     private bool mRandomTris;
 
+    /// <summary>The blur factor (higher value makes heightmap smoother).</summary>
+    private int mBlur;
+
+    /*--------------------------------------
+     * PUBLIC PROPERTIES
+     *------------------------------------*/
+
+    /// <summary>The renderable heightmap 3d model.</summary>
     public Model Model { get; private set; }
 
+    /*--------------------------------------
+     * NON-PUBLIC CONSTRUCTORS
+     *------------------------------------*/
+
+    /// <summary>Creates a new height map.</summary>
+    /// <param name="tex">The heightmap texture.</param>
+    /// <param name="stepX">The number of pixels to "skip" along the x-axis to create a more "low
+    ///                      poly" heightmap.</param>
+    /// <param name="stepY">The number of pixels to "skip" along the y-axis to create a more "low
+    ///                      poly" heightmap.</param>
+    /// <param name="smooth">Indicates whether the heightmap should have smooth shading.</param>
+    /// <param name="scale">The scale of the heightmap (along all axes).</param>
+    /// <param name="yScale">The scale of the heightmap (along the y-axis).</param>
+    /// <param name="randomTris">Whether the direction of the diagonal of each quad sould be
+    ///                          randomized.</param>
+    /// <param name="blur">The blur factor (higher value makes heightmap smoother).</param>
     private Heightmap(Texture2D tex,
-                      int stepX,
-                      int stepY,
-                      bool smooth,
-                      float scale,
-                      float yScale,
-                      bool randomTris)
+                      int       stepX,
+                      int       stepY,
+                      bool      smooth,
+                      float     scale,
+                      float     yScale,
+                      bool      randomTris,
+                      int       blur)
     {
         mTex        = tex;
         mStepX      = stepX;
@@ -53,12 +92,25 @@ public class Heightmap {
         mScale      = scale;
         mYScale     = yScale;
         mRandomTris = randomTris;
+        mBlur       = blur;
 
-        // Probably bad idea to do this amount of work in ctor but who really cares?
+        // Probably bad idea to do this amount of work in ctor but who really cares? This ctor is
+        // private anyway.
         Init();
     }
 
+    /// <summary>Figures out the height at the specified x- and z-coordinates. The coordinates
+    ///          should be specified in world-space scale.</summary>
+    /// <param name="x">The x-coordinate of the position to calculate the height at.</param>
+    /// <param name="y">The x-coordinate of the position to calculate the height at.</param>
     public float HeightAt(float x, float z) {
+        // TODO: This function could probably be optimized.
+
+        // So basically, what's going on here is, we transform the given position in world-space to
+        // heightmap-space and figure out over which quad (k0, k1, k2 and k3 'vertex' indices) we
+        // are. Then we 2d-lerp over the quad to figure out the y-coordinate, which we transform
+        // back into world-space and return.
+
         var xScale = 1.0f/mTex.Width;
         var yScale = 1.0f/255.0f;
         var zScale = 1.0f/mTex.Height;
@@ -103,19 +155,39 @@ public class Heightmap {
         return y;
     }
 
+    /// <summary>Loads a heightmap and creates a model.</summary>
+    /// <param name="name">The heightmap texture asset name.</param>
+    /// <param name="stepX">The number of pixels to "skip" along the x-axis to create a more "low
+    ///                      poly" heightmap.</param>
+    /// <param name="stepY">The number of pixels to "skip" along the y-axis to create a more "low
+    ///                      poly" heightmap.</param>
+    /// <param name="smooth">Indicates whether the heightmap should have smooth shading.</param>
+    /// <param name="scale">The scale of the heightmap (along all axes).</param>
+    /// <param name="yScale">The scale of the heightmap (along the y-axis).</param>
+    /// <param name="randomTris">Whether the direction of the diagonal of each quad sould be
+    ///                          randomized.</param>
+    /// <param name="blur">The blur factor (higher value makes heightmap smoother).</param>
     public static Heightmap Load(string name,
-                                 int stepX=1,
-                                 int stepY=1,
-                                 bool smooth=true,
-                                 float scale=1.0f,
-                                 float yScale=1.0f,
-                                 bool randomTris=true)
+                                 int    stepX      = 1,
+                                 int    stepY      = 1,
+                                 bool   smooth     = true,
+                                 float  scale      = 1.0f,
+                                 float  yScale     = 1.0f,
+                                 bool   randomTris = true,
+                                 int    blur       = 16)
     {
         var tex = Game1.Inst.Content.Load<Texture2D>(name);
-        return new Heightmap(tex, stepX, stepY, smooth, scale, yScale, randomTris);
+        return new Heightmap(tex, stepX, stepY, smooth, scale, yScale, randomTris, blur);
     }
 
+    /// <summary>Creates the MonoGame/XNA renderable model.</summary>
+    /// <param name="indices">The triangle indices.</param>
+    /// <param name="verts">The model vertices.</param>
     private void CreateModel(int[] indices, VertexPositionNormalColor[] verts) {
+        //--------------------
+        // Compute normals.
+        //--------------------
+
         for (var i = 0; i < indices.Length-2; i += 3) {
             var i0 = indices[i];
             var i1 = indices[i+1];
@@ -133,6 +205,12 @@ public class Heightmap {
         for (var i = 0; i < verts.Length; i++) {
             verts[i].Normal.Normalize();
         }
+
+        //--------------------
+        // Setup model.
+        //--------------------
+
+        // TODO: The code below is retarded. Blame XNA/MonoGame. :-(
 
         var device = Game1.Inst.GraphicsDevice;
 
@@ -162,7 +240,7 @@ public class Heightmap {
         parts[0].Effect = new BasicEffect(device);
 
         var bone = new ModelBone {
-            Name = "Heightmap",
+            Name      = "Heightmap",
             Transform = Matrix.Identity
         };
 
@@ -176,27 +254,36 @@ public class Heightmap {
         Model = new Model(device, bones, meshes);
     }
 
+    /// <summary>Initializes the heightmap.</summary>
     private void Init() {
+        //--------------------
+        // Copy pixel data.
+        //--------------------
+
         mHeights = new float[mTex.Width*mTex.Height];
 
         var pixels = new Color[mHeights.Length];
         mTex.GetData<Color>(pixels);
 
         for (var i = 0; i < mHeights.Length; i++) {
+            // Keep blue channel as height. Why blue channel? Because it was used in the previous
+            // implementation. Works well.
             mHeights[i] = pixels[i].B;
         }
+
+        //--------------------
+        // Blur heightmap.
+        //--------------------
 
         var blurPixels = new float[mHeights.Length];
 
         Func<int, float> calcBlur = (int k) => {
-            const int N = 16;
-
             var val   = 0.0f;
             var count = 0;
 
-            for (var i = -N; i <= N; i++) {
+            for (var i = -mBlur; i <= mBlur; i++) {
                 var a = k + i*mTex.Height;
-                for (var j = -N; j <= N; j++) {
+                for (var j = -mBlur; j <= mBlur; j++) {
                     var k0 = a + j;
                     if (k0 < 0 || k0 >= mHeights.Length) {
                         continue;
@@ -210,13 +297,20 @@ public class Heightmap {
             return val/count;
         };
 
+        // Go to work, little CPUs! *cracks whip*
         Parallel.For(0, mHeights.Length, i => {
             blurPixels[i] = calcBlur(i);
         });
 
+        // Copy back blurred values into heightmap values. We have to double-buffer to get a correct
+        // result (because of the nature of blurring).
         for (var i = 0; i < mHeights.Length; i++) {
             mHeights[i] = blurPixels[i];
         }
+
+        //--------------------
+        // Setup vertices.
+        //--------------------
 
         var indices = new List<int>();
         var verts   = new List<VertexPositionNormalColor>();
@@ -233,6 +327,10 @@ public class Heightmap {
         var rnd = new Random();
 
         Func<float, float, float, Color> calcColor = (x, y, z) => {
+            // The logic below is a bit messy - it's the result of some experimentation. Feel free
+            // to tear it apart and come up with something better. :-) Basically, it computes and
+            // interpolates between colors depending on the heightmap height at the given position.
+
             Func<float, float, float, float> f1 = (a, b, r) => (1.0f-r)*a + r*b;
             Func<Color, Color, float, Color> f = (a, b, r) =>
                 new Color(f1(a.R/255.0f, b.R/255.0f, r),
@@ -290,6 +388,10 @@ public class Heightmap {
             };
 
             if (mSmooth) {
+                // So, if we're doing a smooth heightmap, cache the vertex index so we can reuse it.
+                // This means triangles end up sharing vertices, in which case the normal
+                // computation will give smooth triangles.
+
                 if (!indexCache.ContainsKey(key)) {
                     verts.Add(vert);
                     indexCache[key] = indexCounter++;
@@ -314,6 +416,7 @@ public class Heightmap {
 
         for (var i = 0; i < mTex.Width-mStepX; i += mStepX) {
             for (var j = 0; j < mTex.Height-mStepY; j += mStepY) {
+                // If random tris are enabled, randomize the diagonal of each triangle.
                 if (!mRandomTris || rnd.Next(0, 2) == 1) {
                     calcTri(i       , j       , i+mStepX, j       , i+mStepX, j+mStepY);
                     calcTri(i+mStepX, j+mStepY, i       , j+mStepY, i       , j);

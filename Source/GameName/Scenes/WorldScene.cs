@@ -83,12 +83,13 @@ namespace GameName.Scenes
 #endif
 
             var heightmap = Heightmap.Load("Textures/HeightMap",
-                                           stepX: 8,
-                                           stepY: 8,
-                                           smooth: false,
-                                           scale: 200.0f,
-                                           yScale: 0.4f,
-                                           randomTris: true);
+                                           stepX      : 8,
+                                           stepY      : 8,
+                                           smooth     : false,
+                                           scale      : 200.0f,
+                                           yScale     : 0.4f,
+                                           randomTris : true,
+                                           blur       : 16);
             physicsSys.Heightmap = heightmap;
 
             base.Init();
