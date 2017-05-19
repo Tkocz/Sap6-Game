@@ -16,6 +16,7 @@ namespace EngineName.Systems
         private Texture2D normalMap;
         private float mT;
         private float mDT;
+
         public override void Init() {
             mGraphicsDevice = Game1.Inst.GraphicsDevice;
             normalMap = Game1.Inst.Content.Load<Texture2D>("Textures/water_bump");
@@ -31,9 +32,6 @@ namespace EngineName.Systems
 
             base.Draw(t, dt);
 
-            Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-
             foreach (var camera in Game1.Inst.Scene.GetComponents<CCamera>()) {
                 var camPos = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(camera.Key);
                 DrawScene((CCamera)(camera.Value), -1, camPos);
@@ -45,6 +43,10 @@ namespace EngineName.Systems
 
         public void DrawScene(CCamera camera, int excludeEid=-1, CTransform camPos=null) {
             // TODO: Clean code below up, hard to read.
+
+            Game1.Inst.GraphicsDevice.Clear(new Color(0.4f, 0.6f, 0.8f));
+
+            Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             foreach (CTransform transformComponent in Game1.Inst.Scene.GetComponents<CTransform>().Values)
             {
@@ -204,6 +206,8 @@ namespace EngineName.Systems
                         mesh.Draw();
                     }
                 }
+
+
             }
 
             // -

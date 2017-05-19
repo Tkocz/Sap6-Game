@@ -159,6 +159,7 @@
 #begin Fonts\sector034.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts\sector034.spritefont
 
@@ -177,6 +178,7 @@
 #begin Fonts/DroidSans.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts/DroidSans.spritefont
 
@@ -603,12 +605,14 @@
 #begin Fonts/FFFForward.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts/FFFForward.spritefont
 
 #begin Fonts/FFFForward_Large.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts/FFFForward_Large.spritefont
 
@@ -641,4 +645,10 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Tropical.png
+
+#begin Effects/UnderWater.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/UnderWater.fx
 

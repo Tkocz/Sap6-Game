@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using EngineName.Utils;
 
 namespace GameName.Scenes
 {
@@ -29,6 +30,9 @@ namespace GameName.Scenes
         private List<int> balls = new List<int>();
         private NetworkSystem _networkSystem;
         private WorldSceneConfig configs;
+        private Effect mUnderWaterFx;
+        private RenderTarget2D mRT;
+        private WaterSystem waterSys;
 
         public WorldScene(WorldSceneConfig configs) {
             this.configs = configs;
@@ -38,13 +42,27 @@ namespace GameName.Scenes
 
         public override void Draw(float t, float dt)
         {
-            Game1.Inst.GraphicsDevice.Clear(new Color(0.4f, 0.6f, 0.8f));
             if (shouldLeave) // TODO: When we parallelise this probably won't work.
             {
                 Game1.Inst.LeaveScene();
                 Game1.Inst.EnterScene(new EndGameScene(passedTime, pickUpCount,won));
             }
-            base.Draw(t, dt);
+
+            var camera = (CCamera)GetComponentFromEntity<CCamera>(player);
+
+            if (camera.Position.Y < waterSys.WaterHeight) {
+                GfxUtil.SetRT(mRT);
+                base.Draw(t, dt);
+                GfxUtil.SetRT(null);
+                mUnderWaterFx.Parameters["SrcTex"].SetValue(mRT);
+                mUnderWaterFx.Parameters["Phase"].SetValue(t);
+                GfxUtil.DrawFsQuad(mUnderWaterFx);
+            }
+            else {
+                GfxUtil.SetRT(null);
+                base.Draw(t, dt);
+
+            }
         }
 
         public void InitGameComponents()
@@ -63,10 +81,15 @@ namespace GameName.Scenes
             InitGameComponents();
             InitSceneLightSettings();
 
-            //todo set waterheight depending on 
-            var waterSys = new WaterSystem();
+
+            mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
+            mRT = GfxUtil.CreateRT();
+
+
+            //todo set waterheight depending on
+            waterSys = new WaterSystem();
             if (configs.map == "Tropical") //"DinoIsland"
-            {  
+            {
                 waterSys.WaterHeight = -7;
                 heightMapScale = 300;
                 yScaleMap = 0.1f;
@@ -76,7 +99,7 @@ namespace GameName.Scenes
                 yScaleMap = 0.5f;
                 waterSys.WaterHeight = -58;
             }
-            
+
 
 
             var physicsSys = new PhysicsSystem();
@@ -99,7 +122,7 @@ namespace GameName.Scenes
 #if DEBUG
            AddSystem(new DebugOverlay());
 #endif
-            
+
             var heightmap = Heightmap.Load("Textures/" + configs.map,
                                            stepX      : 8,
                                            stepY      : 8,

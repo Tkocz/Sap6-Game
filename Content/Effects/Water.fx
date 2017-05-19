@@ -105,7 +105,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0 {
   float3 dif  = color * difFac;
   float3 spec = float3(1.0, 1.0, 1.0) * specFac;
 
-  return float4(amb+dif+spec, 0.2+0.4*(difFac+specFac));
+  return float4(amb+dif+spec, 0.4+0.3*(difFac+specFac));
 }
 technique BasicColorDrawing {
   pass Pass1 {
