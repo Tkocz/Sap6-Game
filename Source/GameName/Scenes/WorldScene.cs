@@ -67,15 +67,14 @@ namespace GameName.Scenes
             physicsSys.InvSpatPartSize = 0.07f;
             physicsSys.Gravity *= 2.0f;
             AddSystems(
-                new RenderingSystem(),
-                new CameraSystem(),
+                waterSys,
                 physicsSys,
                 new InputSystem(),
-                waterSys,
-                new Rendering2DSystem(),
                 new AISystem(),
                 new AnimationSystem(),
                 new InventorySystem(),
+                new CameraSystem(),
+                new Rendering2DSystem(),
                 new HealthSystem()
             );
 
@@ -88,13 +87,16 @@ namespace GameName.Scenes
                                            stepY      : 8,
                                            smooth     : false,
                                            scale      : 200.0f,
-                                           yScale     : 0.1f,
+                                           yScale     : 0.4f,
                                            randomTris : true,
                                            blur       : 16);
 
             physicsSys.Heightmap = heightmap;
 
             base.Init();
+
+			SceneUtils.SpawnEnvironment(heightmap);
+
 
             //add network after init
 
@@ -112,7 +114,7 @@ namespace GameName.Scenes
             // Camera entity
             float fieldofview = MathHelper.PiOver2;
             float nearplane = 0.1f;
-            float farplane = 1000f;
+            float farplane = 100f;
 
             player = AddEntity();
 
@@ -172,24 +174,13 @@ namespace GameName.Scenes
             });
 
             int heightMap = AddEntity();
-			Dictionary<int, string> elementList = new Dictionary<int, string>();
-			elementList.Add(255, "LeafTree");
-			elementList.Add(245, "PalmTree");
-			elementList.Add(235, "tree");
-			elementList.Add(170, "rock2");
-			var heightMapComp = new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/" + configs.map), elements = elementList };
+			var heightMapComp = new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/" + configs.map)};
 			var heightTrans = new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) };
             AddComponent<C3DRenderable>(heightMap, heightMapComp);
             AddComponent(heightMap, heightTrans);
-            // manually start loading all heightmap components, should be moved/automated
+			// manually start loading all heightmap components, should be moved/automated
 
-			foreach (var i in heightMapComp.EnvironmentSpawn )
-			{
-				int newElement = Game1.Inst.Scene.AddEntity ();
-				Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), InvTransf = Matrix.Identity });
-				Game1.Inst.Scene.AddComponent(newElement, new CTransform() { Position = new Vector3(i.X + heightTrans.Position.X, i.Y * heightTrans.Scale.Y - 1f, i.Z + heightTrans.Position.Z), Scale = new Vector3((float)rnd.NextDouble() * 0.25f + 0.75f), Rotation = Matrix.CreateRotationY((float)rnd.NextDouble() * MathHelper.Pi * 2f) });
-				Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + heightMapComp.elements[(int)i.W])  ,fileName = heightMapComp.elements[(int)i.W] });
-			}
+
             waterSys.Load();
 
            OnEvent("game_end", data =>

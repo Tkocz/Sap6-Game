@@ -105,6 +105,17 @@ public class Heightmap {
         return mPixels[x + y*mTex.Width];
     }
 
+		public Vector2 GetDimensions()
+		{
+			return new Vector2(mTex.Width, mTex.Height);
+		}
+
+		public float GetScale()
+		{
+			return mScale;
+		}
+
+
     /// <summary>Figures out the height at the specified x- and z-coordinates. The coordinates
     ///          should be specified in world-space scale.</summary>
     /// <param name="x">The x-coordinate of the position to calculate the height at.</param>
