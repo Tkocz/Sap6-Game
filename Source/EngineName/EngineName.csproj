@@ -49,6 +49,7 @@
     <Compile Include="Components\CBody.cs" />
     <Compile Include="Components\CBox.cs" />
     <Compile Include="Components\CFlock.cs" />
+    <Compile Include="Components\CHealth.cs" />
     <Compile Include="Components\CInput.cs" />
     <Compile Include="Components\CInventory.cs" />
     <Compile Include="Components\CInventoryItem.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Systems\ChatSystem.cs" />
     <Compile Include="Systems\DebugOverlay.cs" />
     <Compile Include="Systems\FpsCounterSystem.cs" />
+    <Compile Include="Systems\HealthSystem.cs" />
     <Compile Include="Systems\LogicSystem.cs" />
     <Compile Include="Systems\MapSystem.cs" />
     <Compile Include="Systems\NetworkSystem.cs" />

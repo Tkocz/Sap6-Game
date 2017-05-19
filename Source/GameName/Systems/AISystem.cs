@@ -110,15 +110,15 @@ namespace GameName.Systems
         // Enemy speed
         private FuzzyNumber FastSpeed(Vector3 velocity) {
             double speed = Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Z, 2));
-            return (FuzzyUtil.SigMF(speed, 5, -2));
+            return (FuzzyUtil.SigMF(speed, 4.5, -2));
         }
         private FuzzyNumber MediumSpeed(Vector3 velocity) {
             double speed = Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Z, 2));
-            return (FuzzyUtil.GaussMF(speed, 4, 1));
+            return (FuzzyUtil.GaussMF(speed, 3, 1));
         }
         private FuzzyNumber SlowSpeed(Vector3 velocity) {
             double speed = Math.Sqrt(Math.Pow(velocity.X, 2) + Math.Pow(velocity.Z, 2));
-            return (FuzzyUtil.SigMF(speed, 2, 2));
+            return (FuzzyUtil.SigMF(speed, 1.5, 2));
         }
     }
 }

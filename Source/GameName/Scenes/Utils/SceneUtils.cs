@@ -104,6 +104,9 @@ namespace GameName.Scenes.Utils {
                         MaxVelocity = 5,
                         Restitution = 0
                     });
+                    // health value of npcs, maybe change per species/flock/member?
+                    var npcHealth = 1;
+                    currentScene.AddComponent(id, new CHealth { MaxHealth = npcHealth, Health = npcHealth });
                     currentScene.AddComponent(id, new CAI { Flock = flockId });
                     currentScene.AddComponent(id, new CSyncObject());
 
