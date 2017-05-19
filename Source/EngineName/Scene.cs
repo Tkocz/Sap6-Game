@@ -128,7 +128,7 @@ namespace EngineName {
         }
         /// <summary>Removes the specified entity from the scene.</summary>
         /// <param name="entity">The entity to remove from the scene.</param>
-        /// 
+        ///
         public void RemoveEntity(int eid) {
             mEntsToRemove.Add(eid);
         }
@@ -213,6 +213,7 @@ namespace EngineName {
     public virtual void Init() {
 
         // init all component dictionaries
+        Components.Add(typeof(CWater), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CTransform), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CInput), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(C3DRenderable), new Dictionary<int, EcsComponent>());
