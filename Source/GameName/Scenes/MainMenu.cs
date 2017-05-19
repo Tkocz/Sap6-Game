@@ -58,6 +58,7 @@ public sealed class MainMenu: MenuScene {
         CreateLabel("Quit", () => {
             Game1.Inst.Exit();
         });
+        addArrow();
 
         var screenCenter = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.5f, Game1.Inst.GraphicsDevice.Viewport.Height * 0.5f);
         string text = "GAME";
