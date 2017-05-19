@@ -1,4 +1,8 @@
-﻿using System;
+﻿#pragma warning disable CS0414
+#pragma warning disable CS0219
+#pragma warning disable CS0169
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -176,3 +180,7 @@ namespace GameName.Systems
 
     }
 }
+
+#pragma warning restore CS0414
+#pragma warning restore CS0219
+#pragma warning restore CS0169

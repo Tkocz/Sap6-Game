@@ -52,7 +52,7 @@ namespace GameName.Systems
                     foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>()) {
                         if (!Game1.Inst.Scene.EntityHasComponent<CBody>(player.Key))
                             continue;
-                        var playerBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(player.Key);
+
                         var playerTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(player.Key);
 
                         var distance = PositionalUtil.Distance(playerTransform.Position, npcTransform.Position);

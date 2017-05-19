@@ -106,10 +106,8 @@ namespace EngineName.Systems
                             for (var j = 0; j < effect.CurrentTechnique.Passes.Count; j++) {
                                 effect.CurrentTechnique.Passes[j].Apply();
                                 device.DrawIndexedPrimitives(PrimitiveType.TriangleList,
-                                                             part.VertexOffset,
                                                              0,
-                                                             part.NumVertices,
-                                                             part.StartIndex,
+                                                             0,
                                                              part.PrimitiveCount);
                             }
                         }

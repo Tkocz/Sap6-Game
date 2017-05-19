@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+#pragma warning disable CS0414
 #pragma warning disable CS0219
 #pragma warning disable CS0169
 
@@ -459,5 +460,6 @@ namespace EngineName.Systems
     }
 }
 
+#pragma warning restore CS0414
 #pragma warning restore CS0219
 #pragma warning restore CS0169

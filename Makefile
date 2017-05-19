@@ -75,8 +75,8 @@ engine: $(C_BINDIR)/$(E_TARGET)
 game: $(C_BINDIR)/$(G_TARGET)
 
 libs:
-	mkdir -p $(C_BINDIR)
-	-cp -nr $(MONOGAME_PATH)/* $(C_BINDIR)
+	@mkdir -p $(C_BINDIR)
+	-@cp -nr $(MONOGAME_PATH)/* $(C_BINDIR)
 
 run:
 	cd $(C_BINDIR); \
@@ -91,7 +91,7 @@ run:
 .PHONY: $(C_BINDIR)/$(G_TARGET) game
 
 $(C_BINDIR)/$(E_TARGET):
-	mkdir -p $(C_BINDIR)
+	@mkdir -p $(C_BINDIR)
 	$(E_COMPILER) $(E_FLAGS)                        \
 	              $(addprefix -lib:, $(E_LIBPATHS)) \
 	              $(addprefix -r:, $(E_LIBS))       \
@@ -99,7 +99,7 @@ $(C_BINDIR)/$(E_TARGET):
 	              -recurse:$(E_SRCDIR)/*.cs
 
 $(C_BINDIR)/$(G_TARGET): engine
-	mkdir -p $(C_BINDIR)
+	@mkdir -p $(C_BINDIR)
 	$(G_COMPILER) $(G_FLAGS)                        \
 	              $(addprefix -lib:, $(G_LIBPATHS)) \
 	              $(addprefix -r:, $(G_LIBS))       \
@@ -162,7 +162,7 @@ $(G_CONTENTDIR)/Textures/*.png:
 	@echo /build:$@                   >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 pre-content:
-	mkdir -p $(G_TMPDIR)
+	@mkdir -p $(G_TMPDIR)
 	@echo /compress                     > $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /intermediateDir:$(G_OBJDIR) >> $(G_TMPDIR)/$(G_CONTENTFILE)
 	@echo /outputDir:$(C_BINDIR)       >> $(G_TMPDIR)/$(G_CONTENTFILE)
@@ -171,5 +171,5 @@ pre-content:
 	@echo /quiet                       >> $(G_TMPDIR)/$(G_CONTENTFILE)
 
 content: pre-content $(CONTENT)
-	mkdir -p $(C_BINDIR)
-	mgcb -@:$(G_TMPDIR)/$(G_CONTENTFILE)
+	@mkdir -p $(C_BINDIR)
+	mgcb -@:$(G_TMPDIR)/$(G_CONTENTFILE) > /dev/null
