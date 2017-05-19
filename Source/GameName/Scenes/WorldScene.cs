@@ -90,6 +90,7 @@ namespace GameName.Scenes
                                            yScale     : 0.4f,
                                            randomTris : true,
                                            blur       : 16);
+
             physicsSys.Heightmap = heightmap;
 
             base.Init();
@@ -113,6 +114,22 @@ namespace GameName.Scenes
             float farplane = 1000f;
 
             player = AddEntity();
+
+            Func<float, Matrix> playerAnim = (t) => {
+                var transf = (CTransform)GetComponentFromEntity<CTransform>(player);
+                var body = (CBody)GetComponentFromEntity<CBody>(player);
+
+                // Wiggle wiggle!
+                var x = 0.3f*Vector3.Dot(transf.Frame.Forward, body.Velocity);
+                var walk =
+                    Matrix.CreateFromAxisAngle(Vector3.Forward, x*0.1f*(float)Math.Cos(t*24.0f))
+                  * Matrix.CreateTranslation(Vector3.Up * -x*0.1f*(float)Math.Sin(t*48.0f));
+
+                var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f*(float)Math.Sin(t*2.0f));
+
+                return walk * idle;
+            };
+
             AddComponent(player, new CBody() {
                 MaxVelocity = 5f,
                 InvMass = 0.01f,
@@ -123,10 +140,11 @@ namespace GameName.Scenes
                 ReachableArea = new BoundingBox(new Vector3(-1.5f, -2.0f, -1.5f), new Vector3(1.5f, 2.0f, 1.5f)),
                 Restitution = 0.1f
             });
+
             AddComponent(player, new CInput());
             AddComponent(player, new CPlayer());
             AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, rnd.Next(0,50)), Scale = new Vector3(0.5f) });
-            AddComponent<C3DRenderable>(player, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/viking") , fileName = "viking" });
+            AddComponent<C3DRenderable>(player, new CImportedModel() { animFn = playerAnim, model = Game1.Inst.Content.Load<Model>("Models/viking") , fileName = "viking" });
             AddComponent(player, new CSyncObject { fileName = "viking" });
             AddComponent(player, new CInventory());
 

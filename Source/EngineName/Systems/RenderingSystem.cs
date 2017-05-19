@@ -66,6 +66,11 @@ namespace EngineName.Systems
                 C3DRenderable model = (C3DRenderable)component.Value;
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
                 CTransform transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
+                var anim = Matrix.Identity;
+
+                if (model.animFn != null) {
+                    anim = model.animFn(mT);
+                }
 
                 Matrix[] bones = new Matrix[model.model.Bones.Count];
                 model.model.CopyAbsoluteBoneTransformsTo(bones);
@@ -81,7 +86,7 @@ namespace EngineName.Systems
                     }
                     else if (model.material != null) {
                         model.material.CamPos = camPos.Position;
-                        model.material.Model = mesh.ParentBone.Transform * transform.Frame;
+                        model.material.Model = mesh.ParentBone.Transform * anim * transform.Frame;
                         model.material.View  = camera.View;
                         model.material.Proj  = camera.Projection;
                         model.material.Prerender();
@@ -134,7 +139,7 @@ namespace EngineName.Systems
 
                             effect.Projection = camera.Projection;
                             effect.View = camera.View;
-                            effect.World = mesh.ParentBone.Transform * transform.Frame;
+                            effect.World = mesh.ParentBone.Transform * anim * transform.Frame;
                         }
 
                         mesh.Draw();

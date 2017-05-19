@@ -15,5 +15,6 @@ namespace EngineName.Components.Renderable
         public bool enableVertexColor = false;
         public MaterialShader material;
         public Model model;
+        public Func<float, Matrix> animFn = null;
     }
 }
