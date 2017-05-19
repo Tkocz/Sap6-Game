@@ -48,7 +48,17 @@ void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
   float2 texCoord = float2(vsOut.texCoord.x + 0.02f*sin(Phase+vsOut.texCoord.y*3.141592f),
                            vsOut.texCoord.y + 0.02f*cos(Phase+vsOut.texCoord.x*3.141592f*2.0f));
 
-  float4 a = tex2D(texSampler, texCoord).rgba;
+  float2 r = float2(1.0/1280.0, 1.0/720.0);
+  float4 a0 = tex2D(texSampler, texCoord+float2(-1.0, -1.0)*r).rgba;
+  float4 a1 = tex2D(texSampler, texCoord+float2( 0.0, -1.0)*r).rgba;
+  float4 a2 = tex2D(texSampler, texCoord+float2( 1.0, -1.0)*r).rgba;
+  float4 a3 = tex2D(texSampler, texCoord+float2(-1.0,  0.0)*r).rgba;
+  float4 a4 = tex2D(texSampler, texCoord+float2( 0.0,  0.0)*r).rgba;
+  float4 a5 = tex2D(texSampler, texCoord+float2( 1.0,  0.0)*r).rgba;
+  float4 a6 = tex2D(texSampler, texCoord+float2(-1.0,  1.0)*r).rgba;
+  float4 a7 = tex2D(texSampler, texCoord+float2( 0.0,  1.0)*r).rgba;
+  float4 a8 = tex2D(texSampler, texCoord+float2( 1.0,  1.0)*r).rgba;
+  float4 a = (a0+a1+a2+a3+a4+a5+a6+a7+a8)/9.0f;
   float4 b = float4(0.2, 0.3, 0.5, 1.0);
   psOut.color = lerp(a, b, 0.5);
 }
