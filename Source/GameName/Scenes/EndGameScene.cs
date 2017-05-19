@@ -35,7 +35,7 @@ namespace GameName.Scenes
             if (passedTime > lifeTime)
             {
                 Game1.Inst.LeaveScene();
-                Game1.Inst.EnterScene(new MainMenu());
+                Game1.Inst.EnterScene(new MainMenu(null));
             }
             base.Update(t, dt);
         }

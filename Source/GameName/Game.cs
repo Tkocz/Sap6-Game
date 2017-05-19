@@ -34,11 +34,7 @@ using GameName.Scenes;
         Log.ToFile();
 
         // TODO: Create initial scene.
-#if DBG_MENU
-	using (var game = new Game1(new MainMenu())) {
-#else
-	using (var game = new Game1(new ConfigSceneMenu(true, args))) {
-#endif
+	    using (var game = new Game1(new MainMenu(args))) {
             game.Run();
         }
 

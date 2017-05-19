@@ -23,14 +23,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 /// <summary>Provides the main menu.</summary>
 public sealed class MainMenu: MenuScene {
+    private string[] _args;
+
     //--------------------------------------
     // PUBLIC METHODS
     //--------------------------------------
-
+    public MainMenu(string[] args) {
+        _args = args;
+    }
     /// <summary>Initializes the scene.</summary>
     public override void Init() {
         base.Init();
-
+        #if DBG_MENU
         // Ugly, but useful during development.
         foreach (var type in Assembly.GetExecutingAssembly().GetTypes()) {
             if (!type.IsSubclassOf(typeof (Scene)) || type == GetType()) {
@@ -41,21 +45,18 @@ public sealed class MainMenu: MenuScene {
                 Game1.Inst.EnterScene((Scene)Activator.CreateInstance(type));
             });
         }
-
+        #else
         CreateLabel("Single-Player", () => {
-            Game1.Inst.EnterScene(new ConfigSceneMenu(false,null));
+            Game1.Inst.EnterScene(new ConfigSceneMenu(false, _args));
         });
 
         CreateLabel("Multi-Player", () => {
 
-            Game1.Inst.EnterScene(new ConfigSceneMenu(true ,null));
+            Game1.Inst.EnterScene(new ConfigSceneMenu(true, _args));
         });
+        #endif
 
-        CreateLabel("Collisions", () => {
-            Game1.Inst.EnterScene(new Dev.Collisions());
-        });
-
-        CreateLabel("Quit", () => {
+            CreateLabel("Quit", () => {
             Game1.Inst.Exit();
         });
         addArrow();

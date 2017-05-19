@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using EngineName.Systems;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace GameName.Scenes {
     class ConfigSceneMenu : MenuScene {
@@ -53,6 +54,35 @@ namespace GameName.Scenes {
         }
         public override void Init() {
             base.Init();
+            
+            var screenCenter = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.5f, Game1.Inst.GraphicsDevice.Viewport.Height * 0.5f);
+            string text = "GAME";
+            var largeFont = Game1.Inst.Content.Load<SpriteFont>("Fonts/FFFForward_Large");
+            var textSize = largeFont.MeasureString(text);
+            int id = AddEntity();
+            AddComponent<C2DRenderable>(id, new CText {
+                color = Color.Black,
+                font = largeFont,
+                format = text,
+                origin = Vector2.Zero,
+                position = new Vector2(
+                    screenCenter.X - textSize.X * 0.5f,
+                    screenCenter.Y - textSize.Y - 20
+                )
+            });
+            text = "the game";
+            textSize = mFont.MeasureString(text);
+            id = AddEntity();
+            AddComponent<C2DRenderable>(id, new CText {
+                color = Color.Black,
+                font = mFont,
+                format = text,
+                origin = Vector2.Zero,
+                position = new Vector2(
+                    screenCenter.X - textSize.X * 0.5f,
+                    screenCenter.Y
+                )
+            });
 
             if (mIsMultiplayer)
             {
@@ -103,7 +133,7 @@ namespace GameName.Scenes {
             }, () =>
             {
                 // Map Decrease
-                selectedMap = (selectedMap - 1) % maps.Length;
+                selectedMap = selectedMap > 0 ? (selectedMap - 1) % maps.Length : maps.Length-1;
                 UpdateText("Map: " + maps[selectedMap]);
                 sendMenuItem(_map);
             });
