@@ -21,8 +21,9 @@ namespace GameName.Scenes {
         private int maxPowerUps = 55;
         private int maxTriggers = 55;
         private string[] maps = new string[]{
-            //"Square_island_4x4",
+            "Square_island_4x4",
             "DinoIsland",
+            "HeightMap",
         };
         private int selectedMap = 0;
         private bool mIsMultiplayer;
@@ -34,6 +35,7 @@ namespace GameName.Scenes {
         private int _flocks;
         private int _powerups;
         private int _triggers;
+        private int waiting;
 
         /// <summary>Initializes the scene.</summary>
         public ConfigSceneMenu(bool IsMultiplayer, string[] args) {
@@ -54,7 +56,7 @@ namespace GameName.Scenes {
 
             if (mIsMultiplayer)
             {
-              
+                addWatingForPlayers();
                 OnEvent("update_peers", updatePeers);
                 OnEvent("selchanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
             }
@@ -67,9 +69,25 @@ namespace GameName.Scenes {
 
         }
 
+        public void addWatingForPlayers()
+        {
+            waiting = AddEntity();
+            var waitingtext = "Searching for players to join";
+            var mes = mFont.MeasureString(waitingtext);
+            AddComponent<C2DRenderable>(waiting,new CText
+            {
+                color = Color.Black,
+                font =  mFont,
+                format = waitingtext,
+                origin = Vector2.Zero,
+                position = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.5f- mes.X/2, Game1.Inst.GraphicsDevice.Viewport.Width *0.5f - 70 )
+            });
+        }
 
         private void CreateLabels()
         {
+            addArrow();
+
             _map = CreateLabel("Map: " + maps[selectedMap], () =>
             {
                 // Map Select
@@ -136,13 +154,24 @@ namespace GameName.Scenes {
             });
             labels.Add(_triggers);
 
-             CreateLabel("Start Game", () => {
-                var configs = new WorldSceneConfig(numFlocks, numPowerUps, numTriggers, maps[selectedMap], null);
+            CreateLabel("Start Game", () =>
+            {
+                WorldSceneConfig configs = null;
+                if (mIsMultiplayer) { 
+                    Raise("send_start_game", maps[selectedMap]);
+                    configs = new WorldSceneConfig(numFlocks, numPowerUps, numTriggers, maps[selectedMap], _networkSystem);
+                    }
+                else
+                {
+                    configs = new WorldSceneConfig(numFlocks, numPowerUps, numTriggers, maps[selectedMap], null);
+                }
                 Game1.Inst.EnterScene(new WorldScene(configs));
             });
             CreateLabel("Return", () => {
                 Game1.Inst.LeaveScene();
             });
+
+            
            
         }
 
@@ -173,6 +202,13 @@ namespace GameName.Scenes {
             }
         }
 
+        private void onStartGame(object data)
+        {
+            var mapName = (string) data;
+            var configs = new WorldSceneConfig(0, 0, 0, mapName, _networkSystem);
+            Game1.Inst.EnterScene(new WorldScene(configs));
+        }
+
         private void updatePeers(object input) {
             var data  = input as List<NetworkPlayer>;
             if (data == null) return;
@@ -188,8 +224,10 @@ namespace GameName.Scenes {
                 else
                 {
                     OnEvent("network_menu_data_received", updateMenuItem);
+                    OnEvent("startgame",onStartGame);
                 }
                 mMasterIsSet = true;
+                RemoveEntity(waiting);
             }
             // remove current player list
             foreach (var id in mPlayerList) {

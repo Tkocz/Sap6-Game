@@ -101,7 +101,7 @@ public class Heightmap {
         Init();
     }
 
-    public float ColorAt(int x, int y) {
+    public Color ColorAt(int x, int y) {
         return mPixels[x + y*mTex.Width];
     }
 
@@ -273,9 +273,9 @@ public class Heightmap {
         mTex.GetData<Color>(mPixels);
 
         for (var i = 0; i < mHeights.Length; i++) {
-            // Keep blue channel as height. Why blue channel? Because it was used in the previous
+            // Keep red channel as height. Why red channel? Because it was used in the previous
             // implementation. Works well.
-            mHeights[i] = mPixels[i].B;
+            mHeights[i] = mPixels[i].R;
         }
 
         //--------------------

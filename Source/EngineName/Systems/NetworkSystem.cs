@@ -64,12 +64,11 @@ namespace EngineName.Systems
 
             Game1.Inst.Scene.OnEvent("send_to_peer", data => this.SendObject((string)data, "metadata"));
             Game1.Inst.Scene.OnEvent("search_for_peers", data => _peer.DiscoverLocalPeers(_searchport));
-            Game1.Inst.Scene.OnEvent("send_setup_game",
+            Game1.Inst.Scene.OnEvent("send_start_game",
                 data =>
                 {
-                    this.SendObject(_peer.Configuration.BroadcastAddress.ToString(), "StartEvent");
+                    this.SendObject(data, "StartEvent");
                     _isMaster = true;
-                    Game1.Inst.Scene.Raise("startgamerequest", null);
                     _scanForPeers = false;
                 });
             Game1.Inst.Scene.OnEvent("send_menuitem", data =>
@@ -287,11 +286,10 @@ namespace EngineName.Systems
                             var metadata = _msg.ReadString();
                             if (metadata == "StartEvent")
                             {
-                                var ip = _msg.ReadString();
-                                masterIp = ip;
+                                var map = _msg.ReadString();
                                 _isMaster = false;
-                                MasterNetConnection = _peer.Connections.FirstOrDefault(x => x.RemoteEndPoint.Address.ToString() == ip);
-                                Game1.Inst.Scene.Raise("startgamerequest", _msg.ReadString());
+                                MasterNetConnection = _peer.Connections.FirstOrDefault(x => x.RemoteEndPoint.Address.ToString() == _msg.SenderEndPoint.Address.ToString());
+                                Game1.Inst.Scene.Raise("startgame", map);
                             }
                             else if(metadata == "metadata")
                             {
