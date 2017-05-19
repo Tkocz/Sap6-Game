@@ -21,6 +21,7 @@ namespace GameName.Scenes
         private bool shouldLeave = false;
         private Random rnd = new Random();
         private int worldSize = 590;
+        private int heightMapScale = 200;
         private int player;
         private int pickUpCount = 0;
         private bool won;
@@ -81,12 +82,12 @@ namespace GameName.Scenes
 #if DEBUG
            AddSystem(new DebugOverlay());
 #endif
-
+            
             var heightmap = Heightmap.Load("Textures/" + configs.map,
                                            stepX      : 8,
                                            stepY      : 8,
                                            smooth     : false,
-                                           scale      : 200.0f,
+                                           scale      : heightMapScale,
                                            yScale     : 0.1f,
                                            randomTris : true,
                                            blur       : 16);
@@ -223,9 +224,9 @@ namespace GameName.Scenes
 
             if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
             {
-                Utils.SceneUtils.CreateAnimals(configs.numFlocks);
-                Utils.SceneUtils.CreateTriggerEvents(configs.numTriggers);
-                Utils.SceneUtils.CreateCollectables(configs.numPowerUps);
+                Utils.SceneUtils.CreateAnimals(configs.numFlocks, heightMapScale / 2);
+                Utils.SceneUtils.CreateTriggerEvents(configs.numTriggers, heightMapScale / 2);
+                Utils.SceneUtils.CreateCollectables(configs.numPowerUps, heightMapScale / 2);
                 // Add tree as sprint goal
                 int sprintGoal = AddEntity();
                 AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
