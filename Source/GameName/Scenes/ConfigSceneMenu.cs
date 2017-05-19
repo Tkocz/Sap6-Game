@@ -21,8 +21,9 @@ namespace GameName.Scenes {
         private int maxPowerUps = 55;
         private int maxTriggers = 55;
         private string[] maps = new string[]{
-            //"Square_island_4x4",
+            "Square_island_4x4",
             "DinoIsland",
+            "HeightMap",
         };
         private int selectedMap = 0;
         private bool mIsMultiplayer;

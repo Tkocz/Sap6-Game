@@ -20,7 +20,7 @@ namespace EngineName.Systems
         private int[] vibrations;
         private Effect bEffect;
 
-        public float WaterHeight = 40;
+        public float WaterHeight = -9;
         public byte WaterOpacity = 100;
         public int Resolution = 40; // vertices per direction
         public float Frequency = 1.5f;

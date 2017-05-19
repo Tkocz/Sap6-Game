@@ -266,9 +266,9 @@ public class Heightmap {
         mTex.GetData<Color>(pixels);
 
         for (var i = 0; i < mHeights.Length; i++) {
-            // Keep blue channel as height. Why blue channel? Because it was used in the previous
+            // Keep red channel as height. Why red channel? Because it was used in the previous
             // implementation. Works well.
-            mHeights[i] = pixels[i].B;
+            mHeights[i] = pixels[i].R;
         }
 
         //--------------------

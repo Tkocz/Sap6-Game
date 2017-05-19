@@ -82,12 +82,12 @@ namespace GameName.Scenes
            AddSystem(new DebugOverlay());
 #endif
 
-            var heightmap = Heightmap.Load("Textures/HeightMap",
+            var heightmap = Heightmap.Load("Textures/" + configs.map,
                                            stepX      : 8,
                                            stepY      : 8,
                                            smooth     : false,
                                            scale      : 200.0f,
-                                           yScale     : 0.4f,
+                                           yScale     : 0.1f,
                                            randomTris : true,
                                            blur       : 16);
 
