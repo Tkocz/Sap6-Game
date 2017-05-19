@@ -140,7 +140,33 @@ namespace GameName.Scenes.Utils {
             }
         }
 
-        public static void CreateTriggerEvents(int numTriggers, int worldsize) {
+		public static void SpawnEnvironment(Heightmap heightmap)
+		{
+			Dictionary<int, string> elementList = new Dictionary<int, string>();
+			elementList.Add(255, "LeafTree");
+			elementList.Add(245, "PalmTree");
+			elementList.Add(235, "tree");
+			elementList.Add(170, "rock2");
+
+			for (int y = 0; y<heightmap.GetDimensions().Y; y++)
+			{
+				for (int x = 0; x<heightmap.GetDimensions().X; x++)
+				{
+					if (elementList.ContainsKey(heightmap.ColorAt(x, y).B))
+					{
+						int newElement = Game1.Inst.Scene.AddEntity();
+						string type = elementList[(int)heightmap.ColorAt(x, y).B];
+						var wx = (x / heightmap.GetDimensions().X - 0.5f) * 400.0f;
+						var wy = (y / heightmap.GetDimensions().Y - 0.5f) * 400.0f;
+						Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-1, -5, -1), new Vector3(1, 5, 1)), InvTransf = Matrix.Identity });
+						Game1.Inst.Scene.AddComponent(newElement, new CTransform() { Position = new Vector3(400.0f * (x / (float)heightmap.GetDimensions().X - 0.5f), heightmap.HeightAt(wx, wy) - 1f, 400.0f * (y / (float)heightmap.GetDimensions().Y - 0.5f)), Scale = new Vector3((float)rnd.NextDouble() * 0.25f + 0.75f), Rotation = Matrix.CreateRotationY((float)rnd.NextDouble() * MathHelper.Pi * 2f) });
+						Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + type), fileName = type });
+					}
+				}
+			}
+		}
+
+        public static void CreateTriggerEvents(int numTriggers) {
             var currentScene = Game1.Inst.Scene;
             Random rnd = new Random();
 
