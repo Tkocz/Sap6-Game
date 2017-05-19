@@ -67,15 +67,15 @@ namespace GameName.Scenes
             physicsSys.InvSpatPartSize = 0.07f;
             physicsSys.Gravity *= 2.0f;
             AddSystems(
-                new RenderingSystem(),
-                new CameraSystem(),
+                waterSys,
                 physicsSys,
                 new InputSystem(),
-                waterSys,
-                new Rendering2DSystem(),
                 new AISystem(),
                 new AnimationSystem(),
-                new InventorySystem()
+                new InventorySystem(),
+                new CameraSystem(),
+                new RenderingSystem(),
+                new Rendering2DSystem()
             );
 
 #if DEBUG
@@ -87,7 +87,7 @@ namespace GameName.Scenes
                                            stepY      : 8,
                                            smooth     : false,
                                            scale      : 200.0f,
-                                           yScale     : 0.1f,
+                                           yScale     : 0.4f,
                                            randomTris : true,
                                            blur       : 16);
 
@@ -111,7 +111,7 @@ namespace GameName.Scenes
             // Camera entity
             float fieldofview = MathHelper.PiOver2;
             float nearplane = 0.1f;
-            float farplane = 1000f;
+            float farplane = 100f;
 
             player = AddEntity();
 

@@ -41,7 +41,7 @@ namespace EngineName.Systems
                 cameraComponent.Target = p + Vector3.Up;
                 cameraComponent.Position += 6.0f*dt*(c - cameraComponent.Position);
 
-                cameraComponent.View = Matrix.CreateLookAt(cameraComponent.Position, cameraComponent.Target, Vector3.Up);
+                cameraComponent.View = Matrix.CreateLookAt(c, cameraComponent.Target, Vector3.Up);
             }
             base.Update(t, dt);
         }
