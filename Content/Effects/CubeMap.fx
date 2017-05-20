@@ -134,16 +134,16 @@ float2 cubeMap(float3 p, out int i) {
     return float2(0.5f * (uc/mA + 1.0), 0.5f * (vc / mA + 1.0));
 }
 
-void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
-    // TODO: Camera pos should not be hardcoded here!!!
-    float3 n = normalize(vsOut.norm + 0.2f*bump(vsOut.texCoord));
-    float3 v = normalize(vsOut.worldPos.xyz - CamPos);
+void psMain(in VS_OUTPUT psIn, out PS_OUTPUT psOut) {
+    float3 n = normalize(psIn.norm + 0.2f*bump(psIn.texCoord));
+    float3 v = normalize(psIn.worldPos.xyz - CamPos);
     float3 h = reflect(v, n);
-    float3 l = normalize(LightPos - vsOut.worldPos.xyz);
+    float3 l = normalize(LightPos - psIn.worldPos.xyz);
     float3 r = reflect(l, n);
 
     // Phong specularity
-    float3 s = float3(1.0, 1.0, 1.0) * (pow(max(0.0, dot(r, v)), Shininess));
+    float3 s = pow(max(0.0, dot(r, v)), Shininess);
+    float3 d = max(0.0, dot(l, v));
 
     int    i  = -1;
     float2 tc = cubeMap(h.xyz, i);
@@ -157,7 +157,10 @@ void psMain(in VS_OUTPUT vsOut, out PS_OUTPUT psOut) {
     else if (i == 4) psOut.color = tex2D(envMap4, tc).rgba;
     else if (i == 5) psOut.color = tex2D(envMap5, tc).rgba;
 
-    psOut.color += float4(s, 0.0);
+    float a = 0.5 - 0.5*s;
+    psOut.color = (1.0-a)*psOut.color + a*float4(d*float3(0.5, 0.5, 0.5), 1.0);
+
+    psOut.color += float4(s*float3(1.0, 1.0, 1.0), 0.0);
 }
 
 void vsMain(in VS_INPUT vsIn, out VS_OUTPUT vsOut) {

@@ -5,6 +5,7 @@ namespace GameName.Dev {
 //--------------------------------------
 
 using System;
+using System.Collections.Generic;
 
 using EngineName;
 using EngineName.Components;
@@ -53,7 +54,7 @@ public sealed class Materials: Scene {
         mCamID = InitCam();
 
         // Spawn a few balls.
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 2; i++) {
             var r = i == 0 ? 6.0f : 1.0f;
             CreateBall(new Vector3(0.9f*i - 3.5f, 0.3f*i, 0.7f*i), // Position
                        new Vector3(         3.0f*(i-4), 2.0f*i  , 3.0f-i),   // Velocity
@@ -105,10 +106,11 @@ public sealed class Materials: Scene {
             var rot = 0.0f;
             envMap = new EnvMapMaterial(mRenderer,
                                         ball,
-                                        (CTransform)GetComponentFromEntity<CTransform>(ball));
+                                        (CTransform)GetComponentFromEntity<CTransform>(ball),
+                                        Game1.Inst.Content.Load<Texture2D>("Textures/Bumpmap0"));
 
             // TODO: If the camera moves, this needs to be done every frame.
-            envMap.SetCameraPos(new Vector3(9.0f, 12.0f, 18.0f));
+            //envMap.SetCameraPos(new Vector3(9.0f, 12.0f, 18.0f));
             AddComponent(ball, new CLogic { Fn    = (t, dt) => {
                                                 rot += 1.0f*dt;
                                                 transf.Rotation = Matrix.CreateRotationX(rot)
@@ -121,7 +123,8 @@ public sealed class Materials: Scene {
         }
 
         AddComponent<C3DRenderable>(ball, new CImportedModel {
-            material = reflective ? envMap : null,
+                materials = new Dictionary<int, MaterialShader> {
+                    {0, reflective ? envMap : null } },
             model  = Game1.Inst.Content.Load<Model>("Models/DummySphere")
         });
 

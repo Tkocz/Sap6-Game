@@ -5,6 +5,7 @@ namespace GameName.Dev {
 //--------------------------------------
 
 using System;
+using System.Collections.Generic;
 
 using EngineName;
 using EngineName.Components;
@@ -381,13 +382,13 @@ public sealed class Collisions: Scene {
 
         AddComponent<C3DRenderable>(ball, new CImportedModel {
             model  = Game1.Inst.Content.Load<Model>("Models/DummySphere"),
-            material = new AdsMaterial(0.15f*col,
-                                             col,
-                                             Vector3.One,
-                                             50.0f,
-                                             Game1.Inst.Content.Load<Texture2D>("Textures/Ball"),
-                                             Game1.Inst.Content.Load<Texture2D>("Textures/Grain"),
-                                             0.1f)
+            materials = new Dictionary<int, MaterialShader> { {0, new AdsMaterial(0.15f*col,
+                                                 col,
+                                                 Vector3.One,
+                                                 50.0f,
+                                                 Game1.Inst.Content.Load<Texture2D>("Textures/Ball"),
+                                                 Game1.Inst.Content.Load<Texture2D>("Textures/Grain"),
+                                                 0.1f) } }
         });
 
         return ball;
@@ -415,10 +416,10 @@ public sealed class Collisions: Scene {
 
         AddComponent<C3DRenderable>(box1, new CImportedModel {
             model  = Game1.Inst.Content.Load<Model>("Models/DummyBox"),
-            material = new AdsMaterial(0.2f*col.Value,
-                                            col.Value,
-                                            new Vector3(1.0f, 1.0f, 1.0f),
-                                            30.0f)
+            materials = new Dictionary<int, MaterialShader> { {0, new AdsMaterial(0.2f*col.Value,
+                                                 col.Value,
+                                                 new Vector3(1.0f, 1.0f, 1.0f),
+                                                 30.0f) } }
         });
 
         var rot = Matrix.CreateFromAxisAngle(rotAxis, rotRad);

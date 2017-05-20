@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using EngineName.Components;
 using Microsoft.Xna.Framework;
+using EngineName.Shaders;
 
 namespace EngineName.Systems
 {
@@ -26,15 +27,14 @@ namespace EngineName.Systems
             base.Draw(t, dt);
 
             foreach (var camera in Game1.Inst.Scene.GetComponents<CCamera>()) {
-                var camPos = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(camera.Key);
-                DrawScene((CCamera)(camera.Value), -1, camPos);
+                DrawScene((CCamera)(camera.Value), -1);
                 break;
             }
             // debugging for software culling
             //Console.WriteLine(string.Format("{0} meshes drawn", counter));
         }
 
-        public void DrawScene(CCamera camera, int excludeEid=-1, CTransform camPos=null) {
+        public void DrawScene(CCamera camera, int excludeEid=-1) {
             // TODO: Clean code below up, hard to read.
 
             Game1.Inst.GraphicsDevice.Clear(new Color(0.4f, 0.6f, 0.8f));
@@ -48,7 +48,9 @@ namespace EngineName.Systems
                     Matrix.CreateTranslation(transformComponent.Position);
             }
 
+            var device = Game1.Inst.GraphicsDevice;
             var scene = Game1.Inst.Scene;
+
             foreach (var component in scene.GetComponents<C3DRenderable>()) {
                 var key = component.Key;
 
@@ -57,21 +59,25 @@ namespace EngineName.Systems
                     continue;
                 }
 
-
                 C3DRenderable model = (C3DRenderable)component.Value;
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
-                CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
-                var anim = Matrix.Identity;
 
+                if ((string)model.model.Tag == "water") {
+                    // Drawn after.
+                    break;
+                }
+
+                CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
+
+                Matrix[] bones = new Matrix[model.model.Bones.Count];
+                model.model.CopyAbsoluteBoneTransformsTo(bones);
+
+                var anim = Matrix.Identity;
                 if (model.animFn != null) {
                     anim = model.animFn(mT);
                 }
 
-                Matrix[] bones = new Matrix[model.model.Bones.Count];
-                model.model.CopyAbsoluteBoneTransformsTo(bones);
-                foreach (var mesh in model.model.Meshes)
-                {
-
+                foreach (var mesh in model.model.Meshes) {
                     if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame))
                         == ContainmentType.Disjoint)
                     {
@@ -81,75 +87,55 @@ namespace EngineName.Systems
                         }
                     }
 
+                    Effect lastEffect = null;
+                    for (var i = 0; i < mesh.MeshParts.Count; i++) {
+                        var part = mesh.MeshParts[i];
 
-                    // TODO: This might bug out with multiple mesh parts.
-                    if ((string)model.model.Tag == "water") {
-                        // Drawn after.
-                        break;
-                    }
-                    else if (model.material != null) {
-                        model.material.CamPos = camPos.Position;
-                        model.material.Model = mesh.ParentBone.Transform * anim * transform.Frame;
-                        model.material.View  = camera.View;
-                        model.material.Proj  = camera.Projection;
-                        model.material.Prerender();
-
-                        var device = Game1.Inst.GraphicsDevice;
-
-                        for (var i = 0; i < mesh.MeshParts.Count; i++) {
-                            var part = mesh.MeshParts[i];
-                            var effect = model.material.mEffect;
-
-                            device.SetVertexBuffer(part.VertexBuffer);
-                            device.Indices = part.IndexBuffer;
-
-                            for (var j = 0; j < effect.CurrentTechnique.Passes.Count; j++) {
-                                effect.CurrentTechnique.Passes[j].Apply();
-                                device.DrawIndexedPrimitives(PrimitiveType.TriangleList,
-                                                             0,
-                                                             0,
-                                                             part.PrimitiveCount);
-                            }
+                        if (part.PrimitiveCount == 0) {
+                            continue;
                         }
-                    }
-                    else {
-                        var lastEffect = (Effect)null;
-                        for(int i = 0; i < mesh.MeshParts.Count; i++) {
-                            var meshPart = mesh.MeshParts[i];
-                            var effect = (BasicEffect)meshPart.Effect;
 
-                            if (lastEffect != effect) {
-                                effect.PreferPerPixelLighting = true;
-                                effect.EnableDefaultLighting();
-                                effect.VertexColorEnabled = model.enableVertexColor;
-                                effect.LightingEnabled = true;
-                                effect.AmbientLightColor = scene.AmbientColor;
+                        MaterialShader mat = null;
 
-                                effect.DirectionalLight0.Direction = scene.Direction;
-                                effect.DirectionalLight0.DiffuseColor = scene.DiffuseColor;
-                                effect.DirectionalLight0.Enabled = true;
-                                effect.DirectionalLight0.SpecularColor = scene.SpecularColor * model.specular;
-                                effect.DirectionalLight1.SpecularColor = scene.SpecularColor * model.specular;
-                                effect.DirectionalLight1.DiffuseColor = scene.DiffuseColor*0.7f;
-                                effect.DirectionalLight2.SpecularColor = scene.SpecularColor * model.specular;
-                                effect.DirectionalLight2.DiffuseColor = scene.DiffuseColor*0.5f;
+                        if (model.materials != null) {
+                            model.materials.TryGetValue(i, out mat);
+                        }
 
-                                effect.SpecularPower = 100;
+                        var effect = mat?.mEffect ?? part.Effect;
 
-                                effect.FogEnabled = true;
-                                effect.FogStart = 35.0f;
-                                effect.FogEnd = 100.0f;
-                                effect.FogColor = new Vector3(0.4f, 0.6f, 0.8f);
-
-                                effect.Projection = camera.Projection;
-                                effect.View = camera.View;
-                                effect.World = mesh.ParentBone.Transform * anim * transform.Frame;
+                        if (lastEffect != effect) {
+                            if (mat != null) {
+                                mat.CamPos = camera.Position;
+                                mat.Model  = mesh.ParentBone.Transform * anim * transform.Frame;
+                                mat.View   = camera.View;
+                                mat.Proj   = camera.Projection;
+                                mat.Prerender();
+                            }
+                            else {
+                                SetupBasicEffect((BasicEffect)effect,
+                                                 camera,
+                                                 model,
+                                                 scene,
+                                                 transform,
+                                                 mesh,
+                                                 anim);
                             }
 
                             lastEffect = effect;
                         }
 
-                        mesh.Draw();
+                        device.SetVertexBuffer(part.VertexBuffer);
+                        device.Indices = part.IndexBuffer;
+
+                        for (var j = 0; j < effect.CurrentTechnique.Passes.Count; j++) {
+                            effect.CurrentTechnique.Passes[j].Apply();
+                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList,
+                                                         part.VertexOffset,
+                                                         0,
+                                                         part.NumVertices,
+                                                         part.StartIndex,
+                                                         part.PrimitiveCount);
+                        }
                     }
                 }
             }
@@ -177,16 +163,7 @@ namespace EngineName.Systems
                         part.Effect.Parameters["World"].SetValue(world);
                         part.Effect.Parameters["View"].SetValue(camera.View);
                         part.Effect.Parameters["Projection"].SetValue(camera.Projection);
-                        part.Effect.Parameters["CameraPosition"].SetValue(camPos.Position);
-
-
-                        //part.Effect.Parameters["Shininess"].SetValue(200f);
-                        //part.Effect.Parameters["SpecularColor"].SetValue(new Vector4(1, 1, 1, 1));
-                        //part.Effect.Parameters["SpecularIntensity"].SetValue(200f);
-
-                        //part.Effect.Parameters["NormalMap"].SetValue(normalMap);
-                        //part.Effect.Parameters["BumpConstant"].SetValue(8 + 2 * (float)Math.Cos(mT));
-
+                        part.Effect.Parameters["CameraPosition"].SetValue(camera.Position);
                         part.Effect.Parameters["Time"].SetValue(mT);
 
                         foreach (var pass in part.Effect.CurrentTechnique.Passes) {
@@ -201,6 +178,46 @@ namespace EngineName.Systems
             }
 
             // -
+        }
+
+        private void SetupBasicEffect(BasicEffect   effect,
+                                      CCamera       camera,
+                                      C3DRenderable model,
+                                      Scene         scene,
+                                      CTransform    transform,
+                                      ModelMesh     mesh,
+                                      Matrix        anim)
+        {
+            effect.EnableDefaultLighting();
+
+            effect.PreferPerPixelLighting = true;
+            effect.VertexColorEnabled     = model.enableVertexColor;
+            effect.LightingEnabled        = true;
+            effect.AmbientLightColor      = scene.AmbientColor;
+
+            effect.DirectionalLight0.Enabled       = true;
+            effect.DirectionalLight0.Direction     = scene.Direction;
+            effect.DirectionalLight0.DiffuseColor  = scene.DiffuseColor;
+            effect.DirectionalLight0.SpecularColor = scene.SpecularColor * model.specular;
+
+            effect.DirectionalLight1.Enabled       = true;
+            effect.DirectionalLight1.DiffuseColor  = scene.DiffuseColor*0.7f;
+            effect.DirectionalLight1.SpecularColor = scene.SpecularColor * model.specular;
+
+            effect.DirectionalLight2.Enabled       = true;
+            effect.DirectionalLight2.DiffuseColor  = scene.DiffuseColor*0.5f;
+            effect.DirectionalLight2.SpecularColor = scene.SpecularColor * model.specular;
+
+            effect.SpecularPower = 100;
+
+            effect.FogEnabled = true;
+            effect.FogStart   = 35.0f;
+            effect.FogEnd     = 100.0f;
+            effect.FogColor   = new Vector3(0.4f, 0.6f, 0.8f);
+
+            effect.Projection = camera.Projection;
+            effect.View       = camera.View;
+            effect.World      = mesh.ParentBone.Transform * anim * transform.Frame;
         }
     }
 

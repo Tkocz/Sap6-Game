@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using EngineName.Shaders;
 
 namespace GameName.Scenes
 {
@@ -32,6 +33,7 @@ namespace GameName.Scenes
         private Effect mUnderWaterFx;
         private RenderTarget2D mRT;
         private WaterSystem waterSys;
+        private RenderingSystem mRenderer;
 
         public WorldScene(WorldSceneConfig configs) {
             this.configs = configs;
@@ -113,7 +115,8 @@ namespace GameName.Scenes
                 new AnimationSystem(),
                 new InventorySystem(),
                 new CameraSystem(),
-                new RenderingSystem(),
+                new LogicSystem(),
+    mRenderer = new RenderingSystem(),
                 new Rendering2DSystem(),
                 new HealthSystem()
             );
@@ -186,11 +189,36 @@ namespace GameName.Scenes
 
             AddComponent(player, new CInput());
             AddComponent(player, new CPlayer());
-            AddComponent(player, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, rnd.Next(0,50)), Scale = new Vector3(0.5f) });
-            AddComponent<C3DRenderable>(player, new CImportedModel() { animFn = playerAnim, model = Game1.Inst.Content.Load<Model>("Models/viking") , fileName = "viking" });
+
+            var playerTransf = new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, rnd.Next(0,50)), Scale = new Vector3(0.5f) };
+
+            AddComponent(player, playerTransf);
+
+            // Glossy helmet, lol!
+            var cubeMap = Game1.Inst.Content.Load<Effect>("Effects/CubeMap");
+            var envMap = new EnvMapMaterial(mRenderer, player, playerTransf, cubeMap);
+
+            AddComponent<C3DRenderable>(player,
+                                        new CImportedModel() {
+                                            animFn = playerAnim,
+                                            model = Game1.Inst.Content.Load<Model>("Models/viking") ,
+                                            fileName = "viking",
+                                            materials = new Dictionary<int, MaterialShader> {
+                                                { 8, envMap }
+                                            }});
             AddComponent(player, new CSyncObject { fileName = "viking" });
+
             AddComponent(player, new CInventory());
             AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
+
+            AddComponent(player, new CLogic {
+                InvHz = 1.0f/30.0f,
+                Fn = (t, dt) => {
+                    var cam = (CCamera)GetComponentFromEntity<CCamera>(player);
+                    var camPos = cam.Position;
+                    envMap.Update();
+                }
+            });
 
             AddComponent(player, new CCamera
             {

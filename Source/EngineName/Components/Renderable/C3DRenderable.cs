@@ -11,9 +11,10 @@ namespace EngineName.Components.Renderable
 {
     public class C3DRenderable:CRenderable
     {
+        public Dictionary<int, MaterialShader> materials;
         public float specular = 1.0f;
         public bool enableVertexColor = false;
-        public MaterialShader material;
+
         public Model model;
         public Func<float, Matrix> animFn = null;
     }

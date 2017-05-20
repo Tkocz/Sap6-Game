@@ -46,7 +46,8 @@ public class EnvMapMaterial: MaterialShader {
     public EnvMapMaterial(RenderingSystem renderer,
                           int             eid,
                           CTransform      transf,
-                          Effect          material)
+                          Effect          material,
+                          Texture2D       bumpTex=null)
         : base(material)
     {
         mEid      = eid;
@@ -66,7 +67,7 @@ public class EnvMapMaterial: MaterialShader {
                                             RenderTargetUsage.PreserveContents); // TODO: Needed?
         }
 
-        var bumpTex = Game1.Inst.Content.Load<Texture2D>("Textures/Bumpmap0");
+        ;
         mEffect.Parameters["BumpMap"].SetValue(bumpTex);
     }
 
@@ -76,8 +77,9 @@ public class EnvMapMaterial: MaterialShader {
     /// <param name="transf">The transform component of the entity to environment map.</param>
     public EnvMapMaterial(RenderingSystem renderer,
                           int             eid,
-                          CTransform      transf)
-        : this(renderer, eid, transf, Game1.Inst.Content.Load<Effect>("Effects/CubeMap"))
+                          CTransform      transf,
+                          Texture2D       bumpTex=null)
+        : this(renderer, eid, transf, Game1.Inst.Content.Load<Effect>("Effects/CubeMap"), bumpTex)
     {
     }
 
@@ -93,40 +95,42 @@ public class EnvMapMaterial: MaterialShader {
         }
     }
 
-    /// <summary>Sets the camera position.</summary>
-    /// <param name="pos">The camera position, in world-space.</param>
-    public void SetCameraPos(Vector3 pos) {
-        mEffect.Parameters["CamPos"].SetValue(pos);
-    }
-
     /// <summary>Updates the cube map by rendering each environment mapped cube face. NOTE: This is
     ///          really slow so don't do this too often.</summary>
     public void Update() {
         // Basically, what we do here is position cameras in each direction of the cube and render
         // to hidden targets, then use them as texture sources in the shader (see CubeMap.fx).
 
-        var p = mTransf.Position;
+        var p   = mTransf.Position;
+        var rot = Matrix.Identity;
+
+        var r = Vector3.Transform(Vector3.Right   , rot);
+        var l = Vector3.Transform(Vector3.Left    , rot);
+        var u = Vector3.Transform(Vector3.Up      , rot);
+        var d = Vector3.Transform(Vector3.Down    , rot);
+        var b = Vector3.Transform(Vector3.Backward, rot);
+        var f = Vector3.Transform(Vector3.Forward , rot);
 
         // TODO: Cache cameras, don't need to realloc them here.
         var cams = new CCamera[6];
-        cams[0] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Right   , Vector3.Down    ) };
-        cams[1] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Left    , Vector3.Down    ) };
-        cams[2] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Up      , Vector3.Backward) };
-        cams[3] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Down    , Vector3.Forward ) };
-        cams[4] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Backward, Vector3.Down    ) };
-        cams[5] = new CCamera { View = Matrix.CreateLookAt(p, p + Vector3.Forward , Vector3.Down    ) };
+        cams[0] = new CCamera { View = Matrix.CreateLookAt(p, p + r, d    ) };
+        cams[1] = new CCamera { View = Matrix.CreateLookAt(p, p + l, d    ) };
+        cams[2] = new CCamera { View = Matrix.CreateLookAt(p, p + u, b) };
+        cams[3] = new CCamera { View = Matrix.CreateLookAt(p, p + d, f ) };
+        cams[4] = new CCamera { View = Matrix.CreateLookAt(p, p + b, d    ) };
+        cams[5] = new CCamera { View = Matrix.CreateLookAt(p, p + f, d    ) };
 
         var aspect = 1.0f;
         var fovRad = 90.0f*2.0f*MathHelper.Pi/360.0f;
-        var zFar   = 1000.0f;
+        var zFar   = 100.0f;
         var zNear  = 0.01f;
 
         for (var i = 0; i < 6; i++) {
             cams[i].Projection = Matrix.CreatePerspectiveFieldOfView(fovRad, aspect, zNear, zFar);
             GfxUtil.SetRT(mEnvRTs[i]);
-            Game1.Inst.GraphicsDevice.Clear(Color.White);
 
-            mRenderer.DrawScene(cams[i], mEid, mTransf);
+            Game1.Inst.GraphicsDevice.Clear(Color.Magenta);
+            mRenderer.DrawScene(cams[i], mEid);
         }
 
         GfxUtil.SetRT(null);
