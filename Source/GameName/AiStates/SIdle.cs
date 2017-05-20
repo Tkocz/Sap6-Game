@@ -1,9 +1,9 @@
-﻿using EngineName;
-using EngineName.Components;
-using EngineName.Core;
-using EngineName.Systems;
+﻿using Thengill;
+using Thengill.Components;
+using Thengill.Core;
+using Thengill.Systems;
 using GameName.Systems;
-using EngineName.Utils;
+using Thengill.Utils;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace GameName.AiStates
 
             var rotationSpeed = 1.0f * dt;
             var movementSpeed = dt * flock.PreferredMovementSpeed;
-            
+
             var separation = Separation(npcTransform.Position, flock);
             var alignment = flock.AvgVelocity/flock.Members.Count;
             var cohesion = flock.Centroid - npcTransform.Position;
@@ -42,7 +42,7 @@ namespace GameName.AiStates
             separation *= flock.SeparationFactor;
             alignment *= flock.AlignmentFactor;
             cohesion *= flock.CohesionFactor;
-            
+
             // add all directions and then normalize to get a goal direction
             var rot = separation+cohesion+alignment;
             rot.Normalize();
@@ -77,7 +77,7 @@ namespace GameName.AiStates
                 if ((d > 0) && (d < flock.SeparationDistance)) {
                     // Calculate vector pointing away from neighbor
                     Vector3 diff = Vector3.Normalize(position - otherTransform.Position);
-                    
+
                     //Vector3 diff = Vector3.Subtract(position, otherTransform.Position);
                     //diff.Normalize();
                     diff /= d;        // Weight by distance (makes closer neighbors more important to steer away from)

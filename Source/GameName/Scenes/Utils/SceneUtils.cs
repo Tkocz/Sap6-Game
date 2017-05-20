@@ -1,7 +1,7 @@
-﻿using EngineName;
-using EngineName.Components;
-using EngineName.Components.Renderable;
-using EngineName.Systems;
+﻿using Thengill;
+using Thengill.Components;
+using Thengill.Components.Renderable;
+using Thengill.Systems;
 using GameName.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

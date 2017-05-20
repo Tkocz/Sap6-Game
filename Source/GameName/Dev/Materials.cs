@@ -7,13 +7,13 @@ namespace GameName.Dev {
 using System;
 using System.Collections.Generic;
 
-using EngineName;
-using EngineName.Components;
-using EngineName.Components.Renderable;
-using EngineName.Core;
-using EngineName.Shaders;
-using EngineName.Systems;
-using EngineName.Utils;
+using Thengill;
+using Thengill.Components;
+using Thengill.Components.Renderable;
+using Thengill.Core;
+using Thengill.Shaders;
+using Thengill.Systems;
+using Thengill.Utils;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

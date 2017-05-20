@@ -9,15 +9,15 @@
 
 # Common config
 C_BINDIR = bin
-C_FLAGS  = -optimize+ -define:DBG_MENU -define:DasdsEBUG -define:MT_PHYS -define:TRACE
+C_FLAGS  = -optimize+ -define:DBG_MENU -define:DEBUG -define:MT_PHYS -define:TRACE
 
 # Engine config
 E_COMPILER   = mcs
 E_FLAGS      = $(C_FLAGS) -target:library
 E_LIBPATHS   = $(MONOGAME_PATH)
 E_LIBS       = MonoGame.Framework.dll Lidgren.Network.dll
-E_SRCDIR     = Source/EngineName
-E_TARGET     = EngineName.dll
+E_SRCDIR     = Source/Thengill
+E_TARGET     = Thengill.dll
 
 # Game config
 G_COMPILER    = mcs
@@ -25,7 +25,7 @@ G_CONTENTDIR  = Content
 G_CONTENTFILE = Content.mgcb
 G_FLAGS       = $(C_FLAGS) -target:winexe
 G_LIBPATHS    = $(C_BINDIR) $(MONOGAME_PATH)
-G_LIBS        = EngineName.dll MonoGame.Framework.dll
+G_LIBS        = Thengill.dll MonoGame.Framework.dll
 G_OBJDIR      = obj
 G_SRCDIR      = Source/GameName
 G_TARGET      = Program.exe

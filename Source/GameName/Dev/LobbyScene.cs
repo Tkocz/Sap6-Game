@@ -1,10 +1,10 @@
 ﻿using System.Threading;
-using EngineName;
-using EngineName.Components;
-using EngineName.Components.Renderable;
-using EngineName.Logging;
-using EngineName.Systems;
-using EngineName.Utils;
+using Thengill;
+using Thengill.Components;
+using Thengill.Components.Renderable;
+using Thengill.Logging;
+using Thengill.Systems;
+using Thengill.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using GameName.Systems;
@@ -49,7 +49,7 @@ namespace GameName.Scenes
 #if DEBUG
             AddSystem(new DebugOverlay());
 #endif
-           
+
             base.Init();
 
             int player = AddEntity();

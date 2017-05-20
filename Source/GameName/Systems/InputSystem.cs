@@ -1,12 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using EngineName.Core;
-using EngineName;
+using Thengill.Core;
+using Thengill;
 using System;
 using System.Linq;
-using EngineName.Components;
+using Thengill.Components;
 using GameName.Scenes;
-using EngineName.Systems;
+using Thengill.Systems;
 
 namespace GameName.Systems {
     public class InputSystem : EcsSystem {

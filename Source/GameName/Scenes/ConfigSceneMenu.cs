@@ -1,6 +1,6 @@
-﻿using EngineName;
-using EngineName.Components.Renderable;
-using EngineName.Utils;
+﻿using Thengill;
+using Thengill.Components.Renderable;
+using Thengill.Utils;
 using GameName.Scenes.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using EngineName.Systems;
+using Thengill.Systems;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GameName.Scenes {
@@ -53,7 +53,7 @@ namespace GameName.Scenes {
         }
         public override void Init() {
             base.Init();
-            
+
             var screenCenter = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.5f, Game1.Inst.GraphicsDevice.Viewport.Height * 0.5f);
             string text = "GAME";
             var largeFont = Game1.Inst.Content.Load<SpriteFont>("Fonts/FFFForward_Large");
@@ -186,7 +186,7 @@ namespace GameName.Scenes {
             CreateLabel("Start Game", () =>
             {
                 WorldSceneConfig configs = null;
-                if (mIsMultiplayer) { 
+                if (mIsMultiplayer) {
                     Raise("send_start_game", maps[selectedMap]);
                     configs = new WorldSceneConfig(numFlocks, numPowerUps, numTriggers, maps[selectedMap], _networkSystem);
                     }
@@ -200,8 +200,8 @@ namespace GameName.Scenes {
                 Game1.Inst.LeaveScene();
             });
 
-            
-           
+
+
         }
 
         private void updateMenuItem(object data)
@@ -214,7 +214,7 @@ namespace GameName.Scenes {
             }
             else
             {
-                menuItem.CText.font = mFont;   
+                menuItem.CText.font = mFont;
                 AddComponent<C2DRenderable>(menuItem.Id,menuItem.CText);
             }
         }

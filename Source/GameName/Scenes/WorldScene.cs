@@ -1,10 +1,10 @@
-﻿using EngineName;
-using EngineName.Components;
-using EngineName.Components.Renderable;
-using EngineName.Core;
-using EngineName.Logging;
-using EngineName.Systems;
-using EngineName.Utils;
+﻿using Thengill;
+using Thengill.Components;
+using Thengill.Components.Renderable;
+using Thengill.Core;
+using Thengill.Logging;
+using Thengill.Systems;
+using Thengill.Utils;
 using GameName.Components;
 using GameName.Scenes.Utils;
 using GameName.Systems;
@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using EngineName.Shaders;
+using Thengill.Shaders;
 
 namespace GameName.Scenes
 {
@@ -180,7 +180,7 @@ namespace GameName.Scenes
                 MaxVelocity = 5f,
                 InvMass = 0.01f,
                 SpeedMultiplier = 1,
-                Radius = 0.9f,
+                Radius = 0.7f,
                 Aabb = new BoundingBox(new Vector3(-0.5f, -0.9f, -0.5f), new Vector3(0.5f, 0.9f, 0.5f)),
                 LinDrag = 0.8f,
                 ReachableArea = new BoundingBox(new Vector3(-1.5f, -2.0f, -1.5f), new Vector3(1.5f, 2.0f, 1.5f)),

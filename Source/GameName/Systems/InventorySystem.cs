@@ -1,7 +1,7 @@
-﻿using EngineName;
-using EngineName.Components;
-using EngineName.Components.Renderable;
-using EngineName.Core;
+﻿using Thengill;
+using Thengill.Components;
+using Thengill.Components.Renderable;
+using Thengill.Core;
 using GameName.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -45,7 +45,7 @@ namespace GameName.Systems
         }
         /// <summary>
         /// Create a new ball, this is the only application that this system has been used for.
-        /// But CInventoryItem could contain a model which would make it possible to apply the same 
+        /// But CInventoryItem could contain a model which would make it possible to apply the same
         /// </summary>
         /// <param name="p"> Initial postion of the ball. </param>
         /// <param name="v"> Initial Velocity of the ball. </param>

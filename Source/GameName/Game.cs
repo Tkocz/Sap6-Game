@@ -8,11 +8,11 @@ namespace GameName {
 
 using System;
 
-using EngineName;
-using EngineName.Logging;
-using EngineName.Components;
-using EngineName.Components.Renderable;
-using EngineName.Systems;
+using Thengill;
+using Thengill.Logging;
+using Thengill.Components;
+using Thengill.Components.Renderable;
+using Thengill.Systems;
 
 using GameName.Scenes;
     using GameName.Dev;

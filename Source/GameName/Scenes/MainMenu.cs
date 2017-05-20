@@ -7,9 +7,9 @@ namespace GameName.Scenes {
 using System;
 using System.Reflection;
 
-using EngineName;
-using EngineName.Utils;
-using EngineName.Components.Renderable;
+using Thengill;
+using Thengill.Utils;
+using Thengill.Components.Renderable;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

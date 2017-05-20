@@ -1,5 +1,5 @@
-﻿using System;using EngineName;using EngineName.Components.Renderable;
-using EngineName.Systems;
+﻿using System;using Thengill;using Thengill.Components.Renderable;
+using Thengill.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 namespace GameName.Scenes
@@ -21,7 +21,7 @@ namespace GameName.Scenes
             string winlos = won ? "You win" : "You lose";                        winlos = string.Format("Game Over, {0}" +                          " Your Time: {1} \n" +                          " You picked up {2} number of balls", winlos, gameTime,ballCount);
             AddComponent<C2DRenderable>(text, new CText()
             {
-                
+
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),                format = winlos,
                 color = Color.Black,
                 position = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.5f, Game1.Inst.GraphicsDevice.Viewport.Height * 0.5f),

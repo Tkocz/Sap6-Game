@@ -1,8 +1,8 @@
-using EngineName;
-using EngineName.Components;
-using EngineName.Core;
-using EngineName.Systems;
-using EngineName.Utils;
+using Thengill;
+using Thengill.Components;
+using Thengill.Core;
+using Thengill.Systems;
+using Thengill.Utils;
 using GameName.AiStates;
 using Microsoft.Xna.Framework;
 using System;

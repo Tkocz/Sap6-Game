@@ -1,5 +1,5 @@
-﻿using EngineName;
-using EngineName.Components.Renderable;
+﻿using Thengill;
+using Thengill.Components.Renderable;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
