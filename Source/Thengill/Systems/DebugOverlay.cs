@@ -104,13 +104,13 @@ public sealed class DebugOverlay: EcsSystem {
         DrawAABBs();
 
         var x = 16.0f;
-        var y = 16.0f;
+        var y = 720.0f - 24.0f - 16.0f;
 
         mSB.Begin();
 
         foreach (var fn in mStrFns) {
             GfxUtil.DrawText(mSB, x, y, fn(t, dt), GfxUtil.DefFont, Color.Magenta);
-            y += 24.0f;
+            y -= 24.0f;
         }
 
         mSB.End();

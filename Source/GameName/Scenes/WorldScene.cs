@@ -28,6 +28,8 @@ namespace GameName.Scenes
         private int pickUpCount = 0;
         private bool won;
 
+        private Hud mHud;
+
         private NetworkSystem _networkSystem;
         private WorldSceneConfig configs;
         private Effect mUnderWaterFx;
@@ -64,6 +66,9 @@ namespace GameName.Scenes
                 base.Draw(t, dt);
 
             }
+
+            mHud.Update();
+            mHud.Draw();
         }
 
         public void InitGameComponents()
@@ -100,8 +105,6 @@ namespace GameName.Scenes
                 yScaleMap = 0.5f;
                 waterSys.WaterHeight = -58;
             }
-
-
 
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
@@ -215,7 +218,6 @@ namespace GameName.Scenes
                 InvHz = 1.0f/30.0f,
                 Fn = (t, dt) => {
                     var cam = (CCamera)GetComponentFromEntity<CCamera>(player);
-                    var camPos = cam.Position;
                     envMap.Update();
                 }
             });
@@ -312,7 +314,16 @@ namespace GameName.Scenes
 
             }
 
-            Log.GetLog().Debug("TestScene initialized.");
+            Log.GetLog().Debug("WorldScene initialized.");
+
+            mHud = new Hud();
+
+            // Example of how to create hud elements.
+            mHud.Button(10, 10, mHud.Text("Click me (and check log)"))
+                .OnClick(() => Console.WriteLine("Text button clicked."));
+
+            mHud.Button(100, 100, mHud.Sprite("Textures/clubbing"))
+                .OnClick(() => Console.WriteLine("Sprite button clicked."));
         }
 
         public override void Update(float t, float dt)
