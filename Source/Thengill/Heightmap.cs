@@ -218,14 +218,16 @@ public class Heightmap {
             verts[i1].Normal += n;
             verts[i2].Normal += n;
 
-            var c = new Color((verts[i0].Color.R + verts[i1].Color.R + verts[i2].Color.R) / 3,
-                              (verts[i0].Color.G + verts[i1].Color.G + verts[i2].Color.G) / 3,
-                              (verts[i0].Color.B + verts[i1].Color.B + verts[i2].Color.B) / 3);
+            if (true || !mSmooth) {
+                var c = new Color((verts[i0].Color.R + verts[i1].Color.R + verts[i2].Color.R) / 3,
+                                  (verts[i0].Color.G + verts[i1].Color.G + verts[i2].Color.G) / 3,
+                                  (verts[i0].Color.B + verts[i1].Color.B + verts[i2].Color.B) / 3);
 
-            verts[i0].Color = verts[i1].Color = verts[i2].Color = c;
+                verts[i0].Color = verts[i1].Color = verts[i2].Color = c;
             }
+        }
 
-            for (var i = 0; i < verts.Length; i++) {
+        for (var i = 0; i < verts.Length; i++) {
             verts[i].Normal.Normalize();
         }
 

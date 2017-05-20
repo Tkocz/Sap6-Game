@@ -131,7 +131,7 @@ namespace GameName.Scenes
             var heightmap = Heightmap.Load("Textures/" + configs.map,
                                            stepX      : 8,
                                            stepY      : 8,
-                                           smooth     : false,
+                                           smooth     : true,
                                            scale      : heightMapScale,
                                            yScale     : yScaleMap,
                                            randomTris : true,
@@ -233,10 +233,23 @@ namespace GameName.Scenes
 
             // Heightmap entity
 
+            var mapMat = new ToonMaterial(Vector3.One*0.2f,
+                                          new Vector3(1.0f, 0.0f, 1.0f), // ignored
+                                          Vector3.Zero,
+                                          40.0f,
+                                          null, // diftex
+                                          null, // normtex
+                                          1.0f, // normcoeff
+                                          5, // diflevels
+                                          2, // spelevels,
+                                          true); // use vert col
+
+
             int hme = AddEntity();
             AddComponent<C3DRenderable>(hme, new C3DRenderable { model = heightmap.Model,
                                                                  enableVertexColor = true,
-                                                                 specular = 0.03f });
+                                                                 specular = 0.03f,
+                                                                 materials = new Dictionary<int, MaterialShader> { {0, mapMat } }});
             AddComponent(hme, new CTransform {
                 Position = Vector3.Zero,
                 Rotation = Matrix.Identity,

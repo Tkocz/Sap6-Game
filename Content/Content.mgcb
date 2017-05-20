@@ -652,3 +652,9 @@
 /processorParam:DebugMode=Auto
 /build:Effects/UnderWater.fx
 
+#begin Effects/ToonMaterial.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/ToonMaterial.fx
+
