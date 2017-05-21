@@ -22,12 +22,13 @@ extern uniform bool UseVertCol;
 sampler difTex = sampler_state { Texture = <DifTex>; mipfilter = LINEAR; };
 sampler normTex = sampler_state { Texture = <NormTex>; mipfilter = LINEAR; };
 
-static const int NUM_LIGHTS = 2;
+static const int NUM_LIGHTS = 3;
 
 // Directional lights!
 static const float4 Lights[NUM_LIGHTS] = {
-  float4(-1.0, -1.0, -0.5,  0.4),
-  float4( -0.5, -1.0, 0.5,  0.4),
+  float4(-1.0, -1.0, -0.5,  0.5),
+  float4(-0.5, -1.0, 0.5,  0.5),
+  float4( 1.0, -0.5, -1.0,  0.5),
 };
 
 struct PSOutput {

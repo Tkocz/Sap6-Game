@@ -329,14 +329,19 @@ namespace GameName.Scenes
 
             Log.GetLog().Debug("WorldScene initialized.");
 
+            InitHud();
+        }
+
+        public void InitHud() {
             mHud = new Hud();
 
             // Example of how to create hud elements.
-            mHud.Button(10, 10, mHud.Text("Click me (and check log)"))
+            mHud.Button(10, 10, mHud.Text(() => "Click me (and check log)"))
                 .OnClick(() => Console.WriteLine("Text button clicked."));
 
-            mHud.Button(100, 100, mHud.Sprite("Textures/clubbing"))
-                .OnClick(() => Console.WriteLine("Sprite button clicked."));
+            mHud.Button(1050, 12, mHud.Sprite("Textures/Heart", 0.15f));
+            mHud.Button(1100, 12, mHud.Sprite("Textures/Heart", 0.15f));
+            mHud.Button(1150, 12, mHud.Sprite("Textures/Heart", 0.15f));
         }
 
         public override void Update(float t, float dt)

@@ -17,6 +17,7 @@ public class Hud {
     };
 
     public class SpriteVisual: Visual {
+        private float mScale;
         private Texture2D mSprite;
 
         public override int Width {
@@ -27,12 +28,21 @@ public class Hud {
             get { return mSprite.Height; }
         }
 
-        public SpriteVisual(string asset) {
+        public SpriteVisual(string asset, float scale=1.0f) {
             mSprite = Game1.Inst.Content.Load<Texture2D>(asset);
+            mScale  = scale;
         }
 
         public override void Draw(SpriteBatch sb, int x, int y) {
-            sb.Draw(mSprite, new Vector2(x, y), Color.White);
+            sb.Draw(texture         : mSprite,
+                    position        : new Vector2(x, y),
+                    sourceRectangle : null,
+                    color           : Color.White,
+                    rotation        : 0.0f,
+                    origin          : Vector2.Zero,
+                    scale           : mScale,
+                    effects         : SpriteEffects.None,
+                    layerDepth      : 0.0f);
         }
     }
 
@@ -41,17 +51,17 @@ public class Hud {
         private int mWidth;
         private int mHeight;
 
-        public string Str { get; }
+        public Func<string> Str { get; }
 
         public override int Width {
-            get { return mWidth; }
+            get { return (int)mFont.MeasureString(Str()).X; }
         }
 
         public override int Height {
-            get { return mHeight; }
+            get { return (int)mFont.MeasureString(Str()).Y; }
         }
 
-        public TextVisual(string str, SpriteFont font=null) {
+        public TextVisual(Func<string> str, SpriteFont font=null) {
             Str = str;
 
             if (font == null) {
@@ -59,15 +69,10 @@ public class Hud {
             }
 
             mFont = font;
-
-            var s = font.MeasureString(str);
-
-            mWidth  = (int)s.X;
-            mHeight = (int)s.Y;
         }
 
         public override void Draw(SpriteBatch sb, int x, int y) {
-            GfxUtil.DrawText(sb, x, y, Str, mFont, Color.White);
+            GfxUtil.DrawText(sb, x, y, Str(), mFont, Color.White);
         }
     }
 
@@ -152,16 +157,16 @@ public class Hud {
         return button;
     }
 
-    public TextVisual Text(string str) {
+    public TextVisual Text(Func<string> str) {
         return new TextVisual(str);
     }
 
-    public SpriteVisual Sprite(string asset) {
-        return new SpriteVisual(asset);
+    public SpriteVisual Sprite(string asset, float scale=1.0f) {
+        return new SpriteVisual(asset, scale);
     }
 
     public void Draw() {
-        mSB.Begin();
+        mSB.Begin(SpriteSortMode.Deferred);
 
         foreach (var elem in mElems) {
             elem.Draw(mSB);
