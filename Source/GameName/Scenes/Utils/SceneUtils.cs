@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Thengill.Shaders;
 
 namespace GameName.Scenes.Utils {
     class SceneUtils {
@@ -168,6 +169,26 @@ namespace GameName.Scenes.Utils {
 			elementList.Add(235, "tree");
 			elementList.Add(170, "rock2");
 
+                        var matDic = new Dictionary<int, MaterialShader>();
+                        matDic = null;
+                        // TODO: Models are not properly vertex colored so code below makes
+                        //       everything blue.
+                        // var toonMat = new ToonMaterial(Vector3.One*0.2f,
+                        //                                new Vector3(1.0f, 0.0f, 1.0f), // ignored
+                        //                                Vector3.Zero,
+                        //                                40.0f,
+                        //                                null, // diftex
+                        //                                null, // normtex
+                        //                                1.0f, // normcoeff
+                        //                                5, // diflevels
+                        //                                2, // spelevels,
+                        //                                true); // use vert col
+
+
+                        // for (var i = 0; i < 20; i++) {
+                        //     matDic[i] = toonMat;
+                        // }
+
 			for (int y = 0; y<heightmap.GetDimensions().Y; y++)
 			{
 				for (int x = 0; x<heightmap.GetDimensions().X; x++)
@@ -179,8 +200,8 @@ namespace GameName.Scenes.Utils {
 						var wx = (x / heightmap.GetDimensions().X - 0.5f) * worldsize;
 						var wy = (y / heightmap.GetDimensions().Y - 0.5f) * worldsize;
 						Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-1, -5, -1), new Vector3(1, 5, 1)), InvTransf = Matrix.Identity });
-						Game1.Inst.Scene.AddComponent(newElement, new CTransform() { Position = new Vector3(worldsize * (x / (float)heightmap.GetDimensions().X - 0.5f), heightmap.HeightAt(wx, wy) - 1f, worldsize * (y / (float)heightmap.GetDimensions().Y - 0.5f)), Scale = new Vector3((float)rnd.NextDouble() * 0.25f + 0.75f), Rotation = Matrix.CreateRotationY((float)rnd.NextDouble() * MathHelper.Pi * 2f) });
-						Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + type), fileName = type });
+						Game1.Inst.Scene.AddComponent(newElement, new CTransform() { Position = new Vector3(worldsize * (x / (float)heightmap.GetDimensions().X - 0.5f), heightmap.HeightAt(wx, wy) - 1.5f, worldsize * (y / (float)heightmap.GetDimensions().Y - 0.5f)), Scale = new Vector3((float)rnd.NextDouble() * 0.25f + 0.75f), Rotation = Matrix.CreateRotationY((float)rnd.NextDouble() * MathHelper.Pi * 2f) });
+						Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + type), fileName = type, materials = matDic, enableVertexColor = false });
 					}
 				}
 			}

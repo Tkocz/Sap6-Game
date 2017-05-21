@@ -22,6 +22,11 @@ extern uniform bool UseVertCol;
 sampler difTex = sampler_state { Texture = <DifTex>; mipfilter = LINEAR; };
 sampler normTex = sampler_state { Texture = <NormTex>; mipfilter = LINEAR; };
 
+// TODO: Should be uniforms
+static const float FogStart  = 35.0;
+static const float FogEnd    = 100.0;
+static const float3 FogColor = float3(0.4, 0.6, 0.8);
+
 static const int NUM_LIGHTS = 3;
 
 // Directional lights!
@@ -101,6 +106,10 @@ void ps_main(in VSOutput x, out PSOutput r) {
 
     r.color += float4(c, 1.0);
   }
+
+  float fogFac = min(max(0.0, length(x.worldPos - CamPos) - FogStart) / (FogEnd - FogStart), 1.0);
+  // not supporting alpha here, w/e
+  r.color = float4((1.0-fogFac)*r.color.rgb + fogFac*FogColor, 1.0);
 }
 
 void vs_main(in VSInput x, out VSOutput r) {

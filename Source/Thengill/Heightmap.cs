@@ -78,14 +78,15 @@ public class Heightmap {
     /// <param name="randomTris">Whether the direction of the diagonal of each quad sould be
     ///                          randomized.</param>
     /// <param name="blur">The blur factor (higher value makes heightmap smoother).</param>
-    private Heightmap(Texture2D tex,
-                      int       stepX,
-                      int       stepY,
-                      bool      smooth,
-                      float     scale,
-                      float     yScale,
-                      bool      randomTris,
-                      int       blur)
+    private Heightmap(Texture2D                          tex,
+                      int                                stepX,
+                      int                                stepY,
+                      bool                               smooth,
+                      float                              scale,
+                      float                              yScale,
+                      bool                               randomTris,
+                      int                                blur,
+                      Func<float, float, float, Color> calcColor)
     {
         mTex        = tex;
         mStepX      = stepX;
@@ -98,7 +99,7 @@ public class Heightmap {
 
         // Probably bad idea to do this amount of work in ctor but who really cares? This ctor is
         // private anyway.
-        Init();
+        Init(calcColor);
     }
 
     public Color ColorAt(int x, int y) {
@@ -184,23 +185,24 @@ public class Heightmap {
     /// <param name="randomTris">Whether the direction of the diagonal of each quad sould be
     ///                          randomized.</param>
     /// <param name="blur">The blur factor (higher value makes heightmap smoother).</param>
-    public static Heightmap Load(string name,
-                                 int    stepX      = 1,
-                                 int    stepY      = 1,
-                                 bool   smooth     = true,
-                                 float  scale      = 1.0f,
-                                 float  yScale     = 1.0f,
-                                 bool   randomTris = true,
-                                 int    blur       = 16)
+    public static Heightmap Load(string                           name,
+                                 int                              stepX      = 1,
+                                 int                              stepY      = 1,
+                                 bool                             smooth     = true,
+                                 float                            scale      = 1.0f,
+                                 float                            yScale     = 1.0f,
+                                 bool                             randomTris = true,
+                                 int                              blur       = 16,
+                                 Func<float, float, float, Color> colorFn = null)
     {
         var tex = Game1.Inst.Content.Load<Texture2D>(name);
-        return new Heightmap(tex, stepX, stepY, smooth, scale, yScale, randomTris, blur);
+        return new Heightmap(tex, stepX, stepY, smooth, scale, yScale, randomTris, blur, colorFn);
     }
 
     /// <summary>Creates the MonoGame/XNA renderable model.</summary>
     /// <param name="indices">The triangle indices.</param>
     /// <param name="verts">The model vertices.</param>
-    private void CreateModel(int[] indices, VertexPositionNormalColor[] verts) {
+    private void CreateModel(int[] indices, VertexPositionNormalColor[] verts, Func<float, float, float, Color> calcColor) {
         //--------------------
         // Compute normals.
         //--------------------
@@ -281,7 +283,7 @@ public class Heightmap {
     }
 
     /// <summary>Initializes the heightmap.</summary>
-    private void Init() {
+    private void Init(Func<float, float, float, Color> calcColor) {
         //--------------------
         // Copy pixel data.
         //--------------------
@@ -352,49 +354,6 @@ public class Heightmap {
 
         var rnd = new Random();
 
-        Func<float, float, float, Color> calcColor = (x, y, z) => {
-            // The logic below is a bit messy - it's the result of some experimentation. Feel free
-            // to tear it apart and come up with something better. :-) Basically, it computes and
-            // interpolates between colors depending on the heightmap height at the given position.
-
-            Func<float, float, float, float> f1 = (a, b, r) => (1.0f-r)*a + r*b;
-            Func<Color, Color, float, Color> f = (a, b, r) =>
-                new Color(f1(a.R/255.0f, b.R/255.0f, r),
-                          f1(a.G/255.0f, b.G/255.0f, r),
-                          f1(a.B/255.0f, b.B/255.0f, r),
-                          f1(a.A/255.0f, b.A/255.0f, r));
-
-            var r1 = 0.1f * (float)(rnd.NextDouble() - 0.5f);
-            var r2 = 0.1f * (float)(rnd.NextDouble() - 0.5f);
-            var r3 = 0.1f * (float)(rnd.NextDouble() - 0.5f);
-
-            var rockColor  = new Color(0.6f+r1, 0.6f+r1, 0.65f+r1);
-            var grassColor = new Color(0.2f+0.3f*r1, 0.4f+0.3f*r2, 0.3f+0.3f*r3);
-            var sandColor  = new Color(0.3f+0.3f*r1, 0.1f+0.3f*r2, 0.0f+0.3f*r2);
-
-            var color = grassColor;
-
-            if (y < 0.0f) {
-                y += 0.4f;
-                var r = 2.0f/(1.0f + (float)Math.Pow(MathHelper.E, 40.0f*y)) - 1.0f;
-                r = Math.Max(Math.Min(r, 1.0f), 0.0f);
-                color = f(grassColor,
-                          sandColor,
-                          r);
-            }
-
-            if (y > 0.05f) {
-                y -= 0.05f;
-                var r = 2.0f/(1.0f + (float)Math.Pow(MathHelper.E, -90.0f*y)) - 1.0f;
-                r = Math.Max(Math.Min(r, 1.0f), 0.0f);
-                color = f(grassColor,
-                          rockColor,
-                          r);
-            }
-
-            return color;
-        };
-
         Func<int, int, int> calcVert = (i, j) => {
             UInt64 key = ((UInt64)i) << 32 | (UInt64)j;
 
@@ -454,7 +413,7 @@ public class Heightmap {
             }
         }
 
-        CreateModel(indices.ToArray(), verts.ToArray());
+        CreateModel(indices.ToArray(), verts.ToArray(), calcColor);
     }
 }
 

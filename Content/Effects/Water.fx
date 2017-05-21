@@ -23,6 +23,11 @@ uniform extern float Frequency; // 2
 uniform extern float BumpConstant;
 uniform extern texture NormalMap;
 
+// TODO: Should be uniforms
+static const float FogStart  = 35.0;
+static const float FogEnd    = 100.0;
+static const float3 FogColor = float3(0.4, 0.6, 0.8);
+
 sampler2D bumpSampler = sampler_state {
   Texture = (NormalMap);
   MinFilter = Linear;
@@ -105,7 +110,11 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0 {
   float3 dif  = color * difFac;
   float3 spec = float3(1.0, 1.0, 1.0) * specFac;
 
-  return float4(amb+dif+spec, 0.4+0.3*(difFac+specFac));
+  float fogFac = min(max(0.0, length(input.WorldPos - CameraPosition) - FogStart) / (FogEnd - FogStart), 1.0);
+  float4 col = float4(amb+dif+spec, 0.4+0.3*(difFac+specFac));
+  float4 color2 = (1.0-fogFac)*col + fogFac*float4(FogColor, 1.0);
+
+  return color2;
 }
 technique BasicColorDrawing {
   pass Pass1 {

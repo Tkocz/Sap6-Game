@@ -48,8 +48,6 @@ public class Hud {
 
     public class TextVisual: Visual {
         private SpriteFont mFont;
-        private int mWidth;
-        private int mHeight;
 
         public Func<string> Str { get; }
 
