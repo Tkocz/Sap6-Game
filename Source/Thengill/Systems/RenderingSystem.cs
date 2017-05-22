@@ -50,7 +50,7 @@ namespace Thengill.Systems
 
             var device = Game1.Inst.GraphicsDevice;
             var scene = Game1.Inst.Scene;
-
+            var frustrum = camera.Frustum;
             foreach (var component in scene.GetComponents<C3DRenderable>()) {
                 var key = component.Key;
 
@@ -76,16 +76,21 @@ namespace Thengill.Systems
                 if (model.animFn != null) {
                     anim = model.animFn(mT);
                 }
-
-                foreach (var mesh in model.model.Meshes) {
-                    if (camera.Frustum.Contains(mesh.BoundingSphere.Transform(transform.Frame))
-                        == ContainmentType.Disjoint)
+              
+                foreach (var mesh in model.model.Meshes)
+                {
+                    string tag = model.model.Tag as string;
+                    if (tag != "Heightmap")
                     {
-                        // TODO: This is a really ugly hack. :-(
-                        //if ((string)model.model.Tag != "Heightmap") {
-                            //break;
-                        //}
+                        if (frustrum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) ==
+                            ContainmentType.Disjoint)
+                        {
+                            // TODO: This is a really ugly hack. :-(
+
+                            break;
+                        }
                     }
+
 
                     Effect lastEffect = null;
                     for (var i = 0; i < mesh.MeshParts.Count; i++) {
