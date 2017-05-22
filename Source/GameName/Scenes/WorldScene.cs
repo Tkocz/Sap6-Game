@@ -34,7 +34,6 @@ namespace GameName.Scenes
         private WorldSceneConfig configs;
         private Effect mUnderWaterFx;
         private RenderTarget2D mRT;
-        private WaterSystem waterSys;
         private RenderingSystem mRenderer;
 
         public WorldScene(WorldSceneConfig configs) {
@@ -53,7 +52,7 @@ namespace GameName.Scenes
 
             var camera = (CCamera)GetComponentFromEntity<CCamera>(player);
 
-            if (camera.Position.Y < waterSys.WaterHeight) {
+            if (camera.Position.Y < configs.WaterHeight) {
                 GfxUtil.SetRT(mRT);
                 base.Draw(t, dt);
                 GfxUtil.SetRT(null);
@@ -86,20 +85,15 @@ namespace GameName.Scenes
         {
             InitGameComponents();
             InitSceneLightSettings();
-
-
+            
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
             mRT = GfxUtil.CreateRT();
-
-
-            //todo set waterheight depending on
-            waterSys = new WaterSystem();
-
+            
             int playerz = 0;
             int playerx = 0;
             if (configs.map == "Tropical") //"DinoIsland"
             {
-                waterSys.WaterHeight = -7;
+                //waterSys.WaterHeight = -7;
                 heightMapScale = 300;
                 yScaleMap = 0.1f;
                 playerz = 0;
@@ -108,7 +102,7 @@ namespace GameName.Scenes
             else if(configs.map == "UpNorth"){ //HeightMap
                 heightMapScale = 300;
                 yScaleMap = 0.5f;
-                waterSys.WaterHeight = -58;
+                //waterSys.WaterHeight = -58;
                 playerz = -49;
                 playerx = -62;
             }
@@ -118,7 +112,6 @@ namespace GameName.Scenes
             physicsSys.InvSpatPartSize = 0.07f;
             physicsSys.Gravity *= 2.0f;
             AddSystems(
-                waterSys,
                 physicsSys,
                 new InputSystem(),
                 new AISystem(),
@@ -197,13 +190,13 @@ namespace GameName.Scenes
 
             physicsSys.Heightmap = heightmap;
 
+            WaterFactory.Create(configs.WaterHeight, configs.TerrainWidth, configs.TerrainHeight);
+
             base.Init();
 
 			SceneUtils.SpawnEnvironment(heightmap, heightMapScale);
-
-
+            
             //add network after init
-
             if (_networkSystem != null)
             {
 

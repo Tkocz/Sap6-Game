@@ -1,9 +1,7 @@
+using Thengill.Components.Renderable;
 namespace Thengill.Components {
-
-using Core;
-
-public sealed class CWater: EcsComponent {
-    // Dummy component.
-}
+    public class CWater: C3DRenderable {
+        // Dummy component.
+    }
 
 }
