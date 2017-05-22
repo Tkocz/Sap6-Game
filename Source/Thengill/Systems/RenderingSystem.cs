@@ -67,11 +67,6 @@ namespace Thengill.Systems
                 C3DRenderable model = (C3DRenderable)component.Value;
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
 
-                if (scene.EntityHasComponent<CWater>(key)) {
-                    // Drawn after.
-                    continue;
-                }
-
                 CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
 
                 Matrix[] bones = new Matrix[model.model.Bones.Count];
@@ -151,16 +146,13 @@ namespace Thengill.Systems
             }
 
             foreach (var component in scene.GetComponents<CWater>()) {
+                var model = (C3DRenderable)component.Value;
                 var key = component.Key;
 
                 if (key == excludeEid) {
                     // TODO: This is originally a hack to simplify rendering of environment maps.
                     continue;
                 }
-
-
-                C3DRenderable model = (C3DRenderable)scene.GetComponentFromEntity<C3DRenderable>(key);
-                if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
                 CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
 
                 Matrix[] bones = new Matrix[model.model.Bones.Count];

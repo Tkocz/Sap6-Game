@@ -98,7 +98,7 @@
     <Compile Include="Systems\Rendering2DSystem.cs" />
     <Compile Include="Systems\RenderingSystem.cs" />
     <Compile Include="Core\VertexPositionNormalColor.cs" />
-    <Compile Include="Systems\WaterSystem.cs" />
+    <Compile Include="Utils\WaterFactory.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
     <Compile Include="Utils\FuzzyUtil.cs" />
