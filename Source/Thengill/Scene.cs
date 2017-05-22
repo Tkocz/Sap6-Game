@@ -229,6 +229,7 @@ namespace Thengill {
 		Components.Add(typeof(CInventory), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CPickUp), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CHealth), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CScore), new Dictionary<int, EcsComponent>());
 
 #if DEBUG
             AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));

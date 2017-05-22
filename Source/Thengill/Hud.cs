@@ -10,13 +10,23 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 public class Hud {
+    public enum VerticalAnchor {
+        Top,
+        Center,
+        Bottom,
+    };
+    public enum HorizontalAnchor {
+        Left,
+        Center,
+        Right
+    };
     public abstract class Visual {
         public abstract int Width { get; }
         public abstract int Height { get; }
         public abstract void Draw(SpriteBatch sb, int x, int y);
     };
 
-    public class SpriteVisual: Visual {
+        public class SpriteVisual: Visual {
         private float mScale;
         private Texture2D mSprite;
 
@@ -147,7 +157,16 @@ public class Hud {
         mSB = new SpriteBatch(Game1.Inst.GraphicsDevice);
     }
 
-    public ButtonElem Button(int x, int y, Visual up, Visual down=null) {
+    public ButtonElem Button(int x, int y, Visual up, Visual down=null, VerticalAnchor vertAnchor = VerticalAnchor.Top, HorizontalAnchor horAnchor = HorizontalAnchor.Left) {
+        if (horAnchor == HorizontalAnchor.Center)
+            x -= (int)(up.Width * 0.5f);
+        if (horAnchor == HorizontalAnchor.Right)
+            x -= up.Width;
+        if(vertAnchor == VerticalAnchor.Center)
+            y += (int)(up.Height*0.5f);
+        if (vertAnchor == VerticalAnchor.Bottom)
+            y -= up.Height;
+
         var button = new ButtonElem(x, y, up, down);
 
         mElems.Add(button);

@@ -197,6 +197,7 @@ namespace GameName.Scenes
 
             AddComponent(player, new CInventory());
             AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
+            AddComponent(player, new CScore());
             /*
             AddComponent(player, new CLogic {
                 InvHz = 1.0f/30.0f,
@@ -318,7 +319,13 @@ namespace GameName.Scenes
 
         public void InitHud() {
             mHud = new Hud();
-
+            var viewport = Game1.Inst.GraphicsDevice.Viewport;
+            Vector2 screenCenter = new Vector2(viewport.Width * 0.5f, viewport.Height * 0.5f);
+            var count = 0;
+            foreach (CScore scoreComponent in GetComponents<CScore>().Values) {
+                mHud.Button((int)(viewport.Width * 0.9f), count*30 + 60, mHud.Text(() => string.Format("Score: {0}", scoreComponent.Score)));
+                count++;
+            }
             // Example of how to create hud elements.
             mHud.Button(10, 10, mHud.Text(() => "Click me (and check log)"))
                 .OnClick(() => Console.WriteLine("Text button clicked."));
