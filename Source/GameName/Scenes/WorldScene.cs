@@ -81,9 +81,9 @@ namespace GameName.Scenes
         {
             InitGameComponents();
             InitSceneLightSettings();
-            
+
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
-            mRT = GfxUtil.CreateRT();     
+            mRT = GfxUtil.CreateRT();
 
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
@@ -118,14 +118,14 @@ namespace GameName.Scenes
 
             physicsSys.Heightmap = heightmap;
 
-         
+
             base.Init();
 
 
             WaterFactory.Create(configs.WaterHeight, configs.HeightMapScale, configs.HeightMapScale);
 
             SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
-            
+
             //add network after init
             if (_networkSystem != null)
             {
@@ -315,6 +315,23 @@ namespace GameName.Scenes
             Log.GetLog().Debug("WorldScene initialized.");
 
             InitHud();
+
+            var grassTex = Game1.Inst.Content.Load<Texture2D>("Textures/Grass");
+            for (var i = 0; i < 10000; i++) {
+                var bb = AddEntity();
+
+                var x = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+                var z = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+                var y = heightmap.HeightAt(x, z);
+                var s = 1.0f + 0.8f*(float)rnd.NextDouble();
+
+                AddComponent(bb, new CBillboard {
+                    Pos   = new Vector3(x, y + 0.5f*s , z),
+                    Tex   = grassTex,
+                    Scale = s
+                });
+            }
+
         }
 
         public void InitHud() {

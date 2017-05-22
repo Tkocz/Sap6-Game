@@ -213,6 +213,7 @@ namespace Thengill {
     public virtual void Init() {
 
         // init all component dictionaries
+        Components.Add(typeof(CBillboard), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CWater), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CTransform), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CInput), new Dictionary<int, EcsComponent>());
