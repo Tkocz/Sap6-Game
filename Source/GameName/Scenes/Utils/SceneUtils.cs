@@ -42,6 +42,29 @@ namespace GameName.Scenes.Utils {
             currentScene.AddComponent(ball, new CPickUp());
             return ball;
         }
+
+        public static Func<float, Matrix> wiggleAnimation(int id)
+        {
+            var randt = (float)rnd.NextDouble() * 2.0f * MathHelper.Pi;
+            var currentScene = Game1.Inst.Scene;
+            Func<float, Matrix> npcAnim = (t) => {
+                var transf = (CTransform)currentScene.GetComponentFromEntity<CTransform>(id);
+                var body = (CBody)currentScene.GetComponentFromEntity<CBody>(id);
+
+                // Wiggle wiggle!
+                var x = 0.3f * Vector3.Dot(transf.Frame.Forward, body.Velocity);
+                var walk =
+                    Matrix.CreateFromAxisAngle(Vector3.Forward, x * 0.1f * (float)Math.Cos(randt + t * 12.0f))
+                  * Matrix.CreateTranslation(Vector3.Up * -x * 0.1f * (float)Math.Sin(randt + t * 24.0f));
+
+                var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f * (float)Math.Sin(randt + t * 2.0f));
+
+                return walk * idle;
+            };
+            return npcAnim;
+        }
+
+
         public static void CreateAnimals(int numFlocks,int worldsize) {
             var currentScene = Game1.Inst.Scene;
 
@@ -69,22 +92,7 @@ namespace GameName.Scenes.Utils {
 
                 for (int i = 0; i < membersPerFlock; i++) {
                     int id = currentScene.AddEntity();
-
-                    var randt = (float)rnd.NextDouble()*2.0f*MathHelper.Pi;
-                    Func<float, Matrix> npcAnim = (t) => {
-                        var transf = (CTransform)currentScene.GetComponentFromEntity<CTransform>(id);
-                        var body = (CBody)currentScene.GetComponentFromEntity<CBody>(id);
-
-                        // Wiggle wiggle!
-                        var x = 0.3f * Vector3.Dot(transf.Frame.Forward, body.Velocity);
-                        var walk =
-                            Matrix.CreateFromAxisAngle(Vector3.Forward, x * 0.1f * (float)Math.Cos(randt+t * 12.0f))
-                          * Matrix.CreateTranslation(Vector3.Up * -x * 0.1f * (float)Math.Sin(randt+t * 24.0f));
-
-                        var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f * (float)Math.Sin(randt+t * 2.0f));
-
-                        return walk * idle;
-                    };
+                    var npcAnim = wiggleAnimation(id);
 
                     if (flockAnimal.Equals("hen")) {
                         // TODO: Make animals have different animations based on state

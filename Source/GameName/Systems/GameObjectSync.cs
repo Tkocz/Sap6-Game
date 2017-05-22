@@ -13,6 +13,7 @@ using Thengill.Components.Renderable;
 using Thengill.Core;
 using Thengill.Systems;
 using GameName.Components;
+using GameName.Scenes.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -53,6 +54,7 @@ namespace GameName.Systems
             //Add entity
             if (!Game1.Inst.Scene.EntityHasComponent<CTransform>(data.ID))
             {
+                var currentScene = Game1.Inst.Scene;
                 //calculate BoundindBox since we have the data do this
                 data.CBody.Aabb = new BoundingBox(-data.CBody.Radius * Vector3.One, data.CBody.Radius * Vector3.One);
                 Game1.Inst.Scene.AddComponent(data.ID, data.CBody);
@@ -60,10 +62,14 @@ namespace GameName.Systems
 
                 if (data.ModelFileName == "hen")
                 {
-                    CAnimation normalAnimation = new CHenNormalAnimation();
+                    var npcAnim = SceneUtils.wiggleAnimation(data.ID);
+                    // TODO: Make animals have different animations based on state
+                    CAnimation normalAnimation = new CHenNormalAnimation { animFn = npcAnim };
                     // Set a random offset to animation so not all animals are synced
                     normalAnimation.CurrentKeyframe = rnd.Next(normalAnimation.Keyframes.Count - 1);
-                    Game1.Inst.Scene.AddComponent<C3DRenderable>(data.ID, normalAnimation);
+                    // Random animation speed between 0.8-1.0
+                    normalAnimation.AnimationSpeed = (float)rnd.NextDouble() * 0.2f + 0.8f;
+                    currentScene.AddComponent<C3DRenderable>(data.ID, normalAnimation);
                 }
                 else
                 {
