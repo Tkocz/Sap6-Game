@@ -234,7 +234,7 @@ namespace GameName.Scenes {
         private void onStartGame(object data)
         {
             var mapName = (string) data;
-            var configs = new WorldSceneConfig(0, 0, 0, mapName, _networkSystem);
+            var configs = new WorldSceneConfig( 0, 0, 0, mapName, _networkSystem);
             Game1.Inst.EnterScene(new WorldScene(configs));
         }
 
