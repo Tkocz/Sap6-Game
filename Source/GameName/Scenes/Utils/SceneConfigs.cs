@@ -23,11 +23,11 @@ namespace GameName.Scenes.Utils {
         public Func<float, float, float, Color> colorsMap;
         public WorldSceneConfig(int numFlocks, int numPowerUps, int numTriggers, string map, NetworkSystem network)
         {
-            this.NumFlocks = numFlocks;
-            this.NumPowerUps = numPowerUps;
-            this.NumTriggers = numTriggers;
-            this.Map = map;
-            this.Network = network;
+            NumFlocks = numFlocks;
+            NumPowerUps = numPowerUps;
+            NumTriggers = numTriggers;
+            Map = map;
+            Network = network;
             Map = map;
 
             if (Map == "Tropical") //"DinoIsland"
