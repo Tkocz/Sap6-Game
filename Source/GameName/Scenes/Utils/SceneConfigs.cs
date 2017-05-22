@@ -14,8 +14,6 @@ namespace GameName.Scenes.Utils {
         public int NumTriggers;
         public string Map;
         public float WaterHeight;
-        public float WaterDepth;
-        public float WaterWidth;
         public int HeightMapScale = 300;
         public float YScaleMap = 0.4f;
         public NetworkSystem Network;

@@ -118,11 +118,13 @@ namespace GameName.Scenes
 
             physicsSys.Heightmap = heightmap;
 
-            WaterFactory.Create(configs.WaterHeight, configs.TerrainWidth, configs.TerrainHeight);
-
+         
             base.Init();
 
-			SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
+
+            WaterFactory.Create(configs.WaterHeight, configs.HeightMapScale, configs.HeightMapScale);
+
+            SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
             
             //add network after init
             if (_networkSystem != null)
@@ -247,7 +249,6 @@ namespace GameName.Scenes
 			// manually start loading all heightmap components, should be moved/automated
 
 
-            waterSys.Load();
 
            OnEvent("game_end", data =>
            {
