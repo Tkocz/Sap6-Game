@@ -48,10 +48,15 @@ namespace Thengill.Systems
                     Matrix.CreateTranslation(transformComponent.Position);
             }
 
+            var numDraws1 = 0;
+            var numDraws = 0;
+
             var device = Game1.Inst.GraphicsDevice;
             var scene = Game1.Inst.Scene;
             var frustrum = camera.Frustum;
+
             foreach (var component in scene.GetComponents<C3DRenderable>()) {
+                numDraws1++;
                 var key = component.Key;
 
                 if (key == excludeEid) {
@@ -64,7 +69,7 @@ namespace Thengill.Systems
 
                 if (scene.EntityHasComponent<CWater>(key)) {
                     // Drawn after.
-                    break;
+                    continue;
                 }
 
                 CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
@@ -76,21 +81,19 @@ namespace Thengill.Systems
                 if (model.animFn != null) {
                     anim = model.animFn(mT);
                 }
-              
+
                 foreach (var mesh in model.model.Meshes)
                 {
                     string tag = model.model.Tag as string;
+                    // TODO: This is a really ugly hack. :-(
                     if (tag != "Heightmap")
                     {
                         if (frustrum.Contains(mesh.BoundingSphere.Transform(transform.Frame)) ==
                             ContainmentType.Disjoint)
                         {
-                            // TODO: This is a really ugly hack. :-(
-
                             break;
                         }
                     }
-
 
                     Effect lastEffect = null;
                     for (var i = 0; i < mesh.MeshParts.Count; i++) {
@@ -134,6 +137,8 @@ namespace Thengill.Systems
 
                         for (var j = 0; j < effect.CurrentTechnique.Passes.Count; j++) {
                             effect.CurrentTechnique.Passes[j].Apply();
+
+                            numDraws++;
                             device.DrawIndexedPrimitives(PrimitiveType.TriangleList,
                                                          part.VertexOffset,
                                                          0,
