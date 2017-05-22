@@ -117,16 +117,16 @@ namespace GameName.Scenes.Utils {
                     transformComponent.Position = new Vector3(memberX, y, memberZ);
                     transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
                         (float)(Math.PI * (rnd.NextDouble() * 2)));
-                    float scale = 1f;
-                    transformComponent.Scale = new Vector3(scale, scale, scale);
+                    float size = 0.5f;
+                    transformComponent.Scale = new Vector3(1f);
                     currentScene.AddComponent(id, transformComponent);
                     currentScene.AddComponent(id, new CBody {
                         InvMass = 0.05f,
-                        Aabb = new BoundingBox(-scale * Vector3.One, scale * Vector3.One),
+                        Aabb = new BoundingBox(-size * Vector3.One, size * Vector3.One),
                         LinDrag = 0.8f,
                         Velocity = Vector3.Zero,
                         Radius = 1f,
-                        SpeedMultiplier = scale,
+                        SpeedMultiplier = size,
                         MaxVelocity = 4,
                         Restitution = 0
                     });
