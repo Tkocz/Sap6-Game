@@ -62,7 +62,7 @@ namespace Thengill.Systems
                 C3DRenderable model = (C3DRenderable)component.Value;
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
 
-                if ((string)model.model.Tag == "water") {
+                if (scene.EntityHasComponent<CWater>(key)) {
                     // Drawn after.
                     break;
                 }
@@ -82,9 +82,9 @@ namespace Thengill.Systems
                         == ContainmentType.Disjoint)
                     {
                         // TODO: This is a really ugly hack. :-(
-                        if ((string)model.model.Tag != "Heightmap") {
-                            break;
-                        }
+                        //if ((string)model.model.Tag != "Heightmap") {
+                            //break;
+                        //}
                     }
 
                     Effect lastEffect = null;

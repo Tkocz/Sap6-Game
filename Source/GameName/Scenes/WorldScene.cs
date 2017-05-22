@@ -94,16 +94,23 @@ namespace GameName.Scenes
 
             //todo set waterheight depending on
             waterSys = new WaterSystem();
+
+            int playerz = 0;
+            int playerx = 0;
             if (configs.map == "Tropical") //"DinoIsland"
             {
                 waterSys.WaterHeight = -7;
                 heightMapScale = 300;
                 yScaleMap = 0.1f;
+                playerz = 0;
+                playerx = 0;
             }
             else if(configs.map == "UpNorth"){ //HeightMap
                 heightMapScale = 300;
                 yScaleMap = 0.5f;
                 waterSys.WaterHeight = -58;
+                playerz = -49;
+                playerx = -62;
             }
 
             var physicsSys = new PhysicsSystem();
@@ -181,7 +188,7 @@ namespace GameName.Scenes
             var heightmap = Heightmap.Load("Textures/" + configs.map,
                                            stepX      : 8,
                                            stepY      : 8,
-                                           smooth     : true,
+                                           smooth     : false,
                                            scale      : heightMapScale,
                                            yScale     : yScaleMap,
                                            randomTris : true,
@@ -244,7 +251,9 @@ namespace GameName.Scenes
             AddComponent(player, new CInput());
             AddComponent(player, new CPlayer());
 
-            var playerTransf = new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(0, -0, rnd.Next(0,50)), Scale = new Vector3(0.5f) };
+
+            var playery = (heightmap.HeightAt(playerx, playerz));
+            var playerTransf = new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(playerx, playery, playerz), Scale = new Vector3(0.5f) };
 
             AddComponent(player, playerTransf);
 
@@ -300,7 +309,8 @@ namespace GameName.Scenes
             AddComponent<C3DRenderable>(hme, new C3DRenderable { model = heightmap.Model,
                                                                  enableVertexColor = true,
                                                                  specular = 0.03f,
-                                                                 materials = new Dictionary<int, MaterialShader> { {0, mapMat } }});
+                // materials = new Dictionary<int, MaterialShader> { {0, mapMat } }
+            });
             AddComponent(hme, new CTransform {
                 Position = Vector3.Zero,
                 Rotation = Matrix.Identity,
