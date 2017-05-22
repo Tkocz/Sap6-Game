@@ -258,22 +258,23 @@ namespace GameName.Scenes
             AddComponent(player, playerTransf);
 
             // Glossy helmet, lol!
-            var cubeMap = Game1.Inst.Content.Load<Effect>("Effects/CubeMap");
-            var envMap = new EnvMapMaterial(mRenderer, player, playerTransf, cubeMap);
+            //var cubeMap = Game1.Inst.Content.Load<Effect>("Effects/CubeMap");
+            //var envMap = new EnvMapMaterial(mRenderer, player, playerTransf, cubeMap);
 
             AddComponent<C3DRenderable>(player,
                                         new CImportedModel() {
                                             animFn = playerAnim,
                                             model = Game1.Inst.Content.Load<Model>("Models/viking") ,
                                             fileName = "viking",
-                                            materials = new Dictionary<int, MaterialShader> {
+                                            /*materials = new Dictionary<int, MaterialShader> {
                                                 { 8, envMap }
-                                            }});
+                                            }*/
+                                        });
             AddComponent(player, new CSyncObject { fileName = "viking" });
 
             AddComponent(player, new CInventory());
             AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
-
+            /*
             AddComponent(player, new CLogic {
                 InvHz = 1.0f/30.0f,
                 Fn = (t, dt) => {
@@ -281,7 +282,7 @@ namespace GameName.Scenes
                     envMap.Update();
                 }
             });
-
+            */
             AddComponent(player, new CCamera
             {
                 Height = 3.5f,

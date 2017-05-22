@@ -130,7 +130,7 @@ public class EnvMapMaterial: MaterialShader {
             GfxUtil.SetRT(mEnvRTs[i]);
 
             Game1.Inst.GraphicsDevice.Clear(Color.Magenta);
-            mRenderer.DrawScene(cams[i], mEid);
+            //mRenderer.DrawScene(cams[i], mEid);
         }
 
         GfxUtil.SetRT(null);
