@@ -168,7 +168,36 @@ namespace GameName.Scenes.Utils {
                 currentScene.AddComponent(id, new CSyncObject());
             }
         }
-
+        public static void SpawnBirds(WorldSceneConfig config) {
+            var scene = Game1.Inst.Scene;
+            var fileName = "seagull";
+            var birdCount = 30;
+            var halfWorld = config.HeightMapScale * 0.5f;
+            for (int i = 0; i < birdCount; i++) {
+                int id = scene.AddEntity();
+                var randt = (float)rnd.NextDouble() * 2.0f * MathHelper.Pi;
+                var rotationSpeed = (float)rnd.NextDouble() * 0.25f + 0.5f;
+                var transform = new CTransform {
+                    Position = new Vector3(
+                        (float)rnd.NextDouble()*halfWorld-halfWorld, 
+                        config.WaterHeight + (float)rnd.NextDouble()*10+15, 
+                        (float)rnd.NextDouble()*halfWorld-halfWorld
+                        ),
+                    Scale = Vector3.One
+                };
+                Func<float, Matrix> flyingAnimation = (t) => {
+                    var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f * (float)Math.Sin(randt + t * 2.0f));
+                    var rot = Matrix.CreateRotationY(-(t * rotationSpeed));
+                    return idle * rot;
+                };
+                scene.AddComponent(id, transform);
+                scene.AddComponent<C3DRenderable>(id, new CImportedModel {
+                    fileName = fileName,
+                    model = Game1.Inst.Content.Load<Model>("Models/" + fileName),
+                    animFn = flyingAnimation
+                });
+            }
+        }
 		public static void SpawnEnvironment(Heightmap heightmap, int worldsize)
 		{
             Func<float, float> treeFn = x => 0.2f * (float)Math.Pow(x, 3);

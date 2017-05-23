@@ -287,6 +287,7 @@ namespace GameName.Scenes
                 Utils.SceneUtils.CreateAnimals(configs.NumFlocks, configs.HeightMapScale / 2);
                 Utils.SceneUtils.CreateTriggerEvents(configs.NumTriggers, configs.HeightMapScale / 2);
                 Utils.SceneUtils.CreateCollectables(configs.NumPowerUps, configs.HeightMapScale / 2);
+                SceneUtils.SpawnBirds(configs);
                 // Add tree as sprint goal
                 int sprintGoal = AddEntity();
                 AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
