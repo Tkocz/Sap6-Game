@@ -179,8 +179,8 @@ namespace GameName.Scenes.Utils {
                 var rotationSpeed = (float)rnd.NextDouble() * 0.25f + 0.5f;
                 var transform = new CTransform {
                     Position = new Vector3(
-                        (float)rnd.NextDouble()*halfWorld-halfWorld, 
-                        config.WaterHeight + (float)rnd.NextDouble()*10+25, 
+                        (float)rnd.NextDouble()*halfWorld-halfWorld,
+                        config.WaterHeight + (float)rnd.NextDouble()*10+25,
                         (float)rnd.NextDouble()*halfWorld-halfWorld
                         ),
                     Scale = Vector3.One
