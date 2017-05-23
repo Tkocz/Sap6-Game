@@ -397,8 +397,8 @@ namespace GameName.Scenes
 
             AddComponent<CBox>(plat,
                                new CBox {
-                                   Box = new BoundingBox(new Vector3(-1.6f, -0.1f, -d1.Length()),
-                                                         new Vector3( 1.6f,  0.1f,  d1.Length())),
+                                   Box = new BoundingBox(new Vector3(-1.6f, -0.2f, -d1.Length()),
+                                                         new Vector3( 1.6f,  0.2f,  d1.Length())),
                                    InvTransf = Matrix.Invert(rot)
                                });
         }
