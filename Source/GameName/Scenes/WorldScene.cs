@@ -363,6 +363,70 @@ namespace GameName.Scenes
                 });
             }
 
+            CreatePlatforms(heightmap);
+
+        }
+
+        public void CreatePlatform(Heightmap heightmap, float x1, float z1, float x2, float z2) {
+            var y1 = heightmap.HeightAt(x1, z1);
+            var y2 = heightmap.HeightAt(x2, z2);
+
+            if (y1 < configs.WaterHeight) y1 = configs.WaterHeight;
+            if (y2 < configs.WaterHeight) y2 = configs.WaterHeight;
+
+            var a = new Vector3(x1, y1+0.5f, z1);
+            var b = new Vector3(x2, y2+0.5f, z2);
+
+            var d1 = b - a;
+            var d2 = d1;
+            var d3 = d2;
+
+            d2.Y = 0.0f;
+
+            d2.Normalize();
+            d3.Normalize();
+
+            var theta1 = (float)Math.Acos(Vector3.Dot(Vector3.Forward, d2));
+            var axis1  = Vector3.Cross(Vector3.Forward, d2);
+            var rot1   = Matrix.CreateFromAxisAngle(axis1, theta1);
+
+            var theta2 = (float)Math.Acos(Vector3.Dot(d2, d3));
+            var axis2  = Vector3.Cross(d2, d3);
+            var rot2   = Matrix.CreateFromAxisAngle(axis2, theta2);
+
+            var rot = rot1 * rot2;
+
+            var plat = AddEntity();
+            AddComponent<C3DRenderable>(plat,
+                                        new C3DRenderable {
+                                            model = Game1.Inst.Content.Load<Model>("Models/Platform1"),
+                                        });
+
+            AddComponent<CTransform>(plat,
+                                     new CTransform {
+                                         Position = a + 0.5f*d1,
+                                         Rotation = rot,
+                                         Scale = new Vector3(1.6f, 1.0f, d1.Length())
+                                     });
+
+            AddComponent<CBox>(plat,
+                               new CBox {
+                                   Box = new BoundingBox(new Vector3(-1.6f, -0.1f, -d1.Length()),
+                                                         new Vector3( 1.6f,  0.1f,  d1.Length())),
+                                   InvTransf = Matrix.Invert(rot)
+                               });
+        }
+
+        public void CreatePlatforms(Heightmap heightmap) {
+            for (var i = 0; i < 20; i++) {
+                var x1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+                var z1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+
+                var x2 = x1 + 15.0f * ((float)rnd.NextDouble() - 0.5f);
+                var z2 = z1 + 15.0f * ((float)rnd.NextDouble() - 0.5f);
+
+                CreatePlatform(heightmap, x1, z1, x2, z2);
+            }
         }
 
         public void InitHud() {

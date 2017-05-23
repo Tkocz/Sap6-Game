@@ -9,7 +9,7 @@
 
 # Common config
 C_BINDIR = bin
-C_FLAGS  = -optimize+ -define:DBG_MENU -define:DEBUGasd -define:MT_PHYS -define:TRACE
+C_FLAGS  = -optimize+ -define:DBG_MENU -define:DEBUG -define:MT_PHYS -define:TRACE
 
 # Engine config
 E_COMPILER   = mcs
