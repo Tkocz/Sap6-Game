@@ -316,18 +316,48 @@ namespace GameName.Scenes
 
             InitHud();
 
-            var grassTex = Game1.Inst.Content.Load<Texture2D>("Textures/Grass");
+            var billboards = new [] {
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Bush", 1.2f),
+                new Tuple<string, float>("Flowers", 0.6f)
+            };
+
+            var billboards2 = new [] {
+                new Tuple<string, float>("Seaweed1", 0.6f),
+                new Tuple<string, float>("Seaweed2", 0.6f),
+            };
+;
             for (var i = 0; i < 10000; i++) {
-                var bb = AddEntity();
+                var bbs = billboards;
 
                 var x = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
                 var z = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
                 var y = heightmap.HeightAt(x, z);
-                var s = 1.0f + 0.8f*(float)rnd.NextDouble();
 
-                AddComponent(bb, new CBillboard {
+                if (y < configs.WaterHeight) {
+                    bbs = billboards2;
+                }
+
+                var bb = bbs[rnd.Next(0, bbs.Length)];
+                var s = (1.0f + 0.8f*(float)rnd.NextDouble()) * bb.Item2;
+
+                AddComponent(AddEntity(), new CBillboard {
                     Pos   = new Vector3(x, y + 0.5f*s , z),
-                    Tex   = grassTex,
+                    Tex   = Game1.Inst.Content.Load<Texture2D>("Textures/" + bb.Item1),
                     Scale = s
                 });
             }
