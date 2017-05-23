@@ -171,14 +171,14 @@ namespace GameName.Scenes.Utils {
 
 		public static void SpawnEnvironment(Heightmap heightmap, int worldsize)
 		{
-            // Definition for environment spawns: model name, submersion into ground, model scale, random scale function
             Func<float, float> treeFn = x => 0.2f * (float)Math.Pow(x, 3);
             Func<float, float> rockFn = x => 0.5f * (float)Math.Pow(x, 1.2);
             var elementList = new Dictionary<int, Tuple<string, float, float, Func<float, float>>>();
-			elementList.Add(255, new Tuple<string, float, float, Func<float, float>>("LeafTree",    1.5f, 0.35f, treeFn));
-            elementList.Add(245, new Tuple<string, float, float, Func<float, float>>("PalmTree",    1.5f, 0.55f, treeFn));
-            elementList.Add(235, new Tuple<string, float, float, Func<float, float>>("tree",        1.5f, 0.4f, treeFn));
-            elementList.Add(170, new Tuple<string, float, float, Func<float, float>>("rock",        0.1f, 1.4f, rockFn));
+            // Definition for environment spawns: model name, submersion into ground, model scale, random scale function
+			elementList.Add(255, new Tuple<string, float, float, Func<float, float>>("LeafTree",    0.5f,   1f,     treeFn));
+            elementList.Add(245, new Tuple<string, float, float, Func<float, float>>("PalmTree",    1.0f,   1f,     treeFn));
+            elementList.Add(235, new Tuple<string, float, float, Func<float, float>>("tree",        0.5f,   1.2f,   treeFn));
+            elementList.Add(170, new Tuple<string, float, float, Func<float, float>>("rock",        0.1f,   1.4f,   rockFn));
 
                         var matDic = new Dictionary<int, MaterialShader>();
                         matDic = null;
