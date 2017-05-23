@@ -15,7 +15,7 @@ namespace Thengill.Components
         public float Angle { get; set; }
         public bool IsAttacking { get; set; }
         public float StartTime { get; set; }
-        public float AnimationTime = 2f;
+        public float AnimationTime = 0.5f;
         public Matrix originalBones;
 
         public CPlayer() {

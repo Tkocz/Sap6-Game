@@ -118,13 +118,11 @@ namespace Thengill.Systems
                     CPlayer playerData = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(key);
                     if (playerData.IsAttacking) {
                         var temp = Matrix.Identity * playerData.originalBones;
-                        bones[0] *= Matrix.CreateTranslation(-bones[0].M41, -bones[0].M42, -bones[0].M43);
-                        //bones[1] = Matrix.Lerp(playerData.originalBones, Matrix.CreateRotationX(MathHelper.PiOver2) * playerData.originalBones, mT / (playerData.StartTime + playerData.AnimationTime) );
+                        bones[1] *= Matrix.CreateTranslation(0.0f, 0.3f, -0.2f);
                         var progress = (mT - playerData.StartTime) / playerData.AnimationTime;
                         var radians = MathHelper.Lerp(0, MathHelper.Pi, Math.Min(progress, 1));
-                        bones[0] *= Matrix.CreateRotationX(radians);
-                        bones[0] *= Matrix.CreateTranslation(temp.M41, temp.M42, temp.M43);
-                        //model.model.Bones[1].Transform = bones[1];
+                        bones[1] *= Matrix.CreateRotationX(2*(float)Math.Sin(-radians));
+                        bones[1] *= Matrix.CreateTranslation(0.0f, -0.3f, 0.2f);
                     }
                 }
 
@@ -161,7 +159,7 @@ namespace Thengill.Systems
                         if (lastEffect != effect) {
                             if (mat != null) {
                                 mat.CamPos = camera.Position;
-                                mat.Model  = bones[k + 1] * anim * transform.Frame;
+                                mat.Model  = bones[mesh.ParentBone.Index] * anim * transform.Frame;
                                 mat.View   = camera.View;
                                 mat.Proj   = camera.Projection;
                                 mat.Prerender();
@@ -174,7 +172,7 @@ namespace Thengill.Systems
                                                  transform,
                                                  mesh,
                                                  anim,
-                                                 bones[k + 1]);
+                                                 bones[mesh.ParentBone.Index]);
                             }
 
                             lastEffect = effect;
