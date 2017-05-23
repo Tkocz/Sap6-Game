@@ -273,6 +273,7 @@ namespace GameName.Scenes
                 Utils.SceneUtils.CreateAnimals(configs.NumFlocks, configs.HeightMapScale / 2);
                 Utils.SceneUtils.CreateTriggerEvents(configs.NumTriggers, configs.HeightMapScale / 2);
                 Utils.SceneUtils.CreateCollectables(configs.NumPowerUps, configs.HeightMapScale / 2);
+                SceneUtils.SpawnBirds(configs);
                 // Add tree as sprint goal
                 int sprintGoal = AddEntity();
                 AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
@@ -301,6 +302,117 @@ namespace GameName.Scenes
             Log.GetLog().Debug("WorldScene initialized.");
 
             InitHud();
+
+            var billboards = new [] {
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Grass", 1.0f),
+                new Tuple<string, float>("Bush", 1.2f),
+                new Tuple<string, float>("Flowers", 0.6f)
+            };
+
+            var billboards2 = new [] {
+                new Tuple<string, float>("Seaweed1", 0.6f),
+                new Tuple<string, float>("Seaweed2", 0.6f),
+            };
+;
+            for (var i = 0; i < 10000; i++) {
+                var bbs = billboards;
+
+                var x = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+                var z = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+                var y = heightmap.HeightAt(x, z);
+
+                if (y < configs.WaterHeight) {
+                    bbs = billboards2;
+                }
+
+                var bb = bbs[rnd.Next(0, bbs.Length)];
+                var s = (1.0f + 0.8f*(float)rnd.NextDouble()) * bb.Item2;
+
+                AddComponent(AddEntity(), new CBillboard {
+                    Pos   = new Vector3(x, y + 0.5f*s , z),
+                    Tex   = Game1.Inst.Content.Load<Texture2D>("Textures/" + bb.Item1),
+                    Scale = s
+                });
+            }
+
+            CreatePlatforms(heightmap);
+
+        }
+
+        public void CreatePlatform(Heightmap heightmap, float x1, float z1, float x2, float z2) {
+            var y1 = heightmap.HeightAt(x1, z1);
+            var y2 = heightmap.HeightAt(x2, z2);
+
+            if (y1 < configs.WaterHeight) y1 = configs.WaterHeight;
+            if (y2 < configs.WaterHeight) y2 = configs.WaterHeight;
+
+            var a = new Vector3(x1, y1+0.5f, z1);
+            var b = new Vector3(x2, y2+0.5f, z2);
+
+            var d1 = b - a;
+            var d2 = d1;
+            var d3 = d2;
+
+            d2.Y = 0.0f;
+
+            d2.Normalize();
+            d3.Normalize();
+
+            var theta1 = (float)Math.Acos(Vector3.Dot(Vector3.Forward, d2));
+            var axis1  = Vector3.Cross(Vector3.Forward, d2);
+            var rot1   = Matrix.CreateFromAxisAngle(axis1, theta1);
+
+            var theta2 = (float)Math.Acos(Vector3.Dot(d2, d3));
+            var axis2  = Vector3.Cross(d2, d3);
+            var rot2   = Matrix.CreateFromAxisAngle(axis2, theta2);
+
+            var rot = rot1 * rot2;
+
+            var plat = AddEntity();
+            AddComponent<C3DRenderable>(plat,
+                                        new C3DRenderable {
+                                            model = Game1.Inst.Content.Load<Model>("Models/Platform1"),
+                                        });
+
+            AddComponent<CTransform>(plat,
+                                     new CTransform {
+                                         Position = a + 0.5f*d1,
+                                         Rotation = rot,
+                                         Scale = new Vector3(1.6f, 1.0f, d1.Length())
+                                     });
+
+            AddComponent<CBox>(plat,
+                               new CBox {
+                                   Box = new BoundingBox(new Vector3(-1.6f, -0.1f, -d1.Length()),
+                                                         new Vector3( 1.6f,  0.1f,  d1.Length())),
+                                   InvTransf = Matrix.Invert(rot)
+                               });
+        }
+
+        public void CreatePlatforms(Heightmap heightmap) {
+            for (var i = 0; i < 20; i++) {
+                var x1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+                var z1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+
+                var x2 = x1 + 15.0f * ((float)rnd.NextDouble() - 0.5f);
+                var z2 = z1 + 15.0f * ((float)rnd.NextDouble() - 0.5f);
+
+                CreatePlatform(heightmap, x1, z1, x2, z2);
+            }
         }
 
         public void InitHud() {
