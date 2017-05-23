@@ -22,25 +22,20 @@ namespace GameName.Scenes
         private bool shouldLeave = false;
         private Random rnd = new Random();
         private int worldSize = 590;
-        private int heightMapScale = 300;
-        private float yScaleMap = 0.4f;
         private int player;
         private int pickUpCount = 0;
         private bool won;
-
         private Hud mHud;
-
         private NetworkSystem _networkSystem;
         private WorldSceneConfig configs;
         private Effect mUnderWaterFx;
         private RenderTarget2D mRT;
-        private WaterSystem waterSys;
         private RenderingSystem mRenderer;
 
         public WorldScene(WorldSceneConfig configs) {
             this.configs = configs;
-            if(configs.network != null)
-                _networkSystem = configs.network;
+            if(configs.Network != null)
+                _networkSystem = configs.Network;
         }
 
         public override void Draw(float t, float dt)
@@ -53,7 +48,7 @@ namespace GameName.Scenes
 
             var camera = (CCamera)GetComponentFromEntity<CCamera>(player);
 
-            if (camera.Position.Y < waterSys.WaterHeight) {
+            if (camera.Position.Y < configs.WaterHeight) {
                 GfxUtil.SetRT(mRT);
                 base.Draw(t, dt);
                 GfxUtil.SetRT(null);
@@ -87,38 +82,14 @@ namespace GameName.Scenes
             InitGameComponents();
             InitSceneLightSettings();
 
-
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
             mRT = GfxUtil.CreateRT();
-
-
-            //todo set waterheight depending on
-            waterSys = new WaterSystem();
-
-            int playerz = 0;
-            int playerx = 0;
-            if (configs.map == "Tropical") //"DinoIsland"
-            {
-                waterSys.WaterHeight = -7;
-                heightMapScale = 300;
-                yScaleMap = 0.1f;
-                playerz = 0;
-                playerx = 0;
-            }
-            else if(configs.map == "UpNorth"){ //HeightMap
-                heightMapScale = 300;
-                yScaleMap = 0.5f;
-                waterSys.WaterHeight = -58;
-                playerz = -49;
-                playerx = -62;
-            }
 
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
             physicsSys.InvSpatPartSize = 0.07f;
             physicsSys.Gravity *= 2.0f;
             AddSystems(
-                waterSys,
                 physicsSys,
                 new InputSystem(),
                 new AISystem(),
@@ -135,75 +106,27 @@ namespace GameName.Scenes
            AddSystem(new DebugOverlay());
 #endif
 
-#region REFACTOR THIS
-           Func<float, float, float, Color> colorFn = (x, y, z) => {
-               // The logic below is a bit messy - it's the result of some experimentation. Feel free
-               // to tear it apart and come up with something better. :-) Basically, it computes and
-               // interpolates between colors depending on the heightmap height at the given position.
-
-               Func<float, float, float, float> f1 = (a, b, r) => (1.0f-r)*a + r*b;
-               Func<Color, Color, float, Color> f = (a, b, r) =>
-               new Color(f1(a.R/255.0f, b.R/255.0f, r),
-                         f1(a.G/255.0f, b.G/255.0f, r),
-                         f1(a.B/255.0f, b.B/255.0f, r),
-                         f1(a.A/255.0f, b.A/255.0f, r));
-
-               var r1 = 0.1f * (float)(rnd.NextDouble() - 0.5f);
-               var r2 = 0.1f * (float)(rnd.NextDouble() - 0.5f);
-               var r3 = 0.1f * (float)(rnd.NextDouble() - 0.5f);
-
-               var rockColor  = new Color(0.6f+r1, 0.6f+r1, 0.65f+r1);
-               var grassColor = new Color(0.2f+0.3f*r1, 0.4f+0.3f*r2, 0.3f+0.3f*r3);
-               var sandColor  = new Color(0.3f+0.3f*r1, 0.1f+0.3f*r2, 0.0f+0.3f*r2);
-
-               if (configs.map == "Tropical") {
-                   rockColor = new Color(0.6f+0.3f*r1, 0.8f+0.3f*r2, 0.4f+0.3f*r3);
-                   grassColor = new Color(0.35f+0.3f*r1, 0.55f+0.3f*r2, 0.25f+0.3f*r3);
-                   sandColor = new Color(0.3f+0.3f*r1, 0.2f+0.3f*r2, 0.1f+0.3f*r3);
-               }
-
-               var color = grassColor;
-
-               if (y < 0.0f) {
-                   y += 0.4f;
-                   var r = 2.0f/(1.0f + (float)Math.Pow(MathHelper.E, 40.0f*y)) - 1.0f;
-                   r = Math.Max(Math.Min(r, 1.0f), 0.0f);
-                   color = f(grassColor,
-                             sandColor,
-                             r);
-               }
-
-               if (y > 0.05f) {
-                   y -= 0.05f;
-                   var r = 2.0f/(1.0f + (float)Math.Pow(MathHelper.E, -90.0f*y)) - 1.0f;
-                   r = Math.Max(Math.Min(r, 1.0f), 0.0f);
-                   color = f(grassColor,
-                             rockColor,
-                             r);
-               }
-
-               return color;
-           };
-#endregion
-            var heightmap = Heightmap.Load("Textures/" + configs.map,
+            var heightmap = Heightmap.Load("Textures/" + configs.Map,
                                            stepX      : 8,
                                            stepY      : 8,
                                            smooth     : false,
-                                           scale      : heightMapScale,
-                                           yScale     : yScaleMap,
+                                           scale      : configs.HeightMapScale,
+                                           yScale     : configs.YScaleMap,
                                            randomTris : true,
                                            blur       : 16,
-                                           colorFn    : colorFn);
+                                           colorFn    : configs.colorsMap);
 
             physicsSys.Heightmap = heightmap;
 
+
             base.Init();
 
-			SceneUtils.SpawnEnvironment(heightmap, heightMapScale);
 
+            WaterFactory.Create(configs.WaterHeight, configs.HeightMapScale, configs.HeightMapScale);
+
+            SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
 
             //add network after init
-
             if (_networkSystem != null)
             {
 
@@ -252,8 +175,8 @@ namespace GameName.Scenes
             AddComponent(player, new CPlayer());
 
 
-            var playery = (heightmap.HeightAt(playerx, playerz));
-            var playerTransf = new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(playerx, playery, playerz), Scale = new Vector3(0.5f) };
+            var playery = (heightmap.HeightAt(configs.Playerx, configs.Playerz));
+            var playerTransf = new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(configs.Playerx, playery, configs.Playerz), Scale = new Vector3(0.5f) };
 
             AddComponent(player, playerTransf);
 
@@ -274,6 +197,7 @@ namespace GameName.Scenes
 
             AddComponent(player, new CInventory());
             AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
+            AddComponent(player, new CScore());
             /*
             AddComponent(player, new CLogic {
                 InvHz = 1.0f/30.0f,
@@ -319,14 +243,13 @@ namespace GameName.Scenes
             });
 
             int heightMap = AddEntity();
-			var heightMapComp = new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/" + configs.map)};
+			var heightMapComp = new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/" + configs.Map)};
 			var heightTrans = new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) };
             AddComponent<C3DRenderable>(heightMap, heightMapComp);
             AddComponent(heightMap, heightTrans);
 			// manually start loading all heightmap components, should be moved/automated
 
 
-            waterSys.Load();
 
            OnEvent("game_end", data =>
            {
@@ -361,9 +284,9 @@ namespace GameName.Scenes
 
             if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
             {
-                Utils.SceneUtils.CreateAnimals(configs.numFlocks, heightMapScale / 2);
-                Utils.SceneUtils.CreateTriggerEvents(configs.numTriggers, heightMapScale / 2);
-                Utils.SceneUtils.CreateCollectables(configs.numPowerUps, heightMapScale / 2);
+                Utils.SceneUtils.CreateAnimals(configs.NumFlocks, configs.HeightMapScale / 2);
+                Utils.SceneUtils.CreateTriggerEvents(configs.NumTriggers, configs.HeightMapScale / 2);
+                Utils.SceneUtils.CreateCollectables(configs.NumPowerUps, configs.HeightMapScale / 2);
                 // Add tree as sprint goal
                 int sprintGoal = AddEntity();
                 AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
@@ -392,11 +315,34 @@ namespace GameName.Scenes
             Log.GetLog().Debug("WorldScene initialized.");
 
             InitHud();
+
+            var grassTex = Game1.Inst.Content.Load<Texture2D>("Textures/Grass");
+            for (var i = 0; i < 10000; i++) {
+                var bb = AddEntity();
+
+                var x = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+                var z = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+                var y = heightmap.HeightAt(x, z);
+                var s = 1.0f + 0.8f*(float)rnd.NextDouble();
+
+                AddComponent(bb, new CBillboard {
+                    Pos   = new Vector3(x, y + 0.5f*s , z),
+                    Tex   = grassTex,
+                    Scale = s
+                });
+            }
+
         }
 
         public void InitHud() {
             mHud = new Hud();
-
+            var viewport = Game1.Inst.GraphicsDevice.Viewport;
+            Vector2 screenCenter = new Vector2(viewport.Width * 0.5f, viewport.Height * 0.5f);
+            var count = 0;
+            foreach (CScore scoreComponent in GetComponents<CScore>().Values) {
+                mHud.Button((int)(viewport.Width * 0.9f), count*30 + 60, mHud.Text(() => string.Format("Score: {0}", scoreComponent.Score)));
+                count++;
+            }
             // Example of how to create hud elements.
             mHud.Button(10, 10, mHud.Text(() => "Click me (and check log)"))
                 .OnClick(() => Console.WriteLine("Text button clicked."));

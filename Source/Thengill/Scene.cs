@@ -213,6 +213,7 @@ namespace Thengill {
     public virtual void Init() {
 
         // init all component dictionaries
+        Components.Add(typeof(CBillboard), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CWater), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CTransform), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CInput), new Dictionary<int, EcsComponent>());
@@ -229,6 +230,7 @@ namespace Thengill {
 		Components.Add(typeof(CInventory), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CPickUp), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CHealth), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CScore), new Dictionary<int, EcsComponent>());
 
 #if DEBUG
             AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));

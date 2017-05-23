@@ -46,6 +46,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components\CAI.cs" />
+    <Compile Include="Components\CBillboard.cs" />
     <Compile Include="Components\CBody.cs" />
     <Compile Include="Components\CBox.cs" />
     <Compile Include="Components\CFlock.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Components\CLogic.cs" />
     <Compile Include="Components\CParticle.cs" />
     <Compile Include="Components\CPickUp.cs" />
+    <Compile Include="Components\CScore.cs" />
     <Compile Include="Components\CSyncObject.cs" />
     <Compile Include="Components\CWater.cs" />
     <Compile Include="Components\Renderable\CAnimation.cs" />
@@ -80,6 +82,7 @@
     <Compile Include="MenuScene.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="Shaders\AdsMaterial.cs" />
+    <Compile Include="Shaders\BillboardMaterial.cs" />
     <Compile Include="Shaders\EnvMapMaterial.cs" />
     <Compile Include="Shaders\MaterialShader.cs" />
     <Compile Include="Shaders\ToonMaterial.cs" />
@@ -98,7 +101,7 @@
     <Compile Include="Systems\Rendering2DSystem.cs" />
     <Compile Include="Systems\RenderingSystem.cs" />
     <Compile Include="Core\VertexPositionNormalColor.cs" />
-    <Compile Include="Systems\WaterSystem.cs" />
+    <Compile Include="Utils\WaterFactory.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />
     <Compile Include="Utils\FuzzyUtil.cs" />

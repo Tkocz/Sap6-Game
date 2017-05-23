@@ -42,6 +42,29 @@ namespace GameName.Scenes.Utils {
             currentScene.AddComponent(ball, new CPickUp());
             return ball;
         }
+
+        public static Func<float, Matrix> wiggleAnimation(int id)
+        {
+            var randt = (float)rnd.NextDouble() * 2.0f * MathHelper.Pi;
+            var currentScene = Game1.Inst.Scene;
+            Func<float, Matrix> npcAnim = (t) => {
+                var transf = (CTransform)currentScene.GetComponentFromEntity<CTransform>(id);
+                var body = (CBody)currentScene.GetComponentFromEntity<CBody>(id);
+
+                // Wiggle wiggle!
+                var x = 0.3f * Vector3.Dot(transf.Frame.Forward, body.Velocity);
+                var walk =
+                    Matrix.CreateFromAxisAngle(Vector3.Forward, x * 0.1f * (float)Math.Cos(randt + t * 12.0f))
+                  * Matrix.CreateTranslation(Vector3.Up * -x * 0.1f * (float)Math.Sin(randt + t * 24.0f));
+
+                var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f * (float)Math.Sin(randt + t * 2.0f));
+
+                return walk * idle;
+            };
+            return npcAnim;
+        }
+
+
         public static void CreateAnimals(int numFlocks,int worldsize) {
             var currentScene = Game1.Inst.Scene;
 
@@ -69,22 +92,7 @@ namespace GameName.Scenes.Utils {
 
                 for (int i = 0; i < membersPerFlock; i++) {
                     int id = currentScene.AddEntity();
-
-                    var randt = (float)rnd.NextDouble()*2.0f*MathHelper.Pi;
-                    Func<float, Matrix> npcAnim = (t) => {
-                        var transf = (CTransform)currentScene.GetComponentFromEntity<CTransform>(id);
-                        var body = (CBody)currentScene.GetComponentFromEntity<CBody>(id);
-
-                        // Wiggle wiggle!
-                        var x = 0.3f * Vector3.Dot(transf.Frame.Forward, body.Velocity);
-                        var walk =
-                            Matrix.CreateFromAxisAngle(Vector3.Forward, x * 0.1f * (float)Math.Cos(randt+t * 12.0f))
-                          * Matrix.CreateTranslation(Vector3.Up * -x * 0.1f * (float)Math.Sin(randt+t * 24.0f));
-
-                        var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f * (float)Math.Sin(randt+t * 2.0f));
-
-                        return walk * idle;
-                    };
+                    var npcAnim = wiggleAnimation(id);
 
                     if (flockAnimal.Equals("hen")) {
                         // TODO: Make animals have different animations based on state
@@ -109,16 +117,16 @@ namespace GameName.Scenes.Utils {
                     transformComponent.Position = new Vector3(memberX, y, memberZ);
                     transformComponent.Rotation = Matrix.CreateFromAxisAngle(Vector3.UnitY,
                         (float)(Math.PI * (rnd.NextDouble() * 2)));
-                    float scale = 1f;
-                    transformComponent.Scale = new Vector3(scale, scale, scale);
+                    float size = 0.5f;
+                    transformComponent.Scale = new Vector3(1f);
                     currentScene.AddComponent(id, transformComponent);
                     currentScene.AddComponent(id, new CBody {
                         InvMass = 0.05f,
-                        Aabb = new BoundingBox(-scale * Vector3.One, scale * Vector3.One),
+                        Aabb = new BoundingBox(-size * Vector3.One, size * Vector3.One),
                         LinDrag = 0.8f,
                         Velocity = Vector3.Zero,
                         Radius = 1f,
-                        SpeedMultiplier = scale,
+                        SpeedMultiplier = size,
                         MaxVelocity = 4,
                         Restitution = 0
                     });
@@ -199,7 +207,7 @@ namespace GameName.Scenes.Utils {
 						string type = elementList[(int)heightmap.ColorAt(x, y).B];
 						var wx = (x / heightmap.GetDimensions().X - 0.5f) * worldsize;
 						var wy = (y / heightmap.GetDimensions().Y - 0.5f) * worldsize;
-						Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-1, -5, -1), new Vector3(1, 5, 1)), InvTransf = Matrix.Identity });
+						//Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-1, -5, -1), new Vector3(1, 5, 1)), InvTransf = Matrix.Identity });
 						Game1.Inst.Scene.AddComponent(newElement, new CTransform() { Position = new Vector3(worldsize * (x / (float)heightmap.GetDimensions().X - 0.5f), heightmap.HeightAt(wx, wy) - 1.5f, worldsize * (y / (float)heightmap.GetDimensions().Y - 0.5f)), Scale = new Vector3((float)rnd.NextDouble() * 0.25f + 0.75f), Rotation = Matrix.CreateRotationY((float)rnd.NextDouble() * MathHelper.Pi * 2f) });
 						Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + type), fileName = type, materials = matDic, enableVertexColor = false });
 					}

@@ -36,12 +36,17 @@ namespace Thengill.Systems {
             // Check for damage collision (testing for jumping on something)
             if (Vector3.Dot(collision.Normal, Vector3.Up) > Math.Cos(MathHelper.PiOver4)) {
                 var receiver = h1;
-                if (e1IsJumper)
+                var dealer = e2;
+                if (e1IsJumper) {
                     receiver = h2;
+                    dealer = e1;
+                }
                 // if entity has invincibility time left, no damage dealt
                 if (receiver.InvincibilityTime > 0) return;
                 receiver.Health -= receiver.DamageResistance * 1; // TODO: hard coded damage should be replaced to component-based solution
                 receiver.InvincibilityTime = 1; // TODO: change hard coded time to something more appropraiate
+                if (Game1.Inst.Scene.EntityHasComponent<CScore>(dealer))
+                    ((CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(dealer)).Score++;
             }
         }
         public override void Update(float t, float dt) {

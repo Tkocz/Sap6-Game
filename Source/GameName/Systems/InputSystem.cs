@@ -121,7 +121,7 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(inputValue.RightMovementKey)) {
                     yaw = -rotationSpeed;
                 }
-                if (currentState.IsKeyDown(Keys.Space) && !isInAir) {
+                if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
                     isInAir = true;
                 }
@@ -167,42 +167,18 @@ namespace GameName.Systems {
                         }
                     }
                 }
+                // This is an ugly test for adding a score
+                if (currentState.IsKeyDown(Keys.P) && !prevState.IsKeyDown(Keys.P)) {
+                    if (Game1.Inst.Scene.GetType() == typeof(WorldScene)) {
+                        var score = (CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(input.Key);
+                        score.Score++;
+                    }
+                }
                 prevState = currentState;
 
                 addRot = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
                 transform.Heading += yaw;
                 transform.Rotation *= addRot;
-
-
-                //save the currently pressed keys so we can compare on the next update
-
-
-                /*
-
-                //((LookAtCamera)Camera).Target = new Vector3(m.M41, m.M42*0.0f, m.M43);
-                //var ta = ((LookAtCamera)Camera).Target;
-                var p = b.Position;
-                var c = ((LookAtCamera)Camera).Position;
-                var dist = 30f;
-                var yDist = -20f;
-                var h = b.Heading;
-
-                // Vi positionerar kamera utifrån karaktärens heading (h), p = karaktärerns position, c = kamerans position, t = kamerans target, dist = avstånd till objektet
-                // yDist = höjd för kameran, samt t = p -- alltså att kamerans target är position för karaktären.
-                // Då gäller c=p-[d*sin(h + pi/2), y, (-d)*cos(h + pi/2)]
-
-                c = Vector3.Subtract(p, new Vector3((float)(dist * Math.Sin(h + Math.PI * 0.5f)), yDist, (float)((-dist) * Math.Cos(h + Math.PI * 0.5f))));
-
-                c.Y = -yDist; // Lock camera to given height
-                p.Y = 0; // Target too because it was really ugly otherwise
-
-                ((LookAtCamera)Camera).Target = p;
-                ((LookAtCamera)Camera).Position = c;
-
-                return Matrix.CreateLookAt(Position, (Vector3)m_Target, Up);
-
-            */
-
             }
         }
     }

@@ -15,8 +15,44 @@ namespace Thengill.Systems
     public class RenderingSystem : EcsSystem {
         private float mT;
 
+        private IndexBuffer mBillboardIbo;
+        private VertexBuffer mBillboardVbo;
+
+        private BillboardMaterial mBillboardMat;
+
         public override void Init() {
             base.Init();
+
+            var verts = new [] {
+                new VertexPositionTexture { Position          = new Vector3(-0.5f, -0.5f, 0.0f),
+                                            TextureCoordinate = new Vector2( 0.0f,  1.0f) },
+                new VertexPositionTexture { Position          = new Vector3(-0.5f,  0.5f, 0.0f),
+                                            TextureCoordinate = new Vector2( 0.0f,  0.0f) },
+                new VertexPositionTexture { Position          = new Vector3( 0.5f,  0.5f, 0.0f),
+                                            TextureCoordinate = new Vector2( 1.0f,  0.0f) },
+                new VertexPositionTexture { Position          = new Vector3( 0.5f, -0.5f, 0.0f),
+                                            TextureCoordinate = new Vector2( 1.0f,  1.0f) },
+            };
+
+            var indices = new short[6] { 0, 2, 1, 0, 3, 2 };
+
+
+
+            var device = Game1.Inst.GraphicsDevice;
+
+            mBillboardVbo = new VertexBuffer(device,
+                                             VertexPositionTexture.VertexDeclaration,
+                                             verts.Length,
+                                             BufferUsage.None);
+            mBillboardVbo.SetData<VertexPositionTexture>(verts);
+
+            mBillboardIbo = new IndexBuffer(device,
+                                            typeof (short),
+                                            indices.Length,
+                                            BufferUsage.None);
+            mBillboardIbo.SetData<short>(indices);
+
+            mBillboardMat = new BillboardMaterial();
         }
         public override void Update(float t, float dt) {
             base.Update(t, dt);
@@ -66,11 +102,6 @@ namespace Thengill.Systems
 
                 C3DRenderable model = (C3DRenderable)component.Value;
                 if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
-
-                if (scene.EntityHasComponent<CWater>(key)) {
-                    // Drawn after.
-                    continue;
-                }
 
                 CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
 
@@ -150,17 +181,42 @@ namespace Thengill.Systems
                 }
             }
 
+            //--------------------
+            // Billboards
+            //--------------------
+
+            device.SetVertexBuffer(mBillboardVbo);
+            device.Indices = mBillboardIbo;
+
+            var bbMat = mBillboardMat;
+            var pass0 = bbMat.mEffect.CurrentTechnique.Passes[0];
+
+            bbMat.CamPos = camera.Position;
+            bbMat.Proj   = camera.Projection;
+            bbMat.View   = camera.View;
+
+            var camPos = camera.Position;
+
+            foreach (var e in scene.GetComponents<CBillboard>()) {
+                var bb    = (CBillboard)e.Value;
+                var bbRot = Matrix.CreateBillboard(bb.Pos, camPos, Vector3.Up, null);
+
+                bbMat.Tex   = bb.Tex;
+                bbMat.Model = Matrix.CreateScale(bb.Scale) * bbRot;
+                bbMat.Prerender();
+                pass0.Apply();
+
+                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4, 0, 2);
+            }
+
             foreach (var component in scene.GetComponents<CWater>()) {
+                var model = (C3DRenderable)component.Value;
                 var key = component.Key;
 
                 if (key == excludeEid) {
                     // TODO: This is originally a hack to simplify rendering of environment maps.
                     continue;
                 }
-
-
-                C3DRenderable model = (C3DRenderable)scene.GetComponentFromEntity<C3DRenderable>(key);
-                if (model.model == null) continue; // TODO: <- Should be an error, not silent fail?
                 CTransform transform = (CTransform)scene.GetComponentFromEntity<CTransform>(key);
 
                 Matrix[] bones = new Matrix[model.model.Bones.Count];
