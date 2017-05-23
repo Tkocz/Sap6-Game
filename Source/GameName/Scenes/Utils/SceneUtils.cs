@@ -180,7 +180,7 @@ namespace GameName.Scenes.Utils {
                 var transform = new CTransform {
                     Position = new Vector3(
                         (float)rnd.NextDouble()*halfWorld-halfWorld, 
-                        config.WaterHeight + (float)rnd.NextDouble()*10+15, 
+                        config.WaterHeight + (float)rnd.NextDouble()*10+25, 
                         (float)rnd.NextDouble()*halfWorld-halfWorld
                         ),
                     Scale = Vector3.One
