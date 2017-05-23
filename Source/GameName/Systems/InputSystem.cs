@@ -7,6 +7,7 @@ using System.Linq;
 using Thengill.Components;
 using GameName.Scenes;
 using Thengill.Systems;
+using Thengill.Utils;
 
 namespace GameName.Systems {
     public class InputSystem : EcsSystem {
@@ -124,6 +125,7 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
                     isInAir = true;
+					SfxUtil.PlaySound("Sounds/Effects/Jump", vol:1);
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
                 {
