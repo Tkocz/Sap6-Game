@@ -171,6 +171,8 @@ namespace GameName.Scenes.Utils {
 
 		public static void SpawnEnvironment(Heightmap heightmap, int worldsize)
 		{
+
+
 			Dictionary<int, string> elementList = new Dictionary<int, string>();
 			elementList.Add(255, "LeafTree");
 			elementList.Add(245, "PalmTree");
@@ -209,7 +211,24 @@ namespace GameName.Scenes.Utils {
 						var wy = (y / heightmap.GetDimensions().Y - 0.5f) * worldsize;
 						//Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-1, -5, -1), new Vector3(1, 5, 1)), InvTransf = Matrix.Identity });
 						Game1.Inst.Scene.AddComponent(newElement, new CTransform() { Position = new Vector3(worldsize * (x / (float)heightmap.GetDimensions().X - 0.5f), heightmap.HeightAt(wx, wy) - 1.5f, worldsize * (y / (float)heightmap.GetDimensions().Y - 0.5f)), Scale = new Vector3((float)rnd.NextDouble() * 0.25f + 0.75f), Rotation = Matrix.CreateRotationY((float)rnd.NextDouble() * MathHelper.Pi * 2f) });
-						Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + type), fileName = type, materials = matDic, enableVertexColor = false });
+
+
+                                                Func<float, Matrix> animFn = null;
+                                                if (type == "PalmTree") {
+                                                    var axis = new Vector3((float)rnd.NextDouble()-0.5f,
+                                                                           0.0f,
+                                                                           (float)rnd.NextDouble()-0.5f);
+                                                    axis.Normalize();
+
+                                                    var p0 = MathHelper.Pi*2.0f*(float)rnd.NextDouble();
+                                                    var w = (float)rnd.NextDouble()*0.1f+1.0f;
+                                                    animFn = t => {
+                                                        var theta = 0.02f*(float)Math.Cos(p0+t*w);
+                                                        return Matrix.CreateFromAxisAngle(axis, theta);
+                                                    };
+                                                }
+
+                                                Game1.Inst.Scene.AddComponent<C3DRenderable>(newElement, new CImportedModel() { model = Game1.Inst.Content.Load<Model>("Models/" + type), fileName = type, materials = matDic, enableVertexColor = false, animFn = animFn });
 					}
 				}
 			}
