@@ -332,17 +332,5 @@ namespace GameName.Scenes
 
             base.Update(t, dt);
         }
-
-
-        public int GetPlayerEntityID()
-        {
-
-            return player;
-
-        }
-
-        public int GetWorldSize() {
-            return worldSize;
-        }
     }
 }

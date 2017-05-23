@@ -3,7 +3,9 @@ using Microsoft.Xna.Framework.Input;
 using Thengill.Core;
 using Thengill;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using GameName.Components;
 using Thengill.Components;
 using GameName.Scenes;
 using GameName.Scenes.Utils;
@@ -18,24 +20,31 @@ namespace GameName.Systems {
         private float yaw = 0, pitch = 0, roll = 0;
         private bool isInAir = false;
         private KeyboardState prevState = new KeyboardState();
+        private List<int> playersInt = new List<int>();
         public InputSystem() { }
 
         public override void Init()
         {
+            //todo collisionwithground is raised all the time
+            //not the best soultion displays another animtion when jumping for both players if network
             Game1.Inst.Scene.OnEvent("collisionwithground", data => {
-                int playerID;
-                if (Game1.Inst.Scene.GetType() == typeof(WorldScene)) {
-                    playerID = ((WorldScene)Game1.Inst.Scene).GetPlayerEntityID();
-                }else {
-                    return;
+                if (playersInt.Count == 0)
+                {
+                    foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>().Keys)
+                    { 
+                        playersInt.Add(player);
+                    }
                 }
-                if (((PhysicsSystem.CollisionInfo)data).Entity1 == playerID
-                      ||
-                     ((PhysicsSystem.CollisionInfo)data).Entity2 == playerID) {
-                    if (isInAir) { 
-                        isInAir = false;
-                        var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(playerID);
-                        model.animFn = SceneUtils.playerAnimation(playerID,24, 0.1f);
+                var entity = ((PhysicsSystem.CollisionInfo)data).Entity1;
+                if (playersInt.Contains(entity))
+                {
+                    if (isInAir) {
+                        if (Game1.Inst.Scene.EntityHasComponent<CInput>(entity))
+                        {
+                            isInAir = false;
+                        }
+                        var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(entity);
+                        model.animFn = SceneUtils.playerAnimation(entity, 24, 0.1f);
                     }
                 }
             });
@@ -130,12 +139,7 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
                     isInAir = true;
-                    //var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
-                    //model.useAnimation = false;
                     var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
-                    model.useAnimation = true;
-
-
                     model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
