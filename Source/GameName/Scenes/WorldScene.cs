@@ -99,7 +99,8 @@ namespace GameName.Scenes
                 new LogicSystem(),
     mRenderer = new RenderingSystem(),
                 new Rendering2DSystem(),
-                new HealthSystem()
+                new HealthSystem(),
+                new HitSystem()
             );
 
 #if DEBUG

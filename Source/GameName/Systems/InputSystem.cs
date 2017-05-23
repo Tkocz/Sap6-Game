@@ -7,6 +7,7 @@ using System.Linq;
 using Thengill.Components;
 using GameName.Scenes;
 using Thengill.Systems;
+using Thengill.Components.Renderable;
 
 namespace GameName.Systems {
     public class InputSystem : EcsSystem {
@@ -124,6 +125,14 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
                     isInAir = true;
+                }
+                if (currentState.IsKeyDown(Keys.RightShift) && !prevState.IsKeyDown(Keys.RightShift)) {
+                    if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(input.Key)) {
+                        var p = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
+                        p.IsAttacking = true;
+                        p.StartTime = t;
+                        p.originalBones = Matrix.Identity * ((C3DRenderable)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key)).model.Bones[1].ModelTransform;
+                    }
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
                 {

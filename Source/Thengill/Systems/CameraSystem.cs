@@ -25,7 +25,7 @@ namespace Thengill.Systems
                 Vector3 c;
                 var dist = cameraComponent.Distance;
                 var yDist = p.Y + cameraComponent.Height;
-                var h = -playerTransform.Heading;
+                var h = -playerTransform.Heading * MathHelper.PiOver2;
 
                 // Vi positionerar kamera utifrån karaktärens heading (h), p = karaktärerns position, c = kamerans position, t = kamerans target, dist = avstånd till objektet
                 // yDist = höjd för kameran, samt t = p -- alltså att kamerans target är position för karaktären.

@@ -46,7 +46,6 @@
     <Compile Include="AiStates\SEvade.cs" />
     <Compile Include="AiStates\SIdle.cs" />
     <Compile Include="Components\CHenNormalAnimation.cs" />
-    <Compile Include="Components\CPlayer.cs" />
     <Compile Include="Dev\AiScene.cs" />
     <Compile Include="Dev\LobbyScene.cs" />
     <Compile Include="Entities\EHen.cs" />
@@ -63,6 +62,7 @@
     <Compile Include="Scenes\WorldScene.cs" />
     <Compile Include="Systems\AISystem.cs" />
     <Compile Include="Systems\GameObjectSync.cs" />
+    <Compile Include="Systems\HitSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\InventorySystem.cs" />
   </ItemGroup>
