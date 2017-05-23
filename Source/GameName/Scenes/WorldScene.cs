@@ -81,9 +81,9 @@ namespace GameName.Scenes
         {
             InitGameComponents();
             InitSceneLightSettings();
-
+            
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
-            mRT = GfxUtil.CreateRT();
+            mRT = GfxUtil.CreateRT();     
 
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
@@ -118,14 +118,14 @@ namespace GameName.Scenes
 
             physicsSys.Heightmap = heightmap;
 
-
+         
             base.Init();
 
 
             WaterFactory.Create(configs.WaterHeight, configs.HeightMapScale, configs.HeightMapScale);
 
             SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
-
+            
             //add network after init
             if (_networkSystem != null)
             {
@@ -145,20 +145,7 @@ namespace GameName.Scenes
 
             player = AddEntity();
 
-            Func<float, Matrix> playerAnim = (t) => {
-                var transf = (CTransform)GetComponentFromEntity<CTransform>(player);
-                var body = (CBody)GetComponentFromEntity<CBody>(player);
 
-                // Wiggle wiggle!
-                var x = 0.3f*Vector3.Dot(transf.Frame.Forward, body.Velocity);
-                var walk =
-                    Matrix.CreateFromAxisAngle(Vector3.Forward, x*0.1f*(float)Math.Cos(t*24.0f))
-                  * Matrix.CreateTranslation(Vector3.Up * -x*0.1f*(float)Math.Sin(t*48.0f));
-
-                var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f*(float)Math.Sin(t*2.0f));
-
-                return walk * idle;
-            };
 
             AddComponent(player, new CBody() {
                 MaxVelocity = 5f,
@@ -186,7 +173,7 @@ namespace GameName.Scenes
 
             AddComponent<C3DRenderable>(player,
                                         new CImportedModel() {
-                                            animFn = playerAnim,
+                                            animFn = SceneUtils.playerAnimation(player,24,0.1f),
                                             model = Game1.Inst.Content.Load<Model>("Models/viking") ,
                                             fileName = "viking",
                                             /*materials = new Dictionary<int, MaterialShader> {
@@ -197,7 +184,6 @@ namespace GameName.Scenes
 
             AddComponent(player, new CInventory());
             AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
-            AddComponent(player, new CScore());
             /*
             AddComponent(player, new CLogic {
                 InvHz = 1.0f/30.0f,
@@ -315,34 +301,11 @@ namespace GameName.Scenes
             Log.GetLog().Debug("WorldScene initialized.");
 
             InitHud();
-
-            var grassTex = Game1.Inst.Content.Load<Texture2D>("Textures/Grass");
-            for (var i = 0; i < 10000; i++) {
-                var bb = AddEntity();
-
-                var x = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
-                var z = configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
-                var y = heightmap.HeightAt(x, z);
-                var s = 1.0f + 0.8f*(float)rnd.NextDouble();
-
-                AddComponent(bb, new CBillboard {
-                    Pos   = new Vector3(x, y + 0.5f*s , z),
-                    Tex   = grassTex,
-                    Scale = s
-                });
-            }
-
         }
 
         public void InitHud() {
             mHud = new Hud();
-            var viewport = Game1.Inst.GraphicsDevice.Viewport;
-            Vector2 screenCenter = new Vector2(viewport.Width * 0.5f, viewport.Height * 0.5f);
-            var count = 0;
-            foreach (CScore scoreComponent in GetComponents<CScore>().Values) {
-                mHud.Button((int)(viewport.Width * 0.9f), count*30 + 60, mHud.Text(() => string.Format("Score: {0}", scoreComponent.Score)));
-                count++;
-            }
+
             // Example of how to create hud elements.
             mHud.Button(10, 10, mHud.Text(() => "Click me (and check log)"))
                 .OnClick(() => Console.WriteLine("Text button clicked."));

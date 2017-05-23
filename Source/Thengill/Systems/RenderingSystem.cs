@@ -109,7 +109,7 @@ namespace Thengill.Systems
                 model.model.CopyAbsoluteBoneTransformsTo(bones);
 
                 var anim = Matrix.Identity;
-                if (model.animFn != null) {
+                if (model.animFn != null && model.useAnimation) {
                     anim = model.animFn(mT);
                 }
 

@@ -6,6 +6,8 @@ using System;
 using System.Linq;
 using Thengill.Components;
 using GameName.Scenes;
+using GameName.Scenes.Utils;
+using Thengill.Components.Renderable;
 using Thengill.Systems;
 
 namespace GameName.Systems {
@@ -30,7 +32,11 @@ namespace GameName.Systems {
                 if (((PhysicsSystem.CollisionInfo)data).Entity1 == playerID
                       ||
                      ((PhysicsSystem.CollisionInfo)data).Entity2 == playerID) {
-                    isInAir = false;
+                    if (isInAir) { 
+                        isInAir = false;
+                        var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(playerID);
+                        model.animFn = SceneUtils.playerAnimation(playerID,24, 0.1f);
+                    }
                 }
             });
 
@@ -124,6 +130,13 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
                     isInAir = true;
+                    //var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
+                    //model.useAnimation = false;
+                    var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
+                    model.useAnimation = true;
+
+
+                    model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
                 {
