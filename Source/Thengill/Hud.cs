@@ -1,3 +1,5 @@
+
+
 namespace Thengill {
 
 using System;
@@ -151,13 +153,32 @@ public class Hud {
 
     private SpriteBatch mSB;
 
-    private readonly List<Elem> mElems = new List<Elem>();
+    private readonly Dictionary<string,Elem> mElems = new Dictionary<string,Elem>();
 
     public Hud() {
         mSB = new SpriteBatch(Game1.Inst.GraphicsDevice);
+            Game1.Inst.Scene.OnEvent("removeHudElement", data => { RemoveElement((string)data); });
+        }
+
+    public void RemoveElement(string item)
+    {
+        string keytoremove = "";
+        foreach (var key in mElems.Keys)
+        {
+            if (key.Contains(item))
+            {
+                keytoremove = key;
+                break;
+            }
+        }
+        
+        if(!string.IsNullOrEmpty(keytoremove))
+        {
+            mElems.Remove(keytoremove);
+        }
     }
 
-    public ButtonElem Button(int x, int y, Visual up, Visual down=null, VerticalAnchor vertAnchor = VerticalAnchor.Top, HorizontalAnchor horAnchor = HorizontalAnchor.Left) {
+    public ButtonElem Button(string name, int x, int y, Visual up, Visual down=null, VerticalAnchor vertAnchor = VerticalAnchor.Top, HorizontalAnchor horAnchor = HorizontalAnchor.Left) {
         if (horAnchor == HorizontalAnchor.Center)
             x -= (int)(up.Width * 0.5f);
         if (horAnchor == HorizontalAnchor.Right)
@@ -169,7 +190,7 @@ public class Hud {
 
         var button = new ButtonElem(x, y, up, down);
 
-        mElems.Add(button);
+        mElems.Add(name,button);
 
         return button;
     }
@@ -182,10 +203,9 @@ public class Hud {
         return new SpriteVisual(asset, scale);
     }
 
-    public void Draw() {
+    public void Draw(int player) {
         mSB.Begin(SpriteSortMode.Deferred);
-
-        foreach (var elem in mElems) {
+        foreach (var elem in mElems.Values) {
             elem.Draw(mSB);
         }
 
@@ -196,7 +216,7 @@ public class Hud {
         var m  = Mouse.GetState();
         var kb = Keyboard.GetState();
 
-        foreach (var elem in mElems) {
+        foreach (var elem in mElems.Values) {
             elem.Update(m, kb);
         }
     }
