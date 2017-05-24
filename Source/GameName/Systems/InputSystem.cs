@@ -194,6 +194,9 @@ namespace GameName.Systems {
                         score.Score++;
                     }
                 }
+				if (currentState.IsKeyDown(Keys.I) && !prevState.IsKeyDown(Keys.I)) {
+					Game1.Inst.Graphics.ToggleFullScreen();   
+                }
                 prevState = currentState;
 
                 addRot = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);

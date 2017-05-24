@@ -33,7 +33,7 @@ public static void PlaySound(string name, float vol=1.0f, float pitch=0.0f, floa
     // TODO: We probably want to store this in some lookup table even though MonoGame stores a
     //       lookup table internally, see link:
     // https://github.com/labnation/MonoGame/blob/master/MonoGame.Framework/Content/ContentManager.cs#L197
-    //Game1.Inst.Content.Load<SoundEffect>(name).Play(vol, pitch, pan);
+    Game1.Inst.Content.Load<SoundEffect>(name).Play(vol, pitch, pan);
 }
 
 }
