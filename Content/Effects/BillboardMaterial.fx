@@ -6,10 +6,9 @@ extern uniform float3 CamPos;
 
 extern uniform texture BillboardTex;
 
-// TODO: Should be uniforms
-static const float FogStart  = 35.0;
-static const float FogEnd    = 100.0;
-static const float3 FogColor = float3(0.4, 0.6, 0.8);
+extern uniform float FogStart;
+extern uniform float FogEnd;
+extern uniform float3 FogColor;
 
 sampler billboardTex = sampler_state { Texture = <BillboardTex>; mipfilter = LINEAR; };
 

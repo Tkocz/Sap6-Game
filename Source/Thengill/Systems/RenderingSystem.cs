@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Thengill.Components;
 using Microsoft.Xna.Framework;
 using Thengill.Shaders;
+using Thengill.Utils;
 
 namespace Thengill.Systems
 {
@@ -268,7 +269,8 @@ namespace Thengill.Systems
                                       CTransform    transform,
                                       ModelMesh     mesh,
                                       Matrix        anim,
-                                      Matrix        boneTransform)
+                                      Matrix        boneTransform,
+                                      LightingConfig config)
         {
             effect.EnableDefaultLighting();
 
@@ -292,10 +294,10 @@ namespace Thengill.Systems
 
             effect.SpecularPower = 100;
 
-            effect.FogEnabled = true;
-            effect.FogStart   = 35.0f;
-            effect.FogEnd     = 100.0f;
-            effect.FogColor   = new Vector3(0.4f, 0.6f, 0.8f);
+            effect.FogEnabled = config.FogEnabled;
+            effect.FogStart   = config.FogStart;
+            effect.FogEnd     = config.FogEnd;
+            effect.FogColor   = config.ClearColor;
 
             effect.Projection = camera.Projection;
             effect.View       = camera.View;
