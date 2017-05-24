@@ -62,6 +62,7 @@
     <Compile Include="Scenes\WorldScene.cs" />
     <Compile Include="Systems\AISystem.cs" />
     <Compile Include="Systems\GameObjectSync.cs" />
+    <Compile Include="Systems\HitSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\InventorySystem.cs" />
   </ItemGroup>

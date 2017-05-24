@@ -14,6 +14,7 @@ namespace Thengill.Systems
 {
     public class RenderingSystem : EcsSystem {
         private float mT;
+        private float mDT;
 
         private IndexBuffer mBillboardIbo;
         private VertexBuffer mBillboardVbo;
@@ -59,7 +60,7 @@ namespace Thengill.Systems
         }
         public override void Draw(float t, float dt) {
             mT = t;
-
+            mDT = dt;
             base.Draw(t, dt);
 
             foreach (var camera in Game1.Inst.Scene.GetComponents<CCamera>()) {
@@ -113,8 +114,18 @@ namespace Thengill.Systems
                     anim = model.animFn(mT);
                 }
 
-                foreach (var mesh in model.model.Meshes)
+                if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(key)) {
+                    CPlayer playerData = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(key);
+                    if (playerData.IsAttacking) {
+                        bones[1] *= Matrix.CreateTranslation(0.0f, 0.5f, 0f);
+                        bones[1] *= Matrix.CreateRotationX(2*(float)Math.Sin(-playerData.AnimationProgress));
+                        bones[1] *= Matrix.CreateTranslation(0.0f, -0.5f, 0f);
+                    }
+                }
+
+                for(int k = 0; k < model.model.Meshes.Count; k++)
                 {
+                    var mesh = model.model.Meshes[k];
                     string tag = model.model.Tag as string;
                     // TODO: This is a really ugly hack. :-(
                     if (tag != "Heightmap")
@@ -145,7 +156,7 @@ namespace Thengill.Systems
                         if (lastEffect != effect) {
                             if (mat != null) {
                                 mat.CamPos = camera.Position;
-                                mat.Model  = mesh.ParentBone.Transform * anim * transform.Frame;
+                                mat.Model  = bones[mesh.ParentBone.Index] * anim * transform.Frame;
                                 mat.View   = camera.View;
                                 mat.Proj   = camera.Projection;
                                 mat.Prerender();
@@ -157,7 +168,8 @@ namespace Thengill.Systems
                                                  scene,
                                                  transform,
                                                  mesh,
-                                                 anim);
+                                                 anim,
+                                                 bones[mesh.ParentBone.Index]);
                             }
 
                             lastEffect = effect;
@@ -255,7 +267,8 @@ namespace Thengill.Systems
                                       Scene         scene,
                                       CTransform    transform,
                                       ModelMesh     mesh,
-                                      Matrix        anim)
+                                      Matrix        anim,
+                                      Matrix        boneTransform)
         {
             effect.EnableDefaultLighting();
 
@@ -286,7 +299,7 @@ namespace Thengill.Systems
 
             effect.Projection = camera.Projection;
             effect.View       = camera.View;
-            effect.World      = mesh.ParentBone.Transform * anim * transform.Frame;
+            effect.World      = boneTransform * anim * transform.Frame;
         }
     }
 
