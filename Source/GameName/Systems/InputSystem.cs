@@ -129,9 +129,13 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(Keys.RightShift) && !prevState.IsKeyDown(Keys.RightShift)) {
                     if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(input.Key)) {
                         var p = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
-                        p.IsAttacking = true;
-                        p.StartTime = t;
-                        p.originalBones = Matrix.Identity * ((C3DRenderable)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key)).model.Bones[1].ModelTransform;
+                        if (!p.IsAttacking) {
+                            Game1.Inst.Scene.Raise("attack", new HitSystem.HitInfo {
+                                EntityID = input.Key,
+                                IsAttacking = true,
+                                StartTime = t
+                            });
+                        }
                     }
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))

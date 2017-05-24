@@ -117,12 +117,9 @@ namespace Thengill.Systems
                 if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(key)) {
                     CPlayer playerData = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(key);
                     if (playerData.IsAttacking) {
-                        var temp = Matrix.Identity * playerData.originalBones;
-                        bones[1] *= Matrix.CreateTranslation(0.0f, 0.3f, -0.2f);
-                        var progress = (mT - playerData.StartTime) / playerData.AnimationTime;
-                        var radians = MathHelper.Lerp(0, MathHelper.Pi, Math.Min(progress, 1));
-                        bones[1] *= Matrix.CreateRotationX(2*(float)Math.Sin(-radians));
-                        bones[1] *= Matrix.CreateTranslation(0.0f, -0.3f, 0.2f);
+                        bones[1] *= Matrix.CreateTranslation(0.0f, 0.5f, 0f);
+                        bones[1] *= Matrix.CreateRotationX(2*(float)Math.Sin(-playerData.AnimationProgress));
+                        bones[1] *= Matrix.CreateTranslation(0.0f, -0.5f, 0f);
                     }
                 }
 

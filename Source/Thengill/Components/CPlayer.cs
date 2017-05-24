@@ -9,19 +9,11 @@ using Thengill.Core;
 
 namespace Thengill.Components
 {
-    public class CPlayer :EcsComponent
-    {
-        public int AngleDir { get; set; }
-        public float Angle { get; set; }
-        public bool IsAttacking { get; set; }
+    public class CPlayer : EcsComponent {
         public float StartTime { get; set; }
+        public bool IsAttacking = false;
         public float AnimationTime = 0.5f;
-        public Matrix originalBones;
-
-        public CPlayer() {
-            Angle = 0.0f;
-            IsAttacking = false;
-            AngleDir = 1;
-        }
+        public float AnimationProgress = 0.0f;
+        
     }
 }
