@@ -795,3 +795,33 @@
 /processorParam:TextureFormat=DxtCompressed
 /build:Models/blood.fbx
 
+#begin Sounds/Effects/Collide.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Collide.mp3
+
+#begin Sounds/Effects/Hit.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/Hit.mp3
+
+#begin Sounds/Effects/horn_start.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/horn_start.mp3
+
+#begin Sounds/Effects/horny_end.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/horny_end.mp3
+
+#begin Sounds/Effects/swing.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/swing.wav
+

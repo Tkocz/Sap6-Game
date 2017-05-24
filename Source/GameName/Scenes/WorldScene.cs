@@ -265,6 +265,7 @@ namespace GameName.Scenes
                     new CTransform    { Position = transform.Position,
                                         Rotation = Matrix.Identity,
                                         Scale    = rndSize()*Vector3.One } });
+                SfxUtil.PlaySound("Sounds/Effects/Hit");
             });
 
            OnEvent("game_end", data =>
