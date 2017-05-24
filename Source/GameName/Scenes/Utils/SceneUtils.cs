@@ -64,6 +64,25 @@ namespace GameName.Scenes.Utils {
             return npcAnim;
         }
 
+        public static Func<float, Matrix> playerAnimation(int player,int wiggleness, float speed)
+        {
+            
+            Func<float, Matrix> playerAnim = (t) => {
+                var transf = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(player);
+                var body = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(player);
+
+                // Wiggle wiggle!
+                var x = 0.3f * Vector3.Dot(transf.Frame.Forward, body.Velocity);
+                var walk =
+                    Matrix.CreateFromAxisAngle(Vector3.Forward, x * 0.1f * (float)Math.Cos(t * wiggleness))
+                  * Matrix.CreateTranslation(Vector3.Up * -x * speed * (float)Math.Sin(t * wiggleness*2));
+
+                var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f * (float)Math.Sin(t * 2.0f));
+
+                return walk * idle;
+            };
+            return playerAnim;
+        }
 
         public static void CreateAnimals(int numFlocks,int worldsize) {
             var currentScene = Game1.Inst.Scene;
@@ -168,7 +187,36 @@ namespace GameName.Scenes.Utils {
                 currentScene.AddComponent(id, new CSyncObject());
             }
         }
-
+        public static void SpawnBirds(WorldSceneConfig config) {
+            var scene = Game1.Inst.Scene;
+            var fileName = "seagull";
+            var birdCount = 30;
+            var halfWorld = config.HeightMapScale * 0.5f;
+            for (int i = 0; i < birdCount; i++) {
+                int id = scene.AddEntity();
+                var randt = (float)rnd.NextDouble() * 2.0f * MathHelper.Pi;
+                var rotationSpeed = (float)rnd.NextDouble() * 0.25f + 0.5f;
+                var transform = new CTransform {
+                    Position = new Vector3(
+                        (float)rnd.NextDouble()*halfWorld-halfWorld,
+                        config.WaterHeight + (float)rnd.NextDouble()*10+25,
+                        (float)rnd.NextDouble()*halfWorld-halfWorld
+                        ),
+                    Scale = Vector3.One
+                };
+                Func<float, Matrix> flyingAnimation = (t) => {
+                    var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f * (float)Math.Sin(randt + t * 2.0f));
+                    var rot = Matrix.CreateRotationY(-(t * rotationSpeed));
+                    return idle * rot;
+                };
+                scene.AddComponent(id, transform);
+                scene.AddComponent<C3DRenderable>(id, new CImportedModel {
+                    fileName = fileName,
+                    model = Game1.Inst.Content.Load<Model>("Models/" + fileName),
+                    animFn = flyingAnimation
+                });
+            }
+        }
 		public static void SpawnEnvironment(Heightmap heightmap, int worldsize)
 		{
 

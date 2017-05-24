@@ -59,12 +59,18 @@ namespace GameName.Systems
                 data.CBody.Aabb = new BoundingBox(-data.CBody.Radius * Vector3.One, data.CBody.Radius * Vector3.One);
                 Game1.Inst.Scene.AddComponent(data.ID, data.CBody);
                 Game1.Inst.Scene.AddComponent(data.ID, data.CTransform);
+                Func<float, Matrix> aniFunc = null;
+                if (data.IsPlayer)
+                {
+                    Game1.Inst.Scene.AddComponent(data.ID, new CPlayer());
+                    aniFunc = SceneUtils.playerAnimation(data.ID, 24, 0.1f);
+                }
 
                 if (data.ModelFileName == "hen")
                 {
-                    var npcAnim = SceneUtils.wiggleAnimation(data.ID);
+                    aniFunc = SceneUtils.wiggleAnimation(data.ID);
                     // TODO: Make animals have different animations based on state
-                    CAnimation normalAnimation = new CHenNormalAnimation { animFn = npcAnim };
+                    CAnimation normalAnimation = new CHenNormalAnimation { animFn = aniFunc };
                     // Set a random offset to animation so not all animals are synced
                     normalAnimation.CurrentKeyframe = rnd.Next(normalAnimation.Keyframes.Count - 1);
                     // Random animation speed between 0.8-1.0
@@ -73,15 +79,16 @@ namespace GameName.Systems
                 }
                 else
                 {
+                    
                     Game1.Inst.Scene.AddComponent<C3DRenderable>(data.ID, new CImportedModel
                     {
                         model = Game1.Inst.Content.Load<Model>("Models/" + data.ModelFileName),
-                        fileName = data.ModelFileName
-                    });
+                        fileName = data.ModelFileName,
+                        animFn = aniFunc
 
+                    });
                 }
-                if (data.IsPlayer)
-                    Game1.Inst.Scene.AddComponent(data.ID, new CPlayer());
+               
                 Game1.Inst.Scene.AddComponent(data.ID, new CSyncObject {Owner = false});
 
                 newCBody.Add(data.ID, data.CBody);

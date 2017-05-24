@@ -81,9 +81,9 @@ namespace GameName.Scenes
         {
             InitGameComponents();
             InitSceneLightSettings();
-
+            
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
-            mRT = GfxUtil.CreateRT();
+            mRT = GfxUtil.CreateRT();     
 
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
@@ -118,14 +118,14 @@ namespace GameName.Scenes
 
             physicsSys.Heightmap = heightmap;
 
-
+         
             base.Init();
 
 
             WaterFactory.Create(configs.WaterHeight, configs.HeightMapScale, configs.HeightMapScale);
 
             SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
-
+            
             //add network after init
             if (_networkSystem != null)
             {
@@ -145,20 +145,7 @@ namespace GameName.Scenes
 
             player = AddEntity();
 
-            Func<float, Matrix> playerAnim = (t) => {
-                var transf = (CTransform)GetComponentFromEntity<CTransform>(player);
-                var body = (CBody)GetComponentFromEntity<CBody>(player);
 
-                // Wiggle wiggle!
-                var x = 0.3f*Vector3.Dot(transf.Frame.Forward, body.Velocity);
-                var walk =
-                    Matrix.CreateFromAxisAngle(Vector3.Forward, x*0.1f*(float)Math.Cos(t*24.0f))
-                  * Matrix.CreateTranslation(Vector3.Up * -x*0.1f*(float)Math.Sin(t*48.0f));
-
-                var idle = Matrix.CreateTranslation(Vector3.Up * 0.07f*(float)Math.Sin(t*2.0f));
-
-                return walk * idle;
-            };
 
             AddComponent(player, new CBody() {
                 MaxVelocity = 5f,
@@ -186,7 +173,7 @@ namespace GameName.Scenes
 
             AddComponent<C3DRenderable>(player,
                                         new CImportedModel() {
-                                            animFn = playerAnim,
+                                            animFn = SceneUtils.playerAnimation(player,24,0.1f),
                                             model = Game1.Inst.Content.Load<Model>("Models/viking") ,
                                             fileName = "viking",
                                             /*materials = new Dictionary<int, MaterialShader> {
@@ -197,7 +184,6 @@ namespace GameName.Scenes
 
             AddComponent(player, new CInventory());
             AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
-            AddComponent(player, new CScore());
             /*
             AddComponent(player, new CLogic {
                 InvHz = 1.0f/30.0f,
@@ -287,6 +273,7 @@ namespace GameName.Scenes
                 Utils.SceneUtils.CreateAnimals(configs.NumFlocks, configs.HeightMapScale / 2);
                 Utils.SceneUtils.CreateTriggerEvents(configs.NumTriggers, configs.HeightMapScale / 2);
                 Utils.SceneUtils.CreateCollectables(configs.NumPowerUps, configs.HeightMapScale / 2);
+                SceneUtils.SpawnBirds(configs);
                 // Add tree as sprint goal
                 int sprintGoal = AddEntity();
                 AddComponent(sprintGoal, new CBody() { Radius = 5, Aabb = new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)), LinDrag = 0.8f });
@@ -362,17 +349,75 @@ namespace GameName.Scenes
                 });
             }
 
+            CreatePlatforms(heightmap);
+
+        }
+
+        public void CreatePlatform(Heightmap heightmap, float x1, float z1, float x2, float z2) {
+            var y1 = heightmap.HeightAt(x1, z1);
+            var y2 = heightmap.HeightAt(x2, z2);
+
+            if (y1 < configs.WaterHeight) y1 = configs.WaterHeight;
+            if (y2 < configs.WaterHeight) y2 = configs.WaterHeight;
+
+            var a = new Vector3(x1, y1+0.5f, z1);
+            var b = new Vector3(x2, y2+0.5f, z2);
+
+            var d1 = b - a;
+            var d2 = d1;
+            var d3 = d2;
+
+            d2.Y = 0.0f;
+
+            d2.Normalize();
+            d3.Normalize();
+
+            var theta1 = (float)Math.Acos(Vector3.Dot(Vector3.Forward, d2));
+            var axis1  = Vector3.Cross(Vector3.Forward, d2);
+            var rot1   = Matrix.CreateFromAxisAngle(axis1, theta1);
+
+            var theta2 = (float)Math.Acos(Vector3.Dot(d2, d3));
+            var axis2  = Vector3.Cross(d2, d3);
+            var rot2   = Matrix.CreateFromAxisAngle(axis2, theta2);
+
+            var rot = rot1 * rot2;
+
+            var plat = AddEntity();
+            AddComponent<C3DRenderable>(plat,
+                                        new C3DRenderable {
+                                            model = Game1.Inst.Content.Load<Model>("Models/Platform1"),
+                                        });
+
+            AddComponent<CTransform>(plat,
+                                     new CTransform {
+                                         Position = a + 0.5f*d1,
+                                         Rotation = rot,
+                                         Scale = new Vector3(1.6f, 1.0f, d1.Length())
+                                     });
+
+            AddComponent<CBox>(plat,
+                               new CBox {
+                                   Box = new BoundingBox(new Vector3(-1.6f, -0.2f, -d1.Length()),
+                                                         new Vector3( 1.6f,  0.2f,  d1.Length())),
+                                   InvTransf = Matrix.Invert(rot)
+                               });
+        }
+
+        public void CreatePlatforms(Heightmap heightmap) {
+            for (var i = 0; i < 20; i++) {
+                var x1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+                var z1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
+
+                var x2 = x1 + 15.0f * ((float)rnd.NextDouble() - 0.5f);
+                var z2 = z1 + 15.0f * ((float)rnd.NextDouble() - 0.5f);
+
+                CreatePlatform(heightmap, x1, z1, x2, z2);
+            }
         }
 
         public void InitHud() {
             mHud = new Hud();
-            var viewport = Game1.Inst.GraphicsDevice.Viewport;
-            Vector2 screenCenter = new Vector2(viewport.Width * 0.5f, viewport.Height * 0.5f);
-            var count = 0;
-            foreach (CScore scoreComponent in GetComponents<CScore>().Values) {
-                mHud.Button((int)(viewport.Width * 0.9f), count*30 + 60, mHud.Text(() => string.Format("Score: {0}", scoreComponent.Score)));
-                count++;
-            }
+
             // Example of how to create hud elements.
             mHud.Button(10, 10, mHud.Text(() => "Click me (and check log)"))
                 .OnClick(() => Console.WriteLine("Text button clicked."));
@@ -398,18 +443,6 @@ namespace GameName.Scenes
             }
 
             base.Update(t, dt);
-        }
-
-
-        public int GetPlayerEntityID()
-        {
-
-            return player;
-
-        }
-
-        public int GetWorldSize() {
-            return worldSize;
         }
     }
 }
