@@ -221,13 +221,13 @@ namespace GameName.Scenes.Utils {
 		{
 
             Func<float, float> treeFn = x => 0.2f * (float)Math.Pow(x, 2);
-            Func<float, float> rockFn = x => 0.5f * (float)Math.Pow(x, 1.2);
+            Func<float, float> rockFn = x => 0.3f * (float)Math.Pow(x, 1.2);
             var elementList = new Dictionary<int, Tuple<string, float, float, Func<float, float>>>();
             // Definition for environment spawns: model name, submersion into ground, model scale, random scale function
             elementList.Add(255, new Tuple<string, float, float, Func<float, float>>("LeafTree",    0.5f,   1f,     treeFn));
             elementList.Add(245, new Tuple<string, float, float, Func<float, float>>("PalmTree",    1.0f,   1f,     treeFn));
             elementList.Add(235, new Tuple<string, float, float, Func<float, float>>("tree",        0.5f,   1.2f,   treeFn));
-            elementList.Add(170, new Tuple<string, float, float, Func<float, float>>("rock",        0.1f,   1.4f,   rockFn));
+            elementList.Add(170, new Tuple<string, float, float, Func<float, float>>("rock2",       0.1f,   1.6f,   rockFn));
 
                         var matDic = new Dictionary<int, MaterialShader>();
                         matDic = null;
@@ -259,25 +259,24 @@ namespace GameName.Scenes.Utils {
                         var element = elementList[(int)heightmap.ColorAt(x, y).B];
 						var wx = (x / heightmap.GetDimensions().X - 0.5f) * worldsize;
 						var wy = (y / heightmap.GetDimensions().Y - 0.5f) * worldsize;
-						//Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-1, -5, -1), new Vector3(1, 5, 1)), InvTransf = Matrix.Identity });
+                        //Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-1, -5, -1), new Vector3(1, 5, 1)), InvTransf = Matrix.Identity });
+                        Func<float, Matrix> animFn = null;
+                        if (element.Item1.ToLower().Contains("tree")) {
+                            var axis = new Vector3((float)rnd.NextDouble()-0.5f,
+                                                    0.0f,
+                                                    (float)rnd.NextDouble()-0.5f);
+                            axis.Normalize();
 
-                                                Func<float, Matrix> animFn = null;
-                                                if (element.Item1.ToLower().Contains("tree")) {
-                                                    var axis = new Vector3((float)rnd.NextDouble()-0.5f,
-                                                                           0.0f,
-                                                                           (float)rnd.NextDouble()-0.5f);
-                                                    axis.Normalize();
+                            var p0 = MathHelper.Pi*2.0f*(float)rnd.NextDouble();
+                            var w = (float)rnd.NextDouble()*0.1f+1.0f;
 
-                                                    var p0 = MathHelper.Pi*2.0f*(float)rnd.NextDouble();
-                                                    var w = (float)rnd.NextDouble()*0.1f+1.0f;
+                            var m = Matrix.CreateFromAxisAngle(axis, 0.2f-0.4f*(float)rnd.NextDouble());
 
-                                                    var m = Matrix.CreateFromAxisAngle(axis, 0.2f-0.4f*(float)rnd.NextDouble());
-
-                                                    animFn = t => {
-                                                        var theta = 0.03f*(float)Math.Cos(p0+t*w);
-                                                        return m * Matrix.CreateFromAxisAngle(axis, theta);
-                                                    };
-                                                }
+                            animFn = t => {
+                                var theta = 0.03f*(float)Math.Cos(p0+t*w);
+                                return m * Matrix.CreateFromAxisAngle(axis, theta);
+                            };
+                        }
 
 						Game1.Inst.Scene.AddComponent(newElement, new CTransform() {
                             Position = new Vector3(
