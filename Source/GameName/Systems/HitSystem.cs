@@ -6,7 +6,7 @@ using Thengill.Core;
 
 namespace GameName.Systems {
     public class HitSystem : EcsSystem {
-        private bool FA = true;
+        private bool forwardAnimation = true;
         public struct HitInfo {
             //--------------------------------------
             // PUBLIC FIELDS
@@ -36,20 +36,19 @@ namespace GameName.Systems {
                     var progress = (t - attackData.StartTime) / attackData.AnimationTime;
                     float radians;
 
-                    if (FA)
+                    if (forwardAnimation)
                         radians = MathHelper.Lerp(0, MathHelper.Pi, Math.Min(progress, 1));
                     else
                         radians = MathHelper.Lerp(MathHelper.Pi, 0, Math.Max(progress, 0));
 
                     attackData.AnimationProgress = radians;
 
-                    if (FA && radians > 1f) {
-                        FA = false;
+                    if (forwardAnimation && radians > 1f) {
+                        forwardAnimation = false;
                         attackData.AnimationProgress = 1;
-                        //attackData.IsAttacking = false;
                     }
-                    if (!FA && radians < 0) {
-                        FA = true;
+                    if (!forwardAnimation && radians < 0) {
+                        forwardAnimation = true;
                         attackData.AnimationProgress = 0;
                         attackData.IsAttacking = false;
                     }
