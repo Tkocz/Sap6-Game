@@ -8,11 +8,6 @@ namespace GameName.Systems {
     public class HitSystem : EcsSystem {
         private bool forwardAnimation = true;
         public struct HitInfo {
-            //--------------------------------------
-            // PUBLIC FIELDS
-            //--------------------------------------
-
-            /// <summary>The id of first entity involved in the collision.</summary>
             public int EntityID;
             public float StartTime;
             public bool IsAttacking;
