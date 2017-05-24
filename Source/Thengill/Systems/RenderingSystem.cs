@@ -208,10 +208,13 @@ namespace Thengill.Systems
             bbMat.View   = camera.View;
 
             var camPos = camera.Position;
+            var o = camPos - camera.Target;
+            o.Normalize();
+            o *= 2.0f;
 
             foreach (var e in scene.GetComponents<CBillboard>()) {
                 var bb    = (CBillboard)e.Value;
-                var bbRot = Matrix.CreateBillboard(bb.Pos, camPos, Vector3.Up, null);
+                var bbRot = Matrix.CreateBillboard(bb.Pos, camPos + o, Vector3.Up, null);
 
                 bbMat.Tex   = bb.Tex;
                 bbMat.Model = Matrix.CreateScale(bb.Scale) * bbRot;
