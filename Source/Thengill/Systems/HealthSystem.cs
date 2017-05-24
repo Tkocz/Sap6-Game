@@ -16,6 +16,7 @@ namespace Thengill.Systems {
             Game1.Inst.Scene.OnEvent("hit", HandleDeath);
             Game1.Inst.Scene.OnEvent("death", HandleDeath);
         }
+        public DateTime lasthitTime = DateTime.Now;
         private void HandleDamage(object data) {
             var coll = data as CollisionInfo?;
             if (!coll.HasValue) return;
@@ -23,6 +24,17 @@ namespace Thengill.Systems {
 
             var e1 = collision.Entity1;
             var e2 = collision.Entity2;
+
+
+            var p1 = Game1.Inst.Scene.EntityHasComponent<CPlayer>(e1);
+            var p2 = Game1.Inst.Scene.EntityHasComponent<CPlayer>(e2);
+
+            if (p2 == p1 &&  DateTime.Now - lasthitTime > TimeSpan.FromSeconds(4))
+            {
+                lasthitTime = DateTime.Now;
+                Game1.Inst.Scene.Raise("removeHudElement", "heart");
+            }
+
 
             if (!Game1.Inst.Scene.EntityHasComponent<CInput>(e1) &&
                 !Game1.Inst.Scene.EntityHasComponent<CInput>(e2))
@@ -34,6 +46,7 @@ namespace Thengill.Systems {
 
             var h1 = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(e1);
             var h2 = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(e2);
+
             var e1IsJumper = Game1.Inst.Scene.EntityHasComponent<CInput>(e1);
             // Check for damage collision (testing for jumping on something)
             if (Vector3.Dot(collision.Normal, Vector3.Up) > Math.Cos(MathHelper.PiOver4)) {
@@ -72,6 +85,7 @@ namespace Thengill.Systems {
                 if(health.Health <= 0) {
                     Game1.Inst.Scene.Raise("death", healthEntity.Key);
                 }
+               
                 // decrease invincibility time
                 health.InvincibilityTime = health.InvincibilityTime > 0 ? health.InvincibilityTime - dt : 0;
             }

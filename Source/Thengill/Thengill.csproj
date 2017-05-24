@@ -57,6 +57,7 @@
     <Compile Include="Components\CLogic.cs" />
     <Compile Include="Components\CParticle.cs" />
     <Compile Include="Components\CPickUp.cs" />
+    <Compile Include="Components\CPlayer.cs" />
     <Compile Include="Components\CScore.cs" />
     <Compile Include="Components\CSyncObject.cs" />
     <Compile Include="Components\CWater.cs" />

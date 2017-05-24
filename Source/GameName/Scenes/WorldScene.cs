@@ -71,7 +71,7 @@ namespace GameName.Scenes
             }
 
             mHud.Update();
-            mHud.Draw();
+            mHud.Draw(player);
         }
 
         public void InitGameComponents()
@@ -109,7 +109,8 @@ namespace GameName.Scenes
                 new LogicSystem(),
     mRenderer = new RenderingSystem(),
                 new Rendering2DSystem(),
-                new HealthSystem()
+                new HealthSystem(),
+                new HitSystem()
             );
 
 #if DEBUG
@@ -445,14 +446,15 @@ namespace GameName.Scenes
 
         public void InitHud() {
             mHud = new Hud();
-
             // Example of how to create hud elements.
-            mHud.Button(10, 10, mHud.Text(() => "Click me (and check log)"))
+            mHud.Button("Click me",10, 10, mHud.Text(() => "Click me (and check log)"))
                 .OnClick(() => Console.WriteLine("Text button clicked."));
-
-            mHud.Button(1050, 12, mHud.Sprite("Textures/Heart", 0.15f));
-            mHud.Button(1100, 12, mHud.Sprite("Textures/Heart", 0.15f));
-            mHud.Button(1150, 12, mHud.Sprite("Textures/Heart", 0.15f));
+            var heart = (CHealth) Game1.Inst.Scene.GetComponentFromEntity<CHealth>(player);
+            for (int i = 0; i <heart.Health; i++)
+            {
+                mHud.Button("heart"+i, 1050 + i*(50), 12, mHud.Sprite("Textures/Heart", 0.15f));
+            }
+         
         }
 
         public override void Update(float t, float dt)

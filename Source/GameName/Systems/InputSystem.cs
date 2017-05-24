@@ -136,14 +136,27 @@ namespace GameName.Systems {
                 }
                 if (currentState.IsKeyDown(inputValue.RightMovementKey)) {
                     yaw = -rotationSpeed;
+                }                
+                if (currentState.IsKeyDown(Keys.RightShift) && !prevState.IsKeyDown(Keys.RightShift)) {
+                    if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(input.Key)) {
+                        var p = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
+                        if (!p.IsAttacking) {
+                            Game1.Inst.Scene.Raise("attack", new HitSystem.HitInfo {
+                                EntityID = input.Key,
+                                IsAttacking = true,
+                                StartTime = t
+                            });
+                        }
+                    }
                 }
+                
                 if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
                     isInAir = true;
 					SfxUtil.PlaySound("Sounds/Effects/Jump", vol:1);
 					var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
 					model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
-
+					
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
                 {
