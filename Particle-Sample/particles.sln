@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "particles", "particles\particles\particles.csproj", "{DFBDCD13-520D-4032-A201-DCCBAA69A0D4}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "particlesContent", "particles\particlesContent\particlesContent.contentproj", "{55F95DD7-B571-4985-B773-F8FA986FC1A5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DFBDCD13-520D-4032-A201-DCCBAA69A0D4}.Debug|x86.ActiveCfg = Debug|x86
+		{DFBDCD13-520D-4032-A201-DCCBAA69A0D4}.Debug|x86.Build.0 = Debug|x86
+		{DFBDCD13-520D-4032-A201-DCCBAA69A0D4}.Release|x86.ActiveCfg = Release|x86
+		{DFBDCD13-520D-4032-A201-DCCBAA69A0D4}.Release|x86.Build.0 = Release|x86
+		{55F95DD7-B571-4985-B773-F8FA986FC1A5}.Debug|x86.ActiveCfg = Debug|x86
+		{55F95DD7-B571-4985-B773-F8FA986FC1A5}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

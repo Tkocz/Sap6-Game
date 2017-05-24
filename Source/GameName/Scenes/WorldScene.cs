@@ -31,6 +31,7 @@ namespace GameName.Scenes
         private Effect mUnderWaterFx;
         private RenderTarget2D mRT;
         private RenderingSystem mRenderer;
+        private PostProcessor mPostProcessor;
 
         public WorldScene(WorldSceneConfig configs) {
             this.configs = configs;
@@ -55,6 +56,13 @@ namespace GameName.Scenes
                 mUnderWaterFx.Parameters["SrcTex"].SetValue(mRT);
                 mUnderWaterFx.Parameters["Phase"].SetValue(t);
                 GfxUtil.DrawFsQuad(mUnderWaterFx);
+            }
+            else if (configs.IsRaining)
+            {
+                GfxUtil.SetRT(mRT);
+                base.Draw(t, dt);
+                GfxUtil.SetRT(null);
+                mPostProcessor.ApplyPostProcess(t, dt, mRT);
             }
             else {
                 GfxUtil.SetRT(null);
@@ -81,7 +89,8 @@ namespace GameName.Scenes
         {
             InitGameComponents();
             InitSceneLightSettings();
-            
+            mPostProcessor = new PostProcessor();
+
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
             mRT = GfxUtil.CreateRT();     
 

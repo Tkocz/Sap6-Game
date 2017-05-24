@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 namespace GameName.Scenes.Utils {
     public class WorldSceneConfig
     {
+        public bool IsRaining;
         public int NumFlocks;
         public int NumPowerUps;
         public int NumTriggers;
@@ -32,6 +33,7 @@ namespace GameName.Scenes.Utils {
 
             if (Map == "Tropical") //"DinoIsland"
             {
+                IsRaining = false;
                 WaterHeight = -7;
                 HeightMapScale = 300;
                 YScaleMap = 0.1f;
@@ -41,6 +43,7 @@ namespace GameName.Scenes.Utils {
             }
             else if (Map == "UpNorth")
             {
+                IsRaining = true;
                 //HeightMap
                 HeightMapScale = 300;
                 YScaleMap = 0.5f;

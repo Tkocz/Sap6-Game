@@ -86,6 +86,7 @@
     <Compile Include="Shaders\BillboardMaterial.cs" />
     <Compile Include="Shaders\EnvMapMaterial.cs" />
     <Compile Include="Shaders\MaterialShader.cs" />
+    <Compile Include="Shaders\PostProcessor.cs" />
     <Compile Include="Shaders\ToonMaterial.cs" />
     <Compile Include="Systems\AnimationSystem.cs" />
     <Compile Include="Systems\AsyncMultiSystem.cs" />

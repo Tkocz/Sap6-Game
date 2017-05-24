@@ -11,6 +11,7 @@ using GameName.Scenes;
 using GameName.Scenes.Utils;
 using Thengill.Components.Renderable;
 using Thengill.Systems;
+using Thengill.Utils;
 
 namespace GameName.Systems {
     public class InputSystem : EcsSystem {
@@ -139,8 +140,10 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
                     isInAir = true;
-                    var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
-                    model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
+					SfxUtil.PlaySound("Sounds/Effects/Jump", vol:1);
+					var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
+					model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
+
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
                 {
