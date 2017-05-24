@@ -140,6 +140,10 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
                     isInAir = true;
+					SfxUtil.PlaySound("Sounds/Effects/Jump", vol:1);
+					var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
+					model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
+
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
                 {
@@ -199,7 +203,3 @@ namespace GameName.Systems {
         }
     }
 }
-
-					SfxUtil.PlaySound("Sounds/Effects/Jump", vol:1);
-                    var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
-                    model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
