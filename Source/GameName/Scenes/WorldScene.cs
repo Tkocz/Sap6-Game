@@ -31,6 +31,7 @@ namespace GameName.Scenes
         private Effect mUnderWaterFx;
         private RenderTarget2D mRT;
         private RenderingSystem mRenderer;
+        private ParticleSystem mParticleSys;
         private PostProcessor mPostProcessor;
 
         public WorldScene(WorldSceneConfig configs) {
@@ -57,8 +58,7 @@ namespace GameName.Scenes
                 mUnderWaterFx.Parameters["Phase"].SetValue(t);
                 GfxUtil.DrawFsQuad(mUnderWaterFx);
             }
-            else if (configs.IsRaining)
-            {
+            else if (configs.IsRaining) {
                 GfxUtil.SetRT(mRT);
                 base.Draw(t, dt);
                 GfxUtil.SetRT(null);
@@ -89,8 +89,8 @@ namespace GameName.Scenes
         {
             InitGameComponents();
             InitSceneLightSettings();
-            mPostProcessor = new PostProcessor();
 
+            mPostProcessor = new PostProcessor();
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
             mRT = GfxUtil.CreateRT();     
 
@@ -103,6 +103,7 @@ namespace GameName.Scenes
                 new InputSystem(),
                 new AISystem(),
                 new AnimationSystem(),
+ mParticleSys = new ParticleSystem(),
                 new InventorySystem(),
                 new CameraSystem(),
                 new LogicSystem(),
@@ -242,9 +243,27 @@ namespace GameName.Scenes
 			var heightTrans = new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) };
             AddComponent<C3DRenderable>(heightMap, heightMapComp);
             AddComponent(heightMap, heightTrans);
-			// manually start loading all heightmap components, should be moved/automated
+            // manually start loading all heightmap components, should be moved/automated
 
-
+            OnEvent("hit", data => {
+                var key = data as int?;
+                if (key == null) return;
+                var transform = (CTransform)GetComponentFromEntity<CTransform>(key.Value);
+                var id = AddEntity();
+                Func<float> rndSize = () => 0.05f + 0.1f * (float)rnd.NextDouble();
+                Func<Vector3> rndVel = () => new Vector3((float)rnd.NextDouble() - 0.5f,
+                                                         (float)rnd.NextDouble(),
+                                                         (float)rnd.NextDouble() - 0.5f);
+                mParticleSys.SpawnParticles(50, () => new EcsComponent[] {
+                    new CParticle     { Position = transform.Position,
+                                        Velocity = 6.0f*rndVel(),
+                                        Life     = 1.7f,
+                                        F        = () => new Vector3(0.0f, -9.81f, 0.0f) },
+                    new C3DRenderable { model = Game1.Inst.Content.Load<Model>("Models/blood") },
+                    new CTransform    { Position = transform.Position,
+                                        Rotation = Matrix.Identity,
+                                        Scale    = rndSize()*Vector3.One } });
+            });
 
            OnEvent("game_end", data =>
            {

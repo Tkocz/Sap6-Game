@@ -13,6 +13,8 @@ namespace Thengill.Systems {
         public override void Init() {
             // Create event hooks for damage
             Game1.Inst.Scene.OnEvent("collision", HandleDamage);
+            Game1.Inst.Scene.OnEvent("hit", HandleDeath);
+            Game1.Inst.Scene.OnEvent("death", HandleDeath);
         }
         private void HandleDamage(object data) {
             var coll = data as CollisionInfo?;
@@ -36,30 +38,39 @@ namespace Thengill.Systems {
             // Check for damage collision (testing for jumping on something)
             if (Vector3.Dot(collision.Normal, Vector3.Up) > Math.Cos(MathHelper.PiOver4)) {
                 var receiver = h1;
+                var receiverId = e1;
                 var dealer = e2;
                 if (e1IsJumper) {
                     receiver = h2;
+                    receiverId = e2;
                     dealer = e1;
                 }
                 // if entity has invincibility time left, no damage dealt
                 if (receiver.InvincibilityTime > 0) return;
                 receiver.Health -= receiver.DamageResistance * 1; // TODO: hard coded damage should be replaced to component-based solution
                 receiver.InvincibilityTime = 1; // TODO: change hard coded time to something more appropraiate
+                Game1.Inst.Scene.Raise("hit", receiverId);
                 if (Game1.Inst.Scene.EntityHasComponent<CScore>(dealer))
                     ((CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(dealer)).Score++;
             }
+        }
+        private void HandleDeath(object data) {
+            var key = data as int?;
+            if (!key.HasValue)
+                return;
+            // dead
+            if (Game1.Inst.Scene.EntityHasComponent<CAI>(key.Value)) {
+                var aiComp = (CAI)Game1.Inst.Scene.GetComponentFromEntity<CAI>(key.Value);
+                var flock = (CFlock)Game1.Inst.Scene.GetComponentFromEntity<CFlock>(aiComp.Flock);
+                flock.Members.Remove(key.Value);
+            }
+            Game1.Inst.Scene.RemoveEntity(key.Value);
         }
         public override void Update(float t, float dt) {
             foreach(var healthEntity in Game1.Inst.Scene.GetComponents<CHealth>()) {
                 var health = (CHealth)healthEntity.Value;
                 if(health.Health <= 0) {
-                    // dead
-                    if(Game1.Inst.Scene.EntityHasComponent<CAI>(healthEntity.Key)) {
-                        var aiComp = (CAI)Game1.Inst.Scene.GetComponentFromEntity<CAI>(healthEntity.Key);
-                        var flock = (CFlock)Game1.Inst.Scene.GetComponentFromEntity<CFlock>(aiComp.Flock);
-                        flock.Members.Remove(healthEntity.Key);
-                    }
-                    Game1.Inst.Scene.RemoveEntity(healthEntity.Key);
+                    Game1.Inst.Scene.Raise("death", healthEntity.Key);
                 }
                 // decrease invincibility time
                 health.InvincibilityTime = health.InvincibilityTime > 0 ? health.InvincibilityTime - dt : 0;
