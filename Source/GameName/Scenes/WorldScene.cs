@@ -195,6 +195,7 @@ namespace GameName.Scenes
 
             AddComponent(player, new CInventory());
             AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
+			AddComponent(player, new CScore { });
             /*
             AddComponent(player, new CLogic {
                 InvHz = 1.0f/30.0f,

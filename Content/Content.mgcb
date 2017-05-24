@@ -10,14 +10,8 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:..\Source\ContentPipeline\bin\Debug\ContentPipeline.dll
-/reference:..\Source\ContentPipeline\bin\Debug\ContentPipeline.dll
 /reference:../packages/InfinitespaceStudios.Pipeline.1.0.8/tools/InfinitespaceStudios.Pipeline.dll
-/reference:..\Source\ContentPipeline\bin\Debug\ContentPipeline.dll
-/reference:..\Source\ContentPipeline\bin\Debug\ContentPipeline.dll
-/reference:..\Source\ContentPipeline\bin\Debug\ContentPipeline.dll
-/reference:../packages/InfinitespaceStudios.Pipeline.1.0.8/tools/InfinitespaceStudios.Pipeline.dll
-/reference:..\Source\ContentPipeline\bin\Debug\ContentPipeline.dll
+/reference:../bin/DesktopGL/x86/Debug/ContentPipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
