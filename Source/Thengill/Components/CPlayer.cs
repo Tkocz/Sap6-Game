@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Thengill.Core;
 
-namespace GameName.Components
+namespace Thengill.Components
 {
     public class CPlayer :EcsComponent
     {

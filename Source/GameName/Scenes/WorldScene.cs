@@ -31,6 +31,7 @@ namespace GameName.Scenes
         private Effect mUnderWaterFx;
         private RenderTarget2D mRT;
         private RenderingSystem mRenderer;
+        private PostProcessor mPostProcessor;
 
         public WorldScene(WorldSceneConfig configs) {
             this.configs = configs;
@@ -56,6 +57,13 @@ namespace GameName.Scenes
                 mUnderWaterFx.Parameters["Phase"].SetValue(t);
                 GfxUtil.DrawFsQuad(mUnderWaterFx);
             }
+            else if (configs.IsRaining)
+            {
+                GfxUtil.SetRT(mRT);
+                base.Draw(t, dt);
+                GfxUtil.SetRT(null);
+                mPostProcessor.ApplyPostProcess(t, dt, mRT);
+            }
             else {
                 GfxUtil.SetRT(null);
                 base.Draw(t, dt);
@@ -63,7 +71,7 @@ namespace GameName.Scenes
             }
 
             mHud.Update();
-            mHud.Draw();
+            mHud.Draw(player);
         }
 
         public void InitGameComponents()
@@ -81,7 +89,8 @@ namespace GameName.Scenes
         {
             InitGameComponents();
             InitSceneLightSettings();
-            
+            mPostProcessor = new PostProcessor();
+
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
             mRT = GfxUtil.CreateRT();     
 
@@ -418,14 +427,15 @@ namespace GameName.Scenes
 
         public void InitHud() {
             mHud = new Hud();
-
             // Example of how to create hud elements.
-            mHud.Button(10, 10, mHud.Text(() => "Click me (and check log)"))
+            mHud.Button("Click me",10, 10, mHud.Text(() => "Click me (and check log)"))
                 .OnClick(() => Console.WriteLine("Text button clicked."));
-
-            mHud.Button(1050, 12, mHud.Sprite("Textures/Heart", 0.15f));
-            mHud.Button(1100, 12, mHud.Sprite("Textures/Heart", 0.15f));
-            mHud.Button(1150, 12, mHud.Sprite("Textures/Heart", 0.15f));
+            var heart = (CHealth) Game1.Inst.Scene.GetComponentFromEntity<CHealth>(player);
+            for (int i = 0; i <heart.Health; i++)
+            {
+                mHud.Button("heart"+i, 1050 + i*(50), 12, mHud.Sprite("Textures/Heart", 0.15f));
+            }
+         
         }
 
         public override void Update(float t, float dt)

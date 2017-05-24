@@ -57,6 +57,7 @@
     <Compile Include="Components\CLogic.cs" />
     <Compile Include="Components\CParticle.cs" />
     <Compile Include="Components\CPickUp.cs" />
+    <Compile Include="Components\CPlayer.cs" />
     <Compile Include="Components\CScore.cs" />
     <Compile Include="Components\CSyncObject.cs" />
     <Compile Include="Components\CWater.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Shaders\BillboardMaterial.cs" />
     <Compile Include="Shaders\EnvMapMaterial.cs" />
     <Compile Include="Shaders\MaterialShader.cs" />
+    <Compile Include="Shaders\PostProcessor.cs" />
     <Compile Include="Shaders\ToonMaterial.cs" />
     <Compile Include="Systems\AnimationSystem.cs" />
     <Compile Include="Systems\AsyncMultiSystem.cs" />
