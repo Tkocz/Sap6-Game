@@ -8,6 +8,7 @@ using Thengill.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Thengill.Components;
+using Thengill.Shaders;
 
 namespace Thengill.Utils
 {
@@ -27,7 +28,11 @@ namespace Thengill.Utils
             Effect bEffect = Game1.Inst.Content.Load<Effect>("Effects/Water");
             bEffect.Parameters["Frequency"].SetValue(Frequency);
             bEffect.Parameters["Amplitude"].SetValue(Amplitude);
-            
+            var lightConfig = Game1.Inst.Scene.LightConfig;
+            bEffect.Parameters["FogStart"].SetValue(lightConfig.FogStart);
+            bEffect.Parameters["FogEnd"].SetValue(lightConfig.FogEnd);
+            bEffect.Parameters["FogColor"].SetValue(lightConfig.ClearColor);
+
             int counter = 0;
             indices = new int[(Resolution - 1) * (Resolution - 1) * 6];
             vertices = new VertexPositionNormalTexture[Resolution * Resolution];
@@ -111,7 +116,6 @@ namespace Thengill.Utils
 
 
             mesh.Name = "water";
-            // TODO: Match with map parameters
             mesh.BoundingSphere = BoundingSphere.CreateFromBoundingBox(new BoundingBox(new Vector3(0, WaterHeight, 0), new Vector3(TerrainWidth, WaterHeight, TerrainDepth)));
             ModelBone bone = new ModelBone();
             bone.Name = "water";
@@ -124,10 +128,12 @@ namespace Thengill.Utils
             var model = new Model(Game1.Inst.GraphicsDevice,bones,meshes);
             
             int id = Game1.Inst.Scene.AddEntity();
-
-            // TODO: Match with map
+            
             Game1.Inst.Scene.AddComponent(id, new CTransform { Position = Vector3.Zero, Rotation = Matrix.Identity, Scale = new Vector3(1f) });
-            var CModel = new CWater() { model = model };
+            var CModel = new CWater() {
+                model = model,
+                materials = new Dictionary<int, MaterialShader> { { 0, new MaterialShader(bEffect) } }
+            };
             Game1.Inst.Scene.AddComponent(id, CModel);
         }
     }

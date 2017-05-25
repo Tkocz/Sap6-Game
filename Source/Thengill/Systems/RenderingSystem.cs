@@ -75,7 +75,7 @@ namespace Thengill.Systems
         public void DrawScene(CCamera camera, int excludeEid=-1) {
             // TODO: Clean code below up, hard to read.
 
-            Game1.Inst.GraphicsDevice.Clear(new Color(0.4f, 0.6f, 0.8f));
+            Game1.Inst.GraphicsDevice.Clear(new Color(Game1.Inst.Scene.LightConfig.ClearColor));
 
             Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
@@ -160,6 +160,9 @@ namespace Thengill.Systems
                                 mat.Model  = bones[mesh.ParentBone.Index] * anim * transform.Frame;
                                 mat.View   = camera.View;
                                 mat.Proj   = camera.Projection;
+                                mat.FogStart = Game1.Inst.Scene.LightConfig.FogStart;
+                                mat.FogEnd = Game1.Inst.Scene.LightConfig.FogEnd;
+                                mat.FogColor = Game1.Inst.Scene.LightConfig.ClearColor;
                                 mat.Prerender();
                             }
                             else {
@@ -208,6 +211,9 @@ namespace Thengill.Systems
             bbMat.CamPos = camera.Position;
             bbMat.Proj   = camera.Projection;
             bbMat.View   = camera.View;
+            bbMat.FogStart = scene.LightConfig.FogStart;
+            bbMat.FogEnd = scene.LightConfig.FogEnd;
+            bbMat.FogColor = scene.LightConfig.ClearColor;
 
             var camPos = camera.Position;
             var o = camPos - camera.Target;
