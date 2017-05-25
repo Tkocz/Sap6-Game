@@ -23,11 +23,6 @@ namespace Thengill {
         public int NumEntities {
             get { return m_Entities.Count; }
         }
-        /// <summary>Represents a game scenes directed lightsource.</summary>
-        public Vector3 DiffuseColor;
-        public Vector3 Direction;
-        public Vector3 SpecularColor;
-        public Vector3 AmbientColor = new Vector3(0.2f);
 
         /*--------------------------------------
          * NESTED TYPES

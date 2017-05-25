@@ -79,17 +79,9 @@ namespace GameName.Scenes
         {
             Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
         }
-        private void InitSceneLightSettings()
-        {
-            DiffuseColor = new Vector3(1, 0.9607844f, 0.8078432f);
-            Direction = new Vector3(-0.5265408f, - 0.5735765f, - 0.6275069f);
-            SpecularColor = new Vector3(1, 0.9607844f, 0.8078432f);
-            AmbientColor = new Vector3(0.05333332f, 0.09882354f, 0.1819608f);
-        }
         public override void Init()
         {
             InitGameComponents();
-            InitSceneLightSettings();
 
             mPostProcessor = new PostProcessor();
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");

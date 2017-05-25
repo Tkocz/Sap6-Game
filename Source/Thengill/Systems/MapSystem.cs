@@ -278,10 +278,10 @@ namespace Thengill.Systems
 
                 basicEffect.EnableDefaultLighting();
                 basicEffect.LightingEnabled = true;
-                basicEffect.AmbientLightColor = Game1.Inst.Scene.AmbientColor;
-                basicEffect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.SpecularColor;
-                basicEffect.DirectionalLight0.Direction = Game1.Inst.Scene.Direction;
-                basicEffect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.DiffuseColor;
+                basicEffect.AmbientLightColor = Game1.Inst.Scene.LightConfig.AmbientColor;
+                basicEffect.DirectionalLight0.SpecularColor = Game1.Inst.Scene.LightConfig.SpecularColor;
+                basicEffect.DirectionalLight0.Direction = Game1.Inst.Scene.LightConfig.Direction;
+                basicEffect.DirectionalLight0.DiffuseColor = Game1.Inst.Scene.LightConfig.DiffuseColor;
                 basicEffect.DirectionalLight0.Enabled = true;
                 basicEffect.PreferPerPixelLighting = true;
 

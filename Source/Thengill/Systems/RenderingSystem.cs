@@ -279,25 +279,26 @@ namespace Thengill.Systems
                                       Matrix        boneTransform,
                                       LightingConfig config)
         {
+            // TODO: we want the same lighting everywhere so no cheating with this ;) (other shaders dont have this)
             effect.EnableDefaultLighting();
 
             effect.PreferPerPixelLighting = true;
             effect.VertexColorEnabled     = model.enableVertexColor;
             effect.LightingEnabled        = true;
-            effect.AmbientLightColor      = scene.AmbientColor;
+            effect.AmbientLightColor      = config.AmbientColor;
 
             effect.DirectionalLight0.Enabled       = true;
-            effect.DirectionalLight0.Direction     = scene.Direction;
-            effect.DirectionalLight0.DiffuseColor  = scene.DiffuseColor;
-            effect.DirectionalLight0.SpecularColor = scene.SpecularColor * model.specular;
+            effect.DirectionalLight0.Direction     = config.Direction;
+            effect.DirectionalLight0.DiffuseColor  = config.DiffuseColor;
+            effect.DirectionalLight0.SpecularColor = config.SpecularColor * model.specular;
 
             effect.DirectionalLight1.Enabled       = true;
-            effect.DirectionalLight1.DiffuseColor  = scene.DiffuseColor*0.7f;
-            effect.DirectionalLight1.SpecularColor = scene.SpecularColor * model.specular;
+            effect.DirectionalLight1.DiffuseColor  = config.DiffuseColor*0.7f;
+            effect.DirectionalLight1.SpecularColor = config.SpecularColor * model.specular;
 
             effect.DirectionalLight2.Enabled       = true;
-            effect.DirectionalLight2.DiffuseColor  = scene.DiffuseColor*0.5f;
-            effect.DirectionalLight2.SpecularColor = scene.SpecularColor * model.specular;
+            effect.DirectionalLight2.DiffuseColor  = config.DiffuseColor*0.5f;
+            effect.DirectionalLight2.SpecularColor = config.SpecularColor * model.specular;
 
             effect.SpecularPower = 100;
 
