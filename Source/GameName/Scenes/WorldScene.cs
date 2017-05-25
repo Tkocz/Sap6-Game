@@ -164,7 +164,7 @@ namespace GameName.Scenes
                 ReachableArea = new BoundingBox(new Vector3(-1.5f, -2.0f, -1.5f), new Vector3(1.5f, 2.0f, 1.5f)),
                 Restitution = 0.1f
             });
-            
+
             AddComponent(player, new CInput());
             var playery = (heightmap.HeightAt(configs.Playerx, configs.Playerz));
             var chitid = AddEntity();
@@ -174,7 +174,7 @@ namespace GameName.Scenes
             AddComponent(player, new CPlayer() {HitId = chitid});
 
 
-    
+
             var playerTransf = new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(configs.Playerx, playery, configs.Playerz), Scale = new Vector3(0.5f) };
 
             AddComponent(player, playerTransf);
@@ -437,7 +437,7 @@ namespace GameName.Scenes
         }
 
         public void CreatePlatforms(Heightmap heightmap) {
-            for (var i = 0; i < 20; i++) {
+            for (var i = 0; i < 300; i++) {
                 var x1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
                 var z1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
 
