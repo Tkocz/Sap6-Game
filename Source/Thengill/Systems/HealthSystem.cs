@@ -16,8 +16,11 @@ namespace Thengill.Systems {
             Game1.Inst.Scene.OnEvent("hit", HandleDeath);
             Game1.Inst.Scene.OnEvent("death", HandleDeath);
         }
+      
         public DateTime lasthitTime = DateTime.Now;
-        private void HandleDamage(object data) {
+        private void HandleDamage(object data)
+        {
+            //HandleDamageSword(data);
             var coll = data as CollisionInfo?;
             if (!coll.HasValue) return;
             var collision = coll.Value;
@@ -29,7 +32,7 @@ namespace Thengill.Systems {
             var p1 = Game1.Inst.Scene.EntityHasComponent<CPlayer>(e1);
             var p2 = Game1.Inst.Scene.EntityHasComponent<CPlayer>(e2);
 
-            if (p2 == p1 &&  DateTime.Now - lasthitTime > TimeSpan.FromSeconds(4))
+            if (p2 && p1 &&  DateTime.Now - lasthitTime > TimeSpan.FromSeconds(4))
             {
                 lasthitTime = DateTime.Now;
                 Game1.Inst.Scene.Raise("removeHudElement", "heart");
@@ -48,6 +51,9 @@ namespace Thengill.Systems {
             var h2 = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(e2);
 
             var e1IsJumper = Game1.Inst.Scene.EntityHasComponent<CInput>(e1);
+
+
+            
             // Check for damage collision (testing for jumping on something)
             if (Vector3.Dot(collision.Normal, Vector3.Up) > Math.Cos(MathHelper.PiOver4)) {
                 var receiver = h1;
@@ -78,6 +84,60 @@ namespace Thengill.Systems {
                 flock.Members.Remove(key.Value);
             }
             Game1.Inst.Scene.RemoveEntity(key.Value);
+        }
+        private void HandleDamageSword(object data)
+        {
+            var coll = data as CollisionInfo?;
+            if (!coll.HasValue) return;
+            var collision = coll.Value;
+
+            var e1 = collision.Entity1;
+            var e2 = collision.Entity2;
+
+
+            if (!Game1.Inst.Scene.EntityHasComponent<CHit>(e1) &&
+                !Game1.Inst.Scene.EntityHasComponent<CHit>(e2))
+                return;
+
+            CHit chit;
+            CHealth h1;
+
+            if (Game1.Inst.Scene.EntityHasComponent<CHit>(e1) && Game1.Inst.Scene.EntityHasComponent<CHealth>(e2))
+            {
+                chit = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(e1);
+                h1 = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(chit.PlayerId);
+            }
+            else if (Game1.Inst.Scene.EntityHasComponent<CHealth>(e1))
+            {
+                chit = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(e1);
+                h1 = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(chit.PlayerId);
+            }
+            else
+            {
+                //Shoulnt happend;
+                return;
+            }
+
+
+
+            CHealth receiver = null;
+            int dealer = 0;
+            if (chit.AnimationProgress > 0.5)
+            {
+                receiver = h1;
+                dealer = e1;
+            }
+            else
+                return;
+
+            if (receiver.InvincibilityTime > 0) return;
+
+            receiver.Health -= receiver.DamageResistance * 1; // TODO: hard coded damage should be replaced to component-based solution
+            receiver.InvincibilityTime = 1; // TODO: change hard coded time to something more appropraiate
+            if (Game1.Inst.Scene.EntityHasComponent<CScore>(dealer))
+                ((CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(dealer)).Score++;
+
+
         }
         public override void Update(float t, float dt) {
             foreach(var healthEntity in Game1.Inst.Scene.GetComponents<CHealth>()) {

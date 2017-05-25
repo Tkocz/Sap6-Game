@@ -116,7 +116,8 @@ namespace Thengill.Systems
                 }
 
                 if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(key)) {
-                    CPlayer playerData = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(key);
+                    var cp = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(key);
+                    var playerData = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(cp.HitId);
                     if (playerData.IsAttacking) {
                         bones[1] *= Matrix.CreateTranslation(0.0f, 0.5f, 0f);
                         bones[1] *= Matrix.CreateRotationX(2*(float)Math.Sin(-playerData.AnimationProgress));

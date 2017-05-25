@@ -51,6 +51,7 @@
     <Compile Include="Components\CBox.cs" />
     <Compile Include="Components\CFlock.cs" />
     <Compile Include="Components\CHealth.cs" />
+    <Compile Include="Components\CHit.cs" />
     <Compile Include="Components\CInput.cs" />
     <Compile Include="Components\CInventory.cs" />
     <Compile Include="Components\CInventoryItem.cs" />
