@@ -372,7 +372,7 @@ namespace GameName.Scenes.Utils {
             var graphicsDevice = Game1.Inst.GraphicsDevice;
             var scene = Game1.Inst.Scene;
             // vertical offset to avoid flickering
-            var yOffset = 0.05f;
+            var yOffset = 0.1f;
 
             var y = heightmap.HeightAt(x, z);
 
@@ -380,10 +380,10 @@ namespace GameName.Scenes.Utils {
             var B = new Vector3( 0.5f, 0.0f, -0.5f);
             var C = new Vector3( 0.5f, 0.0f,  0.5f);
             var D = new Vector3(-0.5f, 0.0f,  0.5f);
-            A.Y = heightmap.HeightAt(x+A.X, x+A.Z) - y;
-            B.Y = heightmap.HeightAt(x+B.X, x+B.Z) - y;
-            C.Y = heightmap.HeightAt(x+C.X, x+C.Z) - y;
-            D.Y = heightmap.HeightAt(x+D.X, x+D.Z) - y;
+            A.Y = heightmap.HeightAt(x+A.X, z+A.Z) - y;
+            B.Y = heightmap.HeightAt(x+B.X, z+B.Z) - y;
+            C.Y = heightmap.HeightAt(x+C.X, z+C.Z) - y;
+            D.Y = heightmap.HeightAt(x+D.X, z+D.Z) - y;
 
             var vertices = new VertexPositionNormalTexture[4];
             vertices[0] = new VertexPositionNormalTexture(A, Vector3.Up, new Vector2(0, 0));
@@ -438,7 +438,7 @@ namespace GameName.Scenes.Utils {
             var id = scene.AddEntity();
 
             scene.AddComponent<C3DRenderable>(id, new CImportedModel { model = model });
-            scene.AddComponent(id, new CTransform { Position = new Vector3(x, y+yOffset, z) });
+            scene.AddComponent(id, new CTransform { Position = new Vector3(x, y+yOffset, z), Scale = Vector3.One*2 });
         }
     }
 }
