@@ -85,15 +85,18 @@ namespace GameName.Scenes
 
             mPostProcessor = new PostProcessor();
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
-            mRT = GfxUtil.CreateRT();     
+            mRT = GfxUtil.CreateRT();
 
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
             physicsSys.InvSpatPartSize = 0.07f;
             physicsSys.Gravity *= 2.0f;
+            physicsSys.WaterY = configs.WaterHeight;
+            var inputSys = new InputSystem();
+            inputSys.WaterY = configs.WaterHeight;
             AddSystems(
                 physicsSys,
-                new InputSystem(),
+                inputSys,
                 new AISystem(),
                 new AnimationSystem(),
  mParticleSys = new ParticleSystem(),
@@ -122,14 +125,14 @@ namespace GameName.Scenes
 
             physicsSys.Heightmap = heightmap;
 
-         
+
             base.Init();
 
 
             WaterFactory.Create(configs.WaterHeight, configs.HeightMapScale, configs.HeightMapScale);
 
             SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
-            
+
             //add network after init
             if (_networkSystem != null)
             {
@@ -449,7 +452,7 @@ namespace GameName.Scenes
             {
                 mHud.Button("heart"+i, 1050 + i*(50), 12, mHud.Sprite("Textures/Heart", 0.15f));
             }
-         
+
         }
 
         public override void Update(float t, float dt)
