@@ -22,6 +22,9 @@ namespace GameName.Systems {
         private bool isInAir = false;
         private KeyboardState prevState = new KeyboardState();
         private List<int> playersInt = new List<int>();
+
+        public float WaterY { get; set; }
+
         public InputSystem() { }
 
         public override void Init()
@@ -32,7 +35,7 @@ namespace GameName.Systems {
                 if (playersInt.Count == 0)
                 {
                     foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>().Keys)
-                    { 
+                    {
                         playersInt.Add(player);
                     }
                 }
@@ -136,7 +139,7 @@ namespace GameName.Systems {
                 }
                 if (currentState.IsKeyDown(inputValue.RightMovementKey)) {
                     yaw = -rotationSpeed;
-                }                
+                }
                 if (currentState.IsKeyDown(Keys.RightShift) && !prevState.IsKeyDown(Keys.RightShift)) {
                     if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(input.Key)) {
                         var cp = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
@@ -150,14 +153,17 @@ namespace GameName.Systems {
                         }
                     }
                 }
-                
+
                 if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
-                    isInAir = true;
+
+                    if (transform.Position.Y  > WaterY) {
+                        isInAir = true;
+                    }
 					SfxUtil.PlaySound("Sounds/Effects/Jump", vol:1);
 					var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
 					model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
-					
+
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
                 {

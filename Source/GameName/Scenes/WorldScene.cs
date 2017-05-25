@@ -31,10 +31,12 @@ namespace GameName.Scenes
         private Effect mUnderWaterFx;
         private RenderTarget2D mRT;
         private RenderingSystem mRenderer;
+        private ParticleSystem mParticleSys;
         private PostProcessor mPostProcessor;
 
         public WorldScene(WorldSceneConfig configs) {
             this.configs = configs;
+            LightConfig = configs.LightConfig;
             if(configs.Network != null)
                 _networkSystem = configs.Network;
         }
@@ -57,8 +59,7 @@ namespace GameName.Scenes
                 mUnderWaterFx.Parameters["Phase"].SetValue(t);
                 GfxUtil.DrawFsQuad(mUnderWaterFx);
             }
-            else if (configs.IsRaining)
-            {
+            else if (configs.IsRaining) {
                 GfxUtil.SetRT(mRT);
                 base.Draw(t, dt);
                 GfxUtil.SetRT(null);
@@ -78,31 +79,27 @@ namespace GameName.Scenes
         {
             //Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
         }
-        private void InitSceneLightSettings()
-        {
-            DiffuseColor = new Vector3(1, 0.9607844f, 0.8078432f);
-            Direction = new Vector3(-0.5265408f, - 0.5735765f, - 0.6275069f);
-            SpecularColor = new Vector3(1, 0.9607844f, 0.8078432f);
-            AmbientColor = new Vector3(0.05333332f, 0.09882354f, 0.1819608f);
-        }
         public override void Init()
         {
-           
-            InitSceneLightSettings();
-            mPostProcessor = new PostProcessor();
+            InitGameComponents();
 
+            mPostProcessor = new PostProcessor();
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
-            mRT = GfxUtil.CreateRT();     
+            mRT = GfxUtil.CreateRT();
 
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
             physicsSys.InvSpatPartSize = 0.07f;
             physicsSys.Gravity *= 2.0f;
+            physicsSys.WaterY = configs.WaterHeight;
+            var inputSys = new InputSystem();
+            inputSys.WaterY = configs.WaterHeight;
             AddSystems(
                 physicsSys,
-                new InputSystem(),
+                inputSys,
                 new AISystem(),
                 new AnimationSystem(),
+ mParticleSys = new ParticleSystem(),
                 new InventorySystem(),
                 new CameraSystem(),
                 new LogicSystem(),
@@ -128,14 +125,14 @@ namespace GameName.Scenes
 
             physicsSys.Heightmap = heightmap;
 
-         
+
             base.Init();
 
 
             WaterFactory.Create(configs.WaterHeight, configs.HeightMapScale, configs.HeightMapScale);
 
             SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
-            
+
             //add network after init
             if (_networkSystem != null)
             {
@@ -199,6 +196,7 @@ namespace GameName.Scenes
 
             AddComponent(player, new CInventory());
             AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
+			AddComponent(player, new CScore { });
             /*
             AddComponent(player, new CLogic {
                 InvHz = 1.0f/30.0f,
@@ -248,9 +246,28 @@ namespace GameName.Scenes
 			var heightTrans = new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) };
             AddComponent<C3DRenderable>(heightMap, heightMapComp);
             AddComponent(heightMap, heightTrans);
-			// manually start loading all heightmap components, should be moved/automated
+            // manually start loading all heightmap components, should be moved/automated
 
-
+            OnEvent("hit", data => {
+                var key = data as int?;
+                if (key == null) return;
+                var transform = (CTransform)GetComponentFromEntity<CTransform>(key.Value);
+                var id = AddEntity();
+                Func<float> rndSize = () => 0.05f + 0.1f * (float)rnd.NextDouble();
+                Func<Vector3> rndVel = () => new Vector3((float)rnd.NextDouble() - 0.5f,
+                                                         (float)rnd.NextDouble(),
+                                                         (float)rnd.NextDouble() - 0.5f);
+                mParticleSys.SpawnParticles(50, () => new EcsComponent[] {
+                    new CParticle     { Position = transform.Position,
+                                        Velocity = 6.0f*rndVel(),
+                                        Life     = 1.7f,
+                                        F        = () => new Vector3(0.0f, -9.81f, 0.0f) },
+                    new C3DRenderable { model = Game1.Inst.Content.Load<Model>("Models/blood") },
+                    new CTransform    { Position = transform.Position,
+                                        Rotation = Matrix.Identity,
+                                        Scale    = rndSize()*Vector3.One } });
+                SfxUtil.PlaySound("Sounds/Effects/Hit");
+            });
 
            OnEvent("game_end", data =>
            {
@@ -440,7 +457,7 @@ namespace GameName.Scenes
             {
                 mHud.Button("heart"+i, 1050 + i*(50), 12, mHud.Sprite("Textures/Heart", 0.15f));
             }
-         
+
         }
 
         public override void Update(float t, float dt)

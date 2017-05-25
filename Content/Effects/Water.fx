@@ -23,10 +23,9 @@ uniform extern float Frequency; // 2
 uniform extern float BumpConstant;
 uniform extern texture NormalMap;
 
-// TODO: Should be uniforms
-static const float FogStart  = 35.0;
-static const float FogEnd    = 100.0;
-static const float3 FogColor = float3(0.4, 0.6, 0.8);
+uniform extern float FogStart;
+uniform extern float FogEnd;
+uniform extern float3 FogColor;
 
 sampler2D bumpSampler = sampler_state {
   Texture = (NormalMap);

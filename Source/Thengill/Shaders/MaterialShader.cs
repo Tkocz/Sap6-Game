@@ -43,13 +43,37 @@ public class MaterialShader {
 
     /// <summary>The view matrix shader parameter.</summary>
     private EffectParameter mViewParam;
+    /// <summary>
+    /// The fog start distance parameter.
+    /// </summary>
+    private EffectParameter mFogStartParam;
+    /// <summary>
+    /// The fog end distance parameter.
+    /// </summary>
+    private EffectParameter mFogEndParam;
+    /// <summary>
+    /// The fog color parameter.
+    /// </summary>
+    private EffectParameter mFogColorParam;
+    /// <summary>
+    /// The fog start distance
+    /// </summary>
+    private float mFogStart;
+    /// <summary>
+    /// The fog end distance
+    /// </summary>
+    private float mFogEnd;
+    /// <summary>
+    /// The fog color
+    /// </summary>
+    private Vector3 mFogColor;
 
-    //--------------------------------------
-    // PUBLIC PROPERTIES
-    //--------------------------------------
+        //--------------------------------------
+        // PUBLIC PROPERTIES
+        //--------------------------------------
 
-    /// <summary>Gets or sets the camera position.</summary>
-    public Vector3 CamPos {
+        /// <summary>Gets or sets the camera position.</summary>
+        public Vector3 CamPos {
         get {
             return mCamPos;
         }
@@ -98,21 +122,60 @@ public class MaterialShader {
             mViewParam.SetValue(value);
         }
     }
+        /// <summary>
+        /// Gets or sets the fog color.
+        /// </summary>
+        public Vector3 FogColor {
+            get {
+                return mFogColor;
+            }
+            set {
+                mFogColor = value;
+                mFogColorParam.SetValue(value);
+            }
+        }
+        /// <summary>
+        /// Gets or sets the fog start.
+        /// </summary>
+        public float FogStart {
+            get {
+                return mFogStart;
+            }
+            set {
+                mFogStart = value;
+                mFogStartParam.SetValue(value);
+            }
+        }
+        /// <summary>
+        /// Gets or sets the fog color.
+        /// </summary>
+        public float FogEnd {
+            get {
+                return mFogEnd;
+            }
+            set {
+                mFogEnd = value;
+                mFogEndParam.SetValue(value);
+            }
+        }
 
-    //--------------------------------------
-    // PUBLIC CONSTRUCTORS
-    //--------------------------------------
+        //--------------------------------------
+        // PUBLIC CONSTRUCTORS
+        //--------------------------------------
 
-    /// <summary>Initializes a new material shader.</summary>
-    /// <param name="effect">The underlying shader.</param>
-    public MaterialShader(Effect effect) {
+        /// <summary>Initializes a new material shader.</summary>
+        /// <param name="effect">The underlying shader.</param>
+        public MaterialShader(Effect effect) {
         mEffect = effect;
 
         mCamPosParam = effect.Parameters["CamPos"];
         mModelParam  = effect.Parameters["Model"];
         mProjParam   = effect.Parameters["Proj"];
         mViewParam   = effect.Parameters["View"];
-    }
+        mFogColorParam = effect.Parameters["FogColor"];
+        mFogStartParam = effect.Parameters["FogStart"];
+        mFogEndParam = effect.Parameters["FogEnd"];
+        }
 
     /// <summary>Called just before the material is rendered.</summary>
     public virtual void Prerender() {
