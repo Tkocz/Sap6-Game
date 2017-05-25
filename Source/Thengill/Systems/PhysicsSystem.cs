@@ -829,6 +829,10 @@ public class PhysicsSystem: EcsSystem {
         body.RotAx  = Vector3.Cross(n, f);
 
         body.RotAx.Normalize();
+
+        Scene.Raise("collision", new CollisionInfo { Entity1  = cp.First,
+                                                     Entity2  = cp.Second,
+                                                     Normal   = n});
     }
 }
 

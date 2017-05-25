@@ -29,6 +29,28 @@ namespace GameName.Systems {
 
         public override void Init()
         {
+            Game1.Inst.Scene.OnEvent("collision", data => {
+                if (playersInt.Count == 0)
+                {
+                    foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>().Keys)
+                    {
+                        playersInt.Add(player);
+                    }
+                }
+                var entity = ((PhysicsSystem.CollisionInfo)data).Entity1;
+                if (playersInt.Contains(entity))
+                {
+                    if (isInAir) {
+                        if (Game1.Inst.Scene.EntityHasComponent<CInput>(entity))
+                        {
+                            isInAir = false;
+                        }
+                        var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(entity);
+                        model.animFn = SceneUtils.playerAnimation(entity, 24, 0.1f);
+                    }
+                }
+            });
+
             //todo collisionwithground is raised all the time
             //not the best soultion displays another animtion when jumping for both players if network
             Game1.Inst.Scene.OnEvent("collisionwithground", data => {
@@ -143,7 +165,7 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(Keys.RightShift) && !prevState.IsKeyDown(Keys.RightShift)) {
                     if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(input.Key)) {
                         var cp = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
-                        var p = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(cp.HitId); 
+                        var p = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(cp.HitId);
                         if (!p.IsAttacking) {
                             Game1.Inst.Scene.Raise("attack", new HitSystem.HitInfo {
                                 EntityID = input.Key,
