@@ -367,5 +367,78 @@ namespace GameName.Scenes.Utils {
                 }
             }
         }
+
+        public static void CreateSplatter(float x, float z, Heightmap heightmap) {
+            var graphicsDevice = Game1.Inst.GraphicsDevice;
+            var scene = Game1.Inst.Scene;
+            // vertical offset to avoid flickering
+            var yOffset = 0.05f;
+
+            var y = heightmap.HeightAt(x, z);
+
+            var A = new Vector3(-0.5f, 0.0f, -0.5f);
+            var B = new Vector3( 0.5f, 0.0f, -0.5f);
+            var C = new Vector3( 0.5f, 0.0f,  0.5f);
+            var D = new Vector3(-0.5f, 0.0f,  0.5f);
+            A.Y = heightmap.HeightAt(x+A.X, x+A.Z) - y;
+            B.Y = heightmap.HeightAt(x+B.X, x+B.Z) - y;
+            C.Y = heightmap.HeightAt(x+C.X, x+C.Z) - y;
+            D.Y = heightmap.HeightAt(x+D.X, x+D.Z) - y;
+
+            var vertices = new VertexPositionNormalTexture[4];
+            vertices[0] = new VertexPositionNormalTexture(A, Vector3.Up, new Vector2(0, 0));
+            vertices[1] = new VertexPositionNormalTexture(B, Vector3.Up, new Vector2(1, 0));
+            vertices[2] = new VertexPositionNormalTexture(C, Vector3.Up, new Vector2(1, 1));
+            vertices[3] = new VertexPositionNormalTexture(D, Vector3.Up, new Vector2(0, 1));
+
+            var indices = new short[6];
+            indices[0] = 0;
+            indices[1] = 1;
+            indices[2] = 2;
+
+            indices[3] = 0;
+            indices[4] = 2;
+            indices[5] = 3;
+
+            var vertexBuffer = new VertexBuffer(graphicsDevice, VertexPositionNormalTexture.VertexDeclaration, vertices.Length, BufferUsage.None);
+            vertexBuffer.SetData(vertices);
+
+            var indexBuffer = new IndexBuffer(graphicsDevice, typeof(short), indices.Length, BufferUsage.None);
+            indexBuffer.SetData(indices);
+
+            var bEffect = new BasicEffect(graphicsDevice);
+            bEffect.TextureEnabled = true;
+            bEffect.Texture = Game1.Inst.Content.Load<Texture2D>("Textures/splatter");
+
+            var meshes = new List<ModelMesh>();
+            var parts = new List<ModelMeshPart>();
+            var bones = new List<ModelBone>();
+
+            parts.Add(new ModelMeshPart {
+                VertexBuffer = vertexBuffer,
+                NumVertices = vertices.Length,
+                IndexBuffer = indexBuffer,
+                PrimitiveCount = indices.Length / 3
+            });
+            var mesh = new ModelMesh(graphicsDevice, parts);
+            parts[0].Effect = bEffect;
+
+            var bone = new ModelBone {
+                Name = "Splatter",
+                Transform = Matrix.Identity
+            };
+            bone.AddMesh(mesh);
+            mesh.ParentBone = bone;
+
+            bones.Add(bone);
+            meshes.Add(mesh);
+
+            var model = new Model(graphicsDevice, bones, meshes);
+
+            var id = scene.AddEntity();
+
+            scene.AddComponent<C3DRenderable>(id, new CImportedModel { model = model });
+            scene.AddComponent(id, new CTransform { Position = new Vector3(x, y+yOffset, z) });
+        }
     }
 }

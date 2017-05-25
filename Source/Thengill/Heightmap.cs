@@ -272,7 +272,6 @@ public class Heightmap {
         };
 
         bone.AddMesh(mesh);
-
         mesh.ParentBone = bone;
 
         bones.Add(bone);

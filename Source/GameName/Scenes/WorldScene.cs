@@ -236,11 +236,11 @@ namespace GameName.Scenes
                 Scale    = Vector3.One
             });
 
-            int heightMap = AddEntity();
+            int heightMapId = AddEntity();
 			var heightMapComp = new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/" + configs.Map)};
 			var heightTrans = new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) };
-            AddComponent<C3DRenderable>(heightMap, heightMapComp);
-            AddComponent(heightMap, heightTrans);
+            AddComponent<C3DRenderable>(heightMapId, heightMapComp);
+            AddComponent(heightMapId, heightTrans);
             // manually start loading all heightmap components, should be moved/automated
 
             OnEvent("hit", data => {
@@ -261,6 +261,7 @@ namespace GameName.Scenes
                     new CTransform    { Position = transform.Position,
                                         Rotation = Matrix.Identity,
                                         Scale    = rndSize()*Vector3.One } });
+                SceneUtils.CreateSplatter(transform.Position.X, transform.Position.Z, heightmap);
                 SfxUtil.PlaySound("Sounds/Effects/Hit");
             });
 
