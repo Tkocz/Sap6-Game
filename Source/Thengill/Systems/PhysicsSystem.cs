@@ -127,6 +127,9 @@ public class PhysicsSystem: EcsSystem {
     // PUBLIC PROPERTIES
     //--------------------------------------
 
+    /// <summary>Gets or sets the water level.</summary>
+    public float WaterY { get; set; } = Single.NegativeInfinity;
+
     /// <summary>The inverse of the spatial partitioning voxel size (in meters).</summary>
     public float InvSpatPartSize { get; set; } = 1.0f; // 1/meters along each axis
 
@@ -208,7 +211,16 @@ public class PhysicsSystem: EcsSystem {
 
             // TODO: Implement 4th order Runge-Kutta for differential equations.
             // Symplectic Euler is ok for now so compute force before updating position!
-            body.Velocity   += dt*(Gravity - body.InvMass*body.LinDrag*body.Velocity);
+
+            var g = Gravity;
+            var l = body.LinDrag;
+
+            if (transf.Position.Y < WaterY) {
+                g *= 0.6f;
+                l += 600.0f;
+            }
+
+            body.Velocity   += dt*(g - body.InvMass*l*body.Velocity);
             transf.Position += dt*body.Velocity;
 
             if (body.EnableRot) {
