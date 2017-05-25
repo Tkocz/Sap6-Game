@@ -36,6 +36,7 @@ namespace GameName.Scenes
 
         public WorldScene(WorldSceneConfig configs) {
             this.configs = configs;
+            LightConfig = configs.LightConfig;
             if(configs.Network != null)
                 _networkSystem = configs.Network;
         }

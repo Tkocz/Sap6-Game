@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Thengill.Utils;
 
 namespace GameName.Scenes.Utils {
     public class WorldSceneConfig
@@ -22,6 +23,8 @@ namespace GameName.Scenes.Utils {
         public int Playerx = 0;
         private Random rnd = new Random();
         public Func<float, float, float, Color> colorsMap;
+        public LightingConfig LightConfig;
+
         public WorldSceneConfig(int numFlocks, int numPowerUps, int numTriggers, string map, NetworkSystem network)
         {
             NumFlocks = numFlocks;
@@ -31,6 +34,7 @@ namespace GameName.Scenes.Utils {
             Network = network;
             Map = map;
 
+            LightConfig = new LightingConfig();
             if (Map == "Tropical") //"DinoIsland"
             {
                 IsRaining = false;

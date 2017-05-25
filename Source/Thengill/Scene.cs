@@ -77,6 +77,7 @@ namespace Thengill {
         private int EntityCounter = -1;
         //wanted a more unique id... couldnt use standard random class in C# ...when started two instances of the game... same tick equals same id.. ;) probaly change!
         private CryptoRandom rnd = new CryptoRandom();
+        public LightingConfig LightConfig;
 
         /*--------------------------------------
 * PUBLIC METHODS

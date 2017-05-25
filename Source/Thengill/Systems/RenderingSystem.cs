@@ -170,7 +170,8 @@ namespace Thengill.Systems
                                                  transform,
                                                  mesh,
                                                  anim,
-                                                 bones[mesh.ParentBone.Index]);
+                                                 bones[mesh.ParentBone.Index],
+                                                 Game1.Inst.Scene.LightConfig);
                             }
 
                             lastEffect = effect;
