@@ -10,10 +10,6 @@ using Thengill.Core;
 namespace Thengill.Components
 {
     public class CPlayer : EcsComponent {
-        public float StartTime { get; set; }
-        public bool IsAttacking = false;
-        public float AnimationTime = 0.5f;
-        public float AnimationProgress = 0.0f;
-        
+        public int HitId { get; set; }
     }
 }

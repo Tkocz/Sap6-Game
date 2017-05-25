@@ -76,7 +76,7 @@ namespace GameName.Scenes
 
         public void InitGameComponents()
         {
-            Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
+            //Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
         }
         private void InitSceneLightSettings()
         {
@@ -87,7 +87,7 @@ namespace GameName.Scenes
         }
         public override void Init()
         {
-            InitGameComponents();
+           
             InitSceneLightSettings();
             mPostProcessor = new PostProcessor();
 
@@ -167,12 +167,17 @@ namespace GameName.Scenes
                 ReachableArea = new BoundingBox(new Vector3(-1.5f, -2.0f, -1.5f), new Vector3(1.5f, 2.0f, 1.5f)),
                 Restitution = 0.1f
             });
-
+            
             AddComponent(player, new CInput());
-            AddComponent(player, new CPlayer());
-
-
             var playery = (heightmap.HeightAt(configs.Playerx, configs.Playerz));
+            var chitid = AddEntity();
+            AddComponent(chitid, new CHit() {PlayerId = player});
+            //AddComponent(chitid, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(configs.Playerx, playery, configs.Playerz) + new CHit().HitBoxOffset}  ) ;
+            //AddComponent(chitid, new CBody() { Aabb = new BoundingBox(new Vector3(-2f, -2f, -2f), new Vector3(2f, 2f, 2f)) });
+            AddComponent(player, new CPlayer() {HitId = chitid});
+
+
+    
             var playerTransf = new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(configs.Playerx, playery, configs.Playerz), Scale = new Vector3(0.5f) };
 
             AddComponent(player, playerTransf);
