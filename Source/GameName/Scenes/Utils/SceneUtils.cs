@@ -66,7 +66,7 @@ namespace GameName.Scenes.Utils {
 
         public static Func<float, Matrix> playerAnimation(int player,int wiggleness, float speed)
         {
-            
+
             Func<float, Matrix> playerAnim = (t) => {
                 var transf = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(player);
                 var body = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(player);
@@ -385,11 +385,14 @@ namespace GameName.Scenes.Utils {
             C.Y = heightmap.HeightAt(x+C.X, z+C.Z) - y;
             D.Y = heightmap.HeightAt(x+D.X, z+D.Z) - y;
 
+            var N = -Vector3.Cross(A - B, A - D);
+            N.Normalize();
+
             var vertices = new VertexPositionNormalTexture[4];
-            vertices[0] = new VertexPositionNormalTexture(A, Vector3.Up, new Vector2(0, 0));
-            vertices[1] = new VertexPositionNormalTexture(B, Vector3.Up, new Vector2(1, 0));
-            vertices[2] = new VertexPositionNormalTexture(C, Vector3.Up, new Vector2(1, 1));
-            vertices[3] = new VertexPositionNormalTexture(D, Vector3.Up, new Vector2(0, 1));
+            vertices[0] = new VertexPositionNormalTexture(A, N, new Vector2(0, 0));
+            vertices[1] = new VertexPositionNormalTexture(B, N, new Vector2(1, 0));
+            vertices[2] = new VertexPositionNormalTexture(C, N, new Vector2(1, 1));
+            vertices[3] = new VertexPositionNormalTexture(D, N, new Vector2(0, 1));
 
             var indices = new short[6];
             indices[0] = 0;
