@@ -93,6 +93,7 @@ namespace GameName.Scenes
             physicsSys.Gravity *= 2.0f;
             physicsSys.WaterY = configs.WaterHeight;
             var inputSys = new InputSystem();
+
             inputSys.WaterY = configs.WaterHeight;
             AddSystems(
                 physicsSys,
@@ -124,6 +125,7 @@ namespace GameName.Scenes
                                            colorFn    : configs.colorsMap);
 
             physicsSys.Heightmap = heightmap;
+            inputSys.Heightmap = heightmap;
 
 
             base.Init();

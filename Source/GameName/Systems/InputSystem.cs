@@ -20,10 +20,12 @@ namespace GameName.Systems {
         private Matrix addRot;
         private float yaw = 0, pitch = 0, roll = 0;
         private bool isInAir = false;
+        private bool isOnGround = false; // whether the player is on ground (the heightmap, not box)
         private KeyboardState prevState = new KeyboardState();
         private List<int> playersInt = new List<int>();
 
         public float WaterY { get; set; }
+        public Heightmap Heightmap { get; set; }
 
         public InputSystem() { }
 
@@ -44,6 +46,7 @@ namespace GameName.Systems {
                         if (Game1.Inst.Scene.EntityHasComponent<CInput>(entity))
                         {
                             isInAir = false;
+                            isOnGround = false;
                         }
                         var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(entity);
                         model.animFn = SceneUtils.playerAnimation(entity, 24, 0.1f);
@@ -68,6 +71,7 @@ namespace GameName.Systems {
                         if (Game1.Inst.Scene.EntityHasComponent<CInput>(entity))
                         {
                             isInAir = false;
+                            isOnGround = true;
                         }
                         var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(entity);
                         model.animFn = SceneUtils.playerAnimation(entity, 24, 0.1f);
@@ -138,10 +142,61 @@ namespace GameName.Systems {
 
                 Vector3 acceleration = Vector3.Zero;
 
-                if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
-                    acceleration += movementSpeed * transform.Frame.Forward;
-                if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
-                    acceleration += movementSpeed * transform.Frame.Backward;
+                if (currentState.IsKeyDown(inputValue.ForwardMovementKey)) {
+                    var w = transform.Frame.Forward;
+
+                    if (!isInAir && isOnGround) {
+                        var tx = transform.Position.X;
+                        var tz = transform.Position.Z;
+
+                        var fv1 = w;
+                        fv1.Normalize();
+
+                        var fv2 = fv1;
+                        fv2 *= 0.05f;
+
+                        // Compute height delta.
+                        var y1 = Heightmap.HeightAt(tx, tz);
+                        var y2 = Heightmap.HeightAt(tx+fv2.X, tz+fv2.Z);
+                        fv2.Y = (float)Math.Max(0.0f, y2 - y1);
+
+                        fv2.Normalize();
+
+                        var maxAngle = (float)Math.Cos(MathHelper.ToRadians(70.0f));
+                        var fac = (float)Math.Max(0.0f, Vector3.Dot(fv1, fv2) - maxAngle);
+                        movementSpeed *= fac;
+                    }
+
+                    acceleration += movementSpeed * w;
+                }
+
+                if (currentState.IsKeyDown(inputValue.BackwardMovementKey)) {
+                    var w = transform.Frame.Backward;
+
+                    if (!isInAir && isOnGround) {
+                        var tx = transform.Position.X;
+                        var tz = transform.Position.Z;
+
+                        var fv1 = w;
+                        fv1.Normalize();
+
+                        var fv2 = fv1;
+                        fv2 *= 0.05f;
+
+                        // Compute height delta.
+                        var y1 = Heightmap.HeightAt(tx, tz);
+                        var y2 = Heightmap.HeightAt(tx+fv2.X, tz+fv2.Z);
+                        fv2.Y = (float)Math.Max(0.0f, y2 - y1);
+
+                        fv2.Normalize();
+
+                        var maxAngle = (float)Math.Cos(MathHelper.ToRadians(70.0f));
+                        var fac = (float)Math.Max(0.0f, Vector3.Dot(fv1, fv2) - maxAngle);
+                        movementSpeed *= fac;
+                    }
+
+                    acceleration += movementSpeed * w;
+                }
 
 
                 acceleration.Y = 0.0f;
