@@ -441,7 +441,7 @@ namespace GameName.Scenes.Utils {
             var id = scene.AddEntity();
 
             scene.AddComponent<C3DRenderable>(id, new CImportedModel { model = model });
-            scene.AddComponent(id, new CTransform { Position = new Vector3(x, y+yOffset, z), Scale = Vector3.One*2 });
+            scene.AddComponent(id, new CTransform { Position = new Vector3(x, y+yOffset, z), Scale = new Vector3((float)rnd.NextDouble()*0.5f+1.5f) });
         }
     }
 }
