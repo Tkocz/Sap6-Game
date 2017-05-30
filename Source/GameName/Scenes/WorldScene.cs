@@ -171,8 +171,8 @@ namespace GameName.Scenes
             var playery = (heightmap.HeightAt(configs.Playerx, configs.Playerz));
             var chitid = AddEntity();
             AddComponent(chitid, new CHit() {PlayerId = player});
-            //AddComponent(chitid, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(configs.Playerx, playery, configs.Playerz) + new CHit().HitBoxOffset}  ) ;
-            //AddComponent(chitid, new CBody() { Aabb = new BoundingBox(new Vector3(-2f, -2f, -2f), new Vector3(2f, 2f, 2f)) });
+            AddComponent(chitid, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(configs.Playerx, playery, configs.Playerz) + new CHit().HitBoxOffset}  ) ;
+            AddComponent(chitid, new CBody() { Aabb = new BoundingBox(new Vector3(-2f, -2f, -2f), new Vector3(2f, 2f, 2f)) });
             AddComponent(player, new CPlayer() {HitId = chitid});
 
 

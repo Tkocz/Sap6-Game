@@ -13,6 +13,7 @@ namespace Thengill.Components
         public int PlayerId;
         public float StartTime { get; set; }
         public bool IsAttacking = false;
+        public DateTime LastSpashed = DateTime.Now;
         public float AnimationTime = 0.5f;
         public float AnimationProgress = 0.0f;
         public Vector3 HitBoxOffset = new Vector3(0.5f, 0.5f, -0.5f);
