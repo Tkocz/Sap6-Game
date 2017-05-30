@@ -259,7 +259,7 @@ namespace GameName.Scenes
                 Func<Vector3> rndVel = () => new Vector3((float)rnd.NextDouble() - 0.5f,
                                                          (float)rnd.NextDouble(),
                                                          (float)rnd.NextDouble() - 0.5f);
-                mParticleSys.SpawnParticles(50, () => new EcsComponent[] {
+                mParticleSys.SpawnParticles(100, () => new EcsComponent[] {
                     new CParticle     { Position = transform.Position,
                                         Velocity = 6.0f*rndVel(),
                                         Life     = 1.7f,
