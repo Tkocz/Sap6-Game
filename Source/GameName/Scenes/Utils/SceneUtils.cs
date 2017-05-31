@@ -227,7 +227,9 @@ namespace GameName.Scenes.Utils {
             elementList.Add(255, new Tuple<string, float, float, Func<float, float>>("LeafTree",    0.5f,   1f,     treeFn));
             elementList.Add(245, new Tuple<string, float, float, Func<float, float>>("PalmTree",    1.0f,   1f,     treeFn));
             elementList.Add(235, new Tuple<string, float, float, Func<float, float>>("tree",        0.5f,   1.2f,   treeFn));
+			elementList.Add(225, new Tuple<string, float, float, Func<float, float>>("pinetree",    0.5f,   1.2f,   treeFn));
             elementList.Add(170, new Tuple<string, float, float, Func<float, float>>("rock",        0.1f,   1.4f,   rockFn));
+
 
                         var matDic = new Dictionary<int, MaterialShader>();
                         matDic = null;
