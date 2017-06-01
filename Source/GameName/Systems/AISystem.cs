@@ -46,44 +46,55 @@ namespace GameName.Systems
                     if (npcComponent.State == null)
                         npcComponent.State = new SIdle(npcKey);
 
-                    // find closest enemy
-                    var closestEnemyDistance = float.MaxValue;
-                    var closestEnemyId = -1;
-                    foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>()) {
-                        if (!Game1.Inst.Scene.EntityHasComponent<CBody>(player.Key))
-                            continue;
+                    if (npcComponent.StateLockTime <= 0) {
+                        // find closest enemy
+                        var closestEnemyDistance = float.MaxValue;
+                        var closestEnemyId = -1;
+                        foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>())
+                        {
+                            if (!Game1.Inst.Scene.EntityHasComponent<CBody>(player.Key))
+                                continue;
 
-                        var playerTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(player.Key);
+                            var playerTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(player.Key);
 
-                        var distance = PositionalUtil.Distance(playerTransform.Position, npcTransform.Position);
+                            var distance = PositionalUtil.Distance(playerTransform.Position, npcTransform.Position);
 
-                        if (closestEnemyDistance > distance) {
-                            closestEnemyDistance = distance;
-                            closestEnemyId = player.Key;
+                            if (closestEnemyDistance > distance)
+                            {
+                                closestEnemyDistance = distance;
+                                closestEnemyId = player.Key;
+                            }
                         }
-                    }
-                    if(closestEnemyId==-1)return;
-                    var enemyBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(closestEnemyId);
+                        if (closestEnemyId == -1) return;
+                        var enemyBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(closestEnemyId);
 
-                    // Save fuzzy values instead of recalculating on every rule
-                    var closeToEnemy = CloseToEnemy(closestEnemyDistance);
-                    var fastEnemySpeed = FastSpeed(enemyBody.Velocity);
-                    var mediumToEnemy = MediumToEnemy(closestEnemyDistance);
+                        // Save fuzzy values instead of recalculating on every rule
+                        var closeToEnemy = CloseToEnemy(closestEnemyDistance);
+                        var fastEnemySpeed = FastSpeed(enemyBody.Velocity);
+                        var mediumToEnemy = MediumToEnemy(closestEnemyDistance);
 
-                    // Test rules and set state accordingly
-                    if ((closeToEnemy & fastEnemySpeed).IsTrue()) {
-                        if (npcComponent.State.GetType() != typeof(SEvade))
-                            npcComponent.State = new SEvade(npcKey);
-                    }
-                    else if (((closeToEnemy | mediumToEnemy) & !fastEnemySpeed).IsTrue()) {
-                        if (npcComponent.State.GetType() != typeof(SAware))
-                            npcComponent.State = new SAware(npcKey);
-                    }
-                    else if (npcComponent.State.GetType() != typeof(SIdle))
-                        npcComponent.State = new SIdle(npcKey);
+                        // Test rules and set state accordingly
+                        if ((closeToEnemy & fastEnemySpeed).IsTrue())
+                        {
+                            if (npcComponent.State.GetType() != typeof(SEvade))
+                            {
+                                npcComponent.State = new SEvade(npcKey);
+                                npcComponent.StateLockTime = 2;
+                            }
+                        }
+                        else if ((closeToEnemy & !fastEnemySpeed).IsTrue())
+                        {
+                            if (npcComponent.State.GetType() != typeof(SAware))
+                                npcComponent.State = new SAware(npcKey);
+                        }
+                        else if (npcComponent.State.GetType() != typeof(SIdle)) {
+                            npcComponent.State = new SIdle(npcKey);
+                        }
 
+                    }
                     // Act upon state
                     npcComponent.State.Handle(t, dt);
+                    npcComponent.StateLockTime = Math.Max(npcComponent.StateLockTime-dt, 0);
                 }
             }
         }
