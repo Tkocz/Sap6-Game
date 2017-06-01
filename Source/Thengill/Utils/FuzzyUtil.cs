@@ -12,7 +12,7 @@ namespace Thengill.Utils {
         /// <param name="mu">The FuzzyNumber to be changed by hedge function</param>
         /// <returns>FuzzyNumber after hedge</returns>
         public static FuzzyNumber Very(FuzzyNumber mu) {
-            return new FuzzyNumber(Math.Pow(mu.Value, 2));
+            return new FuzzyNumber(Math.Pow(mu.Value, 20));
         }
         /// <summary>
         /// Hedge function for determining the hedge "slightly"

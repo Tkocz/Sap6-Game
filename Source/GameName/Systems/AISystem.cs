@@ -111,7 +111,7 @@ namespace GameName.Systems
                                 npcComponent.StateLockTime = ScaryTime;
                             }
                         }
-                        else if ((closeToEnemy & !fastEnemySpeed).IsTrue())
+                        else if ((FuzzyUtil.Very(closeToEnemy) & !fastEnemySpeed).IsTrue())
                         {
                             if (npcComponent.State.GetType() != typeof(SAware))
                                 npcComponent.State = new SAware(npcKey);
