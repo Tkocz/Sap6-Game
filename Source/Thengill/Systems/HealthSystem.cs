@@ -12,14 +12,18 @@ namespace Thengill.Systems {
     public class HealthSystem : EcsSystem {
         public override void Init() {
             // Create event hooks for damage
-            Game1.Inst.Scene.OnEvent("collision", HandleDamage);
-            Game1.Inst.Scene.OnEvent("collision", HandleDamageSword);
+            Game1.Inst.Scene.OnEvent("collision", HandleJumpCollision);
+            Game1.Inst.Scene.OnEvent("collision", HandleAxeCollision);
             Game1.Inst.Scene.OnEvent("death", HandleDeath);
             Game1.Inst.Scene.OnEvent("makedamage", MakeDamageHandler);
         }
 
         public DateTime lasthitTime = DateTime.Now;
-        private void HandleDamage(object data)
+        /// <summary>
+        /// Handler for when jumping on objects
+        /// </summary>
+        /// <param name="data"></param>
+        private void HandleJumpCollision(object data)
         {
             var coll = data as CollisionInfo?;
             if (!coll.HasValue) return;
@@ -71,6 +75,10 @@ namespace Thengill.Systems {
                 Game1.Inst.Scene.Raise("makedamage", new DamageInfo {dealer = dealer,receiver = receiver ,receiverId = receiverId}); 
             }
         }
+        /// <summary>
+        /// Handler for when an entity is marked for death
+        /// </summary>
+        /// <param name="data">Integer containing entity key which is going to die</param>
         private void HandleDeath(object data) {
             var key = data as int?;
             if (!key.HasValue)
@@ -83,7 +91,10 @@ namespace Thengill.Systems {
             }
             Game1.Inst.Scene.RemoveEntity(key.Value);
         }
-
+        /// <summary>
+        /// Handler for dealing damage as well as dealing points for dealer
+        /// </summary>
+        /// <param name="data">DamageInfo instance</param>
         private void MakeDamageHandler(object data)
         {
             DamageInfo damageinfo = data as DamageInfo;
@@ -93,7 +104,11 @@ namespace Thengill.Systems {
             if (Game1.Inst.Scene.EntityHasComponent<CScore>(damageinfo.dealer))
                 ((CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(damageinfo.dealer)).Score++;
         }
-        private void HandleDamageSword(object data)
+        /// <summary>
+        /// Handler for when axe hits objects
+        /// </summary>
+        /// <param name="data">CollisionInfo instance</param>
+        private void HandleAxeCollision(object data)
         {
             
             var coll = data as CollisionInfo?;
@@ -102,9 +117,6 @@ namespace Thengill.Systems {
 
             var e1 = collision.Entity1;
             var e2 = collision.Entity2;
-
-
-          
 
             CHit chit;
             CHealth h1;
@@ -148,6 +160,11 @@ namespace Thengill.Systems {
             Game1.Inst.Scene.Raise("makedamage", new DamageInfo {dealer = dealer,receiver = receiver ,receiverId = receiverId}); 
 
         }
+        /// <summary>
+        /// Update loop. Decreases invincibility time and raises death event when needed.
+        /// </summary>
+        /// <param name="t">Total time in seconds</param>
+        /// <param name="dt">Delta time in seconds</param>
         public override void Update(float t, float dt) {
             foreach (var healthEntity in Game1.Inst.Scene.GetComponents<CHealth>()) {
                 var health = (CHealth)healthEntity.Value;
