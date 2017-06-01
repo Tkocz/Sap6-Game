@@ -139,7 +139,7 @@ namespace GameName.Scenes.Utils {
                     currentScene.AddComponent(id, transformComponent);
                     currentScene.AddComponent(id, new CBody {
                         InvMass = 0.05f,
-                        Aabb = new BoundingBox(-size * Vector3.One, size * Vector3.One),
+                        Aabb = new BoundingBox(-size * new Vector3(1.0f, 2.0f, 1.0f), size * new Vector3(1.0f, 0.0f, 1.0f)),
                         LinDrag = 0.8f,
                         Velocity = Vector3.Zero,
                         Radius = 1f,
