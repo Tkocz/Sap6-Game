@@ -262,13 +262,6 @@ namespace GameName.Systems {
                         }
                     }
                 }
-                // This is an ugly test for adding a score
-                if (currentState.IsKeyDown(Keys.P) && !prevState.IsKeyDown(Keys.P)) {
-                    if (Game1.Inst.Scene.GetType() == typeof(WorldScene)) {
-                        var score = (CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(input.Key);
-                        score.Score++;
-                    }
-                }
                 prevState = currentState;
 
                 addRot = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
