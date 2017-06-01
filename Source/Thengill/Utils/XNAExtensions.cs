@@ -293,7 +293,9 @@ namespace Thengill.Utils
             retval.Radius = message.ReadSingle();
             return retval;
         }
-
+        /************************************/
+        /* Custom methods for game project */
+        /************************************/
         public static CTransform ReadCTransform(this NetBuffer message)
         {
             CTransform retval = new CTransform();

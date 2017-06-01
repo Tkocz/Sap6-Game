@@ -138,12 +138,11 @@ namespace GameName.Scenes
 
             SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
 
-            //add network after init
+            //add network after init since we dont want reinit and lose our connections.
             if (_networkSystem != null)
             {
-
                 var sync = new GameObjectSyncSystem(_networkSystem._isMaster);
-                _networkSystem.InitLight();
+                _networkSystem.AddGameEvents();
                 sync.Init();
                 AddSystem(_networkSystem);
                 AddSystem(sync);

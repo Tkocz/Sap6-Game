@@ -49,10 +49,9 @@ namespace GameName.Systems {
                         attackData.IsAttacking = false;
                     }
                 }
-                
+                /*Adds bounding box for axe rotates around player */
                 var chittransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(p.Key);
                 var cplayertransform = (CTransform) Game1.Inst.Scene.GetComponentFromEntity<CTransform>(attackData.PlayerId);
-                
                 chittransform.Position = cplayertransform.Position + Vector3.Transform(attackData.HitBoxOffset, Matrix.CreateRotationY(cplayertransform.Heading - MathHelper.PiOver2));
                
             }

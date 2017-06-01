@@ -22,7 +22,6 @@ namespace GameName.Systems
     public class GameObjectSyncSystem : EcsSystem
     {
 
-
         private Dictionary<int, CBody> prevCBody = new Dictionary<int, CBody>();
         private Dictionary<int, CTransform> prevTransform = new Dictionary<int, CTransform>();
         private Dictionary<int, CBody> newCBody = new Dictionary<int, CBody>();

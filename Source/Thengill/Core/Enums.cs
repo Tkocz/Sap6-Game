@@ -8,6 +8,7 @@ namespace Thengill.Core
 {
     public static class Enums
     {
+        /// <summary>Enums used for networks system</summary>
         public enum MessageType
         {
             String,

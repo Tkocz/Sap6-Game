@@ -88,8 +88,8 @@ namespace Thengill.Systems
 
             players.Add(new NetworkPlayer { IP = _peer.Configuration.BroadcastAddress.ToString(), Time = _timestart, You = true});
         }
-        /// <summary>A lighter init who is need who is needed when we go from menu to the worldscene</summary>
-        public void InitLight()
+        /// <summary>Adds events need for game </summary>
+        public void AddGameEvents()
         {
 
             DebugOverlay.Inst.DbgStr((a, b) => $"Cons: {_peer.Connections.Count} IsMaster: {_isMaster}");
@@ -97,12 +97,12 @@ namespace Thengill.Systems
             Game1.Inst.Scene.OnEvent("sendentity", data =>
             {
                 var sync = (EntitySync)data;
-                SendCObject(sync.CTransform, sync.CBody, sync.ID, sync.ModelFileName,sync.IsPlayer,false);
+                SendEntity(sync.CTransform, sync.CBody, sync.ID, sync.ModelFileName,sync.IsPlayer,false);
             });
             Game1.Inst.Scene.OnEvent("sendentitylight", data =>
             {
                 var sync = (EntitySync)data;
-                SendCObject(sync.CTransform, sync.CBody, sync.ID, sync.ModelFileName, sync.IsPlayer,true);
+                SendEntity(sync.CTransform, sync.CBody, sync.ID, sync.ModelFileName, sync.IsPlayer,true);
             });
             Game1.Inst.Scene.OnEvent("network_game_end",
             data =>
@@ -122,13 +122,11 @@ namespace Thengill.Systems
         private bool havePeers()
         {
             if(_peer.Connections != null && _peer.Connections.Count > 0)
-                return true;
-
-            _peer.DiscoverLocalPeers(_searchport);
+                return true;;
             return false;
         }
 
-        /// <summary>Send information about newly connected peer to all other peers for faster discovery </summary>
+        /// <summary>Send information about peer so its possible to determine who was in the looby first </summary>
         public void SendPeerPlayerInfo()
         {
             if (havePeers())
@@ -160,7 +158,8 @@ namespace Thengill.Systems
 
             _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
-        public void SendCObject(CTransform cTransform, CBody cBody, int id,string modelfilename, bool IsPlayer, bool isLight)
+        /// <summary>Send an entity containing CTransform cTransform, CBody cBody, int id,string modelfilename</summary>
+        public void SendEntity(CTransform cTransform, CBody cBody, int id,string modelfilename, bool IsPlayer, bool isLight)
         {
             if (!havePeers())
             {
@@ -184,7 +183,10 @@ namespace Thengill.Systems
 
         }
 
-        /// <summary>Send simple string to all peers </summary>
+        /// <summary>
+        /// Send object thats cbody ctransform vector3 int32 string ctext to peers
+        /// Todo add SendEntity to this method.   
+        ///  </summary>
         public void SendObject(object datatosend, object metadata)
         {
             if (!havePeers())
@@ -243,7 +245,6 @@ namespace Thengill.Systems
                     break;
 
             }
-            //ability to send diffrent types of data with ease
             if (MasterNetConnection==null) {
                 _peer.SendMessage(msg, _peer.Connections, NetDeliveryMethod.Unreliable, 0);
             }
@@ -275,7 +276,7 @@ namespace Thengill.Systems
                         }
                         break;
                     case NetIncomingMessageType.ConnectionApproval:
-                        Debug.WriteLine("ReceivePeersData ConnectionApproval");
+                        //Debug.WriteLine("ReceivePeersData ConnectionApproval");
                         _msg.SenderConnection.Approve();
                         //broadcast this to all connected clients
                         SendPeerInfo(_msg.SenderEndPoint.Address, _msg.SenderEndPoint.Port);
@@ -315,9 +316,7 @@ namespace Thengill.Systems
                                 if (_peer.Configuration.LocalAddress.GetHashCode() != endPoint.Address.GetHashCode()
                                     || _peer.Configuration.Port.GetHashCode() != endPoint.Port.GetHashCode())
                                 {
-                                    Debug.WriteLine(
-                                        string.Format("Data::PeerInfo::Initiate new connection to: {0}:{1}",
-                                            endPoint.Address.ToString(), endPoint.Port.ToString()));
+                                    Debug.WriteLine(string.Format("Data::PeerInfo::Initiate new connection to: {0}:{1}", endPoint.Address.ToString(), endPoint.Port.ToString()));
                                     _peer.Connect(endPoint);
                                 }
                             }
@@ -358,7 +357,6 @@ namespace Thengill.Systems
                             {
                                 Game1.Inst.Scene.Raise("game_end", data);
                             }
-                            //Game1.Inst.Scene.Raise("network_data", data);
                         }
                         else if (mType == Enums.MessageType.PlayerInfo)
                         {
@@ -428,7 +426,7 @@ namespace Thengill.Systems
                 s_bpsBytes = 0;
                 remaingTime = 0;
                 if (_scanForPeers) {
-                    SendPeerPlayerInfo();
+                    ScanForNewPeers();
                 }
             }
 
