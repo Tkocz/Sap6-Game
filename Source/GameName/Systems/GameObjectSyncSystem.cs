@@ -19,7 +19,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameName.Systems
 {
-    public class GameObjectSync : EcsSystem
+    public class GameObjectSyncSystem : EcsSystem
     {
 
 
@@ -34,7 +34,7 @@ namespace GameName.Systems
         private const float updateInterval = (float)1 / 20;
         private float remaingTime = 0;
 
-        public GameObjectSync(bool ismaster)
+        public GameObjectSyncSystem(bool ismaster)
         {
             isMaster = ismaster;
         }
