@@ -72,7 +72,7 @@ namespace GameName.Systems {
                         {
                             isInAir = false;
                             isOnGround = true;
-							SfxUtil.PlaySound("Sounds/Effects/jump_end", vol:1);
+							SfxUtil.PlaySound("Sounds/Effects/jump_end", vol:1, randomPitch:true);
 
                         }
                         var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(entity);
@@ -198,7 +198,7 @@ namespace GameName.Systems {
                 }
                 if (currentState.IsKeyDown(Keys.K) && !prevState.IsKeyDown(Keys.K)) {
                     if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(input.Key)) {
-						SfxUtil.PlaySound("Sounds/Effects/Swing", vol:1);
+						SfxUtil.PlaySound("Sounds/Effects/Swing", vol:1, randomPitch: true);
                         var cp = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
                         var p = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(cp.HitId);
                         if (!p.IsAttacking) {
@@ -218,7 +218,7 @@ namespace GameName.Systems {
                     if (transform.Position.Y  > WaterY) {
                         isInAir = true;
                     }
-					SfxUtil.PlaySound("Sounds/Effects/jump_start", vol:1);
+					SfxUtil.PlaySound("Sounds/Effects/jump_start", vol:1, randomPitch: true);
 					var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
 					model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
 

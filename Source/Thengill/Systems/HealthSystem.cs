@@ -83,7 +83,7 @@ namespace Thengill.Systems {
             if(Game1.Inst.Scene.EntityHasComponent<CHealth>(key.Value)) {
                 var health = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(key.Value);
                 if (health.DeathSound != null)
-                    SfxUtil.PlaySound(health.DeathSound);
+                    SfxUtil.PlaySound(health.DeathSound, randomPitch: true);
             }
             if (Game1.Inst.Scene.EntityHasComponent<CAI>(key.Value)) {
                 var aiComp = (CAI)Game1.Inst.Scene.GetComponentFromEntity<CAI>(key.Value);
