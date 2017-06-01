@@ -163,7 +163,8 @@ namespace GameName.Scenes {
                 sendMenuItem(_flocks);
             });
             labels.Add(_flocks);
-
+            /*
+            // Commented out for demo, not ready for the game
             _powerups = CreateLabel("Number of Power-Ups: " + amountsStrings[numPowerUps], () => { // Powerups Select
                 numPowerUps = (numPowerUps + 1) % amountsStrings.Length;
                 UpdateText("Number of Power-Ups: " + amountsStrings[numPowerUps]);
@@ -194,7 +195,7 @@ namespace GameName.Scenes {
                 sendMenuItem(_triggers);
             });
             labels.Add(_triggers);
-
+            */
             CreateLabel("Start Game", () =>
             {
                 WorldSceneConfig configs = null;
