@@ -102,6 +102,7 @@ namespace GameName.Scenes.Utils {
 
                 double animal = rnd.NextDouble();
                 string flockAnimal = animal > 0.66 ? "flossy" : animal > 0.33 ? "goose" : "hen";
+                string deathSound = string.Format("Sounds/Effects/{0}", (flockAnimal == "flossy" ? "SheepDeath" : flockAnimal == "goose" ? "GooseDeath" : "DeathChicken"));
 
                 int flockX = (int)(rnd.NextDouble() * worldsize*2 - worldsize);
                 int flockZ = (int)(rnd.NextDouble() * worldsize*2 - worldsize);
@@ -149,7 +150,7 @@ namespace GameName.Scenes.Utils {
                     });
                     // health value of npcs, maybe change per species/flock/member?
                     var npcHealth = 1;
-                    currentScene.AddComponent(id, new CHealth { MaxHealth = npcHealth, Health = npcHealth });
+                    currentScene.AddComponent(id, new CHealth { MaxHealth = npcHealth, Health = npcHealth, DeathSound = deathSound });
                     currentScene.AddComponent(id, new CAI { Flock = flockId });
                     currentScene.AddComponent(id, new CSyncObject());
 
