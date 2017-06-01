@@ -117,6 +117,8 @@ namespace GameName.Systems {
 
                 Vector3 acceleration = Vector3.Zero;
 
+                if (currentState.IsKeyDown(Keys.LeftShift))
+                    movementSpeed *= 0.4f;
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey)) {
                     var w = transform.Frame.Forward;
 
