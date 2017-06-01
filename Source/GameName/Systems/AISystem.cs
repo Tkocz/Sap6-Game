@@ -18,9 +18,40 @@ namespace GameName.Systems
     {
         public Vector3 curPos;
         public AiState curState;
+        /// <summary>
+        /// Time being scared
+        /// </summary>
+        public float ScaryTime = 2;
+        /// <summary>
+        /// Distance which is considered scary distance from a hit
+        /// </summary>
+        public float ScaryDistance = 10;
         public override void Init() {
             base.Init();
+            Game1.Inst.Scene.OnEvent("hit", handleHit);
         }
+        /// <summary>
+        /// Handler for scaring animals that are close to a hit
+        /// </summary>
+        /// <param name="obj">ID of damage receiver</param>
+        private void handleHit(object obj) {
+            var key = obj as int?;
+            if (!key.HasValue) return;
+            var scene = Game1.Inst.Scene;
+            if (!scene.EntityHasComponent<CTransform>(key.Value))
+                return;
+            var hitLocation = ((CTransform)scene.GetComponentFromEntity<CTransform>(key.Value)).Position;
+            foreach(var aiEntity in scene.GetComponents<CAI>()) {
+                if (!scene.EntityHasComponent<CTransform>(aiEntity.Key)) continue;
+                var aiLocation = ((CTransform)(scene.GetComponentFromEntity<CTransform>(aiEntity.Key))).Position;
+                if(PositionalUtil.Distance(hitLocation, aiLocation) <= ScaryDistance) {
+                    var aiComponent = (CAI)aiEntity.Value;
+                    aiComponent.State = new SEvade(aiEntity.Key);
+                    aiComponent.StateLockTime = ScaryTime;
+                }
+            }
+        }
+
         public override void Update(float t, float dt) {
             // TODO: Make state deciding into fuzzy logic
             foreach (var flockKeyPair in Game1.Inst.Scene.GetComponents<CFlock>()) {
@@ -79,7 +110,7 @@ namespace GameName.Systems
                             if (npcComponent.State.GetType() != typeof(SEvade))
                             {
                                 npcComponent.State = new SEvade(npcKey);
-                                npcComponent.StateLockTime = 2;
+                                npcComponent.StateLockTime = ScaryTime;
                             }
                         }
                         else if ((closeToEnemy & !fastEnemySpeed).IsTrue())
@@ -103,10 +134,10 @@ namespace GameName.Systems
             return FuzzyUtil.SigMF(distance, 20, 0.3);
         }
         private FuzzyNumber MediumToEnemy(float distance) {
-            return (FuzzyUtil.SigMF(distance, 50, 15));
+            return (FuzzyUtil.GaussMF(distance, 50, 15));
         }
         private FuzzyNumber FarToEnemy(float distance) {
-            return (FuzzyUtil.GaussMF(distance, 100, -0.3));
+            return (FuzzyUtil.SigMF(distance, 100, -0.3));
         }
         // Distance to flock
         private FuzzyNumber CloseToFlock(float distance) {

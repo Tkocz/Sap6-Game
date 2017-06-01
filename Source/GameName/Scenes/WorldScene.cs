@@ -281,30 +281,7 @@ namespace GameName.Scenes
                 shouldLeave = true;
                // We reached the goal and wants to leave the scene-
            });
-
-            //OnEvent("collision", data => {
-            //    if (((PhysicsSystem.CollisionInfo)data).Entity1 == player &&
-            //        balls.Contains(((PhysicsSystem.CollisionInfo)data).Entity2))
-            //    {
-            //        var inventory = (CInventory)GetComponentFromEntity<CInventory>(player);
-            //        if (!inventory.isFull && !inventory.inventory.Contains(((PhysicsSystem.CollisionInfo)data).Entity2))
-            //        {
-            //            inventory.inventory.Add(((PhysicsSystem.CollisionInfo)data).Entity2);
-            //            pickUpCount++;
-            //        }
-            //    }
-            //    else if (balls.Contains(((PhysicsSystem.CollisionInfo)data).Entity1) &&
-            //            ((PhysicsSystem.CollisionInfo)data).Entity2 == player)
-            //    {
-            //        var inventory = (CInventory)GetComponentFromEntity<CInventory>(player);
-            //        if (!inventory.isFull && !inventory.inventory.Contains(((PhysicsSystem.CollisionInfo)data).Entity1))
-            //        {
-            //            inventory.inventory.Add(((PhysicsSystem.CollisionInfo)data).Entity1);
-            //            pickUpCount++;
-            //        }
-            //    }
-            //});
-
+            
 
             if ((_networkSystem != null && _networkSystem._isMaster) || _networkSystem == null)
             {
