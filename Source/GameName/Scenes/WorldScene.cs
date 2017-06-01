@@ -142,7 +142,7 @@ namespace GameName.Scenes
             if (_networkSystem != null)
             {
 
-                var sync = new GameObjectSync(_networkSystem._isMaster);
+                var sync = new GameObjectSyncSystem(_networkSystem._isMaster);
                 _networkSystem.InitLight();
                 sync.Init();
                 AddSystem(_networkSystem);
