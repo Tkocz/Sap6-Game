@@ -10,7 +10,7 @@ namespace GameName.Scenes
 {
     class EndGameScene : Scene
     {
-        private const float lifeTime = 10.0f;
+        private const float lifeTime = 30.0f;
         private float passedTime = 0.0f;
         private float gameTime;
         private int score;
@@ -28,17 +28,28 @@ namespace GameName.Scenes
         {
             AddSystem(new Rendering2DSystem());
             base.Init();
-            int text = AddEntity();
-            string winlos = won ? "You win" : "You lose";            
-            winlos = string.Format("Game Over, {0}" +
-                          " Number of animals killed: {1} \n", winlos, score);
-            AddComponent<C2DRenderable>(text, new CText()
+            int textTopId = AddEntity();
+            int textBottomId = AddEntity();
+            string textTop = won ? "You win" : "You lose";            
+            textTop = string.Format("Game Over, {0}", textTop);
+            string textBottom = string.Format("\nNumber of animals killed: {0}", score);
+            SpriteFont font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans");
+            AddComponent<C2DRenderable>(textTopId, new CText()
             {
-
-                font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans"),
-                format = winlos,
+                
+                font = font,
+                format = textTop,
                 color = Color.Black,
-                position = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.5f, Game1.Inst.GraphicsDevice.Viewport.Height * 0.5f),
+                position = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.5f - (font.MeasureString(textTop).X * 0.5f), Game1.Inst.GraphicsDevice.Viewport.Height * 0.5f - (font.MeasureString(textBottom).Y * 0.5f)),
+                origin = Vector2.Zero
+
+            });
+            AddComponent<C2DRenderable>(textBottomId, new CText() {
+
+                font = font,
+                format = textBottom,
+                color = Color.Black,
+                position = new Vector2(Game1.Inst.GraphicsDevice.Viewport.Width * 0.5f - (font.MeasureString(textBottom).X * 0.5f), Game1.Inst.GraphicsDevice.Viewport.Height * 0.5f + (font.MeasureString(textBottom).Y * 0.5f)),
                 origin = Vector2.Zero
 
             });

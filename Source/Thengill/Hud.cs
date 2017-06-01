@@ -62,7 +62,7 @@ public class Hud {
         private SpriteFont mFont;
 
         public Func<string> Str { get; }
-
+        public Color Color { get; set; }
         public override int Width {
             get { return (int)mFont.MeasureString(Str()).X; }
         }
@@ -71,9 +71,9 @@ public class Hud {
             get { return (int)mFont.MeasureString(Str()).Y; }
         }
 
-        public TextVisual(Func<string> str, SpriteFont font=null) {
+        public TextVisual(Func<string> str, Color color, SpriteFont font=null) {
             Str = str;
-
+            Color = color;
             if (font == null) {
                 font = Game1.Inst.Content.Load<SpriteFont>("Fonts/FFFForward");
             }
@@ -82,7 +82,7 @@ public class Hud {
         }
 
         public override void Draw(SpriteBatch sb, int x, int y) {
-            GfxUtil.DrawText(sb, x, y, Str(), mFont, Color.White);
+            GfxUtil.DrawText(sb, x, y, Str(), mFont, Color);
         }
     }
 
@@ -195,8 +195,8 @@ public class Hud {
         return button;
     }
 
-    public TextVisual Text(Func<string> str) {
-        return new TextVisual(str);
+    public TextVisual Text(Func<string> str, Color color) {
+        return new TextVisual(str, color);
     }
 
     public SpriteVisual Sprite(string asset, float scale=1.0f) {
