@@ -198,10 +198,11 @@ namespace GameName.Systems {
                 }
                 if (currentState.IsKeyDown(Keys.K) && !prevState.IsKeyDown(Keys.K)) {
                     if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(input.Key)) {
-						SfxUtil.PlaySound("Sounds/Effects/Swing", vol:1, randomPitch: true);
                         var cp = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
                         var p = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(cp.HitId);
                         if (!p.IsAttacking) {
+                            SfxUtil.PlaySound("Sounds/Effects/Swing", vol: 1, randomPitch: true);
+
                             Game1.Inst.Scene.Raise("attack", new HitSystem.HitInfo {
                                 EntityID = input.Key,
                                 IsAttacking = true,
