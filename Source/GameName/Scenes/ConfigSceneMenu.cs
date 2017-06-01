@@ -28,7 +28,7 @@ namespace GameName.Scenes {
             0,
             5,
             15,
-            50,
+            30,
         };
 
         private string[] maps = new string[]{
