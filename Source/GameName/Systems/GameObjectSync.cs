@@ -28,12 +28,11 @@ namespace GameName.Systems
         private Dictionary<int, CBody> newCBody = new Dictionary<int, CBody>();
         private Dictionary<int, CTransform> newTransform = new Dictionary<int, CTransform>();
         private Random rnd = new Random();
+        private int haveSent;
         private bool isMaster;
         private int counter = 0;
         private const float updateInterval = (float)1 / 20;
-        private const float updateIntervalSlow = (float)1 / 2;
         private float remaingTime = 0;
-        private float remaingTimeSlow = 0;
 
         public GameObjectSync(bool ismaster)
         {
@@ -49,6 +48,7 @@ namespace GameName.Systems
         }
 
 
+        /// <summary> Add or updates objects retrieved by other players </summary>
         private void addOrUpdatCObjects(EntitySync data)
         {
             //Add entity
@@ -113,9 +113,11 @@ namespace GameName.Systems
                 }
             }
         }
-        private void syncObjects()
+        
+        /// <summary> Sync objects thats have the Component CSyncObject to other players </summary>
+        private void syncObjects(float dt)
         {
-            counter++;
+           
             foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
             {
 
@@ -127,21 +129,14 @@ namespace GameName.Systems
                     var cbody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(pair.Key);
                     var isPlayer = Game1.Inst.Scene.EntityHasComponent<CPlayer>(pair.Key);
 
-                    /*var totalspeed = Math.Sqrt(Math.Pow(cbody.Velocity.X, 2) + Math.Pow(cbody.Velocity.Z, 2));
-                    if (counter > 10 && remaingTimeSlow < updateIntervalSlow && (totalspeed < 1 || totalspeed > -1))
-                    {
-                        continue;
-                    }
-                    else {*/
-                        if (counter < 10 || counter % 10000 == 0)
-                            Game1.Inst.Scene.Raise("sendentity", new EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
-                        else
-                            Game1.Inst.Scene.Raise("sendentitylight", new EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
-                    //}
-                    if (counter == 10000)
-                    {
-                        counter = 10;
-                    }
+                    if ((int)dt % 60 == 0 || haveSent < 10)// Send whole object 10 time to be safe then time every minute
+                        Game1.Inst.Scene.Raise("sendentity", new EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
+                    else
+                        Game1.Inst.Scene.Raise("sendentitylight", new EntitySync() { CBody = cbody, CTransform = ctransform, ID = pair.Key, ModelFileName = model.fileName, IsPlayer = isPlayer });
+                }
+                if (haveSent < 10)
+                {
+                    haveSent++;
                 }
             }
         }
@@ -150,16 +145,11 @@ namespace GameName.Systems
         public override void Update(float t, float dt)
         {
             remaingTime += dt;
-            remaingTimeSlow += dt;
             if (remaingTime > updateInterval)
             {
-                syncObjects();
+                syncObjects(dt);
                 remaingTime = 0;
             }
-            if (remaingTimeSlow > updateIntervalSlow)
-                remaingTimeSlow = 0;
-
-
 
             //Todo Impliment Prediction for player movement
             /*foreach (var pair in Game1.Inst.Scene.GetComponents<CSyncObject>())
@@ -178,7 +168,9 @@ namespace GameName.Systems
                 var transform = (CTransform) Game1.Inst.Scene.GetComponentFromEntity<CTransform>(key);
                 var newtransform = newTransform[key];
                 var newcbody = newCBody[key];
-                //Smooth
+                
+               
+                //Smoothing
                 cbody.Velocity = Vector3.Lerp(cbody.Velocity, newcbody.Velocity, 0.1f);
                 transform.Position = Vector3.Lerp(transform.Position, newtransform.Position, 0.1f);
                 transform.Scale = Vector3.Lerp(transform.Scale, newtransform.Scale, 0.1f);

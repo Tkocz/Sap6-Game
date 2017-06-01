@@ -88,7 +88,7 @@ namespace Thengill.Systems
 
             players.Add(new NetworkPlayer { IP = _peer.Configuration.BroadcastAddress.ToString(), Time = _timestart, You = true});
         }
-
+        /// <summary>A lighter init who is need who is needed when we go from menu to the worldscene</summary>
         public void InitLight()
         {
 
@@ -421,8 +421,6 @@ namespace Thengill.Systems
             MessageLoop();
 
             remaingTime += dt;
-
-
             //Dirty remove later
             if (remaingTime > updateInterval)
             {
