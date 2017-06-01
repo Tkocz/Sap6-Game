@@ -200,7 +200,7 @@ namespace GameName.Scenes
             AddComponent(player, new CSyncObject { fileName = "viking" });
 
             AddComponent(player, new CInventory());
-            AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
+            AddComponent(player, new CHealth { MaxHealth = 3, Health = 3, DeathSound = "Sounds/Effects/DeathHuman" });
 			AddComponent(player, new CScore { });
             /*
             AddComponent(player, new CLogic {
