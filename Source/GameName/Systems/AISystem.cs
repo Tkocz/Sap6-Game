@@ -14,10 +14,11 @@ using GameName.Components;
 
 namespace GameName.Systems
 {
+    /// <summary>
+    /// System for handling AI in the game.
+    /// </summary>
     public class AISystem : EcsSystem
     {
-        public Vector3 curPos;
-        public AiState curState;
         /// <summary>
         /// Time being scared
         /// </summary>
@@ -53,12 +54,10 @@ namespace GameName.Systems
         }
 
         public override void Update(float t, float dt) {
-            // TODO: Make state deciding into fuzzy logic
             foreach (var flockKeyPair in Game1.Inst.Scene.GetComponents<CFlock>()) {
                 var flock = (CFlock)flockKeyPair.Value;
-                //var flockTransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(flockKeyPair.Key);
 
-                // Calculate flock centroid and avg velocity
+                // Calculate flock centroid and avg velocity (used in some states)
                 Vector3 theCenter = Vector3.Zero;
                 Vector3 theVelocity = Vector3.Zero;
                 foreach (var npcKey in flock.Members) {
@@ -107,8 +106,7 @@ namespace GameName.Systems
                         // Test rules and set state accordingly
                         if ((closeToEnemy & fastEnemySpeed).IsTrue())
                         {
-                            if (npcComponent.State.GetType() != typeof(SEvade))
-                            {
+                            if (npcComponent.State.GetType() != typeof(SEvade)) {
                                 npcComponent.State = new SEvade(npcKey);
                                 npcComponent.StateLockTime = ScaryTime;
                             }
