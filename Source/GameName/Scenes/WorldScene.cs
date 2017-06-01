@@ -47,6 +47,7 @@ namespace GameName.Scenes
             if (shouldLeave) // TODO: When we parallelise this probably won't work.
             {
                 CScore score = (CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(player);
+                SfxUtil.PlaySound("Sounds/Effects/horny_end");
                 Game1.Inst.LeaveScene();
                 Game1.Inst.EnterScene(new EndGameScene(passedTime, score.Score, won));
             }
@@ -339,6 +340,8 @@ namespace GameName.Scenes
             Log.GetLog().Debug("WorldScene initialized.");
 
             InitHud();
+
+            SfxUtil.PlaySound("Sounds/Effects/horn_start");
 
             var billboards = new [] {
                 new Tuple<string, float>("Grass", 1.0f),
