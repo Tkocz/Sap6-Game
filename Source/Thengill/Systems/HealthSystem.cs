@@ -7,21 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Thengill.Systems.PhysicsSystem;
-using Thengill.Utils;
 
 namespace Thengill.Systems {
     public class HealthSystem : EcsSystem {
         public override void Init() {
             // Create event hooks for damage
+            Game1.Inst.Scene.OnEvent("collision", HandleDamage);
             Game1.Inst.Scene.OnEvent("collision", HandleDamageSword);
-            Game1.Inst.Scene.OnEvent("hit", HandleDeath);
             Game1.Inst.Scene.OnEvent("death", HandleDeath);
+            Game1.Inst.Scene.OnEvent("makedamage", MakeDamageHandler);
         }
 
         public DateTime lasthitTime = DateTime.Now;
         private void HandleDamage(object data)
         {
-            //HandleDamageSword(data);
             var coll = data as CollisionInfo?;
             if (!coll.HasValue) return;
             var collision = coll.Value;
@@ -68,11 +67,8 @@ namespace Thengill.Systems {
                 }
                 // if entity has invincibility time left, no damage dealt
                 if (receiver.InvincibilityTime > 0) return;
-                receiver.Health -= receiver.DamageResistance * 1; // TODO: hard coded damage should be replaced to component-based solution
-                receiver.InvincibilityTime = 1; // TODO: change hard coded time to something more appropraiate
-                Game1.Inst.Scene.Raise("hit", receiverId);
-                if (Game1.Inst.Scene.EntityHasComponent<CScore>(dealer))
-                    ((CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(dealer)).Score++;
+
+                Game1.Inst.Scene.Raise("makedamage", new DamageInfo {dealer = dealer,receiver = receiver ,receiverId = receiverId}); 
             }
         }
         private void HandleDeath(object data) {
@@ -80,11 +76,6 @@ namespace Thengill.Systems {
             if (!key.HasValue)
                 return;
             // dead
-            if(Game1.Inst.Scene.EntityHasComponent<CHealth>(key.Value)) {
-                var health = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(key.Value);
-                if (health.DeathSound != null)
-                    SfxUtil.PlaySound(health.DeathSound, randomPitch: true);
-            }
             if (Game1.Inst.Scene.EntityHasComponent<CAI>(key.Value)) {
                 var aiComp = (CAI)Game1.Inst.Scene.GetComponentFromEntity<CAI>(key.Value);
                 var flock = (CFlock)Game1.Inst.Scene.GetComponentFromEntity<CFlock>(aiComp.Flock);
@@ -92,7 +83,16 @@ namespace Thengill.Systems {
             }
             Game1.Inst.Scene.RemoveEntity(key.Value);
         }
-        private List<int> dealers = new List<int>(); 
+
+        private void MakeDamageHandler(object data)
+        {
+            DamageInfo damageinfo = data as DamageInfo;
+            damageinfo.receiver.Health -= damageinfo.receiver.DamageResistance * 1; // TODO: hard coded damage should be replaced to component-based solution
+            damageinfo.receiver.InvincibilityTime = 1; // TODO: change hard coded time to something more appropraiate
+            Game1.Inst.Scene.Raise("hit", damageinfo.receiverId);
+            if (Game1.Inst.Scene.EntityHasComponent<CScore>(damageinfo.dealer))
+                ((CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(damageinfo.dealer)).Score++;
+        }
         private void HandleDamageSword(object data)
         {
             
@@ -144,18 +144,10 @@ namespace Thengill.Systems {
                 return;
 
             if (receiver.InvincibilityTime > 0) return;
-            receiver.Health -= receiver.DamageResistance * 1; // TODO: hard coded damage should be replaced to component-based solution
-            receiver.InvincibilityTime = 1; // TODO: change hard coded time to something more appropraiate
-            Game1.Inst.Scene.Raise("hit", receiverId);
-            if (Game1.Inst.Scene.EntityHasComponent<CScore>(dealer))
-                ((CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(dealer)).Score++;
 
+            Game1.Inst.Scene.Raise("makedamage", new DamageInfo {dealer = dealer,receiver = receiver ,receiverId = receiverId}); 
 
         }
-
-        private float remaingTime = 0;
-        private float updateInterval;
-
         public override void Update(float t, float dt) {
             foreach (var healthEntity in Game1.Inst.Scene.GetComponents<CHealth>()) {
                 var health = (CHealth)healthEntity.Value;
@@ -166,6 +158,13 @@ namespace Thengill.Systems {
                 // decrease invincibility time
                 health.InvincibilityTime = health.InvincibilityTime > 0 ? health.InvincibilityTime - dt : 0;
             }
+        }
+
+        public class DamageInfo
+        {
+            public CHealth receiver;
+            public int dealer;
+            public int receiverId;
         }
     }
 }
