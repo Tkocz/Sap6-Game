@@ -18,6 +18,7 @@ namespace GameName.Scenes
 {
     public class WorldScene : Scene
     {
+        private float roundTime = 120.0f;
         private float passedTime = 0.0f;
         private bool shouldLeave = false;
         private Random rnd = new Random();
@@ -45,8 +46,10 @@ namespace GameName.Scenes
         {
             if (shouldLeave) // TODO: When we parallelise this probably won't work.
             {
+                CScore score = (CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(player);
+                SfxUtil.PlaySound("Sounds/Effects/horny_end");
                 Game1.Inst.LeaveScene();
-                Game1.Inst.EnterScene(new EndGameScene(passedTime, pickUpCount,won));
+                Game1.Inst.EnterScene(new EndGameScene(passedTime, score.Score, won));
             }
 
             var camera = (CCamera)GetComponentFromEntity<CCamera>(player);
@@ -338,6 +341,8 @@ namespace GameName.Scenes
 
             InitHud();
 
+            SfxUtil.PlaySound("Sounds/Effects/horn_start");
+
             var billboards = new [] {
                 new Tuple<string, float>("Grass", 1.0f),
                 new Tuple<string, float>("Grass", 1.0f),
@@ -457,10 +462,21 @@ namespace GameName.Scenes
             var screenWidth = Game1.Inst.GraphicsDevice.Viewport.Width;
             var score = (CScore)GetComponentFromEntity<CScore>(player);
             //var textSize = 
+            SpriteFont font = Game1.Inst.Content.Load<SpriteFont>("Fonts/FFFForward");
+            Vector2 lengthtop = font.MeasureString("Time Left");
+            Vector2 lengthbottom = font.MeasureString("000");
+
+            mHud.Button("timelefttop", screenWidth / 2 - (int)lengthtop.X / 2, 10, mHud.Text(() => {
+                return string.Format("Time Left:");
+            }, Color.Black));
+            mHud.Button("timeleftbottom", screenWidth / 2 - (int)lengthbottom.X / 2, 12 + (int)lengthtop.Y, mHud.Text(() => {
+                
+                return string.Format("{0:000}", (int)(roundTime - passedTime));
+            }, Color.Black));
             mHud.Button("score", screenWidth-60, 80, mHud.Text(() =>
             {
                 return string.Format("Score: {0}", score.Score);
-            }), horAnchor: Hud.HorizontalAnchor.Right);
+            }, Color.White), horAnchor: Hud.HorizontalAnchor.Right);
             var heart = (CHealth) Game1.Inst.Scene.GetComponentFromEntity<CHealth>(player);
             for (int i = 0; i <heart.Health; i++)
             {
@@ -472,6 +488,11 @@ namespace GameName.Scenes
         public override void Update(float t, float dt)
         {
             passedTime += dt;
+
+            if(passedTime > roundTime) {
+                // TODO: network ending.
+                Game1.Inst.Scene.Raise("game_end", player);
+            }
 
             // TODO: Move to more appropriate location, only trying out heart rotation looks
             foreach(var comp in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {

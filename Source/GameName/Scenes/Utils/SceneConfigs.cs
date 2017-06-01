@@ -49,6 +49,11 @@ namespace GameName.Scenes.Utils {
                 Playerz = 0;
                 Playerx = 0;
                 colorsMap = createColorsTropical();
+
+                LightConfig.FogEnabled = true;
+                LightConfig.FogStart = 35;
+                LightConfig.FogEnd = 100;
+                LightConfig.ClearColor = new Vector3(0.4f, 0.7f, 0.9f);
             }
             else if (Map == "UpNorth")
             {
@@ -60,6 +65,11 @@ namespace GameName.Scenes.Utils {
                 Playerz = -49;
                 Playerx = -62;
                 colorsMap = createColors();
+
+                LightConfig.FogEnabled = true;
+                LightConfig.FogStart = 10;
+                LightConfig.FogEnd = 90;
+                LightConfig.ClearColor = new Vector3(0.45f, 0.5f, 0.6f);
             }
         }
 
