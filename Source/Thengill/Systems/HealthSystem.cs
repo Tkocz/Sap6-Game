@@ -12,7 +12,7 @@ namespace Thengill.Systems {
     public class HealthSystem : EcsSystem {
         public override void Init() {
             // Create event hooks for damage
-            Game1.Inst.Scene.OnEvent("collision", HandleDamage);
+            Game1.Inst.Scene.OnEvent("collision", HandleDamageSword);
             Game1.Inst.Scene.OnEvent("hit", HandleDeath);
             Game1.Inst.Scene.OnEvent("death", HandleDeath);
         }
@@ -20,7 +20,7 @@ namespace Thengill.Systems {
         public DateTime lasthitTime = DateTime.Now;
         private void HandleDamage(object data)
         {
-            HandleDamageSword(data);
+            //HandleDamageSword(data);
             var coll = data as CollisionInfo?;
             if (!coll.HasValue) return;
             var collision = coll.Value;
@@ -121,7 +121,6 @@ namespace Thengill.Systems {
             }
             else
             {
-                //Shoulnt happend;
                 return;
             }
 
@@ -129,7 +128,7 @@ namespace Thengill.Systems {
 
             CHealth receiver = null;
             int dealer = 0;
-            if (chit.AnimationProgress > 0.50  && chit.LastSpashed - DateTime.Now > TimeSpan.FromSeconds(1))
+            if(true)
             {
                 receiver = h1;
                 dealer = chit.PlayerId;
