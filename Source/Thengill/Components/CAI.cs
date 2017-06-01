@@ -19,5 +19,9 @@ namespace Thengill.Components
         /// Flock entity ID
         /// </summary>
         public int Flock = -1;
+        /// <summary>
+        /// Time which enables temporary locking of a certain AI state
+        /// </summary>
+        public float StateLockTime = 0;
     }
 }
