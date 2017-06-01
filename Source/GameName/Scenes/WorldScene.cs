@@ -45,8 +45,9 @@ namespace GameName.Scenes
         {
             if (shouldLeave) // TODO: When we parallelise this probably won't work.
             {
+                CScore score = (CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(player);
                 Game1.Inst.LeaveScene();
-                Game1.Inst.EnterScene(new EndGameScene(passedTime, pickUpCount,won));
+                Game1.Inst.EnterScene(new EndGameScene(passedTime, score.Score, won));
             }
 
             var camera = (CCamera)GetComponentFromEntity<CCamera>(player);
@@ -466,6 +467,11 @@ namespace GameName.Scenes
         public override void Update(float t, float dt)
         {
             passedTime += dt;
+
+            if(passedTime > 120.0f) {
+                // TODO: network ending.
+                Game1.Inst.Scene.Raise("game_end", player);
+            }
 
             // TODO: Move to more appropriate location, only trying out heart rotation looks
             foreach(var comp in Game1.Inst.Scene.GetComponents<C3DRenderable>()) {

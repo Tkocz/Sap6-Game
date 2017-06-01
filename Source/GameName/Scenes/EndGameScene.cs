@@ -13,14 +13,14 @@ namespace GameName.Scenes
         private const float lifeTime = 10.0f;
         private float passedTime = 0.0f;
         private float gameTime;
-        private int ballCount;
+        private int score;
         private bool won;
 
-        public EndGameScene(float gameTime, int ballCount, bool won)
+        public EndGameScene(float gameTime, int score, bool won)
         {
 
             this.gameTime = gameTime;
-            this.ballCount = ballCount;
+            this.score = score;
             this.won = won;
         }
 
@@ -31,8 +31,7 @@ namespace GameName.Scenes
             int text = AddEntity();
             string winlos = won ? "You win" : "You lose";            
             winlos = string.Format("Game Over, {0}" +
-                          " Your Time: {1} \n" +
-                          " You picked up {2} number of balls", winlos, gameTime,ballCount);
+                          " Number of animals killed: {1} \n", winlos, score);
             AddComponent<C2DRenderable>(text, new CText()
             {
 
