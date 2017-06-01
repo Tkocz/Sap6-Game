@@ -95,31 +95,6 @@ namespace GameName.Systems {
                 }
                 var transform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(input.Key);
                 var inputValue = (CInput)input.Value;
-                /*if (Game1.Inst.Scene.EntityHasComponent<CCamera>(input.Key))
-                {
-                    CCamera cameraComponent = (CCamera)Game1.Inst.Scene.GetComponentFromEntity<CCamera>(input.Key);
-
-                    if (currentState.IsKeyDown(inputValue.CameraMovementForward))
-                    {
-                        transform.Position += CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
-                        cameraComponent.Target += CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
-                    }
-                    if (currentState.IsKeyDown(inputValue.CameraMovementBackward))
-                    {
-                        transform.Position -= CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
-                        cameraComponent.Target -= CAMERASPEED * new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), 0, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f)));
-                    }
-                    if (currentState.IsKeyDown(inputValue.CameraMovementLeft))
-                    {
-                        cameraComponent.Heading -= 0.05f;
-                        transform.Position = Vector3.Subtract(cameraComponent.Target, new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), cameraComponent.Height, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f))));
-                    }
-                    if (currentState.IsKeyDown(inputValue.CameraMovementRight))
-                    {
-                        cameraComponent.Heading += 0.05f;
-                        transform.Position = Vector3.Subtract(cameraComponent.Target, new Vector3((float)(cameraComponent.Distance * Math.Sin(cameraComponent.Heading + Math.PI * 0.5f)), cameraComponent.Height, (float)((-cameraComponent.Distance) * Math.Cos(cameraComponent.Heading + Math.PI * 0.5f))));
-                    }
-                }*/
 
                 //For Network Chat
                 foreach (Keys key in pressedKeys)
@@ -142,6 +117,8 @@ namespace GameName.Systems {
 
                 Vector3 acceleration = Vector3.Zero;
 
+                if (currentState.IsKeyDown(Keys.LeftShift))
+                    movementSpeed *= 0.4f;
                 if (currentState.IsKeyDown(inputValue.ForwardMovementKey)) {
                     var w = transform.Frame.Forward;
 
@@ -217,7 +194,7 @@ namespace GameName.Systems {
                 if (currentState.IsKeyDown(inputValue.RightMovementKey)) {
                     yaw = -rotationSpeed;
                 }
-                if (currentState.IsKeyDown(Keys.RightShift) && !prevState.IsKeyDown(Keys.RightShift)) {
+                if (currentState.IsKeyDown(Keys.K) && !prevState.IsKeyDown(Keys.K)) {
                     if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(input.Key)) {
 						SfxUtil.PlaySound("Sounds/Effects/Swing", vol:1);
                         var cp = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
@@ -243,7 +220,7 @@ namespace GameName.Systems {
 					model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
 
                 }
-                if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
+                if (currentState.IsKeyDown(Keys.H) && !prevState.IsKeyDown(Keys.H))
                 {
                     if (Game1.Inst.Scene.GetType() == typeof(WorldScene))
                     {
@@ -266,7 +243,7 @@ namespace GameName.Systems {
                         }
                     }
                 }
-                if (currentState.IsKeyDown(Keys.LeftControl) && !prevState.IsKeyDown(Keys.LeftControl))
+                if (currentState.IsKeyDown(Keys.J) && !prevState.IsKeyDown(Keys.J))
                 {
                     if (Game1.Inst.Scene.EntityHasComponent<CInventory>(input.Key))
                     {
@@ -283,13 +260,6 @@ namespace GameName.Systems {
                             inv.items.Remove(item);
                             inv.itemsToRemove.Add(newItem);
                         }
-                    }
-                }
-                // This is an ugly test for adding a score
-                if (currentState.IsKeyDown(Keys.P) && !prevState.IsKeyDown(Keys.P)) {
-                    if (Game1.Inst.Scene.GetType() == typeof(WorldScene)) {
-                        var score = (CScore)Game1.Inst.Scene.GetComponentFromEntity<CScore>(input.Key);
-                        score.Score++;
                     }
                 }
                 prevState = currentState;

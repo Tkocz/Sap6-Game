@@ -23,7 +23,7 @@
 
 #begin Sounds/Music/MainMenu.mp3
 /importer:Mp3Importer
-/processor:SoundEffectProcessor
+/processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Music/MainMenu.mp3
 
@@ -871,7 +871,7 @@
 
 #begin Sounds/Effects/Swing.mp3
 /importer:Mp3Importer
-/processor:SoundEffectProcessor
+/processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Effects/Swing.mp3
 
