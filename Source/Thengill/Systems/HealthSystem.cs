@@ -16,7 +16,7 @@ namespace Thengill.Systems {
             Game1.Inst.Scene.OnEvent("hit", HandleDeath);
             Game1.Inst.Scene.OnEvent("death", HandleDeath);
         }
-      
+
         public DateTime lasthitTime = DateTime.Now;
         private void HandleDamage(object data)
         {
@@ -53,9 +53,10 @@ namespace Thengill.Systems {
             var e1IsJumper = Game1.Inst.Scene.EntityHasComponent<CInput>(e1);
 
 
-            
+
             // Check for damage collision (testing for jumping on something)
-            if (Vector3.Dot(collision.Normal, Vector3.Up) > Math.Cos(MathHelper.PiOver4)) {
+            if (Vector3.Dot(collision.Normal, Vector3.Up) > Math.Cos(MathHelper.PiOver4) ||
+                Vector3.Dot(-collision.Normal, Vector3.Up) > Math.Cos(MathHelper.PiOver4)) {
                 var receiver = h1;
                 var receiverId = e1;
                 var dealer = e2;
@@ -156,7 +157,7 @@ namespace Thengill.Systems {
                 if(health.Health <= 0) {
                     Game1.Inst.Scene.Raise("death", healthEntity.Key);
                 }
-               
+
                 // decrease invincibility time
                 health.InvincibilityTime = health.InvincibilityTime > 0 ? health.InvincibilityTime - dt : 0;
             }

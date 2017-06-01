@@ -119,6 +119,8 @@ namespace Thengill {
                          "entity.m_Scene is not null!");*/
 
             EntityCounter = rnd.Next(0, int.MaxValue);
+            while (m_Entities.Contains(EntityCounter))
+                EntityCounter = rnd.Next(0, int.MaxValue);
             m_Entities.Add(EntityCounter);
             return EntityCounter;
         }

@@ -103,11 +103,9 @@ namespace GameName.Scenes.Utils {
                 double animal = rnd.NextDouble();
                 string flockAnimal = animal > 0.66 ? "flossy" : animal > 0.33 ? "goose" : "hen";
 
-                // TODO: get the global value of the worldsize
-                int flockX = (int)(rnd.NextDouble() * worldsize);
-                int flockZ = (int)(rnd.NextDouble() * worldsize);
+                int flockX = (int)(rnd.NextDouble() * worldsize*2 - worldsize);
+                int flockZ = (int)(rnd.NextDouble() * worldsize*2 - worldsize);
                 CTransform flockTransform = new CTransform { Position = new Vector3(flockX, 0, flockZ) };
-                flockTransform.Position += new Vector3(-worldsize, 0, -worldsize);
 
                 for (int i = 0; i < membersPerFlock; i++) {
                     int id = currentScene.AddEntity();
@@ -141,7 +139,7 @@ namespace GameName.Scenes.Utils {
                     currentScene.AddComponent(id, transformComponent);
                     currentScene.AddComponent(id, new CBody {
                         InvMass = 0.05f,
-                        Aabb = new BoundingBox(-size * Vector3.One, size * Vector3.One),
+                        Aabb = new BoundingBox(-size * new Vector3(1.0f, 2.0f, 1.0f), size * new Vector3(1.0f, 0.0f, 1.0f)),
                         LinDrag = 0.8f,
                         Velocity = Vector3.Zero,
                         Radius = 1f,
@@ -228,6 +226,8 @@ namespace GameName.Scenes.Utils {
             elementList.Add(245, new Tuple<string, float, float, Func<float, float>>("PalmTree",    1.0f,   1f,     treeFn));
             elementList.Add(235, new Tuple<string, float, float, Func<float, float>>("tree",        0.5f,   1.2f,   treeFn));
             elementList.Add(170, new Tuple<string, float, float, Func<float, float>>("rock2",       0.1f,   1.6f,   rockFn));
+			elementList.Add(225, new Tuple<string, float, float, Func<float, float>>("pinetree",    0.5f,   1.2f,   treeFn));
+
 
                         var matDic = new Dictionary<int, MaterialShader>();
                         matDic = null;

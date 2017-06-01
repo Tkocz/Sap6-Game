@@ -28,7 +28,7 @@ namespace GameName.Scenes {
             0,
             5,
             15,
-            50,
+            30,
         };
 
         private string[] maps = new string[]{
@@ -97,7 +97,6 @@ namespace GameName.Scenes {
             {
                 addWatingForPlayers();
                 OnEvent("update_peers", updatePeers);
-                OnEvent("selchanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
             }
             else
             {
@@ -105,6 +104,8 @@ namespace GameName.Scenes {
                 SfxUtil.PlayMusic("Sounds/Music/MainMenu");
                 CreateLabels();
             }
+
+            OnEvent("selchanged", data => SfxUtil.PlaySound("Sounds/Effects/Click"));
 
         }
 

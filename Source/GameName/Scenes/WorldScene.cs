@@ -259,7 +259,7 @@ namespace GameName.Scenes
                 Func<Vector3> rndVel = () => new Vector3((float)rnd.NextDouble() - 0.5f,
                                                          (float)rnd.NextDouble(),
                                                          (float)rnd.NextDouble() - 0.5f);
-                mParticleSys.SpawnParticles(50, () => new EcsComponent[] {
+                mParticleSys.SpawnParticles(100, () => new EcsComponent[] {
                     new CParticle     { Position = transform.Position,
                                         Velocity = 6.0f*rndVel(),
                                         Life     = 1.7f,
@@ -384,7 +384,7 @@ namespace GameName.Scenes
                 });
             }
 
-            CreatePlatforms(heightmap);
+            //CreatePlatforms(heightmap);
 
         }
 
@@ -452,13 +452,19 @@ namespace GameName.Scenes
 
         public void InitHud() {
             mHud = new Hud();
-            // Example of how to create hud elements.
-            mHud.Button("Click me",10, 10, mHud.Text(() => "Click me (and check log)"))
-                .OnClick(() => Console.WriteLine("Text button clicked."));
+            //mHud.Button("Click me",10, 10, mHud.Text(() => "Click me (and check log)"))
+            //    .OnClick(() => Console.WriteLine("Text button clicked."));
+            var screenWidth = Game1.Inst.GraphicsDevice.Viewport.Width;
+            var score = (CScore)GetComponentFromEntity<CScore>(player);
+            //var textSize = 
+            mHud.Button("score", screenWidth-60, 80, mHud.Text(() =>
+            {
+                return string.Format("Score: {0}", score.Score);
+            }), horAnchor: Hud.HorizontalAnchor.Right);
             var heart = (CHealth) Game1.Inst.Scene.GetComponentFromEntity<CHealth>(player);
             for (int i = 0; i <heart.Health; i++)
             {
-                mHud.Button("heart"+i, 1050 + i*(50), 12, mHud.Sprite("Textures/Heart", 0.15f));
+                mHud.Button("heart"+i, screenWidth - 50 - i*50, 0, mHud.Sprite("Textures/Heart", 0.15f), vertAnchor: Hud.VerticalAnchor.Center, horAnchor: Hud.HorizontalAnchor.Right);
             }
 
         }

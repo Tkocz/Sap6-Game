@@ -33,11 +33,11 @@ public class Hud {
         private Texture2D mSprite;
 
         public override int Width {
-            get { return mSprite.Width; }
+            get { return (int)(mSprite.Width * mScale); }
         }
 
         public override int Height {
-            get { return mSprite.Height; }
+            get { return (int)(mSprite.Height * mScale); }
         }
 
         public SpriteVisual(string asset, float scale=1.0f) {
