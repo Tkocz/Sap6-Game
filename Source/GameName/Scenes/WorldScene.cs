@@ -200,7 +200,7 @@ namespace GameName.Scenes
             AddComponent(player, new CSyncObject { fileName = "viking" });
 
             AddComponent(player, new CInventory());
-            AddComponent(player, new CHealth { MaxHealth = 3, Health = 3 });
+            AddComponent(player, new CHealth { MaxHealth = 3, Health = 3, DeathSound = "Sounds/Effects/entia" });
 			AddComponent(player, new CScore { });
             /*
             AddComponent(player, new CLogic {
@@ -272,7 +272,7 @@ namespace GameName.Scenes
                                         Rotation = Matrix.Identity,
                                         Scale    = rndSize()*Vector3.One } });
                 SceneUtils.CreateSplatter(transform.Position.X, transform.Position.Z, heightmap);
-                SfxUtil.PlaySound("Sounds/Effects/Hit");
+                SfxUtil.PlaySound("Sounds/Effects/Hit", randomPitch: true);
             });
 
            OnEvent("game_end", data =>

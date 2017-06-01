@@ -1,19 +1,20 @@
 namespace Thengill.Utils {
 
-//--------------------------------------
-// USINGS
-//--------------------------------------
+    //--------------------------------------
+    // USINGS
+    //--------------------------------------
 
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Audio;
+    using Microsoft.Xna.Framework.Media;
+    using Microsoft.Xna.Framework.Audio;
+    using System;
 
-//--------------------------------------
-// CLASSES
-//--------------------------------------
+    //--------------------------------------
+    // CLASSES
+    //--------------------------------------
 
-/// <summary>Provides basic functionality for audio playback.</summary>
+    /// <summary>Provides basic functionality for audio playback.</summary>
 public static class SfxUtil {
-
+    private static Random rnd = new Random();
 //--------------------------------------
 // PUBLIC METHODS
 //--------------------------------------
@@ -29,11 +30,11 @@ public static void PlayMusic(string name) {
 /// <param name="vol">The volume to use for playback (1.0 = 100%).</param>
 /// <param name="pitch">The pitch to use for playback (0.0 = original).</param>
 /// <param name="pan">The pan to use (left-right, 0.0 = center).</param>
-public static void PlaySound(string name, float vol=1.0f, float pitch=0.0f, float pan=0.0f) {
+public static void PlaySound(string name, float vol=1.0f, float pitch=0.0f, float pan=0.0f, bool randomPitch = false) {
     // TODO: We probably want to store this in some lookup table even though MonoGame stores a
     //       lookup table internally, see link:
     // https://github.com/labnation/MonoGame/blob/master/MonoGame.Framework/Content/ContentManager.cs#L197
-    Game1.Inst.Content.Load<SoundEffect>(name).Play(vol, pitch, pan);
+    Game1.Inst.Content.Load<SoundEffect>(name).Play(vol, randomPitch ? (float)(pitch + rnd.NextDouble()*0.4 - 0.2) : pitch, pan);
 }
 
 }

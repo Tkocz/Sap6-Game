@@ -875,3 +875,51 @@
 /processorParam:Quality=Best
 /build:Sounds/Effects/Swing.mp3
 
+#begin Sounds/Effects/DeathChicken.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/DeathChicken.mp3
+
+#begin Sounds/Effects/DeathHuman.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/DeathHuman.mp3
+
+#begin Sounds/Effects/entia.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/entia.mp3
+
+#begin Sounds/Effects/GooseDeath.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/GooseDeath.mp3
+
+#begin Sounds/Effects/jump_end.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/jump_end.mp3
+
+#begin Sounds/Effects/jump_start.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/jump_start.mp3
+
+#begin Sounds/Effects/SheepDeath.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/SheepDeath.mp3
+
+#begin Sounds/Effects/SwingHit.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Effects/SwingHit.mp3
+
