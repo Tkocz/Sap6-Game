@@ -36,6 +36,7 @@ namespace GameName.Scenes
 
         public WorldScene(WorldSceneConfig configs) {
             this.configs = configs;
+            LightConfig = configs.LightConfig;
             if(configs.Network != null)
                 _networkSystem = configs.Network;
         }
@@ -76,31 +77,27 @@ namespace GameName.Scenes
 
         public void InitGameComponents()
         {
-            Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
-        }
-        private void InitSceneLightSettings()
-        {
-            DiffuseColor = new Vector3(1, 0.9607844f, 0.8078432f);
-            Direction = new Vector3(-0.5265408f, - 0.5735765f, - 0.6275069f);
-            SpecularColor = new Vector3(1, 0.9607844f, 0.8078432f);
-            AmbientColor = new Vector3(0.05333332f, 0.09882354f, 0.1819608f);
+            //Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
         }
         public override void Init()
         {
             InitGameComponents();
-            InitSceneLightSettings();
 
             mPostProcessor = new PostProcessor();
             mUnderWaterFx = Game1.Inst.Content.Load<Effect>("Effects/UnderWater");
-            mRT = GfxUtil.CreateRT();     
+            mRT = GfxUtil.CreateRT();
 
             var physicsSys = new PhysicsSystem();
             physicsSys.Bounds = new BoundingBox(-worldSize * Vector3.One, worldSize * Vector3.One);
             physicsSys.InvSpatPartSize = 0.07f;
             physicsSys.Gravity *= 2.0f;
+            physicsSys.WaterY = configs.WaterHeight;
+            var inputSys = new InputSystem();
+
+            inputSys.WaterY = configs.WaterHeight;
             AddSystems(
                 physicsSys,
-                new InputSystem(),
+                inputSys,
                 new AISystem(),
                 new AnimationSystem(),
  mParticleSys = new ParticleSystem(),
@@ -128,15 +125,16 @@ namespace GameName.Scenes
                                            colorFn    : configs.colorsMap);
 
             physicsSys.Heightmap = heightmap;
+            inputSys.Heightmap = heightmap;
 
-         
+
             base.Init();
 
 
             WaterFactory.Create(configs.WaterHeight, configs.HeightMapScale, configs.HeightMapScale);
 
             SceneUtils.SpawnEnvironment(heightmap, configs.HeightMapScale);
-            
+
             //add network after init
             if (_networkSystem != null)
             {
@@ -170,10 +168,15 @@ namespace GameName.Scenes
             });
 
             AddComponent(player, new CInput());
-            AddComponent(player, new CPlayer());
-
-
             var playery = (heightmap.HeightAt(configs.Playerx, configs.Playerz));
+            var chitid = AddEntity();
+            AddComponent(chitid, new CHit() {PlayerId = player});
+            //AddComponent(chitid, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(configs.Playerx, playery, configs.Playerz) + new CHit().HitBoxOffset}  ) ;
+            //AddComponent(chitid, new CBody() { Aabb = new BoundingBox(new Vector3(-2f, -2f, -2f), new Vector3(2f, 2f, 2f)) });
+            AddComponent(player, new CPlayer() {HitId = chitid});
+
+
+
             var playerTransf = new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(configs.Playerx, playery, configs.Playerz), Scale = new Vector3(0.5f) };
 
             AddComponent(player, playerTransf);
@@ -240,11 +243,11 @@ namespace GameName.Scenes
                 Scale    = Vector3.One
             });
 
-            int heightMap = AddEntity();
+            int heightMapId = AddEntity();
 			var heightMapComp = new CHeightmap() { Image = Game1.Inst.Content.Load<Texture2D>("Textures/" + configs.Map)};
 			var heightTrans = new CTransform() { Position = new Vector3(-590, 0, -590), Rotation = Matrix.Identity, Scale = new Vector3(1, 0.5f, 1) };
-            AddComponent<C3DRenderable>(heightMap, heightMapComp);
-            AddComponent(heightMap, heightTrans);
+            AddComponent<C3DRenderable>(heightMapId, heightMapComp);
+            AddComponent(heightMapId, heightTrans);
             // manually start loading all heightmap components, should be moved/automated
 
             OnEvent("hit", data => {
@@ -256,7 +259,7 @@ namespace GameName.Scenes
                 Func<Vector3> rndVel = () => new Vector3((float)rnd.NextDouble() - 0.5f,
                                                          (float)rnd.NextDouble(),
                                                          (float)rnd.NextDouble() - 0.5f);
-                mParticleSys.SpawnParticles(50, () => new EcsComponent[] {
+                mParticleSys.SpawnParticles(100, () => new EcsComponent[] {
                     new CParticle     { Position = transform.Position,
                                         Velocity = 6.0f*rndVel(),
                                         Life     = 1.7f,
@@ -265,6 +268,7 @@ namespace GameName.Scenes
                     new CTransform    { Position = transform.Position,
                                         Rotation = Matrix.Identity,
                                         Scale    = rndSize()*Vector3.One } });
+                SceneUtils.CreateSplatter(transform.Position.X, transform.Position.Z, heightmap);
                 SfxUtil.PlaySound("Sounds/Effects/Hit");
             });
 
@@ -435,7 +439,7 @@ namespace GameName.Scenes
         }
 
         public void CreatePlatforms(Heightmap heightmap) {
-            for (var i = 0; i < 20; i++) {
+            for (var i = 0; i < 300; i++) {
                 var x1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
                 var z1 = 0.8f*configs.HeightMapScale * ((float)rnd.NextDouble() - 0.5f);
 
@@ -456,7 +460,7 @@ namespace GameName.Scenes
             {
                 mHud.Button("heart"+i, 1050 + i*(50), 12, mHud.Sprite("Textures/Heart", 0.15f));
             }
-         
+
         }
 
         public override void Update(float t, float dt)

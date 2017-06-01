@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Thengill.Components;
 using Microsoft.Xna.Framework;
 using Thengill.Shaders;
+using Thengill.Utils;
 
 namespace Thengill.Systems
 {
@@ -74,7 +75,7 @@ namespace Thengill.Systems
         public void DrawScene(CCamera camera, int excludeEid=-1) {
             // TODO: Clean code below up, hard to read.
 
-            Game1.Inst.GraphicsDevice.Clear(new Color(0.4f, 0.6f, 0.8f));
+            Game1.Inst.GraphicsDevice.Clear(new Color(Game1.Inst.Scene.LightConfig.ClearColor));
 
             Game1.Inst.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
@@ -115,7 +116,8 @@ namespace Thengill.Systems
                 }
 
                 if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(key)) {
-                    CPlayer playerData = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(key);
+                    var cp = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(key);
+                    var playerData = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(cp.HitId);
                     if (playerData.IsAttacking) {
                         bones[1] *= Matrix.CreateTranslation(0.0f, 0.5f, 0f);
                         bones[1] *= Matrix.CreateRotationX(2*(float)Math.Sin(-playerData.AnimationProgress));
@@ -159,6 +161,9 @@ namespace Thengill.Systems
                                 mat.Model  = bones[mesh.ParentBone.Index] * anim * transform.Frame;
                                 mat.View   = camera.View;
                                 mat.Proj   = camera.Projection;
+                                mat.FogStart = Game1.Inst.Scene.LightConfig.FogStart;
+                                mat.FogEnd = Game1.Inst.Scene.LightConfig.FogEnd;
+                                mat.FogColor = Game1.Inst.Scene.LightConfig.ClearColor;
                                 mat.Prerender();
                             }
                             else {
@@ -169,7 +174,8 @@ namespace Thengill.Systems
                                                  transform,
                                                  mesh,
                                                  anim,
-                                                 bones[mesh.ParentBone.Index]);
+                                                 bones[mesh.ParentBone.Index],
+                                                 Game1.Inst.Scene.LightConfig);
                             }
 
                             lastEffect = effect;
@@ -206,6 +212,9 @@ namespace Thengill.Systems
             bbMat.CamPos = camera.Position;
             bbMat.Proj   = camera.Projection;
             bbMat.View   = camera.View;
+            bbMat.FogStart = scene.LightConfig.FogStart;
+            bbMat.FogEnd = scene.LightConfig.FogEnd;
+            bbMat.FogColor = scene.LightConfig.ClearColor;
 
             var camPos = camera.Position;
             var o = camPos - camera.Target;
@@ -268,34 +277,36 @@ namespace Thengill.Systems
                                       CTransform    transform,
                                       ModelMesh     mesh,
                                       Matrix        anim,
-                                      Matrix        boneTransform)
+                                      Matrix        boneTransform,
+                                      LightingConfig config)
         {
+            // TODO: we want the same lighting everywhere so no cheating with this ;) (other shaders dont have this)
             effect.EnableDefaultLighting();
 
             effect.PreferPerPixelLighting = true;
             effect.VertexColorEnabled     = model.enableVertexColor;
             effect.LightingEnabled        = true;
-            effect.AmbientLightColor      = scene.AmbientColor;
+            effect.AmbientLightColor      = config.AmbientColor;
 
             effect.DirectionalLight0.Enabled       = true;
-            effect.DirectionalLight0.Direction     = scene.Direction;
-            effect.DirectionalLight0.DiffuseColor  = scene.DiffuseColor;
-            effect.DirectionalLight0.SpecularColor = scene.SpecularColor * model.specular;
+            effect.DirectionalLight0.Direction     = config.Direction;
+            effect.DirectionalLight0.DiffuseColor  = config.DiffuseColor;
+            effect.DirectionalLight0.SpecularColor = config.SpecularColor * model.specular;
 
             effect.DirectionalLight1.Enabled       = true;
-            effect.DirectionalLight1.DiffuseColor  = scene.DiffuseColor*0.7f;
-            effect.DirectionalLight1.SpecularColor = scene.SpecularColor * model.specular;
+            effect.DirectionalLight1.DiffuseColor  = config.DiffuseColor*0.7f;
+            effect.DirectionalLight1.SpecularColor = config.SpecularColor * model.specular;
 
             effect.DirectionalLight2.Enabled       = true;
-            effect.DirectionalLight2.DiffuseColor  = scene.DiffuseColor*0.5f;
-            effect.DirectionalLight2.SpecularColor = scene.SpecularColor * model.specular;
+            effect.DirectionalLight2.DiffuseColor  = config.DiffuseColor*0.5f;
+            effect.DirectionalLight2.SpecularColor = config.SpecularColor * model.specular;
 
             effect.SpecularPower = 100;
 
-            effect.FogEnabled = true;
-            effect.FogStart   = 35.0f;
-            effect.FogEnd     = 100.0f;
-            effect.FogColor   = new Vector3(0.4f, 0.6f, 0.8f);
+            effect.FogEnabled = config.FogEnabled;
+            effect.FogStart   = config.FogStart;
+            effect.FogEnd     = config.FogEnd;
+            effect.FogColor   = config.ClearColor;
 
             effect.Projection = camera.Projection;
             effect.View       = camera.View;

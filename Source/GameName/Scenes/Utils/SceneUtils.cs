@@ -66,7 +66,7 @@ namespace GameName.Scenes.Utils {
 
         public static Func<float, Matrix> playerAnimation(int player,int wiggleness, float speed)
         {
-            
+
             Func<float, Matrix> playerAnim = (t) => {
                 var transf = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(player);
                 var body = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(player);
@@ -221,14 +221,14 @@ namespace GameName.Scenes.Utils {
 		{
 
             Func<float, float> treeFn = x => 0.2f * (float)Math.Pow(x, 2);
-            Func<float, float> rockFn = x => 0.5f * (float)Math.Pow(x, 1.2);
+            Func<float, float> rockFn = x => 0.3f * (float)Math.Pow(x, 1.2);
             var elementList = new Dictionary<int, Tuple<string, float, float, Func<float, float>>>();
             // Definition for environment spawns: model name, submersion into ground, model scale, random scale function
             elementList.Add(255, new Tuple<string, float, float, Func<float, float>>("LeafTree",    0.5f,   1f,     treeFn));
             elementList.Add(245, new Tuple<string, float, float, Func<float, float>>("PalmTree",    1.0f,   1f,     treeFn));
             elementList.Add(235, new Tuple<string, float, float, Func<float, float>>("tree",        0.5f,   1.2f,   treeFn));
+            elementList.Add(170, new Tuple<string, float, float, Func<float, float>>("rock2",       0.1f,   1.6f,   rockFn));
 			elementList.Add(225, new Tuple<string, float, float, Func<float, float>>("pinetree",    0.5f,   1.2f,   treeFn));
-            elementList.Add(170, new Tuple<string, float, float, Func<float, float>>("rock",        0.1f,   1.4f,   rockFn));
 
 
                         var matDic = new Dictionary<int, MaterialShader>();
@@ -261,25 +261,24 @@ namespace GameName.Scenes.Utils {
                         var element = elementList[(int)heightmap.ColorAt(x, y).B];
 						var wx = (x / heightmap.GetDimensions().X - 0.5f) * worldsize;
 						var wy = (y / heightmap.GetDimensions().Y - 0.5f) * worldsize;
-						//Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-1, -5, -1), new Vector3(1, 5, 1)), InvTransf = Matrix.Identity });
+                        //Game1.Inst.Scene.AddComponent(newElement, new CBox() { Box = new BoundingBox(new Vector3(-1, -5, -1), new Vector3(1, 5, 1)), InvTransf = Matrix.Identity });
+                        Func<float, Matrix> animFn = null;
+                        if (element.Item1.ToLower().Contains("tree")) {
+                            var axis = new Vector3((float)rnd.NextDouble()-0.5f,
+                                                    0.0f,
+                                                    (float)rnd.NextDouble()-0.5f);
+                            axis.Normalize();
 
-                                                Func<float, Matrix> animFn = null;
-                                                if (element.Item1.ToLower().Contains("tree")) {
-                                                    var axis = new Vector3((float)rnd.NextDouble()-0.5f,
-                                                                           0.0f,
-                                                                           (float)rnd.NextDouble()-0.5f);
-                                                    axis.Normalize();
+                            var p0 = MathHelper.Pi*2.0f*(float)rnd.NextDouble();
+                            var w = (float)rnd.NextDouble()*0.1f+1.0f;
 
-                                                    var p0 = MathHelper.Pi*2.0f*(float)rnd.NextDouble();
-                                                    var w = (float)rnd.NextDouble()*0.1f+1.0f;
+                            var m = Matrix.CreateFromAxisAngle(axis, 0.2f-0.4f*(float)rnd.NextDouble());
 
-                                                    var m = Matrix.CreateFromAxisAngle(axis, 0.2f-0.4f*(float)rnd.NextDouble());
-
-                                                    animFn = t => {
-                                                        var theta = 0.03f*(float)Math.Cos(p0+t*w);
-                                                        return m * Matrix.CreateFromAxisAngle(axis, theta);
-                                                    };
-                                                }
+                            animFn = t => {
+                                var theta = 0.03f*(float)Math.Cos(p0+t*w);
+                                return m * Matrix.CreateFromAxisAngle(axis, theta);
+                            };
+                        }
 
 						Game1.Inst.Scene.AddComponent(newElement, new CTransform() {
                             Position = new Vector3(
@@ -369,6 +368,82 @@ namespace GameName.Scenes.Utils {
                     });
                 }
             }
+        }
+
+        public static void CreateSplatter(float x, float z, Heightmap heightmap) {
+            var graphicsDevice = Game1.Inst.GraphicsDevice;
+            var scene = Game1.Inst.Scene;
+            // vertical offset to avoid flickering
+            var yOffset = 0.1f;
+
+            var y = heightmap.HeightAt(x, z);
+
+            var A = new Vector3(-0.5f, 0.0f, -0.5f);
+            var B = new Vector3( 0.5f, 0.0f, -0.5f);
+            var C = new Vector3( 0.5f, 0.0f,  0.5f);
+            var D = new Vector3(-0.5f, 0.0f,  0.5f);
+            A.Y = heightmap.HeightAt(x+A.X, z+A.Z) - y;
+            B.Y = heightmap.HeightAt(x+B.X, z+B.Z) - y;
+            C.Y = heightmap.HeightAt(x+C.X, z+C.Z) - y;
+            D.Y = heightmap.HeightAt(x+D.X, z+D.Z) - y;
+
+            var N = -Vector3.Cross(A - B, A - D);
+            N.Normalize();
+
+            var vertices = new VertexPositionNormalTexture[4];
+            vertices[0] = new VertexPositionNormalTexture(A, N, new Vector2(0, 0));
+            vertices[1] = new VertexPositionNormalTexture(B, N, new Vector2(1, 0));
+            vertices[2] = new VertexPositionNormalTexture(C, N, new Vector2(1, 1));
+            vertices[3] = new VertexPositionNormalTexture(D, N, new Vector2(0, 1));
+
+            var indices = new short[6];
+            indices[0] = 0;
+            indices[1] = 1;
+            indices[2] = 2;
+
+            indices[3] = 0;
+            indices[4] = 2;
+            indices[5] = 3;
+
+            var vertexBuffer = new VertexBuffer(graphicsDevice, VertexPositionNormalTexture.VertexDeclaration, vertices.Length, BufferUsage.None);
+            vertexBuffer.SetData(vertices);
+
+            var indexBuffer = new IndexBuffer(graphicsDevice, typeof(short), indices.Length, BufferUsage.None);
+            indexBuffer.SetData(indices);
+
+            var bEffect = new BasicEffect(graphicsDevice);
+            bEffect.TextureEnabled = true;
+            bEffect.Texture = Game1.Inst.Content.Load<Texture2D>("Textures/splatter");
+
+            var meshes = new List<ModelMesh>();
+            var parts = new List<ModelMeshPart>();
+            var bones = new List<ModelBone>();
+
+            parts.Add(new ModelMeshPart {
+                VertexBuffer = vertexBuffer,
+                NumVertices = vertices.Length,
+                IndexBuffer = indexBuffer,
+                PrimitiveCount = indices.Length / 3
+            });
+            var mesh = new ModelMesh(graphicsDevice, parts);
+            parts[0].Effect = bEffect;
+
+            var bone = new ModelBone {
+                Name = "Splatter",
+                Transform = Matrix.Identity
+            };
+            bone.AddMesh(mesh);
+            mesh.ParentBone = bone;
+
+            bones.Add(bone);
+            meshes.Add(mesh);
+
+            var model = new Model(graphicsDevice, bones, meshes);
+
+            var id = scene.AddEntity();
+
+            scene.AddComponent<C3DRenderable>(id, new CImportedModel { model = model });
+            scene.AddComponent(id, new CTransform { Position = new Vector3(x, y+yOffset, z), Scale = new Vector3((float)rnd.NextDouble()*0.5f+1.5f) });
         }
     }
 }

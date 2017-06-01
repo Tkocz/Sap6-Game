@@ -15,18 +15,19 @@ namespace GameName.Systems {
         public override void Init() {
             Game1.Inst.Scene.OnEvent("attack", data => {
                 HitInfo info = (HitInfo)data;
-                var p = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(info.EntityID);
+                var cplay = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(info.EntityID);
+                var chit = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(cplay.HitId);
 
-                p.IsAttacking = info.IsAttacking;
-                p.StartTime   = info.StartTime;
+                chit.IsAttacking = info.IsAttacking;
+                chit.StartTime   = info.StartTime;
 
             });
             base.Init();
         }
         public override void Update(float t, float dt) {
 
-            foreach (var p in Game1.Inst.Scene.GetComponents<CPlayer>()) {
-                var attackData = (CPlayer)p.Value;
+            foreach (var p in Game1.Inst.Scene.GetComponents<CHit>()) {
+                var attackData = (CHit)p.Value;
                 if (attackData.IsAttacking) {
                     var progress = (t - attackData.StartTime) / attackData.AnimationTime;
                     float radians;
@@ -48,6 +49,12 @@ namespace GameName.Systems {
                         attackData.IsAttacking = false;
                     }
                 }
+                /*
+                var chittransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(p.Key);
+                var cplayertransform = (CTransform) Game1.Inst.Scene.GetComponentFromEntity<CTransform>(attackData.PlayerId);
+                var playerRot = Matrix.CreateRotationY(cplayertransform.Heading) * Matrix.CreateTranslation(cplayertransform.Position);
+                chittransform.Position = playerRot.Translation + attackData.HitBoxOffset;
+                */
             }
 
             base.Update(t, dt);

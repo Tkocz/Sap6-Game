@@ -20,19 +20,22 @@ namespace GameName.Systems {
         private Matrix addRot;
         private float yaw = 0, pitch = 0, roll = 0;
         private bool isInAir = false;
+        private bool isOnGround = false; // whether the player is on ground (the heightmap, not box)
         private KeyboardState prevState = new KeyboardState();
         private List<int> playersInt = new List<int>();
+
+        public float WaterY { get; set; }
+        public Heightmap Heightmap { get; set; }
+
         public InputSystem() { }
 
         public override void Init()
         {
-            //todo collisionwithground is raised all the time
-            //not the best soultion displays another animtion when jumping for both players if network
-            Game1.Inst.Scene.OnEvent("collisionwithground", data => {
+            Game1.Inst.Scene.OnEvent("collision", data => {
                 if (playersInt.Count == 0)
                 {
                     foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>().Keys)
-                    { 
+                    {
                         playersInt.Add(player);
                     }
                 }
@@ -43,6 +46,32 @@ namespace GameName.Systems {
                         if (Game1.Inst.Scene.EntityHasComponent<CInput>(entity))
                         {
                             isInAir = false;
+                            isOnGround = false;
+                        }
+                        var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(entity);
+                        model.animFn = SceneUtils.playerAnimation(entity, 24, 0.1f);
+                    }
+                }
+            });
+
+            //todo collisionwithground is raised all the time
+            //not the best soultion displays another animtion when jumping for both players if network
+            Game1.Inst.Scene.OnEvent("collisionwithground", data => {
+                if (playersInt.Count == 0)
+                {
+                    foreach (var player in Game1.Inst.Scene.GetComponents<CPlayer>().Keys)
+                    {
+                        playersInt.Add(player);
+                    }
+                }
+                var entity = ((PhysicsSystem.CollisionInfo)data).Entity1;
+                if (playersInt.Contains(entity))
+                {
+                    if (isInAir) {
+                        if (Game1.Inst.Scene.EntityHasComponent<CInput>(entity))
+                        {
+                            isInAir = false;
+                            isOnGround = true;
                         }
                         var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(entity);
                         model.animFn = SceneUtils.playerAnimation(entity, 24, 0.1f);
@@ -113,10 +142,61 @@ namespace GameName.Systems {
 
                 Vector3 acceleration = Vector3.Zero;
 
-                if (currentState.IsKeyDown(inputValue.ForwardMovementKey))
-                    acceleration += movementSpeed * transform.Frame.Forward;
-                if (currentState.IsKeyDown(inputValue.BackwardMovementKey))
-                    acceleration += movementSpeed * transform.Frame.Backward;
+                if (currentState.IsKeyDown(inputValue.ForwardMovementKey)) {
+                    var w = transform.Frame.Forward;
+
+                    if (!isInAir && isOnGround) {
+                        var tx = transform.Position.X;
+                        var tz = transform.Position.Z;
+
+                        var fv1 = w;
+                        fv1.Normalize();
+
+                        var fv2 = fv1;
+                        fv2 *= 0.05f;
+
+                        // Compute height delta.
+                        var y1 = Heightmap.HeightAt(tx, tz);
+                        var y2 = Heightmap.HeightAt(tx+fv2.X, tz+fv2.Z);
+                        fv2.Y = (float)Math.Max(0.0f, y2 - y1);
+
+                        fv2.Normalize();
+
+                        var maxAngle = (float)Math.Cos(MathHelper.ToRadians(70.0f));
+                        var fac = (float)Math.Max(0.0f, Vector3.Dot(fv1, fv2) - maxAngle);
+                        movementSpeed *= fac;
+                    }
+
+                    acceleration += movementSpeed * w;
+                }
+
+                if (currentState.IsKeyDown(inputValue.BackwardMovementKey)) {
+                    var w = transform.Frame.Backward;
+
+                    if (!isInAir && isOnGround) {
+                        var tx = transform.Position.X;
+                        var tz = transform.Position.Z;
+
+                        var fv1 = w;
+                        fv1.Normalize();
+
+                        var fv2 = fv1;
+                        fv2 *= 0.05f;
+
+                        // Compute height delta.
+                        var y1 = Heightmap.HeightAt(tx, tz);
+                        var y2 = Heightmap.HeightAt(tx+fv2.X, tz+fv2.Z);
+                        fv2.Y = (float)Math.Max(0.0f, y2 - y1);
+
+                        fv2.Normalize();
+
+                        var maxAngle = (float)Math.Cos(MathHelper.ToRadians(70.0f));
+                        var fac = (float)Math.Max(0.0f, Vector3.Dot(fv1, fv2) - maxAngle);
+                        movementSpeed *= fac;
+                    }
+
+                    acceleration += movementSpeed * w;
+                }
 
 
                 acceleration.Y = 0.0f;
@@ -136,10 +216,11 @@ namespace GameName.Systems {
                 }
                 if (currentState.IsKeyDown(inputValue.RightMovementKey)) {
                     yaw = -rotationSpeed;
-                }                
+                }
                 if (currentState.IsKeyDown(Keys.RightShift) && !prevState.IsKeyDown(Keys.RightShift)) {
                     if (Game1.Inst.Scene.EntityHasComponent<CPlayer>(input.Key)) {
-                        var p = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
+                        var cp = (CPlayer)Game1.Inst.Scene.GetComponentFromEntity<CPlayer>(input.Key);
+                        var p = (CHit)Game1.Inst.Scene.GetComponentFromEntity<CHit>(cp.HitId);
                         if (!p.IsAttacking) {
                             Game1.Inst.Scene.Raise("attack", new HitSystem.HitInfo {
                                 EntityID = input.Key,
@@ -149,14 +230,17 @@ namespace GameName.Systems {
                         }
                     }
                 }
-                
+
                 if (currentState.IsKeyDown(Keys.Space) && !prevState.IsKeyDown(Keys.Space) && !isInAir) {
                     body.Velocity.Y += 11f;
-                    isInAir = true;
+
+                    if (transform.Position.Y  > WaterY) {
+                        isInAir = true;
+                    }
 					SfxUtil.PlaySound("Sounds/Effects/Jump", vol:1);
 					var model = (CImportedModel)Game1.Inst.Scene.GetComponentFromEntity<C3DRenderable>(input.Key);
 					model.animFn = SceneUtils.playerAnimation(input.Key, 12, 0.01f);
-					
+
                 }
                 if (currentState.IsKeyDown(Keys.LeftShift) && !prevState.IsKeyDown(Keys.LeftShift))
                 {

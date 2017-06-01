@@ -51,6 +51,7 @@
     <Compile Include="Components\CBox.cs" />
     <Compile Include="Components\CFlock.cs" />
     <Compile Include="Components\CHealth.cs" />
+    <Compile Include="Components\CHit.cs" />
     <Compile Include="Components\CInput.cs" />
     <Compile Include="Components\CInventory.cs" />
     <Compile Include="Components\CInventoryItem.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Systems\Rendering2DSystem.cs" />
     <Compile Include="Systems\RenderingSystem.cs" />
     <Compile Include="Core\VertexPositionNormalColor.cs" />
+    <Compile Include="Utils\LightingConfig.cs" />
     <Compile Include="Utils\WaterFactory.cs" />
     <Compile Include="Utils\AtomicUtil.cs" />
     <Compile Include="Utils\DebugUtil.cs" />

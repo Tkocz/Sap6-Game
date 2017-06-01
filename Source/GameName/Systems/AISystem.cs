@@ -62,6 +62,7 @@ namespace GameName.Systems
                             closestEnemyId = player.Key;
                         }
                     }
+                    if(closestEnemyId==-1)return;
                     var enemyBody = (CBody)Game1.Inst.Scene.GetComponentFromEntity<CBody>(closestEnemyId);
 
                     // Save fuzzy values instead of recalculating on every rule

@@ -23,11 +23,6 @@ namespace Thengill {
         public int NumEntities {
             get { return m_Entities.Count; }
         }
-        /// <summary>Represents a game scenes directed lightsource.</summary>
-        public Vector3 DiffuseColor;
-        public Vector3 Direction;
-        public Vector3 SpecularColor;
-        public Vector3 AmbientColor = new Vector3(0.2f);
 
         /*--------------------------------------
          * NESTED TYPES
@@ -77,6 +72,7 @@ namespace Thengill {
         private int EntityCounter = -1;
         //wanted a more unique id... couldnt use standard random class in C# ...when started two instances of the game... same tick equals same id.. ;) probaly change!
         private CryptoRandom rnd = new CryptoRandom();
+        public LightingConfig LightConfig;
 
         /*--------------------------------------
 * PUBLIC METHODS
@@ -123,6 +119,8 @@ namespace Thengill {
                          "entity.m_Scene is not null!");*/
 
             EntityCounter = rnd.Next(0, int.MaxValue);
+            while (m_Entities.Contains(EntityCounter))
+                EntityCounter = rnd.Next(0, int.MaxValue);
             m_Entities.Add(EntityCounter);
             return EntityCounter;
         }
@@ -231,6 +229,9 @@ namespace Thengill {
         Components.Add(typeof(CPickUp), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CHealth), new Dictionary<int, EcsComponent>());
         Components.Add(typeof(CScore), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CPlayer), new Dictionary<int, EcsComponent>());
+        Components.Add(typeof(CHit), new Dictionary<int, EcsComponent>());
+        
 
 #if DEBUG
             AddSystem(new Systems.FpsCounterSystem(updatesPerSec: 10));
