@@ -174,7 +174,7 @@ namespace GameName.Scenes
             var chitid = AddEntity();
             AddComponent(chitid, new CHit() {PlayerId = player});
             AddComponent(chitid, new CTransform() { Heading = MathHelper.PiOver2, Position = new Vector3(configs.Playerx, playery, configs.Playerz) + new CHit().HitBoxOffset}  ) ;
-            AddComponent(chitid, new CBody() { Aabb = new BoundingBox(new Vector3(-2f, -2f, -2f), new Vector3(2f, 2f, 2f)) });
+            AddComponent(chitid, new CBody() { Aabb = new BoundingBox(new Vector3(-0.4f, -1.3f, -0.4f), new Vector3(0.4f, 0.9f, 0.4f)) });
             AddComponent(player, new CPlayer() {HitId = chitid});
 
 

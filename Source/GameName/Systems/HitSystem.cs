@@ -52,8 +52,8 @@ namespace GameName.Systems {
                 
                 var chittransform = (CTransform)Game1.Inst.Scene.GetComponentFromEntity<CTransform>(p.Key);
                 var cplayertransform = (CTransform) Game1.Inst.Scene.GetComponentFromEntity<CTransform>(attackData.PlayerId);
-                var playerRot = Matrix.CreateRotationY(cplayertransform.Heading) * Matrix.CreateTranslation(cplayertransform.Position);
-                chittransform.Position = playerRot.Translation + attackData.HitBoxOffset;
+                
+                chittransform.Position = cplayertransform.Position + Vector3.Transform(attackData.HitBoxOffset, Matrix.CreateRotationY(cplayertransform.Heading - MathHelper.PiOver2));
                
             }
 

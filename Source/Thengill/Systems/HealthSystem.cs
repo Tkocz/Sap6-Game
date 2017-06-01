@@ -128,7 +128,7 @@ namespace Thengill.Systems {
 
             CHealth receiver = null;
             int dealer = 0;
-            if(true)
+            if(chit.IsAttacking && chit.AnimationProgress > 0.7)
             {
                 receiver = h1;
                 dealer = chit.PlayerId;
