@@ -103,11 +103,9 @@ namespace GameName.Scenes.Utils {
                 double animal = rnd.NextDouble();
                 string flockAnimal = animal > 0.66 ? "flossy" : animal > 0.33 ? "goose" : "hen";
 
-                // TODO: get the global value of the worldsize
-                int flockX = (int)(rnd.NextDouble() * worldsize);
-                int flockZ = (int)(rnd.NextDouble() * worldsize);
+                int flockX = (int)(rnd.NextDouble() * worldsize*2 - worldsize);
+                int flockZ = (int)(rnd.NextDouble() * worldsize*2 - worldsize);
                 CTransform flockTransform = new CTransform { Position = new Vector3(flockX, 0, flockZ) };
-                flockTransform.Position += new Vector3(-worldsize, 0, -worldsize);
 
                 for (int i = 0; i < membersPerFlock; i++) {
                     int id = currentScene.AddEntity();
