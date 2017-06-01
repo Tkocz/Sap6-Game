@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Thengill.Systems.PhysicsSystem;
+using Thengill.Utils;
 
 namespace Thengill.Systems {
     public class HealthSystem : EcsSystem {
@@ -84,6 +85,11 @@ namespace Thengill.Systems {
             if (!key.HasValue)
                 return;
             // dead
+            if (Game1.Inst.Scene.EntityHasComponent<CHealth>(key.Value)) {
+                var health = (CHealth)Game1.Inst.Scene.GetComponentFromEntity<CHealth>(key.Value);
+                if (health.DeathSound != null)
+                   SfxUtil.PlaySound(health.DeathSound, randomPitch: true);
+            }
             if (Game1.Inst.Scene.EntityHasComponent<CAI>(key.Value)) {
                 var aiComp = (CAI)Game1.Inst.Scene.GetComponentFromEntity<CAI>(key.Value);
                 var flock = (CFlock)Game1.Inst.Scene.GetComponentFromEntity<CFlock>(aiComp.Flock);
