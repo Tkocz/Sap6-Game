@@ -444,11 +444,11 @@ namespace GameName.Scenes
 
             mHud.Button("timelefttop", screenWidth / 2 - (int)lengthtop.X / 2, 10, mHud.Text(() => {
                 return string.Format("Time Left:");
-            }, Color.Black));
+            }, Color.White));
             mHud.Button("timeleftbottom", screenWidth / 2 - (int)lengthbottom.X / 2, 12 + (int)lengthtop.Y, mHud.Text(() => {
                 
                 return string.Format("{0:000}", (int)(roundTime - passedTime));
-            }, Color.Black));
+            }, Color.White));
             mHud.Button("score", screenWidth-60, 80, mHud.Text(() =>
             {
                 return string.Format("Score: {0}", score.Score);
