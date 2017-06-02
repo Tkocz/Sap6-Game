@@ -33,7 +33,7 @@ namespace GameName.Scenes
             string textGameOver = won ? "You win" : "You lose";
             textGameOver = string.Format("Game Over, {0}", textGameOver);
             string textNumKilled = string.Format("\nNumber of animals killed: {0}", score);
-            SpriteFont font = Game1.Inst.Content.Load<SpriteFont>("Fonts/DroidSans");
+            SpriteFont font = Game1.Inst.Content.Load<SpriteFont>("Fonts/FFFForward");
             AddComponent<C2DRenderable>(textGameOverId, new CText()
             {
                 
