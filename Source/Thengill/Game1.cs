@@ -77,8 +77,9 @@ public class Game1: Game {
         Graphics = new GraphicsDeviceManager(this);
         Graphics.PreparingDeviceSettings += (sender, e) => {
             e.GraphicsDeviceInformation.GraphicsProfile = GraphicsProfile.HiDef;
+            //e.GraphicsDeviceInformation.PresentationParameters.IsFullScreen = true;
         };
-
+        Graphics.ApplyChanges();
 #if DEBUG
         IsMouseVisible = true;
 #endif
@@ -132,11 +133,12 @@ public class Game1: Game {
     /// <summary>Initializes the game.</summary>
     protected override void Initialize() {
         base.Initialize();
-
-        Graphics.PreferredBackBufferWidth = 1280;
-        Graphics.PreferredBackBufferHeight = 720;
+            
+        Graphics.PreferredBackBufferWidth = 1920;
+        Graphics.PreferredBackBufferHeight = 1080;
+        
         Graphics.ApplyChanges();
-
+        Graphics.ToggleFullScreen();
         var profile = Graphics.GraphicsDevice.GraphicsProfile;
         var width   = Graphics.PreferredBackBufferWidth;
         var height  = Graphics.PreferredBackBufferHeight;
